@@ -1,0 +1,173 @@
+let data1 = {
+  "name": "World",
+  "title": "Famous People",
+  "people" : [
+    { "name": "Larry", "age": 50, "brothers": [] },
+    { "name": "Curly", "age": 45, "brothers": ["Moe", "Shemp"]},
+    { "name": "Moe", "age": 58, "brothers": ["Curly", "Shemp"]}
+  ]
+}
+
+def relational(test)
+  10 * 99 > 900 | test.ok
+  100 / 5 >= 30 | test.equal(?, false)
+  99 mod 6 >= 3 | test.ok
+  33 * 3 mod 6 <= 2 | test.equal(?, false)
+  data1.people[0].age * 2 > 99 | test.ok
+  data1.people[0].age / 2 < 24 | test.equal(?, false)
+  100 / data1.people[0].age >= 2 | test.ok
+  3 * data1.people[0].age <= 149 | test.equal(?, false)
+  test.done()
+end
+
+def equality(test)
+  10 * 99 = 990 | test.ok
+  100 / 5 != 19 | test.ok
+  99 mod 6 = 3 | test.ok
+  33 * 3 mod 6 != 2 | test.ok
+  data1.people[0].age * 2 = 99 | test.equal(?, false)
+  data1.people[0].age / 2 != 25 | test.equal(?, false)
+  100 / data1.people[0].age = 2 | test.ok
+  3 * data1.people[0].age != 149 | test.ok
+  test.done()
+end
+
+let data2 = {
+  numbers: [1,10,30],
+  names: ['bill', 'ted'],
+  person: {age:43, name:'Thom'},
+  stringValue: "a name value"
+}
+
+def evaluation(test)
+  10 in [1,10,30] | test.ok
+  10 in data2.numbers | test.ok
+  'name' in {age:43, name:'Thom'} | test.ok
+  'name' in data2.person | test.ok
+  'name' in 'a name value' | test.equal(?, false)
+  'name' in data2.stringValue | test.equal(?, false)
+  'fred' in ['bill', 'ted'] | test.equal(?, false)
+  'fred' in data2.names | test.equal(?, false)
+  'nothing' in {age:43, name:'Thom'} | test.equal(?, false)
+  'nothing' in data2.person | test.equal(?, false)
+  test.done()
+end
+
+let data3 = {
+  numbers: [1,10,30],
+  names: ['bill', 'ted'],
+  person: {age:43, name:'Thom'}
+}
+
+def notIn(test)
+  10 not in [1,10,30] | test.equal(?, false)
+  10 not in data3.numbers | test.equal(?, false)
+  'name' not in {age:43, name:'Thom'} | test.equal(?, false)
+  'name' not in data3.person | test.equal(?, false)
+  'name' not in 'a name value' | test.ok
+  'name' not in data3.stringValue | test.ok
+  'fred' not in ['bill', 'ted'] | test.ok
+  'fred' not in data3.names | test.ok
+  'nothing' not in {age:43, name:'Thom'} | test.ok
+  'nothing' not in data3.person | test.ok
+  test.done()
+end
+
+def bool(test)
+  true and false | test.equal(?, false)
+  true or false | test.ok
+  data1.people[0].age * 2 = 100 and 'yep' | test.equal(?, "yep")
+  data1.people[0].age * 2 = 99 or 'nope' | test.equal(?, "nope")
+  'yep' and data1.people[0].age * 2 | test.equal(?, 100)
+  'yep' or data1.people[0].age * 2 | test.equal(?, "yep")
+  false or data1.people[0].age * 2 | test.equal(?, 100)
+  not true and not false | test.equal(?, false)
+  not(true or false) | test.equal(?, false)
+  not true or not false | test.ok
+  not(true and false) | test.ok
+  test.done()
+end
+
+def unary(test)
+  -1 | test.equal(?, -1)
+  not false | test.ok
+  not true | test.equal(?, false)
+  not (----10 - 10) | test.ok
+  -data1.people[0].age | test.equal(?, -50)
+  -data1.people[0].age + 10 | test.equal(?, -40)
+  not (data1.people[0].age = 25) | test.ok
+  test.done()
+end
+
+def nilEvaluation(test)
+  true = nil | test.equal(?, false)
+  nil != nil | test.equal(?, false)
+  nil = nil | test.ok
+  bogusValue != nil | test.equal(?, false)
+  bogusValue = nil | test.ok
+  test.done()
+end
+
+def conditional(test)
+  let script = (data) -> 'cond1' if data.cond1 else
+                         'cond2' if data.cond2 else
+                         'cond4' unless data.cond3 else
+                         'cond3'
+
+  {cond1: true} | script | test.equal(?, "cond1")
+  {cond2: true} | script | test.equal(?, "cond2")
+  {cond3: true} | script | test.equal(?, "cond3")
+  {} | script | test.equal(?, "cond4")
+  test.done()
+end
+
+def objectLike(test)
+  let person = {
+    name: "Thom",
+    age: 42,
+    title: "Developer"
+  }
+
+  person like { name: "Thom", age: 42 } | test.ok
+  test.done()
+end
+
+def vectorLike(test)
+  [1, 2, 3] like [1, 2] | test.ok
+  [1, 2, 3] like [1, 2, 3] | test.ok
+  [1, 2] like [1, 2, 3] | test.equal(?, false)
+  [] like [] | test.ok
+  test.done()
+end
+
+def deepPaths(test)
+  let root = [{
+    colors: ['red', 'green', 'blue'],
+    info: {
+      description: "this is a description"
+    }
+  }]
+
+  root[0].colors[1] | test.equal(?, "green")
+  root[0].info.description | test.equal(?, "this is a description")
+  root[0].info['description'] | test.equal(?, "this is a description")
+  root[0].info.notThere | test.equal(?, undefined)
+  () -> root[1].info['description'] | test.throws
+  test.done()
+end
+
+def assignments(test)
+  let a = 99
+  test.equal(a, 99)
+
+  let a = 99, b = 1000
+  test.equal(a + b, 1099)
+
+  let a = 100, b = a + 20, c = b * 2
+  test.equal(c, 240)
+
+  test.done()
+end
+
+export relational, equality, evaluation, notIn, bool, unary, nilEvaluation,
+       conditional, objectLike, vectorLike, deepPaths, assignments

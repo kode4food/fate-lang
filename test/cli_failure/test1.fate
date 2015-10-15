@@ -1,0 +1,6 @@
+# Simple test for failed parse
+
+for person at people,
+    sibling in person.siblings
+  person.name, sibling.name] | "% is the sibling of %"
+end

@@ -1,0 +1,7 @@
+# File Resolver's Import should attempt to load a file.int before venturing
+# into directories.  Therefore this module should only be exposed by a
+# File Resolver if explicitly requested
+
+let test_value = "wrong!"
+
+export test_value

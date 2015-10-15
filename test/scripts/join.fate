@@ -1,0 +1,27 @@
+def patternTest(test)
+  test.expect(10)
+  
+  when a(x, y) & b(g, h)
+    x.type = 'Not' | test.ok
+    x.value = 'another' | test.ok
+    y = 'goodbye' | test.ok
+    g = 'you' | test.ok
+    h = 40 | test.ok
+    test.done()
+  end
+
+  when a({ type: 'Test' } as x, y) & b(g, ? > 50 as h)
+    x.type = 'Test' | test.ok
+    x.value = 'aValue' | test.ok
+    y = 'hello' | test.ok
+    g = 'there' | test.ok
+    h = 99 | test.ok
+  end
+
+  setTimeout( () -> b('there', 99), 50 )
+  setTimeout( () -> a({ type: 'Test', value: 'aValue'}, 'hello'), 100 )
+  setTimeout( () -> b('you', 40), 150 )
+  setTimeout( () -> a({ type: 'Not', value: 'another' }, 'goodbye'), 200 )
+end
+
+export patternTest

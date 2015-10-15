@@ -1,0 +1,9 @@
+# Simple test for warning parse
+
+def query(name, age) where age > 25
+  "They are older than 25"
+end
+
+def query(name, age)
+  "This will shadow the previous, and generate a warning"
+end

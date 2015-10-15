@@ -1,0 +1,43 @@
+{
+  "name": "Fate-Lang",
+  "private": true,
+  "description": "Patterns and Guards and Joins, Oh My!",
+  "author": "Thomas S. Bradford",
+  "version": "0.1.0",
+  "license": "MIT",
+  "homepage": "http://www.49er.io/fate/",
+  "main": "build/fate.js",
+  "keywords": [],
+  "contributors": [
+    {
+      "name": "Thom Bradford",
+      "email": "thom@kode4food.it"
+    }
+  ],
+  "repository": "git@bitbucket.org:kode4food/fate-lang.git",
+  "bin": {
+    "fatec": "lib/cli.js"
+  },
+  "scripts": {
+    "build": "gulp",
+    "test": "gulp test"
+  },
+  "dependencies": {
+    "glob": "^5.0.14",
+    "mkdirp": "^0.5.1",
+    "welsh": "^3.4.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-istanbul": "^0.10.0",
+    "gulp-istanbul-enforcer": "^1.0.3",
+    "gulp-nodeunit": "0.0.5",
+    "gulp-peg": "^0.1.2",
+    "gulp-rename": "^1.2.2",
+    "gulp-typescript": "^2.8.2",
+    "nodeunit": "^0.9.1"
+  },
+  "engines": {
+    "node": "*"
+  }
+}

@@ -1,0 +1,5 @@
+# Simple test for successful parse
+
+for person in people, sibling in person.siblings
+  emit([person.name, sibling.name] | "% is the sibling of %")
+end

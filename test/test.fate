@@ -1,0 +1,57 @@
+# A Test Script
+
+def renderList(people)
+  # will be shadowed
+end
+
+def renderList(people)
+  # otherwise will fall through to this
+  emit(people | "There are %length stooges")
+  for person in people, brother in person.brothers
+    emit(renderItem(person.name, brother))
+  end
+end
+
+def renderList(people)
+where not people
+  # will be called if people is not defined or is empty
+  emit("There are no people!")
+end
+
+def renderItem(name, brother)
+  emit("%brother is the brother of %name")
+end
+
+def renderTest(name)
+  { name } | "Hello %name"
+end
+
+export renderTest as renderTest
+
+def nameAndAge(name, age)
+  { name, age } | "%name is %age"
+end
+
+def nameAndAge("fate" as name, age)
+  { name, age } | "Fate is %age!"
+end
+
+let theName = { name: 'Fate', age: 1 }.name
+
+def differentSignatures(name, age)
+  { name, age } | "%name is %age"
+end
+
+def differentSignatures(height, weight) where weight > 180
+  { height, weight } | "%height and %weight"
+end
+
+def mergedGuards(name, age) where name = 'thom'
+  "Hello, Thom!"
+end
+
+def mergedGuards(name, age) where age > 43
+  "Hello, old guy!"
+end
+
+return "There are no people!"

@@ -1,0 +1,3 @@
+let internal_test_value = "right!"
+
+export internal_test_value as test_value
