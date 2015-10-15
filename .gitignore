@@ -11,6 +11,8 @@ coverage
 report
 
 .idea
+.settings
+.vscode
 *.iml
 *~
 
