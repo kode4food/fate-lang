@@ -1,7 +1,7 @@
 {
   "name": "Fate-Lang",
   "private": true,
-  "description": "Patterns and Guards and Joins, Oh My!",
+  "description": "Patterns & Guards & Joins, Oh My!",
   "author": "Thomas S. Bradford",
   "version": "0.1.0",
   "license": "MIT",
