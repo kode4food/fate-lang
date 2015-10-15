@@ -1,3 +1,5 @@
+from math import random
+
 def patternTest(test)
   test.expect(10)
   
@@ -7,7 +9,6 @@ def patternTest(test)
     y = 'goodbye' | test.ok
     g = 'you' | test.ok
     h = 40 | test.ok
-    test.done()
   end
 
   when a({ type: 'Test' } as x, y) & b(g, ? > 50 as h)
@@ -18,10 +19,11 @@ def patternTest(test)
     h = 99 | test.ok
   end
 
-  setTimeout( () -> b('there', 99), 50 )
-  setTimeout( () -> a({ type: 'Test', value: 'aValue'}, 'hello'), 100 )
-  setTimeout( () -> b('you', 40), 150 )
-  setTimeout( () -> a({ type: 'Not', value: 'another' }, 'goodbye'), 200 )
+  setTimeout( () -> b('there', 99), random() * 100 )
+  setTimeout( () -> a({ type: 'Not', value: 'another' }, 'goodbye'),  random() * 100 )
+  setTimeout( () -> b('you', 40),  random() * 100 )
+  setTimeout( () -> a({ type: 'Test', value: 'aValue'}, 'hello'),  random() * 100 )
+  setTimeout( () -> test.done(), 150)
 end
 
 export patternTest
