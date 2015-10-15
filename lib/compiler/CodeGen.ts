@@ -203,7 +203,7 @@ namespace Fate.Compiler.CodeGen {
 
       var joinName = generate.createAnonymous();
       generate.assignment(joinName, function() {
-        var joinArgs = [];
+        var joinArgs: any[] = [];
         joinArgs.push(function() {
           generate.func({
             contextArgs: allParamNames,
