@@ -1,4 +1,4 @@
-# Fate (Patterns and Guards and Joins, Oh My!)
+# Fate (Patterns & Guards & Joins, Oh My!)
 
 Fate is a language prototype.  It currently compiles into Node.js modules, but the goal is to eventually have it produce JVM code.  It is a mostly functional language, implementing part of the [Join Calculus](https://en.wikipedia.org/wiki/Join-calculus) as well as providing first-class patterns and invocation guards.
 
