@@ -128,7 +128,7 @@ function createFileImportTests(compile, monitor) {
       // command-line build the files
       commandLine(["-in", "./test"], createConsole(), function (exitCode) {
         helpers.monkeyPatchRequires('./test', {
-          'fate': '../build/fate'
+          'fatejs': '../build/fate'
         });
         callback();
       });

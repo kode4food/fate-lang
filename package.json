@@ -1,11 +1,10 @@
 {
-  "name": "Fate-Lang",
-  "private": true,
+  "name": "fatejs",
   "description": "Patterns & Guards & Joins, Oh My!",
   "author": "Thomas S. Bradford",
   "version": "0.1.0",
   "license": "MIT",
-  "homepage": "http://www.49er.io/fate/",
+  "homepage": "http://www.github.com/Forty-Niner/fate-lang",
   "main": "build/fate.js",
   "keywords": [],
   "contributors": [
@@ -14,7 +13,7 @@
       "email": "thom@kode4food.it"
     }
   ],
-  "repository": "git@bitbucket.org:kode4food/fate-lang.git",
+  "repository": "git@github.com/Forty-Niner/fate-lang.git",
   "bin": {
     "fatec": "lib/cli.js"
   },

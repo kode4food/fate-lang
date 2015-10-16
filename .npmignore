@@ -1,4 +1,4 @@
-*.jq.js
+*.fate.js
 
 pids
 logs
@@ -10,6 +10,7 @@ coverage
 report
 
 .idea
+.vscode
 *.iml
 *~
 

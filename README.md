@@ -56,6 +56,41 @@ end
 
 Done!  The problem of vehicle emissions testing is now solved!
 
+## How to Install and Use
+Until the first stable release happens, you're really pressing your luck to use this thing in production.  But if you're insane, you can install the compiler globally like so:
+
+```bash
+npm -g install fatejs
+```
+
+This will link the command line compiler (fatec) into your PATH, allowing you to convert Fate scripts into node.js modules.  Those modules can then be required like any other node module, but the `fatejs` module must be available to node.
+
+You can also compile scripts on the fly by requiring the fatejs module, and calling its compile function, like so:
+
+```javascript
+// require the Fate module
+var fate = require('fatejs');
+
+// compile a script that returns a lambda
+var script = fate.compile('(x) -> x * 100');
+
+// execute the compiled script, 
+// will return the lambda instance
+var resultingLambda = script();
+
+// spit out the result of the lambda!
+console.log(resultingLambda(4));
+```
+
+Or, if you're lazy:
+
+```javascript
+// require the Fate module
+var fate = require('fatejs');
+var resultingLambda = fate.evaluate('(x) -> x * 100');
+console.log(resultingLambda(4));
+```
+
 ## Current Status
 The prototype functions, but not much more.  There's quite a bit left to do in the areas of validation, optimization, and runtime library support.  See the [TODO](doc/TODO.md) document to get an idea.
 

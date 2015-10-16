@@ -27,7 +27,7 @@ exports.cli = nodeunit.testCase({
       test.ok(!cons.contains("Failures"));
 
       helpers.monkeyPatchRequires('./test', {
-        'fate': '../../build/fate'
+        'fatejs': '../../build/fate'
       });
 
       var compiled = require('./cli_success/test1.fate.js');
