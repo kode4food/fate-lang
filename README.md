@@ -57,7 +57,7 @@ end
 Done!  The problem of vehicle emissions testing is now solved!
 
 ## Current Status
-The prototype functions, but not much more.  There's quite a bit left to do in the areas of validation, optimization, and runtime library support.  See the [TODO](docs/TODO.md) document to get an idea.
+The prototype functions, but not much more.  There's quite a bit left to do in the areas of validation, optimization, and runtime library support.  See the [TODO](doc/TODO.md) document to get an idea.
 
 ## License (MIT License)
 Copyright (c) 2015 Thomas S. Bradford
