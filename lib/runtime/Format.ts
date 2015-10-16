@@ -7,7 +7,7 @@ namespace Fate.Runtime {
   var Ident = "[$_a-zA-Z][$_a-zA-Z0-9]*";
   var Term = ";?";
   var Params = "%((%)|(" + Digits + ")|(" + Ident + "))?" + Term;
-  /* "%" ( "%" | digits | identifier )? ";"? */
+               /* "%" ( "%" | digits | identifier )? ";"? */
 
   var ParamRegex = new RegExp(Params, "m");
 

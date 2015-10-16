@@ -7,9 +7,10 @@ namespace Fate.Runtime {
   // Register the default resolvers
   var systemResolver = Resolvers.createSystemResolver();
   var memoryResolver = Resolvers.createMemoryResolver();
+  var _resolvers: Resolvers.Resolver[] = [systemResolver, memoryResolver];
+
   export var registerModule = memoryResolver.registerModule;
   export var unregisterModule = memoryResolver.unregisterModule;
-  var _resolvers: Resolvers.Resolver[] = [systemResolver, memoryResolver];
 
   export function resolveExports(moduleName: string) {
     for ( var i = _resolvers.length - 1; i >= 0; i-- ) {

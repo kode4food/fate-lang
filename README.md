@@ -15,7 +15,7 @@ def calculateVehicleEmissions(car)
 end
 ```
 
-But that's a lot of `if` statements.  Yes, one is too many.  It also packs calculations for two different potential states into a single function, which will become more difficult to isolate if you should need to hide the second calculation from government auditors.  You can break the function up and use a guard on its re-opened version.
+But that's a lot of `if` statements.  Yes, one is too many.  It also packs calculations for two different potential states into a single function, which will become more difficult to isolate if you should need to hide the second calculation from government auditors.  To correct this, you can break the function up and use a guard on its re-opened version.
 
 ```ruby
 def calculateVehicleEmissions(car)
@@ -27,7 +27,7 @@ def calculateVehicleEmissions(car) where car.wheelsInMotion <= 2
 end
 ```
 
-That's better!  Now if the EPA come to your place of business, you can delete the second function and they'll be none the wiser!  But that `where` clause is practically like another `if` statement, and we've already established that we don't like those.  Let's use an in-line pattern instead:
+That's better!  Now if the EPA come to your place of business, you can simply delete the second function and they'll be none the wiser!  But that `where` clause is practically like another `if` statement, and we've already established that we don't like those.  So let's use an in-line pattern instead:
 
 ```ruby
 def calculateVehicleEmissions(car)
@@ -53,6 +53,11 @@ def calculateVehicleEmissions(VehicleUnderTest as car) {
   car.emissions / 40
 end
 ```
+
+Done!  The problem of vehicle emissions testing is now solved!
+
+## Current Status
+The prototype functions, but not much more.  There's quite a bit left to do in the areas of validation, optimization, and runtime library support.  See the [TODO](docs/TODO.md) document to get an idea.
 
 ## License (MIT License)
 Copyright (c) 2015 Thomas S. Bradford

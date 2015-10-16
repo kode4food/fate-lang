@@ -8,7 +8,8 @@ namespace Fate {
   import compileModule = Compiler.compileModule;
   import generateFunction = Compiler.generateFunction;
 
-  export var VERSION = "1.0.0";
+  var pkg = require('../package.json');
+  export var VERSION = pkg.version;
 
   export var global = {
     console: console,

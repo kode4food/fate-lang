@@ -3,8 +3,9 @@
 "use strict";
 
 namespace Fate.Runtime {
-  function noOp() {}
   var slice = Array.prototype.slice;
+
+  function noOp() {}
 
   type ArgTemplate = { [index: number]: any };
 
