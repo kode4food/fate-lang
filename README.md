@@ -1,10 +1,11 @@
 # Fate (Patterns & Guards & Joins, Oh My!)
+[![Build Status](https://travis-ci.org/Forty-Niner/fate-lang.svg?branch=master)](https://travis-ci.org/Forty-Niner/fate-lang)
 
 Fate is a programming language prototype.  It currently compiles into Node.js modules, but the goal is to eventually have it target the JVM.  It is a mostly functional language that includes a processing model inspired by the [Join Calculus](https://en.wikipedia.org/wiki/Join-calculus).  It also provides first-class patterns, invocation guards, list comprehensions, and flexible partial application.
 
 That's a lot to take in, so maybe it's better to just demonstrate.  Let's say you needed to calculate the NOx emissions for an OBD II reporting module.  You could do it the obvious way:
 
-```
+```ruby
 def calculateVehicleEmissions(car)
   if car.wheelsInMotion > 2
     car.emissions
@@ -16,7 +17,7 @@ end
 
 But that's a lot of `if` statements.  Yes, one is too many.  It also packs calculations for two different potential states into a single function, which will become more difficult to isolate if you should need to hide the second calculation from government auditors.  You can break the function up and use a guard on its re-opened version.
 
-```
+```ruby
 def calculateVehicleEmissions(car)
   car.emissions
 end
@@ -28,7 +29,7 @@ end
 
 That's better!  Now if the EPA come to your place of business, you can delete the second function and they'll be none the wiser!  But that `where` clause is practically like another `if` statement, and we've already established that we don't like those.  Let's use an in-line pattern instead:
 
-```
+```ruby
 def calculateVehicleEmissions(car)
   car.emissions
 end
@@ -41,7 +42,7 @@ end
 Better!  But now you have the pattern matching for qualifying cars in a place where it can't be reused.  Let's clean that up:
 
 
-```
+```ruby
 def calculateVehicleEmissions(car)
   car.emissions
 end
