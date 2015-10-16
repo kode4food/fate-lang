@@ -26,7 +26,7 @@ def calculateVehicleEmissions(car) where car.wheelsInMotion <= 2
 end
 ```
 
-That's better!  Now if the EPA come to your place of business, you can delete the second function and none will be the wiser!  But that `where` clause is practically like another `if` statement, and we've already established that we don't like those.  Let's use an in-line pattern instead:
+That's better!  Now if the EPA come to your place of business, you can delete the second function and they'll be none the wiser!  But that `where` clause is practically like another `if` statement, and we've already established that we don't like those.  Let's use an in-line pattern instead:
 
 ```
 def calculateVehicleEmissions(car)
