@@ -1,6 +1,57 @@
 # Fate (Patterns & Guards & Joins, Oh My!)
 
-Fate is a language prototype.  It currently compiles into Node.js modules, but the goal is to eventually have it produce JVM code.  It is a mostly functional language, implementing part of the [Join Calculus](https://en.wikipedia.org/wiki/Join-calculus) as well as providing first-class patterns and invocation guards.
+Fate is a programming language prototype.  It currently compiles into Node.js modules, but the goal is to eventually have it target the JVM.  It is a mostly functional language that includes a processing model inspired by the [Join Calculus](https://en.wikipedia.org/wiki/Join-calculus).  It also provides first-class patterns, invocation guards, list comprehensions, and flexible partial application.
+
+That's a lot to take in, so maybe it's better to just demonstrate.  Let's say you needed to calculate the NOx emissions for an OBD II reporting module.  You could do it the obvious way:
+
+```
+def calculateVehicleEmissions(car)
+  if car.wheelsInMotion > 2
+    car.emissions
+  else
+    car.emissions / 40
+  end
+end
+```
+
+But that's a lot of `if` statements.  Yes, one is too many.  It also packs calculations for two different potential states into a single function, which will become more difficult to isolate if you should need to hide the second calculation from government auditors.  You can break the function up and use a guard on its re-opened version.
+
+```
+def calculateVehicleEmissions(car)
+  car.emissions
+end
+
+def calculateVehicleEmissions(car) where car.wheelsInMotion <= 2
+  car.emissions / 40
+end
+```
+
+That's better!  Now if the EPA come to your place of business, you can delete the second function on nobody's the wiser!  But that `where` clause is practically like another `if` statement, and we've already established that we don't like those.  Let's use in-line patterns instead:
+
+```
+def calculateVehicleEmissions(car)
+  car.emissions
+end
+
+def calculateVehicleEmissions({ wheelsInMotion: ? <= 2 } as car) {
+  car.emissions / 40
+end
+```
+
+Better!  But now you have the pattern matching for qualifying cars in a place where it can't be reused.  Let's clean that up.
+
+
+```
+def calculateVehicleEmissions(car)
+  car.emissions
+end
+
+let VehicleUnderTest = ~{ wheelsInMotion: ? <= 2 }
+
+def calculateVehicleEmissions(VehicleUnderTest as car) {
+  car.emissions / 40
+end
+```
 
 ## License (MIT License)
 Copyright (c) 2015 Thomas S. Bradford
