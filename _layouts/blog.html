@@ -1,0 +1,20 @@
+---
+layout: wide
+home: /
+---
+{% for post in site.posts %}
+<article class="post">
+  <h2>
+    <a class="big-link" href="{{ post.url }}">
+      {{ post.title }}
+    </a>
+  </h2>
+  <div class="entry">
+    <p>
+    {{ post.excerpt | remove: '<p>' | remove: '</p>' }}
+    <a class="read-more" href="{{ post.url }}">read more...</a>
+    </p>
+  </div>
+  {% include by-line.html %}
+</article>  
+{% endfor %}

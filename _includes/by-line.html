@@ -1,0 +1,9 @@
+<div class="by-line">
+  {% if post %}
+    <span class="author">{{ post.author }}</span>
+    (<span class="date">{{ post.date | date: "%B %e, %Y" }}</span>)
+  {% else %}
+    <span class="author">{{ page.author }}</span>
+    (<span class="date">{{ page.date | date: "%B %e, %Y" }}</span>)
+  {% endif %}
+</div>
