@@ -36,7 +36,7 @@ def calculateVehicleEmissions(car)
   car.emissions
 end
 
-def calculateVehicleEmissions({ wheelsInMotion: ? <= 2 } as car) {
+def calculateVehicleEmissions({ wheelsInMotion: ? <= 2 } as car)
   car.emissions / 40
 end
 ```
@@ -51,7 +51,7 @@ end
 
 let VehicleUnderTest = ~{ wheelsInMotion: ? <= 2 }
 
-def calculateVehicleEmissions(VehicleUnderTest as car) {
+def calculateVehicleEmissions(VehicleUnderTest as car)
   car.emissions / 40
 end
 ```
