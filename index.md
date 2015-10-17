@@ -97,5 +97,3 @@ console.log(resultingLambda(4));
 For source code and releases, see the [Fate GitHub Page](http://github.com/Forty-Niner/fate-lang).
 
 For [Sublime Text](http://www.sublimetext.com/) support, install the [Fate](https://packagecontrol.io/packages/Fate) package using the [Package Control](https://packagecontrol.io/) package manager.
-
-For more information about the Fate Language and API, please see the [Fate Guide](http://fatejs.io/guide/) (a work in progress).
