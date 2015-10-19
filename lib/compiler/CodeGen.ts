@@ -249,23 +249,9 @@ namespace Fate.Compiler.CodeGen {
 
         function createArgumentsProlog() {
           var joinArgs = generate.createAnonymous();
-          
-          var destructuredNames = [function () {
-            generate.retrieveAnonymous(joinArgs)
-          }].concat(paramNames.map(function (paramName) {
-            return function () {
-              generate.getter(paramName);
-            };
-          }));
-          
-          generate.statement(function () {
-            generate.arrayDestructure(destructuredNames, function () {
-              generate.call(globals.runtimeImport('joinArguments'), [
-                function () {
-                  generate.functionArguments();
-                }
-              ]);
-            });
+          var assignedNames = [joinArgs].concat(paramNames);
+          generate.assignFromArray(assignedNames, function () {
+            generate.call(globals.runtimeImport('joinArguments'));
           });
           return joinArgs;
         }
@@ -303,7 +289,6 @@ namespace Fate.Compiler.CodeGen {
 
           function createFunction() {
             generate.func({
-              contextArgs: paramNames,
               body: createFunctionBody,
               annotations: node.annotations
             });

@@ -174,14 +174,13 @@ namespace Fate.Compiler.JavaScript {
       retrieveAnonymous: retrieveAnonymous,
       assignResult: assignResult,
       self: self,
-      functionArguments: functionArguments,
       member: member,
       write: write,
       writeAndGroup: writeAndGroup,
       getter: getter,
       assignment: assignment,
       assignments: assignments,
-      arrayDestructure: arrayDestructure,
+      assignFromArray: assignFromArray,
       exports: exports,
       unaryOperator: unaryOperator,
       binaryOperator: binaryOperator,
@@ -392,12 +391,15 @@ namespace Fate.Compiler.JavaScript {
         write(localName, '=', value, ";");
       });
     }
-    
-    function arrayDestructure(names: BodyEntries, arr: BodyEntry) {
-      write('[');
-      writeDelimited(names);
-      write(']=');
-      write(arr);
+
+    function assignFromArray(varNames: Names, arr: BodyEntry) {
+      var anon = createAnonymous();
+      statement(function () {
+        assignAnonymous(anon, arr);
+      });
+      varNames.forEach(function (varName, arrIndex) {
+        write(localForAssignment(varName), '=', anon, '[', arrIndex, '];');
+      });
     }
 
     function exports(items: ModuleItems) {

@@ -27,19 +27,18 @@ namespace Fate.Runtime {
 
   class JoinArguments {
     public consumed: boolean;
-    public argArray: any[];
-    
-    constructor(callArguments: any[]) {
-      this.argArray = [this].concat(callArguments);
+    public argumentArray: any[];
+
+    constructor(callArguments: IArguments) {
+      this.argumentArray = [this].concat(slice.call(callArguments));
     }
   }
 
-  export function joinArguments(args: any[]) {
-    var result = args[0];
-    if ( result instanceof JoinArguments ) {
-      return result.args;
+  export function joinArguments(joinArgs?: JoinArguments) {
+    if ( joinArgs instanceof JoinArguments ) {
+      return joinArgs.argumentArray;
     }
-    return new JoinArguments(args).argArray;
+    return new JoinArguments(arguments).argumentArray;
   }
 
   export function join(body: Function, ...argCount: number[]) {
@@ -95,7 +94,7 @@ namespace Fate.Runtime {
         var argumentSet = argumentSets[setIndex];
         var inputArgs = argumentSet[argumentIndex];
         inputArgs.consumed = true;
-        args = args.concat(inputArgs.argArray);
+        args = args.concat(inputArgs.argumentArray.slice(1));
         argsLength += argCount[setIndex];
         args.length = argsLength;
       });
