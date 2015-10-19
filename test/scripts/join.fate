@@ -1,5 +1,3 @@
-from math import random
-
 def patternTest(test)
   test.expect(10)
 
@@ -19,11 +17,11 @@ def patternTest(test)
     h = 99 | test.ok
   end
 
-  setTimeout( () -> b('there', 99), random() * 100 )
-  setTimeout( () -> a({ type: 'Not', value: 'another' }, 'goodbye'),  random() * 100 )
-  setTimeout( () -> b('you', 40),  random() * 100 )
-  setTimeout( () -> a({ type: 'Test', value: 'aValue'}, 'hello'),  random() * 100 )
-  setTimeout( () -> test.done(), 150)
+  setTimeout( () -> a({ type: 'Test', value: 'aValue'}, 'hello'),  10 )
+  setTimeout( () -> b('there', 99), 20 )
+  setTimeout( () -> a({ type: 'Not', value: 'another' }, 'goodbye'),  30 )
+  setTimeout( () -> b('you', 40),  40 )
+  setTimeout( () -> test.done(), 100)
 end
 
 export patternTest
