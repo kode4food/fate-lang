@@ -3,12 +3,12 @@
 "use strict";
 
 namespace Fate.Runtime {
-  export interface FatePattern {
+  export interface Pattern {
     (obj: any): boolean;
     __fatePattern?: boolean;
   }
 
-  export function definePattern(value: FatePattern) {
+  export function definePattern(value: Pattern) {
     value.__fatePattern = true;
     return value;
   }

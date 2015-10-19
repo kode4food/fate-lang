@@ -99,8 +99,7 @@ namespace Fate.Resolvers {
    * @param {Object} moduleExports the hash of Functions to stub
    */
   function createModuleStub(moduleExports: AnyMap): Types.Module {
-    scriptInterface.exports = scriptExports;
-    return blessModule(scriptInterface);
+    return blessModule(scriptInterface, scriptExports);
 
     function scriptInterface() {
     }

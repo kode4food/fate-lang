@@ -221,7 +221,6 @@ namespace Fate.Compiler.CodeGen {
 
       function createChannelSignature(signature: Syntax.Signature,
                                       signatureIndex: number) {
-        var joinArgs = generate.createAnonymous();
         var paramNames = signature.params.map(
           function (param: Syntax.Parameter) { return param.id.value; }
         );
@@ -236,29 +235,34 @@ namespace Fate.Compiler.CodeGen {
             function () {
               generate.func({
                 contextArgs: paramNames,
-                prolog: argumentProlog,
-                body: joinDispatcher,
+                body: unguardedBody,
                 annotations: node.annotations
               });
             }
           ]);
         }
 
-        function argumentProlog() {
-          generate.statement(function () {
-            generate.assignAnonymous(joinArgs, function() {
-              generate.call(globals.runtimeImport('joinArguments'),
-                ['arguments']
-              );
-            });
-          });
+        function unguardedBody() {
+          var joinArgs = createArgumentsProlog();
+          joinDispatcher(joinArgs);
         }
 
-        function joinDispatcher() {
-          generate.returnStatement(function () {
+        function createArgumentsProlog() {
+          var joinArgs = generate.createAnonymous();
+          var assignedNames = [joinArgs].concat(paramNames);
+          generate.assignFromArray(assignedNames, function () {
+            generate.call(globals.runtimeImport('joinArguments'));
+          });
+          return joinArgs;
+        }
+
+        function joinDispatcher(joinArgs: string) {
+          generate.statement(function () {
             generate.call(joinName, [
               globals.literal(signatureIndex),
-              joinArgs
+              function () {
+                generate.retrieveAnonymous(joinArgs)
+              }
             ]);
           });
         }
@@ -285,20 +289,24 @@ namespace Fate.Compiler.CodeGen {
 
           function createFunction() {
             generate.func({
-              contextArgs: paramNames,
-              prolog: argumentProlog,
               body: createFunctionBody,
               annotations: node.annotations
             });
           }
 
           function createFunctionBody() {
+            var joinArgs = createArgumentsProlog();
             generate.ifStatement(
               defer(signature.guard),
-              joinDispatcher, null
+              function () {
+                joinDispatcher(joinArgs);
+              },
+              null
             );
             generate.returnStatement(function () {
-              generate.call('o', [joinArgs]);
+              generate.call('o', [function () {
+                generate.retrieveAnonymous(joinArgs);
+              }]);
             });
           }
         }

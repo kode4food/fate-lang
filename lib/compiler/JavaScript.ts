@@ -123,7 +123,7 @@ namespace Fate.Compiler.JavaScript {
       if ( id ) {
         return id;
       }
-      id = this.generatedImports[funcName] = this.nextId('i');
+      id = this.generatedImports[funcName] = funcName;
       var funcNameQuoted = JSON.stringify(funcName);
       this.globalVars.push(
         [id, "=r.runtimeImport(", funcNameQuoted, ")"].join('')
@@ -180,6 +180,7 @@ namespace Fate.Compiler.JavaScript {
       getter: getter,
       assignment: assignment,
       assignments: assignments,
+      assignFromArray: assignFromArray,
       exports: exports,
       unaryOperator: unaryOperator,
       binaryOperator: binaryOperator,
@@ -267,6 +268,10 @@ namespace Fate.Compiler.JavaScript {
 
     function self() {
       write(selfName);
+    }
+
+    function functionArguments() {
+      write("arguments");
     }
 
     function member(object: BodyEntry, property: BodyEntry) {
@@ -384,6 +389,16 @@ namespace Fate.Compiler.JavaScript {
 
         var localName = localForAssignment(name);
         write(localName, '=', value, ";");
+      });
+    }
+
+    function assignFromArray(varNames: Names, arr: BodyEntry) {
+      var anon = createAnonymous();
+      statement(function () {
+        assignAnonymous(anon, arr);
+      });
+      varNames.forEach(function (varName, arrIndex) {
+        write(localForAssignment(varName), '=', anon, '[', arrIndex, '];');
       });
     }
 

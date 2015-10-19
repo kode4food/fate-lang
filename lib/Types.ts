@@ -5,10 +5,12 @@
 namespace Fate.Types {
   export type ModulePath = string;
   export type ModuleName = string;
-  export type Module = ModuleInterface | Function;
 
-  export interface ModuleInterface {
-    exports(): ModuleExports;
+  type ModuleExporter = () => ModuleExports;
+
+  export interface Module {
+    exports?: ModuleExporter;
+    __fateModule?: boolean;
   }
 
   export interface ModuleExports {
@@ -23,10 +25,6 @@ namespace Fate.Types {
     [index: string]: any;
   }
 
-  export interface FateModule {
-    __fateModule?: boolean;
-  }
-
   export function isObject(obj: any) {
     return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
   }
@@ -36,8 +34,9 @@ namespace Fate.Types {
              module.__fateModule;
   }
 
-  export function blessModule(value: FateModule) {
+  export function blessModule(value: Module, exports: ModuleExporter) {
     value.__fateModule = true;
+    value.exports = exports;
     return value;
   }
 

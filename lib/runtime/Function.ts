@@ -9,20 +9,6 @@ namespace Fate.Runtime {
 
   type ArgTemplate = { [index: number]: any };
 
-  export interface FateChannel {
-    (...args: any[]): void;
-    __fateChannel?: boolean;
-  }
-
-  export function defineChannel(value: FateChannel) {
-    value.__fateChannel = true;
-    return value;
-  }
-
-  export function isFateChannel(channel: any) {
-    return typeof channel === 'function' && channel.__fateChannel;
-  }
-
   export function defineFunction(func: Function) {
     return func;
   }
@@ -33,14 +19,6 @@ namespace Fate.Runtime {
       originalFunction = noOp;
     }
     return defineFunction(envelope(originalFunction));
-  }
-
-  export function defineGuardedChannel(originalChannel: Function,
-                                       envelope: Function) {
-    if ( !isFateChannel(originalChannel) ) {
-      originalChannel = noOp;
-    }
-    return defineChannel(envelope(originalChannel));
   }
 
   export function bindFunction(func: Function, args: ArgTemplate) {
