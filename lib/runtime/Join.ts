@@ -1,22 +1,45 @@
 namespace Fate.Runtime {
   var slice = Array.prototype.slice;
 
+  function noOp() {}
+
+  export interface Channel {
+    (...args: any[]): void;
+    __fateChannel?: boolean;
+  }
+
+  export function defineChannel(value: Channel) {
+    value.__fateChannel = true;
+    return value;
+  }
+
+  export function defineGuardedChannel(originalChannel: Function,
+                                       envelope: Function) {
+    if ( !isFateChannel(originalChannel) ) {
+      originalChannel = noOp;
+    }
+    return defineChannel(envelope(originalChannel));
+  }
+
+  export function isFateChannel(channel: any) {
+    return typeof channel === 'function' && channel.__fateChannel;
+  }
+
   class JoinArguments {
     public consumed: boolean;
-    constructor(public args: any[]) { }
+    public argArray: any[];
+    
+    constructor(callArguments: any[]) {
+      this.argArray = [this].concat(callArguments);
+    }
   }
 
   export function joinArguments(args: any[]) {
     var result = args[0];
-    if ( !(result instanceof JoinArguments) ) {
-      return new JoinArguments(slice.call(args));
+    if ( result instanceof JoinArguments ) {
+      return result.args;
     }
-
-    var resultArgs = result.args;
-    for ( var i = 0; i < resultArgs.length; i++ ) {
-      args[i] = resultArgs[i];
-    }
-    return result;
+    return new JoinArguments(args).argArray;
   }
 
   export function join(body: Function, ...argCount: number[]) {
@@ -72,7 +95,7 @@ namespace Fate.Runtime {
         var argumentSet = argumentSets[setIndex];
         var inputArgs = argumentSet[argumentIndex];
         inputArgs.consumed = true;
-        args = args.concat(inputArgs.args);
+        args = args.concat(inputArgs.argArray);
         argsLength += argCount[setIndex];
         args.length = argsLength;
       });

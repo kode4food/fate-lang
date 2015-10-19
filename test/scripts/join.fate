@@ -2,8 +2,8 @@ from math import random
 
 def patternTest(test)
   test.expect(10)
-  
-  when a(x, y) & b(g, h)
+
+  when a({ value: 'another' } as x, y) & b(g, h)
     x.type = 'Not' | test.ok
     x.value = 'another' | test.ok
     y = 'goodbye' | test.ok

@@ -5,12 +5,12 @@ namespace Fate.Runtime {
     __fateStopIteration: true
   };
 
-  export interface FateGenerator {
+  export interface Generator {
     (): any;
     __fateGenerator?: boolean;
   }
 
-  export function blessGenerator(value: FateGenerator) {
+  export function blessGenerator(value: Generator) {
     value.__fateGenerator = true;
     return value;
   }

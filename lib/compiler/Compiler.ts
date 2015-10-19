@@ -6,6 +6,7 @@
 namespace Fate.Compiler {
   var vm = require('vm');
   var generatedParser = require('./parser');
+  var SyntaxError = generatedParser.SyntaxError;
 
   import rewriteSyntaxTree = Rewriter.rewriteSyntaxTree;
   import generateScriptBody = CodeGen.generateScriptBody;
@@ -14,17 +15,21 @@ namespace Fate.Compiler {
   export type GeneratedCode = string;
   export type FilePath = string;
 
-  export interface Warning {
-    line: number;
-    column: number;
-    message: string;
-    filePath?: FilePath;
+  export class CompileError implements Error {
+    name: string = "CompileError";
+
+    constructor(public message: string, public line: number,
+                public column: number, public filePath?: FilePath) {}
+
+    public toString() {
+      return this.message;
+    }
   }
 
-  export type Warnings = Warning[];
+  export type CompileErrors = CompileError[];
 
   export function compileModule(script: ScriptContent) {
-    var warnings: Warnings = [];
+    var warnings: CompileErrors = [];
     var parsed = generatedParser.parse(script);
     var rewritten = rewriteSyntaxTree(parsed, warnings);
 
@@ -72,25 +77,49 @@ namespace Fate.Compiler {
     return context.module.exports;
   }
 
-  // Intercepts a PEG.js Exception and generate a human-readable error message
-  export function formatSyntaxError(err: Error, filePath?: Compiler.FilePath) {
-    if ( !err.name || err.name !== 'SyntaxError' ) {
+  export function wrapCompileError(err: Error, filePath?: Compiler.FilePath) {
+    if ( err instanceof CompileError ) {
+      if ( filePath ) {
+        err.filePath = filePath;
+      }
+      err.message = formatCompileError(err, filePath);
       return err;
     }
 
-    var unexpected = err.found ? "'" + err.found + "'" : "end of file";
-    var errString = "Unexpected " + unexpected;
-    var lineInfo = ":" + err.line + ":" + err.column;
+    if ( err instanceof SyntaxError ) {
+      return formatSyntaxError(err, filePath);
+    }
 
-    return new Error((filePath || 'string') + lineInfo + ": " + errString);
+    return err;
   }
 
-  export function formatWarning(warning: Warning,
-                                filePath?: Compiler.FilePath) {
-    var lineInfo = ":" + warning.line + ":" + warning.column;
-    var warningString = warning.message;
+  function formatCompileError(err: CompileError,
+                              filePath?: Compiler.FilePath) {
+    var lineInfo = ":" + err.line + ":" + err.column;
+    var message = err.message;
 
-    filePath = filePath || warning.filePath || 'string';
-    return filePath + lineInfo + ": " + warningString;
+    filePath = filePath || err.filePath || 'string';
+    return filePath + lineInfo + ": " + message;
+  }
+
+  interface PegError {
+    found: string;
+    line: number;
+    column: number;
+  }
+
+  // Intercepts a PEG.js Exception and generate a human-readable error message
+  function formatSyntaxError(err: SyntaxError,
+                             filePath?: Compiler.FilePath): CompileError {
+    var found = err.found;
+    var line = err.line;
+    var column = err.column;
+
+    var unexpected = found ? "'" + found + "'" : "end of file";
+    var errString = "Unexpected " + unexpected;
+    var lineInfo = ":" + line + ":" + column;
+    var message = (filePath || 'string') + lineInfo + ": " + errString;
+
+    return new CompileError(message, line, column, filePath);
   }
 }

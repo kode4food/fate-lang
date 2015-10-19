@@ -1,4 +1,4 @@
-/// <reference path="../../typings/tsd.d.ts"/>
+/// <reference path="../../typings/node/node.d.ts"/>
 /// <reference path="../compiler/Compiler.ts"/>
 /// <reference path="../Types.ts"/>
 /// <reference path="../Fate.ts"/>
@@ -6,11 +6,11 @@
 "use strict";
 
 namespace Fate.Resolvers {
-  var vm = require('vm');
   var fs = require('fs');
+  var vm = require('vm');
   var path = require('path');
 
-  import formatSyntaxError = Compiler.formatSyntaxError;
+  import wrapCompileError = Compiler.wrapCompileError;
   import isFateModule = Types.isFateModule;
 
   type FilePath = string;
@@ -88,7 +88,7 @@ namespace Fate.Resolvers {
           return cached;
         }
         catch ( err ) {
-          throw formatSyntaxError(err, name + ext);
+          throw wrapCompileError(err, name + ext);
         }
       }
 

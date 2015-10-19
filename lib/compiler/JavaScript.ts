@@ -123,7 +123,7 @@ namespace Fate.Compiler.JavaScript {
       if ( id ) {
         return id;
       }
-      id = this.generatedImports[funcName] = this.nextId('i');
+      id = this.generatedImports[funcName] = funcName;
       var funcNameQuoted = JSON.stringify(funcName);
       this.globalVars.push(
         [id, "=r.runtimeImport(", funcNameQuoted, ")"].join('')
@@ -174,12 +174,14 @@ namespace Fate.Compiler.JavaScript {
       retrieveAnonymous: retrieveAnonymous,
       assignResult: assignResult,
       self: self,
+      functionArguments: functionArguments,
       member: member,
       write: write,
       writeAndGroup: writeAndGroup,
       getter: getter,
       assignment: assignment,
       assignments: assignments,
+      arrayDestructure: arrayDestructure,
       exports: exports,
       unaryOperator: unaryOperator,
       binaryOperator: binaryOperator,
@@ -267,6 +269,10 @@ namespace Fate.Compiler.JavaScript {
 
     function self() {
       write(selfName);
+    }
+
+    function functionArguments() {
+      write("arguments");
     }
 
     function member(object: BodyEntry, property: BodyEntry) {
@@ -385,6 +391,13 @@ namespace Fate.Compiler.JavaScript {
         var localName = localForAssignment(name);
         write(localName, '=', value, ";");
       });
+    }
+    
+    function arrayDestructure(names: BodyEntries, arr: BodyEntry) {
+      write('[');
+      writeDelimited(names);
+      write(']=');
+      write(arr);
     }
 
     function exports(items: ModuleItems) {

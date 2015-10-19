@@ -82,7 +82,7 @@ namespace Fate.Compiler.Rewriter {
   };
 
   export function rewriteSyntaxTree(syntaxTree: Syntax.Statements,
-                                    warnings?: Warnings) {
+                                    warnings?: CompileErrors) {
     var nodeStack: (Syntax.Node|Syntax.Nodes)[] = [];
     var wildcardNumbering = 0;
 
@@ -275,14 +275,14 @@ namespace Fate.Compiler.Rewriter {
     // A Wildcard can only exist in a pattern or call binder
     function validateWildcards(node: Syntax.Wildcard) {
       if ( !hasAncestorTags(['pattern', 'bind']) ) {
-        issueWarning(node, "Unexpected Wildcard");
+        issueError(node, "Unexpected Wildcard");
       }
 
       var ancestors = hasAncestorTags('objectAssignment', 'pattern');
       if ( ancestors ) {
         var parent = <Syntax.ObjectAssignment>ancestors[0];
         if ( parent.id === nodeStack[nodeStack.indexOf(parent) + 1] ) {
-          issueWarning(node, "Wildcards cannot appear in Property Names");
+          issueError(node, "Wildcards cannot appear in Property Names");
         }
       }
       return node;
@@ -646,12 +646,14 @@ namespace Fate.Compiler.Rewriter {
       return node;
     }
 
+    function issueError(source: Syntax.Node, message: string) {
+      throw new CompileError(message, source.line, source.column);
+    }
+
     function issueWarning(source: Syntax.Node, message: string) {
-      warnings.push({
-        line: source.line,
-        column: source.column,
-        message: message
-      });
+      warnings.push(
+        new CompileError(message, source.line, source.column)
+      );
     }
   }
 

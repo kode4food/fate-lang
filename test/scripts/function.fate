@@ -1,0 +1,25 @@
+def guardOnly(test)
+  def testFunc(x) where x > 10
+    x * 10
+  end
+
+  testFunc(12) | test.equal(?, 120)
+  testFunc(9) | test.equal(?, undefined)
+  test.done()
+end
+
+def guardAndDefault(test)
+  def testFunc(x)
+    x * 5
+  end
+
+  def testFunc(x) where x > 10
+    x * 10
+  end
+
+  testFunc(12) | test.equal(?, 120)
+  testFunc(9) | test.equal(?, 45)
+  test.done()
+end
+
+export guardOnly, guardAndDefault

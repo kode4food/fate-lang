@@ -14,5 +14,6 @@ function scriptTestCase(moduleName) {
 
 exports.scripts = nodeunit.testCase({
   "Basics": scriptTestCase('basics'),
+  "Functions": scriptTestCase('function'),
   "Joins": scriptTestCase('join')
 });
