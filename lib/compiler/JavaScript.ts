@@ -123,7 +123,7 @@ namespace Fate.Compiler.JavaScript {
       if ( id ) {
         return id;
       }
-      id = this.generatedImports[funcName] = funcName;
+      id = this.generatedImports[funcName] = this.nextId('r');
       var funcNameQuoted = JSON.stringify(funcName);
       this.globalVars.push(
         [id, "=r.runtimeImport(", funcNameQuoted, ")"].join('')
@@ -394,12 +394,19 @@ namespace Fate.Compiler.JavaScript {
 
     function assignFromArray(varNames: Names, arr: BodyEntry) {
       var anon = createAnonymous();
-      statement(function () {
+
+      var elements: BodyEntries = [];
+      elements.push(function () {
         assignAnonymous(anon, arr);
       });
+
       varNames.forEach(function (varName, arrIndex) {
-        write(localForAssignment(varName), '=', anon, '[', arrIndex, '];');
+        elements.push(function () {
+          write(localForAssignment(varName), '=', anon, '[', arrIndex, ']');
+        });
       });
+
+      compoundExpression(elements);
     }
 
     function exports(items: ModuleItems) {

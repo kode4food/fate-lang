@@ -250,8 +250,10 @@ namespace Fate.Compiler.CodeGen {
         function createArgumentsProlog() {
           var joinArgs = generate.createAnonymous();
           var assignedNames = [joinArgs].concat(paramNames);
-          generate.assignFromArray(assignedNames, function () {
-            generate.call(globals.runtimeImport('joinArguments'));
+          generate.statement(function () {
+            generate.assignFromArray(assignedNames, function () {
+              generate.call(globals.runtimeImport('joinArguments'));
+            });
           });
           return joinArgs;
         }

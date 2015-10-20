@@ -65,7 +65,7 @@ npm -g install fatejs
 
 This will link the command line compiler (fatec) into your PATH, allowing you to convert Fate scripts into node.js modules.  Those modules can then be required like any other node module, but the `fatejs` module must be available to node.
 
-You can also compile scripts on the fly by requiring the fatejs module, and calling its compile function, like so:
+You can also compile scripts on the fly by requiring the fatejs module, and calling its `compile()` function, like so:
 
 ```javascript
 // require the Fate module
@@ -74,7 +74,7 @@ var fate = require('fatejs');
 // compile a script that returns a lambda
 var script = fate.compile('(x) -> x * 100');
 
-// execute the compiled script, 
+// execute the compiled script,
 // will return the lambda instance
 var resultingLambda = script();
 
@@ -82,10 +82,9 @@ var resultingLambda = script();
 console.log(resultingLambda(4));
 ```
 
-Or, if you're lazy:
+Or, if you're lazy, you can skip the compile and execute steps, and just call `evaluate()`:
 
 ```javascript
-// require the Fate module
 var fate = require('fatejs');
 var resultingLambda = fate.evaluate('(x) -> x * 100');
 console.log(resultingLambda(4));

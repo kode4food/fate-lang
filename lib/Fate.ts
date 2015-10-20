@@ -5,6 +5,8 @@
 "use strict";
 
 namespace Fate {
+  var fs = require('fs');
+
   import compileModule = Compiler.compileModule;
   import generateFunction = Compiler.generateFunction;
 
@@ -39,5 +41,18 @@ namespace Fate {
   export function evaluate(script: Compiler.ScriptContent, globals?: Object) {
     var compiled = compile(script);
     return compiled(globals || Fate.global);
+  }
+
+  /**
+   * Register the require() extension
+   */
+  require.extensions['.fate'] = fateRequireExtension;
+
+  /* istanbul ignore next */
+  function fateRequireExtension(module: any, filename: string) {
+    var content = fs.readFileSync(filename, 'utf8');
+    var compiledOutput = compileModule(content).scriptBody;
+    var generatedModule = generateFunction(compiledOutput);
+    module.exports = generatedModule.exports();
   }
 }

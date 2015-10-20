@@ -1,9 +1,7 @@
 "use strict";
 
 var nodeunit = require('nodeunit');
-var commandLine = require('../lib/cli').commandLine;
 var helpers = require('./helpers');
-var createConsole = helpers.createConsole;
 
 var fate = require('../build/fate');
 var createMemoryResolver = fate.Resolvers.createMemoryResolver;
@@ -38,10 +36,10 @@ exports.imports = nodeunit.testCase({
 
     "Helper Import": function (test) {
       var script1 = "import helpers\n" +
-                    "helpers.testHelper(1,2)";
+        "helpers.testHelper(1,2)";
 
       var script2 = "from helpers import testHelper as test\n" +
-                    "test(5,6)";
+        "test(5,6)";
 
       var module1 = fate.Runtime.resolveModule('hello');
       var exports1 = fate.Runtime.resolveExports('hello');
@@ -61,10 +59,52 @@ exports.imports = nodeunit.testCase({
     }
   }),
 
-  "compiled and monitored": createFileImportTests(true, true),
-  "compiled and cached": createFileImportTests(true, false),
-  "required and monitored": createFileImportTests(false, true),
-  "required and cached": createFileImportTests(false, false),
+  "file system importer": nodeunit.testCase({
+    setUp: function (callback) {
+      fate.Runtime.resolvers().push(createFileResolver({ path: "./test" }));
+      callback();
+    },
+
+    tearDown: function (callback) {
+      fate.Runtime.resolvers().pop();
+      callback();
+    },
+
+    "Module Retrieval": function (test) {
+      var found1 = fate.Runtime.resolveModule('test');
+      var found2 = fate.Runtime.resolveModule('test');
+      var found3 = fate.Runtime.resolveExports('test');
+      var notFound1 = fate.Runtime.resolveModule('unknown');
+      var notFound2 = fate.Runtime.resolveModule('unknown');
+      var notFound3 = fate.Runtime.resolveExports('unknown');
+      test.equal(found1(), "There are no people!");
+      test.equal(found2(), "There are no people!");
+      test.equal(typeof found3, 'object');
+      test.equal(notFound1, undefined);
+      test.equal(notFound2, undefined);
+      test.equal(notFound3, undefined);
+      test.done();
+    },
+
+    "File Import": function (test) {
+      var script = "import test as t\n" +
+        "t.renderTest('Curly')";
+
+      test.equal(evaluate(script), "Hello Curly");
+      test.done();
+    },
+
+    "File Submodule Import": function (test) {
+      var script1 = "import module1\nmodule1.test_value";
+      var script2 = "import module2\nmodule2.test_value";
+      var script3 = "import module1.index\nindex.test_value";
+
+      test.equal(evaluate(script1), "right!");
+      test.equal(evaluate(script2), "right!");
+      test.equal(evaluate(script3), "wrong!");
+      test.done();
+    }
+  }),
 
   "system imports": nodeunit.testCase({
     setUp: function (callback) {
@@ -112,69 +152,3 @@ exports.imports = nodeunit.testCase({
     }
   })
 });
-
-function createFileImportTests(compile, monitor) {
-  return nodeunit.testCase({
-    setUp: function (callback) {
-      fate.Runtime.resolvers().push(createFileResolver({
-        path: "./test", compile: compile, monitor: monitor
-      }));
-
-      if ( compile ) {
-        callback();
-        return;
-      }
-
-      // command-line build the files
-      commandLine(["-in", "./test"], createConsole(), function (exitCode) {
-        helpers.monkeyPatchRequires('./test', {
-          'fatejs': '../build/fate'
-        });
-        callback();
-      });
-    },
-
-  tearDown: function (callback) {
-      if ( !compile ) {
-        helpers.deleteBuildProducts('./test');
-      }
-      fate.Runtime.resolvers().pop();
-      callback();
-    },
-
-    "Module Retrieval": function (test) {
-      var found1 = fate.Runtime.resolveModule('test');
-      var found2 = fate.Runtime.resolveModule('test');
-      var found3 = fate.Runtime.resolveExports('test');
-      var notFound1 = fate.Runtime.resolveModule('unknown');
-      var notFound2 = fate.Runtime.resolveModule('unknown');
-      var notFound3 = fate.Runtime.resolveExports('unknown');
-      test.equal(found1(), "There are no people!");
-      test.equal(found2(), "There are no people!");
-      test.equal(typeof found3, 'object');
-      test.equal(notFound1, undefined);
-      test.equal(notFound2, undefined);
-      test.equal(notFound3, undefined);
-      test.done();
-    },
-
-    "File Import": function (test) {
-      var script = "import test as t\n" +
-                   "t.renderTest('Curly')";
-
-      test.equal(evaluate(script), "Hello Curly");
-      test.done();
-    },
-
-    "File Submodule Import": function (test) {
-      var script1 = "import module1\nmodule1.test_value";
-      var script2 = "import module2\nmodule2.test_value";
-      var script3 = "import module1.index\nindex.test_value";
-
-      test.equal(evaluate(script1), "right!");
-      test.equal(evaluate(script2), "right!");
-      test.equal(evaluate(script3), "wrong!");
-      test.done();
-    }
-  });
-}

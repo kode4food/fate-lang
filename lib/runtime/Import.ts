@@ -44,25 +44,19 @@ namespace Fate.Runtime {
   // if we're in the process of evaluating a script for the purpose
   // of yielding its exports
   export function importer(moduleName: Types.ModulePath) {
-    var importImplementation = dynamicImporter;
     var module: Types.ModuleExports;
 
     return performImport;
 
     function performImport() {
-      return importImplementation();
-    }
+      if ( module ) {
+        return module;
+      }
 
-    function cachedImporter() {
-      return module;
-    }
-
-    function dynamicImporter() {
       module = resolveExports(moduleName);
       if ( !module ) {
         throw new Error("Module '" + moduleName + "' not resolved");
       }
-      importImplementation = cachedImporter;
       return module;
     }
   }
