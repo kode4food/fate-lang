@@ -89,8 +89,6 @@ namespace Fate.Compiler.JavaScript {
     private generatedBuilders: { [index: string]: GlobalId } = {};
     private globalVars: string[] = [];
 
-    constructor(public verbose = true) {}
-
     public nextId(prefix: string) {
       var next = this.globals[prefix];
       if ( typeof next !== 'number' ) {
@@ -110,7 +108,7 @@ namespace Fate.Compiler.JavaScript {
     public literal(literalValue: any) {
       var canonical = jsonStringify(literalValue);
 
-      if ( this.verbose && this.canLiteralBeInlined(literalValue) ) {
+      if ( this.canLiteralBeInlined(literalValue) ) {
         return canonical;
       }
 
@@ -129,12 +127,7 @@ namespace Fate.Compiler.JavaScript {
       if ( id ) {
         return id;
       }
-      if ( this.verbose ) {
-        id = this.generatedImports[funcName] = funcName;
-      }
-      else {
-        id = this.generatedImports[funcName] = this.nextId('r');
-      }
+      id = this.generatedImports[funcName] = this.nextId('r');
       var funcNameQuoted = JSON.stringify(funcName);
       this.globalVars.push(
         [id, "=r.runtimeImport(", funcNameQuoted, ")"].join('')
@@ -149,12 +142,7 @@ namespace Fate.Compiler.JavaScript {
       if ( id ) {
         return id;
       }
-      if ( this.verbose ) {
-        id = this.generatedBuilders[key] = this.nextId(funcName);
-      }
-      else {
-        id = this.generatedBuilders[key] = this.nextId('b');
-      }
+      id = this.generatedBuilders[key] = this.nextId('b');
       this.globalVars.push(
         id + "=" + funcId + "(" + literalIds.join(',') + ")"
       );

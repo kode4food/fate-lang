@@ -63,6 +63,18 @@ exports.like = nodeunit.testCase({
     test.done();
   },
 
+  "Invalid Wildcards": function (test) {
+    test.throws(function () {
+      evaluate("? > 99");
+    }, "Invalid top level wildcard");
+
+    test.throws(function () {
+      evaluate("~{ ?: 'hello' }");
+    }, "Invalid object id wildcard");
+
+    test.done();
+  },
+
   "Like Matching": function (test) {
     var person1 = {
       "name": "Thom",

@@ -281,7 +281,8 @@ namespace Fate.Compiler.Rewriter {
       var ancestors = hasAncestorTags('objectAssignment', 'pattern');
       if ( ancestors ) {
         var parent = <Syntax.ObjectAssignment>ancestors[0];
-        if ( parent.id === nodeStack[nodeStack.indexOf(parent) + 1] ) {
+        if ( parent.id === nodeStack[nodeStack.indexOf(parent) + 1] ||
+             parent.id === node ) {
           issueError(node, "Wildcards cannot appear in Property Names");
         }
       }

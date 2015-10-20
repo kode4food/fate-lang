@@ -41,6 +41,7 @@ namespace Fate.Compiler {
 
   export function generateNodeModule(generatedCode: GeneratedCode) {
     var buffer: string[] = [];
+    buffer.push('"use strict";');
     buffer.push("const fate=require('fatejs');");
     buffer.push("const r=fate.Runtime;");
     buffer.push(generatedCode);
@@ -51,6 +52,7 @@ namespace Fate.Compiler {
 
   export function generateFunctionCode(generatedCode: GeneratedCode) {
     var buffer: string[] = [];
+    buffer.push('"use strict";');
     buffer.push(generatedCode);
     buffer.push("module.exports=s;");
     return buffer.join('');

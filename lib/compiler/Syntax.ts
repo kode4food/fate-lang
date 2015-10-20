@@ -40,10 +40,6 @@ namespace Fate.Compiler.Syntax {
     public column: number;
     public length: number;
 
-    public dump() {
-      return require('util').inspect(this, { depth: null });
-    }
-
     public template(...args: any[]) {
       var result = node.apply(null, args);
       result.line = this.line;

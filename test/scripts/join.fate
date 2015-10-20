@@ -21,6 +21,7 @@ def patternTest(test)
   setTimeout( () -> b('there', 99), 20 )
   setTimeout( () -> a({ type: 'Not', value: 'another' }, 'goodbye'),  30 )
   setTimeout( () -> b('you', 40),  40 )
+  setTimeout( () -> b('there', 120), 60 )
   setTimeout( () -> test.done(), 100)
 end
 

@@ -1,0 +1,16 @@
+def explicit(test)
+  import './basics' as basics
+  
+  basics.relational | test.ok
+  test.done()
+end
+
+def multiple(test)
+  import './basics' as basics1
+  import './basics' as basics2
+  
+  test.equal(basics1, basics2)
+  test.done()
+end
+
+export explicit, multiple
