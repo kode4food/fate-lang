@@ -13,12 +13,12 @@ namespace Fate.Resolvers {
   export function createSystemResolver() {
     var resolver = createMemoryResolver();
 
-    resolver.registerModule('math', <any>(System.Math));
-    resolver.registerModule('list', <any>(System.List));
-    resolver.registerModule('string', <any>(System.String));
+    resolver.register('math', <any>(System.Math));
+    resolver.register('list', <any>(System.List));
+    resolver.register('string', <any>(System.String));
 
-    delete resolver.registerModule;
-    delete resolver.unregisterModule;
+    delete resolver.register;
+    delete resolver.unregister;
 
     return resolver;
   }

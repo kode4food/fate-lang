@@ -31,7 +31,7 @@ exports.cli = nodeunit.testCase({
       });
 
       var compiled = require('./cli_success/test1.fate.js');
-      test.equal(typeof compiled, 'function');
+      test.ok(fate.Types.isObject(compiled));
 
       // cleanup
       fs.unlinkSync("./test/cli_success/test1.fate.js");

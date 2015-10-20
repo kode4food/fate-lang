@@ -151,7 +151,7 @@ namespace Fate.Compiler.CodeGen {
 
     function createFromEvaluator(node: Syntax.FromStatement) {
       var assigns: any[] = [];
-      var modulePath = node.modulePath.value;
+      var modulePath = node.path.value;
       var modulePathId = globals.literal(modulePath);
       var importer = globals.builder('importer', modulePathId);
 

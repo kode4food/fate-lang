@@ -41,28 +41,18 @@ namespace Fate.Compiler {
 
   export function generateNodeModule(generatedCode: GeneratedCode) {
     var buffer: string[] = [];
-    buffer.push("var fate=require('fatejs');");
-    buffer.push("(function(g,r,module){");
-    buffer.push(generateFunctionCode(generatedCode));
-    buffer.push("}(fate.global,fate.Runtime,module));");
-    buffer.push("if(require.main===module){");
-    buffer.push("module.exports();");
-    buffer.push("}");
+    buffer.push("const fate=require('fatejs');");
+    buffer.push("const r=fate.Runtime;");
+    buffer.push(generatedCode);
+    buffer.push("module.__fateModule=true;");
+    buffer.push("module.result=s(fate.global,module.exports);");
     return buffer.join('');
   }
 
   export function generateFunctionCode(generatedCode: GeneratedCode) {
     var buffer: string[] = [];
-    buffer.push("\"use strict\";");
-    buffer.push("var x;");
-    buffer.push("module.exports=w;");
-    buffer.push("w.exports=function(){");
-    buffer.push("if(!x){x={};s(g,x);}");
-    buffer.push("return x;");
-    buffer.push("};");
-    buffer.push("w.__fateFunction=w.__fateModule=true;");
     buffer.push(generatedCode);
-    buffer.push("function w(c){return s(c||g,{});}");
+    buffer.push("module.exports=s;");
     return buffer.join('');
   }
 
@@ -70,7 +60,7 @@ namespace Fate.Compiler {
     var context = vm.createContext({
       g: Fate.global,
       r: Runtime,
-      module: { exports: {} }
+      module: { }
     });
     vm.runInContext(generateFunctionCode(generatedCode), context);
     return context.module.exports;

@@ -6,11 +6,7 @@ var helpers = require('./helpers');
 var fate = require('../build/fate');
 var createMemoryResolver = fate.Resolvers.createMemoryResolver;
 var createFileResolver = fate.Resolvers.createFileResolver;
-
-function evaluate(script, context) {
-  var template = fate.compile(script);
-  return template(context);
-}
+var evaluate = fate.evaluate;
 
 exports.imports = nodeunit.testCase({
 
@@ -19,8 +15,8 @@ exports.imports = nodeunit.testCase({
       var resolver = createMemoryResolver();
       fate.Runtime.resolvers().push(resolver);
 
-      resolver.registerModule('hello', "'hello world!'");
-      resolver.registerModule('helpers', {
+      resolver.register('hello', "'hello world!'");
+      resolver.register('helpers', {
         testHelper: function testHelper(arg1, arg2) {
           return "arg1=" + arg1 + ":arg2=" + arg2;
         }
@@ -41,15 +37,11 @@ exports.imports = nodeunit.testCase({
       var script2 = "from helpers import testHelper as test\n" +
         "test(5,6)";
 
-      var module1 = fate.Runtime.resolveModule('hello');
-      var exports1 = fate.Runtime.resolveExports('hello');
-      var module2 = fate.Runtime.resolveModule('helpers');
-      var exports2 = fate.Runtime.resolveExports('helpers');
+      var exports1 = fate.Runtime.resolve('hello');
+      var exports2 = fate.Runtime.resolve('helpers');
 
-      test.equal(typeof module1, 'function');
-      test.equal(typeof module2, 'function');
-      test.equal(typeof exports1, 'object');
-      test.equal(typeof exports2, 'object');
+      test.ok(fate.Types.isObject(exports1));
+      test.ok(fate.Types.isObject(exports2));
       test.equal(evaluate(script1), "arg1=1:arg2=2");
       test.equal(evaluate(script2), "arg1=5:arg2=6");
       test.throws(function () {
@@ -71,18 +63,10 @@ exports.imports = nodeunit.testCase({
     },
 
     "Module Retrieval": function (test) {
-      var found1 = fate.Runtime.resolveModule('test');
-      var found2 = fate.Runtime.resolveModule('test');
-      var found3 = fate.Runtime.resolveExports('test');
-      var notFound1 = fate.Runtime.resolveModule('unknown');
-      var notFound2 = fate.Runtime.resolveModule('unknown');
-      var notFound3 = fate.Runtime.resolveExports('unknown');
-      test.equal(found1(), "There are no people!");
-      test.equal(found2(), "There are no people!");
-      test.equal(typeof found3, 'object');
-      test.equal(notFound1, undefined);
-      test.equal(notFound2, undefined);
-      test.equal(notFound3, undefined);
+      var found = fate.Runtime.resolve('test');
+      var notFound = fate.Runtime.resolve('unknown');
+      test.ok(fate.Types.isObject(found));
+      test.equal(notFound, undefined);
       test.done();
     },
 
@@ -114,17 +98,14 @@ exports.imports = nodeunit.testCase({
     "System Import": function (test) {
       test.equal(evaluate("import math\nmath.round(9.5)"), 10);
 
-      var list = fate.Runtime.resolveModule('list');
-      var listExports = fate.Runtime.resolveExports('list');
+      var list = fate.Runtime.resolve('list');
 
-      test.equal(typeof list, 'function');
-      test.equal(typeof listExports, 'object');
-      test.equal(typeof listExports.join, 'function');
-      test.equal(list(), undefined);
-      test.equal(listExports.first('hello'), 'hello');
-      test.equal(listExports.last('hello'), 'hello');
-      test.equal(listExports.length(37), 0);
-      test.equal(listExports.length({ name: 'fate', age: 1 }), 2);
+      test.equal(typeof list, 'object');
+      test.equal(typeof list.join, 'function');
+      test.equal(list.first('hello'), 'hello');
+      test.equal(list.last('hello'), 'hello');
+      test.equal(list.length(37), 0);
+      test.equal(list.length({ name: 'fate', age: 1 }), 2);
       test.done();
     },
 

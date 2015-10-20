@@ -6,11 +6,10 @@ namespace Fate.Types {
   export type ModulePath = string;
   export type ModuleName = string;
 
-  type ModuleExporter = () => ModuleExports;
-
   export interface Module {
-    exports?: ModuleExporter;
     __fateModule?: boolean;
+    result?: any;
+    exports: ModuleExports;
   }
 
   export interface ModuleExports {
@@ -29,15 +28,16 @@ namespace Fate.Types {
     return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
   }
 
+  export function createModule(moduleExports?: ModuleExports) {
+    return {
+      __fateModule: true,
+        exports: moduleExports || {}
+    };
+  }
+
   export function isFateModule(module: any) {
     return ( typeof module === 'function' || isObject(module) ) &&
              module.__fateModule;
-  }
-
-  export function blessModule(value: Module, exports: ModuleExporter) {
-    value.__fateModule = true;
-    value.exports = exports;
-    return value;
   }
 
   export function isTruthy(value: any) {

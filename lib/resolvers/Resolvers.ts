@@ -6,7 +6,6 @@
 
 namespace Fate.Resolvers {
   export interface Resolver {
-    resolveModule(name: Types.ModuleName): Types.Module;
-    resolveExports(name: Types.ModuleName): Types.ModuleExports;
+    resolve(name: Types.ModuleName): Types.Module;
   }
 }

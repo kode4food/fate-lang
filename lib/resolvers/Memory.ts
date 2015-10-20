@@ -5,14 +5,9 @@
 
 namespace Fate.Resolvers {
   import isFateModule = Types.isFateModule;
-  import blessModule = Types.blessModule;
+  import createModule = Types.createModule;
 
   type AnyMap = { [index: string]: any };
-
-  interface CacheInfo {
-    module: Types.Module;
-    moduleExports?: Types.ModuleExports;
-  }
 
   /**
    * Creates a new MemoryResolver.  As its name implies, this resolver
@@ -22,34 +17,20 @@ namespace Fate.Resolvers {
    * modules and native JavaScript helpers.
    */
   export function createMemoryResolver() {
-    var cache: { [index: string]: CacheInfo } = {};
+    var cache: { [index: string]: Types.Module } = {};
 
-    var resolver = {
-      resolveModule: resolveModule,
-      resolveExports: resolveExports,
-      unregisterModule: unregisterModule,
-      registerModule: registerModule
+    return {
+      resolve: resolve,
+      unregister: unregister,
+      register: register
     };
 
-    return resolver;
-
-    function resolveModule(name: Types.ModuleName) {
-      var result = cache[name];
-      return result ? result.module : undefined;
-    }
-
-    function resolveExports(name: Types.ModuleName) {
+    function resolve(name: Types.ModuleName) {
       var result = cache[name];
       if ( !result ) {
         return undefined;
       }
-
-      if ( result.moduleExports ) {
-        return result.moduleExports;
-      }
-
-      var moduleExports = result.moduleExports = result.module.exports();
-      return moduleExports;
+      return result;
     }
 
     /**
@@ -57,7 +38,7 @@ namespace Fate.Resolvers {
      *
      * @param {String} name the name of the module to remove
      */
-    function unregisterModule(name: Types.ModuleName) {
+    function unregister(name: Types.ModuleName) {
       delete cache[name];
     }
 
@@ -67,45 +48,30 @@ namespace Fate.Resolvers {
      * @param {String} name the name of the module to be registered
      * @param {Function|String|Object} module the module to register
      */
-    function registerModule(name: Types.ModuleName,
-                            module: Types.Module|string|AnyMap) {
+    function register(name: Types.ModuleName,
+                      module: Types.Module|string|AnyMap) {
       // A compiled Fate Module function
       if ( isFateModule(module) ) {
-        cache[name] = { module: <Types.Module>module };
+        cache[name] = <Types.Module>module;
         return;
       }
 
       // *String* - An unparsed Fate script
       if ( typeof module === 'string' ) {
-        cache[name] = { module: Fate.compile(module) };
+        var compiled = Fate.compile(module);
+        var generatedModule = createModule();
+        compiled(Fate.global, generatedModule.exports);
+        cache[name] = generatedModule;
         return;
       }
 
       // *Object* - A hash of Helpers (name->Function)
-      if ( typeof module === 'object' && module !== null &&
-           !Array.isArray(module) ) {
-        cache[name] = { module: createModuleStub(<AnyMap>module) };
+      if ( Types.isObject(module) ) {
+        cache[name] = createModule(<Types.ModuleExports>module);
         return;
       }
 
       throw new Error("Module not provided");
-    }
-  }
-
-  /**
-   * Takes a hash of Functions, blesses them, and creates a stub module for
-   * them that can be returned by the `resolveModule()` call.
-   *
-   * @param {Object} moduleExports the hash of Functions to stub
-   */
-  function createModuleStub(moduleExports: AnyMap): Types.Module {
-    return blessModule(scriptInterface, scriptExports);
-
-    function scriptInterface() {
-    }
-
-    function scriptExports() {
-      return moduleExports;
     }
   }
 }

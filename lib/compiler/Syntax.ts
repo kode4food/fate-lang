@@ -209,7 +209,7 @@ namespace Fate.Compiler.Syntax {
   }
 
   export class FromStatement extends Statement {
-    constructor(public modulePath: ModulePath,
+    constructor(public path: ModulePath,
                 public importList: ModuleItems) { super(); }
   }
 

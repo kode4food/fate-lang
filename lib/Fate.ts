@@ -36,11 +36,12 @@ namespace Fate {
 
   /**
    * Convenience function to compile and execute a script against a context
-   * Object and options.  Not generally recommended.
+   * Object.  Not generally recommended.
    */
-  export function evaluate(script: Compiler.ScriptContent, globals?: Object) {
+  export function evaluate(script: Compiler.ScriptContent, context?: Object) {
     var compiled = compile(script);
-    return compiled(globals || Fate.global);
+    var module = { exports: {} };
+    return compiled(context || Fate.global, module);
   }
 
   /**
@@ -48,11 +49,10 @@ namespace Fate {
    */
   require.extensions['.fate'] = fateRequireExtension;
 
-  /* istanbul ignore next */
   function fateRequireExtension(module: any, filename: string) {
     var content = fs.readFileSync(filename, 'utf8');
     var compiledOutput = compileModule(content).scriptBody;
     var generatedModule = generateFunction(compiledOutput);
-    module.exports = generatedModule.exports();
+    generatedModule(global, module.exports);
   }
 }

@@ -76,16 +76,8 @@ function monkeyPatchRequires(root, remappedPaths) {
   });
 }
 
-function deleteBuildProducts(root) {
-  var files = glob.sync('**/*.fate.js', { cwd: root });
-  files.forEach(function (file) {
-    fs.unlinkSync(path.join(root, file));
-  });
-}
-
 // Exported Functions
 exports.createConsole = createConsole;
 exports.evaluateEmit = evaluateEmit;
 exports.evaluateAsync = evaluateAsync;
 exports.monkeyPatchRequires = monkeyPatchRequires;
-exports.deleteBuildProducts = deleteBuildProducts;
