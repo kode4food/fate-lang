@@ -4,14 +4,15 @@
 "use strict";
 
 namespace Fate.Resolvers {
-  import createModule = Types.createModule;
-
   var path = require('path');
+
+  import createModule = Types.createModule;
 
   interface Options {
     path: string,
   }
 
+  var explicitPathRegex = /\.fate(\.js)?$/;
   var pathSuffixes = ['.fate.js', '.fate', '/index.fate.js', '/index.fate'];
 
   /**
@@ -29,7 +30,6 @@ namespace Fate.Resolvers {
     };
 
     function resolve(name: Types.ModuleName) {
-      // Only process the exports in the case of a cache miss
       var result = cache[name];
       if ( result ) {
         return result;
@@ -44,7 +44,15 @@ namespace Fate.Resolvers {
     }
 
     function loadFromFileSystem(name: Types.ModuleName) {
-      // Prefer to resolve a module by moduleName + extension
+      if ( explicitPathRegex.test(name) ) {
+        try {
+          return createModule(require(name));
+        }
+        catch ( err ) {
+          return undefined;
+        }
+      }
+
       var checkPaths = pathSuffixes.map(function (suffix) {
         return path.resolve(basePath, name + suffix);
       });
