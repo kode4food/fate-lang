@@ -198,7 +198,7 @@ exports.basics = nodeunit.testCase({
     test.equal(evaluate("self.name", person), 'thom');
     test.equal(evaluate("self.colors", person), person.colors);
     test.equal(evaluate("self['age']", person), 43);
-    test.equal(evaluate("self", person), person);
+    test.deepEqual(evaluate("self", person), person);
     test.done();
   }
 });

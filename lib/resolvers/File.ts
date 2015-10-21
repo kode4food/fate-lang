@@ -4,6 +4,8 @@
 "use strict";
 
 namespace Fate.Resolvers {
+  import DirPath = Types.DirPath;
+
   var path = require('path');
 
   import createModule = Types.createModule;
@@ -23,50 +25,51 @@ namespace Fate.Resolvers {
    */
   export function createFileResolver(options: Options) {
     var cache: { [index: string]: Types.Module } = {};
-    var basePath = options.path || process.cwd();
+    var defaultBasePath: DirPath = options.path || process.cwd();
 
     return {
       resolve: resolve
     };
 
-    function resolve(name: Types.ModuleName) {
+    function resolve(name: Types.ModuleName, basePath = defaultBasePath) {
       var result = cache[name];
       if ( result ) {
         return result;
       }
 
-      result = loadFromFileSystem(name);
+      result = loadFromFileSystem(name, basePath);
       if ( !result ) {
         return undefined;
       }
       cache[name] = result;
       return result;
     }
+  }
 
-    function loadFromFileSystem(name: Types.ModuleName) {
-      if ( explicitPathRegex.test(name) ) {
-        try {
-          return createModule(require(name));
-        }
-        catch ( err ) {
-          return undefined;
-        }
+  function loadFromFileSystem(name: Types.ModuleName, basePath: DirPath) {
+    if ( explicitPathRegex.test(name) ) {
+      try {
+        var explicitPath = path.resolve(basePath, name);
+        return createModule(require(explicitPath));
       }
-
-      var checkPaths = pathSuffixes.map(function (suffix) {
-        return path.resolve(basePath, name + suffix);
-      });
-
-      for ( var i = 0; i < checkPaths.length; i++ ) {
-        try {
-          var moduleExports = require(checkPaths[i]);
-          return createModule(moduleExports);
-        }
-        catch ( err ) {
-        }
+      catch ( err ) {
+        return undefined;
       }
-
-      return undefined;
     }
+
+    var checkPaths = pathSuffixes.map(function (suffix) {
+      return path.resolve(basePath, name + suffix);
+    });
+
+    for ( var i = 0; i < checkPaths.length; i++ ) {
+      try {
+        var moduleExports = require(checkPaths[i]);
+        return createModule(moduleExports);
+      }
+      catch ( err ) {
+      }
+    }
+
+    return undefined;
   }
 }

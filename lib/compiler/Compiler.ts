@@ -46,7 +46,9 @@ namespace Fate.Compiler {
     buffer.push("const r=fate.Runtime;");
     buffer.push(generatedCode);
     buffer.push("module.__fateModule=true;");
-    buffer.push("module.result=s(fate.global,module.exports);");
+    buffer.push("module.result=s(");
+    buffer.push("fate.globals({__filename}),");
+    buffer.push("module.exports);");
     return buffer.join('');
   }
 
@@ -60,7 +62,7 @@ namespace Fate.Compiler {
 
   export function generateFunction(generatedCode: GeneratedCode) {
     var context = vm.createContext({
-      g: Fate.global,
+      g: Fate.globals(),
       r: Runtime,
       module: { }
     });

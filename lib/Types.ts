@@ -3,7 +3,7 @@
 "use strict";
 
 namespace Fate.Types {
-  export type ModulePath = string;
+  export type DirPath = string;
   export type ModuleName = string;
 
   export interface Module {

@@ -6,6 +6,7 @@
 
 namespace Fate {
   var fs = require('fs');
+  var path = require('path');
 
   import compileModule = Compiler.compileModule;
   import generateFunction = Compiler.generateFunction;
@@ -13,11 +14,29 @@ namespace Fate {
   var pkg = require('../package.json');
   export var VERSION = pkg.version;
 
-  export var global = {
+  var global = {
     console: console,
     require: require,
+    __filename: <string>undefined,
+    __dirname: <string>undefined,
     setTimeout: setTimeout
   };
+
+  export function globals(extensions?: Object) {
+    if ( Types.isObject(extensions) ) {
+      var result = Object.create(global);
+      Util.mixin(result, extensions);
+      return result;
+    }
+    return global;
+  }
+
+  export function sourceInfo(filename: string) {
+    return {
+      __filename: filename,
+      __dirname: path.dirname(filename)
+    };
+  }
 
   /**
    * Fate compiler entry point.  Takes a script and returns a closure
@@ -41,7 +60,7 @@ namespace Fate {
   export function evaluate(script: Compiler.ScriptContent, context?: Object) {
     var compiled = compile(script);
     var module = { exports: {} };
-    return compiled(context || Fate.global, module);
+    return compiled(globals(context), module);
   }
 
   /**
@@ -53,6 +72,6 @@ namespace Fate {
     var content = fs.readFileSync(filename, 'utf8');
     var compiledOutput = compileModule(content).scriptBody;
     var generatedModule = generateFunction(compiledOutput);
-    generatedModule(global, module.exports);
+    generatedModule(globals(sourceInfo(filename)), module.exports);
   }
 }

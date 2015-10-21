@@ -36,7 +36,6 @@ namespace Fate.Compiler.JavaScript {
   interface NameInfo {
     names: NameIdMap;
     scopeInfo: ScopeInfo;
-    selfName: Name;
     usesScratch: boolean;
   }
 
@@ -228,7 +227,6 @@ namespace Fate.Compiler.JavaScript {
       nameStack.push({
         names: names,
         scopeInfo: scopeInfo,
-        selfName: selfName,
         usesScratch: usesScratch
       });
       names = Object.create(names);
@@ -240,7 +238,6 @@ namespace Fate.Compiler.JavaScript {
       var info = nameStack.pop();
       names = info.names;
       scopeInfo = info.scopeInfo;
-      selfName = info.selfName;
       usesScratch = info.usesScratch;
     }
 
@@ -326,13 +323,11 @@ namespace Fate.Compiler.JavaScript {
     function captureState(capturedBody: Function) {
       var myScopeInfo = scopeInfo.snapshot();
       var myNames = names;
-      var mySelfName = selfName;
 
       return function () {
         pushLocalScope();
         scopeInfo = myScopeInfo;
         names = myNames;
-        selfName = mySelfName;
         capturedBody();
         popLocalScope();
       };

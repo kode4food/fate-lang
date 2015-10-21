@@ -142,11 +142,18 @@ namespace Fate.Compiler.CodeGen {
         assigns.push([
           moduleAlias,
           function () {
-            generate.call(importer, []);
+            generate.call(importer, [createImporterArguments]);
           }
         ]);
       });
       generate.assignments(assigns);
+    }
+
+    function createImporterArguments() {
+      generate.member(function () {
+        generate.self();
+      },
+      globals.literal('__dirname'));
     }
 
     function createFromEvaluator(node: Syntax.FromStatement) {
@@ -159,7 +166,7 @@ namespace Fate.Compiler.CodeGen {
       assigns.push([
         anon,
         function () {
-          generate.call(importer, []);
+          generate.call(importer, [createImporterArguments]);
         }
       ]);
 

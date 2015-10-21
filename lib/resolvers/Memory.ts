@@ -60,7 +60,7 @@ namespace Fate.Resolvers {
       if ( typeof module === 'string' ) {
         var compiled = Fate.compile(module);
         var generatedModule = createModule();
-        compiled(Fate.global, generatedModule.exports);
+        compiled(Fate.globals(), generatedModule.exports);
         cache[name] = generatedModule;
         return;
       }
