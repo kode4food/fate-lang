@@ -63,6 +63,8 @@ namespace Fate.Compiler.JavaScript {
     annotations: Annotations;
   }
 
+  var memberIdentifierRegex = /^(["'])([a-zA-Z_$][0-9a-zA-Z_$]*)\1$/;
+
   // presented operators are symbolic
   var operatorMap: StringMap = {
     'eq': '===',
@@ -276,6 +278,12 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function member(object: BodyEntry, property: BodyEntry) {
+      var propertyCode = code(property);
+      var match = memberIdentifierRegex.exec(propertyCode);
+      if ( match && match[2] ) {
+        write(object, '.', match[2]);
+        return
+      }
       write(object, '[', property, ']');
     }
 
