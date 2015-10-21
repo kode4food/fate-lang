@@ -26,16 +26,12 @@ namespace Fate {
     if ( Types.isObject(extensions) ) {
       var result = Object.create(global);
       Util.mixin(result, extensions);
+      if ( !result.__dirname && result.__filename ) {
+        result.__dirname = path.dirname(result.__filename);
+      }
       return result;
     }
     return global;
-  }
-
-  export function sourceInfo(filename: string) {
-    return {
-      __filename: filename,
-      __dirname: path.dirname(filename)
-    };
   }
 
   /**
@@ -72,6 +68,6 @@ namespace Fate {
     var content = fs.readFileSync(filename, 'utf8');
     var compiledOutput = compileModule(content).scriptBody;
     var generatedModule = generateFunction(compiledOutput);
-    generatedModule(globals(sourceInfo(filename)), module.exports);
+    generatedModule(globals(filename), module.exports);
   }
 }
