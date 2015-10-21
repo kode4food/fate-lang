@@ -13,4 +13,19 @@ def multiple(test)
   test.done()
 end
 
-export explicit, multiple
+def parent(test)
+  import '../module1' as module1
+  
+  test.equal(module1.test_value, 'right!')
+  test.done()
+end
+
+def parentFrom(test)
+  from '../module1' import test_value as testv
+  
+  test.equal(testv, 'right!')
+  test.done()
+end
+
+export explicit, multiple, parent, parentFrom
+
