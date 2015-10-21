@@ -5,8 +5,6 @@ namespace Fate.Runtime {
   import DirPath = Types.DirPath;
   import ModuleName = Types.ModuleName;
 
-  type RuntimeInterface = any;
-
   // Register the default resolvers
   var fileResolver = Resolvers.createFileResolver({ path: process.cwd() });
   var systemResolver = Resolvers.createSystemResolver();
@@ -30,10 +28,6 @@ namespace Fate.Runtime {
 
   export function resolvers(): Resolvers.Resolver[] {
     return _resolvers;
-  }
-
-  export function runtimeImport(methodName: string) {
-    return (<RuntimeInterface>Runtime)[methodName];
   }
 
   export function importer(moduleName: ModuleName) {

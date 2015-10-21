@@ -129,9 +129,8 @@ namespace Fate.Compiler.JavaScript {
         return id;
       }
       id = this.generatedImports[funcName] = this.nextId('r');
-      var funcNameQuoted = JSON.stringify(funcName);
       this.globalVars.push(
-        [id, "=r.runtimeImport(", funcNameQuoted, ")"].join('')
+        [id, "=r.", funcName].join('')
       );
       return id;
     }
@@ -179,7 +178,7 @@ namespace Fate.Compiler.JavaScript {
       retrieveAnonymous: retrieveAnonymous,
       assignResult: assignResult,
       self: self,
-      member: member,
+      member: writeMember,
       write: write,
       writeAndGroup: writeAndGroup,
       getter: getter,
@@ -277,11 +276,19 @@ namespace Fate.Compiler.JavaScript {
       write("arguments");
     }
 
-    function member(object: BodyEntry, property: BodyEntry) {
-      var propertyCode = code(property);
-      var match = memberIdentifierRegex.exec(propertyCode);
+    function getMemberIdentifier(name: string) {
+      var match = memberIdentifierRegex.exec(name);
       if ( match && match[2] ) {
-        write(object, '.', match[2]);
+        return match[2];
+      }
+      return null;
+    }
+
+    function writeMember(object: BodyEntry, property: BodyEntry) {
+      var propertyCode = code(property);
+      var memberId = getMemberIdentifier(propertyCode);
+      if ( memberId ) {
+        write(object, '.', memberId);
         return
       }
       write(object, '[', property, ']');
@@ -422,7 +429,8 @@ namespace Fate.Compiler.JavaScript {
         var alias = item[1];
 
         var localName = localForAssignment(name);
-        write('x[', globals.literal(alias), ']=', localName, ';');
+        writeMember('x', globals.literal(alias))
+        write('=', localName, ';');
       });
     }
 
@@ -549,7 +557,7 @@ namespace Fate.Compiler.JavaScript {
         }
         else {
           write('var ', localName, '=');
-          write(self, '[', globals.literal(name), ']');
+          writeMember(self, globals.literal(name));
           write(';');
         }
       });
@@ -623,7 +631,8 @@ namespace Fate.Compiler.JavaScript {
         expressions.forEach(function (item) {
           components.push(function () {
             var name = item[2] ? item[0] : globals.literal(item[0]);
-            write(dictVar, '[', name, ']=', item[1]);
+            writeMember(dictVar, name);
+            write('=', item[1]);
           });
         });
 
@@ -650,7 +659,8 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function objectAssign(dict: Id, name: BodyEntry, value: BodyEntry) {
-      write(dict, '[', name, ']=', value);
+      writeMember(dict, name);
+      write('=', value);
     }
 
     function code(value?: BodyEntry|BodyEntries): string {
