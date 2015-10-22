@@ -334,15 +334,14 @@ namespace Fate.Compiler.CodeGen {
       create();
 
       function createUnguarded() {
-        generate.call(globals.runtimeImport('defineFunction'), [
-          function () {
+        generate.parens(function () {
             generate.func({
               contextArgs: paramNames,
               body: defer(createStatementsEvaluator, node.statements),
               annotations: node.annotations
             });
           }
-        ]);
+        );
       }
 
       function createGuarded() {

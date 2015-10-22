@@ -200,6 +200,7 @@ namespace Fate.Compiler.JavaScript {
       arrayAppend: arrayAppend,
       object: object,
       objectAssign: objectAssign,
+      parens: parens,
       code: code,
       toString: toString
     };
@@ -661,6 +662,10 @@ namespace Fate.Compiler.JavaScript {
     function objectAssign(dict: Id, name: BodyEntry, value: BodyEntry) {
       writeMember(dict, name);
       write('=', value);
+    }
+
+    function parens(expr: BodyEntry) {
+      write('(', expr, ')');
     }
 
     function code(value?: BodyEntry|BodyEntries): string {
