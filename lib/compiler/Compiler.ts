@@ -95,12 +95,6 @@ namespace Fate.Compiler {
     return filePath + lineInfo + ": " + message;
   }
 
-  interface PegError {
-    found: string;
-    line: number;
-    column: number;
-  }
-
   // Intercepts a PEG.js Exception and generate a human-readable error message
   function formatSyntaxError(err: SyntaxError,
                              filePath?: Compiler.FilePath): CompileError {
