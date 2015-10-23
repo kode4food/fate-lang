@@ -1,3 +1,5 @@
+/// <reference path="../Scheduler.ts"/>
+
 namespace Fate.Runtime {
   var slice = Array.prototype.slice;
 
@@ -101,7 +103,7 @@ namespace Fate.Runtime {
 
       satisfied = true;
       argumentSets = null;
-      body.apply(null, args);
+      GlobalScheduler.queue(body, args);
     }
   }
 }
