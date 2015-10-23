@@ -63,8 +63,6 @@ namespace Fate.Compiler.JavaScript {
     annotations: Annotations;
   }
 
-  var memberIdentifierRegex = /^(["'])([a-zA-Z_$][0-9a-zA-Z_$]*)\1$/;
-
   // presented operators are symbolic
   var operatorMap: StringMap = {
     'eq': '===',
@@ -195,6 +193,7 @@ namespace Fate.Compiler.JavaScript {
       func: func,
       compoundExpression: compoundExpression,
       returnStatement: returnStatement,
+      loopBreak: loopBreak,
       call: call,
       array: array,
       arrayAppend: arrayAppend,
@@ -273,12 +272,8 @@ namespace Fate.Compiler.JavaScript {
       write(selfName);
     }
 
-    function functionArguments() {
-      write("arguments");
-    }
-
     function getMemberIdentifier(name: string) {
-      var match = memberIdentifierRegex.exec(name);
+      var match = /^(["'])([a-zA-Z_$][0-9a-zA-Z_$]*)\1$/.exec(name);
       if ( match && match[2] ) {
         return match[2];
       }
@@ -364,9 +359,9 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function writeAndGroup(items: BodyEntries) {
-      write("(");
-      writeDelimited(items, "&&");
-      write(")");
+      write('(');
+      writeDelimited(items, '&&');
+      write(')');
     }
 
     function writeDelimited(items: BodyEntries, delimiter?: string) {
@@ -525,7 +520,7 @@ namespace Fate.Compiler.JavaScript {
       }
       write('(', argNames.join(','), '){');
       if ( usesScratch ) {
-        write('var _;');
+        write('let _;');
       }
       write(prologContent);
       writeLocalVariables(parentNames, argNames);
@@ -554,17 +549,17 @@ namespace Fate.Compiler.JavaScript {
         }
         else if ( parentNames[name] ) {
           // Local Assignments (inherit from parent)
-          write('var ', localName, '=', parentNames[name], ';');
+          write('let ', localName, '=', parentNames[name], ';');
         }
         else {
-          write('var ', localName, '=');
+          write('let ', localName, '=');
           writeMember(self, globals.literal(name));
           write(';');
         }
       });
 
       if ( undefinedVars.length ) {
-        write('var ', undefinedVars.join(','), ';');
+        write('let ', undefinedVars.join(','), ';');
       }
 
       function isArgument(localName: Name) {
@@ -584,6 +579,10 @@ namespace Fate.Compiler.JavaScript {
         return;
       }
       write('return ', bodyCallback, ';');
+    }
+
+    function loopBreak() {
+      write('return;');
     }
 
     function call(funcId: Id|BodyEntry, args?: BodyEntries) {

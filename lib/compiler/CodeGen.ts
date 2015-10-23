@@ -525,7 +525,7 @@ namespace Fate.Compiler.CodeGen {
               defer(range.guard),
               null,
               function () {
-                generate.returnStatement();
+                generate.loopBreak();
               }
             );
           };
