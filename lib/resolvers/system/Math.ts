@@ -1,12 +1,9 @@
-/// <reference path="../../Runtime.ts"/>
-
 "use strict";
 
 var NativeMath = Math;
 
 namespace Fate.Resolvers.System.Math {
-  import blessGenerator = Runtime.blessGenerator;
-  import stopIteration = Runtime.stopIteration;
+  var createRangeGenerator = require('../lib/generator').createRangeGenerator;
 
   function numberSort(left: number, right: number): number {
     return left - right;
@@ -14,25 +11,7 @@ namespace Fate.Resolvers.System.Math {
 
   // `range(start, end)` creates an integer range generator
   export function range(start: number, end: number) {
-    var current: number|Object;
-    current = start = NativeMath.floor(start);
-    end = NativeMath.floor(end);
-    var increment = end > start ? 1 : -1;
-    return blessGenerator(rangeInstance);
-
-    function rangeInstance(): number|Object {
-      if ( current === stopIteration ) {
-        return stopIteration;
-      }
-      var result = current;
-      if ( current === end ) {
-        current = stopIteration;
-      }
-      else {
-        current = <number>current + increment;
-      }
-      return result;
-    }
+    return createRangeGenerator(start, end);
   }
 
   // `avg(value)` if an Array, returns the average (mathematical mean) of

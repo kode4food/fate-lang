@@ -256,12 +256,7 @@ namespace Fate.Compiler.Syntax {
     constructor(public valueId: Identifier,
                 public nameId: Identifier,
                 public collection: Expression,
-                public guard: Expression) {
-      super();
-      if ( !nameId ) {
-        this.nameId = valueId.template('id', 1);
-      }
-    }
+                public guard: Expression) { super(); }
   }
 
   export class Signature extends Node {

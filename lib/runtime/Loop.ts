@@ -1,53 +1,33 @@
 namespace Fate.Runtime {
+  var generator = require('../lib/generator');
+  var isGenerator = generator.isGenerator;
+  var generateIndexedSet = generator.generateIndexedSet;
+
   export type Collection = any[]|any|Function;
+  var EmptyCollection: Collection = [];
 
-  export var stopIteration = {
-    __fateStopIteration: true
-  };
-
-  export interface Generator {
-    (): any;
-    __fateGenerator?: boolean;
+  export function createIterator(collection: Collection) {
+    if ( Array.isArray(collection) || isObject(collection) ||
+         isGenerator(collection) ) {
+      return collection;
+    }
+    return EmptyCollection;
   }
 
-  export function blessGenerator(value: Generator) {
-    value.__fateGenerator = true;
-    return value;
-  }
-
-  export function isFateGenerator(gen: any) {
-    return typeof gen === 'function' && gen.__fateGenerator;
-  }
-
-  export function loop(collection: Collection, loopCallback: Function) {
-    var i: number = 0;
-    var len: number;
-    var name: string|number;
-    var value: any;
-
+  export function createNamedIterator(collection: Collection) {
     if ( Array.isArray(collection) ) {
-      for ( len = collection.length; i < len; i++ ) {
-        value = collection[i];
-        loopCallback(value === null ? undefined : value, i);
-      }
-      return;
+      return collection.map(function (item: any, index: number) {
+        return [item, index];
+      });
     }
-
-    if ( typeof collection === 'object' && collection !== null ) {
-      var items = Object.keys(collection);
-      for ( len = items.length; i < len; i++ ) {
-        name = items[i];
-        value = collection[name];
-        loopCallback(value === null ? undefined : value, name);
-      }
-      return;
+    if ( isObject(collection) ) {
+      return Object.keys(collection).map(function (key) {
+        return [collection[key], key];
+      });
     }
-
-    if ( isFateGenerator(collection) ) {
-      for ( value = collection(); value !== stopIteration;
-            value = collection() ) {
-        loopCallback(value, i++);
-      }
+    if ( isGenerator(collection) ) {
+      return generateIndexedSet(collection);
     }
+    return EmptyCollection;
   }
 }

@@ -434,38 +434,49 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createListCompEvaluator(node: Syntax.ListComprehension) {
-      var isObject = node instanceof Syntax.ObjectComprehension;
-      var genContainer: Function = isObject ? generate.object : generate.array;
-      var createBody = isObject ? createNameValueBody : createValueBody;
-      var result = generate.createAnonymous();
+      generate.parens(function () {
+        generate.call(function () {
+          generate.func({
+            body: functionWrapperBody,
+            annotations: node.annotations
+          });
+        }, []);
+      });
 
-      generate.compoundExpression([
-        function () {
-          generate.assignAnonymous(result, defer(function () {
-            genContainer([]);
-          }));
-        },
-        function () {
-          createLoop(node.ranges, createBody, node.annotations);
-        },
-        function () {
+      function functionWrapperBody() {
+        var isObject = node instanceof Syntax.ObjectComprehension;
+        var genContainer = isObject ? generate.object : generate.array;
+        var createBody = isObject ? createNameValueBody : createValueBody;
+        var result = generate.createAnonymous();
+
+        generate.statement(function () {
+          generate.assignAnonymous(result, function () {
+            (<Function>genContainer)([]);
+          });
+        });
+
+        createLoop(node.ranges, createBody, node.annotations);
+
+        generate.returnStatement(function () {
           generate.retrieveAnonymous(result);
+        });
+
+        function createValueBody() {
+          var arrayCompNode = <Syntax.ArrayComprehension>node;
+          generate.statement(function () {
+            generate.arrayAppend(result, defer(arrayCompNode.value));
+          });
         }
-      ]);
 
-      function createValueBody() {
-        var arrayCompNode = <Syntax.ArrayComprehension>node;
-        generate.statement(function () {
-          generate.arrayAppend(result, defer(arrayCompNode.value));
-        });
-      }
-
-      function createNameValueBody() {
-        var objectCompNode = <Syntax.ObjectComprehension>node;
-        var assign = objectCompNode.assignment;
-        generate.statement(function () {
-          generate.objectAssign(result, defer(assign.id), defer(assign.value));
-        });
+        function createNameValueBody() {
+          var objectCompNode = <Syntax.ObjectComprehension>node;
+          var assign = objectCompNode.assignment;
+          generate.statement(function () {
+            generate.objectAssign(
+              result, defer(assign.id), defer(assign.value)
+            );
+          });
+        }
       }
     }
 
@@ -515,7 +526,7 @@ namespace Fate.Compiler.CodeGen {
 
         var range = ranges[i];
         var valueId = range.valueId.value;
-        var nameId = range.nameId.value;
+        var nameId = range.nameId ? range.nameId.value : null;
         var prolog: Function;
 
         if ( range.guard ) {
@@ -525,7 +536,7 @@ namespace Fate.Compiler.CodeGen {
               defer(range.guard),
               null,
               function () {
-                generate.loopBreak();
+                generate.loopContinue();
               }
             );
           };

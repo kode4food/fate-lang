@@ -46,7 +46,7 @@ namespace Fate.Compiler.JavaScript {
   }
 
   interface LoopOptions {
-    name: Name;
+    name?: Name;
     value: Name;
     collection: BodyEntry;
     guard: BodyEntry;
@@ -190,10 +190,10 @@ namespace Fate.Compiler.JavaScript {
       statement: statement,
       ifStatement: ifStatement,
       loopExpression: loopExpression,
+      loopContinue: loopContinue,
       func: func,
       compoundExpression: compoundExpression,
       returnStatement: returnStatement,
-      loopBreak: loopBreak,
       call: call,
       array: array,
       arrayAppend: arrayAppend,
@@ -240,6 +240,13 @@ namespace Fate.Compiler.JavaScript {
       names = info.names;
       scopeInfo = info.scopeInfo;
       usesScratch = info.usesScratch;
+    }
+
+    function popLocalScopeWithScratch() {
+      // Pass scratch up and through
+      var tmpScratch = usesScratch;
+      popLocalScope();
+      usesScratch = tmpScratch;
     }
 
     function localForAssignment(name: Name) {
@@ -475,21 +482,51 @@ namespace Fate.Compiler.JavaScript {
       var collection = options.collection;
       var loopGuard = options.guard;
       var loopBody = options.body;
-      var annotations = options.annotations;
 
-      var loop = globals.runtimeImport('loop');
+      var iteratorName = itemName ? 'createNamedIterator': 'createIterator';
+      var iterator = globals.runtimeImport(iteratorName);
+      var iteratorContent = code(function () {
+        write(iterator, '(', collection, ')');
+      });
 
-      call(loop, [
-        collection,
-        function () {
-          func({
-            contextArgs: [itemValue, itemName],
-            prolog: loopGuard,
-            body: loopBody,
-            annotations: annotations
-          });
-        }
-      ]);
+      var parentNames = names;
+      pushLocalScope();
+      scopeInfo.annotations = options.annotations;
+
+      var contextArgs = [itemValue];
+      if ( itemName ) {
+        contextArgs.push(itemName);
+      }
+      var argNames = contextArgs.map(localForAssignment);
+
+      var bodyContent = code(function () {
+        generate(loopBody);
+      });
+
+      var guardContent = code(function () {
+        generate(loopGuard);
+      });
+
+      if ( itemName ) {
+        var wrapper = globals.nextId('i');
+        write('for(let ', wrapper, ' of ', iteratorContent, '){');
+        write('let ', argNames[0], '=', wrapper, '[0],');
+        write(argNames[1], '=', wrapper, '[1];');
+      }
+      else {
+        write('for(let ', argNames[0], ' of ', iteratorContent, '){');
+      }
+
+      write(guardContent);
+      writeLocalVariables(parentNames, argNames);
+      write(bodyContent);
+      write('}');
+
+      popLocalScopeWithScratch();
+    }
+
+    function loopContinue() {
+      write('continue;');
     }
 
     function func(options: FunctionOptions) {
@@ -579,10 +616,6 @@ namespace Fate.Compiler.JavaScript {
         return;
       }
       write('return ', bodyCallback, ';');
-    }
-
-    function loopBreak() {
-      write('return;');
     }
 
     function call(funcId: Id|BodyEntry, args?: BodyEntries) {
