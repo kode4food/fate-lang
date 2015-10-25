@@ -103,7 +103,7 @@ let LargeOrangeShape = ~{
   size: ? > 50
 }
 
-if shape like LargeOrangeShap
+if shape like LargeOrangeShape
   'bingo!'
 end
 
