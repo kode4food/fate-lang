@@ -87,7 +87,7 @@ end
 # List and Object Comprehensions
 let result = [for color in colors 
               where color != 'orange'
-              select color | 'The color is %color']
+              select {color} | 'The color is %color']
 
 let deidentified = {for name:value in person
                     where name not in ['name', 'address', 'ssn']}
