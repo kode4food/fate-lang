@@ -85,9 +85,9 @@ let result = 'green' unless turnedOff else 'red'
 # For Loops, with Guards, Else Clauses, and Multiple Ranges
 for color in colors where color != 'orange',
     shape in shapes where shape != 'square'
-  display({color, shape} | "A %color colored %shape")
+  {color, shape} | "A %color colored %shape" | display
 else
-  display("No colored shapes were retrieved")
+  "No colored shapes were retrieved" | display
 end
 
 # List and Object Comprehensions
