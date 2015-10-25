@@ -1,3 +1,5 @@
+import nodeunit
+
 let data1 = {
   "name": "World",
   "title": "Famous People",
@@ -169,5 +171,9 @@ def assignments(test)
   test.done()
 end
 
-export relational, equality, evaluation, notIn, bool, unary, nilEvaluation,
-       conditional, objectLike, vectorLike, deepPaths, assignments
+let tests = nodeunit.testCase({
+  relational, equality, evaluation, notIn, bool, unary, nilEvaluation,
+  conditional, objectLike, vectorLike, deepPaths, assignments
+})
+
+export tests

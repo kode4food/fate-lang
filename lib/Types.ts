@@ -31,7 +31,7 @@ namespace Fate.Types {
   export function createModule(moduleExports?: ModuleExports) {
     return {
       __fateModule: true,
-        exports: moduleExports || {}
+      exports: moduleExports || {}
     };
   }
 

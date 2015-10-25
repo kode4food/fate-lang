@@ -6,11 +6,12 @@ namespace Fate.Runtime {
   import ModuleName = Types.ModuleName;
 
   // Register the default resolvers
+  var nodeResolver = Resolvers.createNodeResolver();
   var fileResolver = Resolvers.createFileResolver({ path: process.cwd() });
   var systemResolver = Resolvers.createSystemResolver();
   var memoryResolver = Resolvers.createMemoryResolver();
   var _resolvers: Resolvers.Resolver[] = [
-    fileResolver, systemResolver, memoryResolver
+    nodeResolver, fileResolver, systemResolver, memoryResolver
   ];
 
   export var registerModule = memoryResolver.register;

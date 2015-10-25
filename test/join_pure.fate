@@ -1,3 +1,5 @@
+import nodeunit
+
 def patternTest(test)
   test.expect(10)
 
@@ -25,4 +27,6 @@ def patternTest(test)
   setTimeout( () -> test.done(), 100)
 end
 
-export patternTest
+let tests = nodeunit.testCase({ patternTest })
+
+export tests

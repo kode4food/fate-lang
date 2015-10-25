@@ -1,3 +1,4 @@
+/// <reference path="./Node.ts"/>
 /// <reference path="./File.ts"/>
 /// <reference path="./Memory.ts"/>
 /// <reference path="./System.ts"/>

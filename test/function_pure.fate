@@ -1,3 +1,5 @@
+import nodeunit
+
 def guardOnly(test)
   def testFunc(x) where x > 10
     x * 10
@@ -22,4 +24,6 @@ def guardAndDefault(test)
   test.done()
 end
 
-export guardOnly, guardAndDefault
+let tests = nodeunit.testCase({ guardOnly, guardAndDefault })
+
+export tests

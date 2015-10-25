@@ -1,4 +1,5 @@
-import '../../build/fate.js' as fate
+import nodeunit
+import '../build/fate.js' as fate
 let types = fate.Types
 
 def truthyFalsy(test)
@@ -22,4 +23,6 @@ def truthyFalsy(test)
   test.done()
 end
 
-export truthyFalsy
+let tests = nodeunit.testCase({ "Truthy / Falsy": truthyFalsy })
+
+export tests
