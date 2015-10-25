@@ -113,6 +113,8 @@ end
 export calculateVehicleEmissions as calculate
 ```
 
+If you'd like more examples, you can always check out the scripts in the project's [Test Directory](./test).
+
 ## How to Install and Use
 Until the first stable release happens, you're really pressing your luck to use this thing in production.  But if you're insane, you can install the compiler globally like so:
 
