@@ -1,6 +1,6 @@
 ---
 layout: fate_title
-title: Fate
+title: Fate Programming
 ---
 ## Patterns & Guards & Joins, Oh My!
 Fate is a programming language prototype.  It currently compiles into Node.js modules, but the goal is to eventually have it target the JVM.  It is a mostly functional language that includes a processing model inspired by the [Join Calculus](https://en.wikipedia.org/wiki/Join-calculus).  It also provides first-class patterns, invocation guards, list comprehensions, and flexible partial application.
