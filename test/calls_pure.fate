@@ -1,0 +1,40 @@
+import nodeunit
+
+let data = {
+  "name": ["title", "case"],
+  "people": [
+    { name: 'Bill', age: 19 },
+    { name: 'Fred', age: 42 },
+    { name: 'Bob', age: 99 }
+  ]
+}
+
+def leftCalls(test)
+  from string import title
+  from list import join
+  let formatted = title(join(data.name))
+  let result = { formatted } | "Hello, %formatted!"
+
+  test.equal(result, "Hello, Title Case!")
+  test.done()
+end
+
+def rightCalls(test)
+  from string import title
+  from list import join
+  let formatted = data.name | join | title
+  let result1 = { formatted } | "Hello, %formatted!"
+
+  let result2 = ['hello', 'there'] | '%1-%0'
+
+  test.equal(result1, "Hello, Title Case!")
+  test.equal(result2, "there-hello")
+  test.done()
+end
+
+let tests = nodeunit.testCase({
+  "Left Function Calls": leftCalls,
+  "Right Piped Calls": rightCalls
+})
+
+export tests
