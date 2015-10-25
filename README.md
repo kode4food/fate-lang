@@ -60,6 +60,12 @@ Done!  The problem of vehicle emissions testing is now solved!
 You've seen Functions and Patterns, but there's more to Fate than that.  Let's take a very quick look at some of those language features.
 
 ```ruby
+# Imports
+from SomeModule import displayString as display
+
+import SomeModule as aModule
+let display = aModule.displayString
+
 # Branching Statements
 if myAge > 50
   'should probably retire'
@@ -77,9 +83,9 @@ let result = 'green' unless turnedOff else 'red'
 # For Loops, with Guards, Else Clauses, and Multiple Ranges
 for color in colors where color != 'orange',
     shape in shapes where shape != 'square'
-  console.log({color, shape} | "A %color colored %shape")
+  display({color, shape} | "A %color colored %shape")
 else
-  console.log("No colored shapes were retrieved")
+  display("No colored shapes were retrieved")
 end
 
 # List and Object Comprehensions
@@ -100,6 +106,9 @@ when userData(user) & notificationData(notifications)
   # the user data and notifications were retrieved
   # do something about that
 end
+
+# Exporting from a module
+export calculateVehicleEmissions as calculate
 ```
 
 ## How to Install and Use
