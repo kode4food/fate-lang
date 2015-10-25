@@ -1,0 +1,18 @@
+import nodeunit
+
+def lambdas(test)
+  let lambda1 = (x, y) -> x + y
+  let lambda2 = x -> x * 2
+  let lambda3 = x -> [for y in x where y > 50 select y * 3]
+
+  test.equals(lambda1(70, 80), 150)
+  test.equals(lambda2(100), 200)
+  test.deepEqual(lambda3([5, 25, 70, 200]), [210, 600])
+  test.done()
+end
+
+let tests = nodeunit.testCase({
+  "Lambdas Expressions": lambdas
+})
+
+export tests

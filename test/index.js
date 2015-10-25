@@ -24,3 +24,4 @@ exports["Pure Fate Calls"] = require('./calls_pure').tests;
 exports["Pure Fate Functions"] = require('./function_pure').tests;
 exports["Pure Fate Imports"] = require('./import_pure').tests;
 exports["Pure Fate Joins"] = require('./join_pure').tests;
+exports["Pure Fate Lambdas"] = require('./lambda_pure').tests;
