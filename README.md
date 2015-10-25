@@ -89,7 +89,7 @@ else
 end
 
 # List and Object Comprehensions
-let result = [for color in colors 
+let result = [for color in colors
               where color != 'orange'
               select {color} | 'The color is %color']
 
@@ -101,7 +101,7 @@ when userData(user) & err()
   # an error occurred fetching notifications
   # deal with the issue
 end
- 
+
 when userData(user) & notificationData(notifications)
   # the user data and notifications were retrieved
   # do something about that
@@ -110,6 +110,8 @@ end
 # Exporting from a module
 export calculateVehicleEmissions as calculate
 ```
+
+If you'd like more examples, you can always check out the scripts in the project's [Test Directory](https://github.com/Forty-Niner/fate-lang/tree/master/test).
 
 ## How to Install and Use
 Until the first stable release happens, you're really pressing your luck to use this thing in production.  But if you're insane, you can install the compiler globally like so:
