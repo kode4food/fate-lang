@@ -96,6 +96,17 @@ let result = [for color in colors
 let deidentified = {for name:value in person
                     where name not in ['name', 'address', 'ssn']}
 
+# More Advanced Patterns
+let LargeOrangeShape = ~{
+  type: ? in ['square', 'circle', 'triangle'],
+  colors: 'orange' in ?,
+  size: ? > 50
+}
+
+if shape like LargeOrangeShap
+  'bingo!'
+end
+
 # Join Processing
 when userData(user) & err()
   # an error occurred fetching notifications
