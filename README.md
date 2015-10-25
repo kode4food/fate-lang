@@ -56,6 +56,52 @@ end
 
 Done!  The problem of vehicle emissions testing is now solved!
 
+## A Quick Tour
+You've seen Functions and Patterns, but there's more to Fate than that.  Let's take a very quick look at some of those language features.
+
+```ruby
+# Branching Statements
+if myAge > 50
+  'should probably retire'
+else
+  'good to go'
+end
+
+unless processFinished
+  'process some request'
+end
+
+# Branching Expressions
+let result = 'green' unless turnedOff else 'red'
+
+# For Loops, with Guards, Else Clauses, and Multiple Ranges
+for color in colors where color != 'orange',
+    shape in shapes where shape != 'square'
+  console.log({color, shape} | "A %color colored %shape")
+else
+  console.log("No colored shapes were retrieved")
+end
+
+# List and Object Comprehensions
+let result = [for color in colors 
+              where color != 'orange'
+              select color | 'The color is %color']
+
+let deidentified = {for name:value in person
+                    where name not in ['name', 'address', 'ssn']}
+
+# Join Processing
+when userData(user) & err()
+  # an error occurred fetching notifications
+  # deal with the issue
+end
+ 
+when userData(user) & notificationData(notifications)
+  # the user data and notifications were retrieved
+  # do something about that
+end
+```
+
 ## How to Install and Use
 Until the first stable release happens, you're really pressing your luck to use this thing in production.  But if you're insane, you can install the compiler globally like so:
 
