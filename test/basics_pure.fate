@@ -41,7 +41,7 @@ let data2 = {
   stringValue: "a name value"
 }
 
-def evaluation(test)
+def inEvaluation(test)
   10 in [1,10,30] | test.ok
   10 in data2.numbers | test.ok
   'name' in {age:43, name:'Thom'} | test.ok
@@ -134,7 +134,7 @@ def objectLike(test)
   test.done()
 end
 
-def vectorLike(test)
+def arrayLike(test)
   [1, 2, 3] like [1, 2] | test.ok
   [1, 2, 3] like [1, 2, 3] | test.ok
   [1, 2] like [1, 2, 3] | test.equal(?, false)
@@ -172,8 +172,18 @@ def assignments(test)
 end
 
 let tests = nodeunit.testCase({
-  relational, equality, evaluation, notIn, bool, unary, nilEvaluation,
-  conditional, objectLike, vectorLike, deepPaths, assignments
+  "Relational Evaluation": relational,
+  "Equality Evaluation": equality,
+  "'in' Evaluation": inEvaluation, 
+  "'not in' Evaluation": notIn,
+  "Boolean Or/And Evaluation": bool,
+  "Unary Evaluation": unary,
+  "'nil' Evaluation": nilEvaluation,
+  "Conditional Evaluation": conditional, 
+  "Object Like": objectLike,
+  "Array Like": arrayLike,
+  "Deep Paths": deepPaths,
+  "Assignments": assignments
 })
 
 export tests

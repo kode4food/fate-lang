@@ -1,6 +1,6 @@
 import nodeunit
 
-def patternTest(test)
+def joinPatternTest(test)
   test.expect(10)
 
   when a({ value: 'another' } as x, y) & b(g, h)
@@ -27,6 +27,8 @@ def patternTest(test)
   setTimeout( () -> test.done(), 100)
 end
 
-let tests = nodeunit.testCase({ patternTest })
+let tests = nodeunit.testCase({
+  "Pattern-driven Join Evaluation": joinPatternTest
+})
 
 export tests

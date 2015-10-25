@@ -23,6 +23,8 @@ def truthyFalsy(test)
   test.done()
 end
 
-let tests = nodeunit.testCase({ "Truthy / Falsy": truthyFalsy })
+let tests = nodeunit.testCase({
+  "Truthy / Falsy": truthyFalsy
+})
 
 export tests

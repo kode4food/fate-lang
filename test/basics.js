@@ -153,7 +153,7 @@ exports.basics = nodeunit.testCase({
     test.done();
   },
 
-  "Vector Like": function (test) {
+  "Array Like": function (test) {
     var script1 = '[1, 2, 3] like [1, 2]';
     var script2 = '[1, 2, 3] like [1, 2, 3]';
     var script3 = '[1, 2] like [1, 2, 3]';
