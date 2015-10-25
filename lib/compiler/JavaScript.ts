@@ -195,6 +195,7 @@ namespace Fate.Compiler.JavaScript {
       compoundExpression: compoundExpression,
       returnStatement: returnStatement,
       call: call,
+      boolean: boolean,
       array: array,
       arrayAppend: arrayAppend,
       object: object,
@@ -627,6 +628,10 @@ namespace Fate.Compiler.JavaScript {
       write(funcId, '(');
       writeDelimited(args);
       write(')');
+    }
+
+    function boolean(value: BodyEntry) {
+      write('(!!(', value, '))');
     }
 
     function array(items: BodyEntries) {

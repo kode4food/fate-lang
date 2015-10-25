@@ -2,15 +2,14 @@
 
 var nodeunit = require('nodeunit');
 var fate = require('../build/fate');
-var createFileResolver = fate.Resolvers.createFileResolver;
-
-fate.Runtime.resolvers().push(createFileResolver({ path: "./test/scripts" }));
 
 function scriptTestCase(moduleName) {
-  return nodeunit.testCase(fate.Runtime.resolve(moduleName));
+  var module = require('./scripts/' + moduleName + '.fate');
+  return nodeunit.testCase(module);
 }
 
 exports.scripts = nodeunit.testCase({
+  "API": scriptTestCase('api'),
   "Basics": scriptTestCase('basics'),
   "Functions": scriptTestCase('function'),
   "Joins": scriptTestCase('join'),

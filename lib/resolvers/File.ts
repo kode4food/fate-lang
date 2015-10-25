@@ -14,7 +14,7 @@ namespace Fate.Resolvers {
     path: string,
   }
 
-  var explicitPathRegex = /\.fate(\.js)?$/;
+  var explicitPathRegex = /(\.fate)?(\.js)?$/;
   var pathSuffixes = ['.fate.js', '.fate', '/index.fate.js', '/index.fate'];
 
   /**
@@ -32,7 +32,8 @@ namespace Fate.Resolvers {
     };
 
     function resolve(name: Types.ModuleName, basePath = defaultBasePath) {
-      var result = cache[name];
+      var cacheKey = basePath + '//' + name;
+      var result = cache[cacheKey];
       if ( result ) {
         return result;
       }
@@ -41,7 +42,7 @@ namespace Fate.Resolvers {
       if ( !result ) {
         return undefined;
       }
-      cache[name] = result;
+      cache[cacheKey] = result;
       return result;
     }
   }

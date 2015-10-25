@@ -68,6 +68,6 @@ namespace Fate {
     var content = fs.readFileSync(filename, 'utf8');
     var compiledOutput = compileModule(content).scriptBody;
     var generatedModule = generateFunction(compiledOutput);
-    generatedModule(globals(filename), module.exports);
+    generatedModule(globals({ __filename: filename }), module.exports);
   }
 }

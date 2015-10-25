@@ -747,9 +747,11 @@ namespace Fate.Compiler.CodeGen {
           generate.assignAnonymous(localName, 'x');
         });
 
-        generate.returnStatement(
-          defer(createPatternTemplate, node.left)
-        );
+        generate.returnStatement(function () {
+          generate.boolean(function () {
+            createPatternTemplate(node.left);
+          })
+        });
       }
     }
 

@@ -1,0 +1,25 @@
+import '../../build/fate.js' as fate
+let types = fate.Types
+
+def truthyFalsy(test)
+  let isFalse = test.equal(?, false),
+      isTrue = test.equal(?, true)
+
+  types.isTruthy(nil) | isFalse
+  types.isTruthy() | isFalse
+  types.isTruthy([]) | isFalse
+  types.isTruthy({}) | isFalse
+  types.isTruthy({ name: 'fate' }) | isTrue
+  types.isTruthy("hello") | isTrue
+  types.isTruthy([1]) | isTrue
+  types.isFalsy(nil) | isTrue
+  types.isFalsy() | isTrue
+  types.isFalsy([]) | isTrue
+  types.isFalsy({}) | isTrue
+  types.isFalsy({ name: 'fate' }) | isFalse
+  types.isFalsy("hello") | isFalse
+  types.isFalsy([1]) | isFalse
+  test.done()
+end
+
+export truthyFalsy
