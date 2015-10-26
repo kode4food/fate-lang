@@ -63,7 +63,7 @@ function evaluateAsync(script, callback) {
 function monkeyPatchRequires(root, remappedPaths) {
   var files = glob.sync('**/*.fate.js', { cwd: root });
   files.forEach(function (file) {
-    // Rewrite the file to point to the local Interpol instance
+    // Rewrite the file to point to the local Fate instance
     var filePath = path.join(root, file);
     var content = fs.readFileSync(filePath).toString();
     Object.keys(remappedPaths).forEach(function (originalPackage) {

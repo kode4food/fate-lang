@@ -9,7 +9,7 @@ namespace Fate.Resolvers.System.String {
   import buildFormatter = Runtime.buildFormatter;
 
   // `build(value, supportFunctions)` converts the provided string and
-  // supportFunctions Object into an Interpol interpolation function.
+  // supportFunctions Object into a Fate interpolation function.
   export function build(value: string) {
     return buildFormatter(value);
   }
