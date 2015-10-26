@@ -654,9 +654,9 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createNotEvaluator(node: Syntax.NotOperator) {
-      var isTruthy = globals.runtimeImport('isTruthy');
+      var isTrue = globals.runtimeImport('isTrue');
       generate.unaryOperator('not', function () {
-        generate.call(isTruthy, [defer(node.left)]);
+        generate.call(isTrue, [defer(node.left)]);
       });
     }
 

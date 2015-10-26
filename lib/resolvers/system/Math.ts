@@ -69,7 +69,6 @@ namespace Fate.Resolvers.System.Math {
       return typeof value === 'number' ? value : NaN;
     }
     for ( var i = 0, res = 0, l = value.length; i < l; res += value[i++] ) {
-      ;
     }
     return res;
   }

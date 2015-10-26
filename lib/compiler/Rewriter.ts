@@ -7,8 +7,8 @@
 namespace Fate.Compiler.Rewriter {
   var wildcardLocal = 'p';
 
-  import isTruthy = Types.isTruthy;
-  import isFalsy = Types.isFalsy;
+  import isTrue = Types.isTrue;
+  import isFalse = Types.isFalse;
   import isIn = Types.isIn;
 
   import Syntax = Compiler.Syntax;
@@ -40,7 +40,7 @@ namespace Fate.Compiler.Rewriter {
   };
 
   var constantFolders: FunctionMap = {
-    'not':    function (v: any) { return isFalsy(v); },
+    'not':    function (v: any) { return isFalse(v); },
     'neg':    function (v: any) { return -v; },
     'add':    function (l: any, r: any) { return l + r; },
     'sub':    function (l: any, r: any) { return l - r; },
@@ -63,21 +63,21 @@ namespace Fate.Compiler.Rewriter {
         return node;
       }
       var value = (<Syntax.Literal>node.left).value;
-      return isTruthy(value) ? node.left : node.right;
+      return isTrue(value) ? node.left : node.right;
     },
     'and': function (node: Syntax.AndOperator) {
       if ( !isLiteral(node.left) ) {
         return node;
       }
       var value = (<Syntax.Literal>node.left).value;
-      return isFalsy(value) ? node.left : node.right;
+      return isFalse(value) ? node.left : node.right;
     },
     'conditional': function (node: Syntax.ConditionalOperator) {
       if ( !isLiteral(node.condition) ) {
         return node;
       }
       var value = (<Syntax.Literal>node.condition).value;
-      return isTruthy(value) ? node.trueResult : node.falseResult;
+      return isTrue(value) ? node.trueResult : node.falseResult;
     }
   };
 
@@ -200,8 +200,9 @@ namespace Fate.Compiler.Rewriter {
           }
         }
         else {
-          Object.keys(node).forEach(function (key) {
-            node[key] = visitNode(node[key]);
+          var currentNode = <Syntax.Node>node;
+          Object.keys(currentNode).forEach(function (key) {
+            currentNode[key] = visitNode(currentNode[key]);
           });
         }
         nodeStack.pop();
@@ -230,8 +231,7 @@ namespace Fate.Compiler.Rewriter {
       }
 
       function statementsProcessor(node: Syntax.Statements) {
-        var statements = visitor(node.statements);
-        node.statements = statements;
+        node.statements = visitor(node.statements);
         return node;
       }
     }
@@ -479,7 +479,7 @@ namespace Fate.Compiler.Rewriter {
         }
 
         var foldedStatements: Syntax.Statement[];
-        if ( isTruthy((<Syntax.Literal>statement.condition).value) ) {
+        if ( isTrue((<Syntax.Literal>statement.condition).value) ) {
           foldedStatements = statement.thenStatements.statements;
         }
         else {

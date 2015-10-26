@@ -2,29 +2,29 @@ import nodeunit
 import '../build/fate.js' as fate
 let types = fate.Types
 
-def truthyFalsy(test)
+def trueFalse(test)
   let isFalse = test.equal(?, false),
       isTrue = test.equal(?, true)
 
-  types.isTruthy(nil) | isFalse
-  types.isTruthy() | isFalse
-  types.isTruthy([]) | isFalse
-  types.isTruthy({}) | isFalse
-  types.isTruthy({ name: 'fate' }) | isTrue
-  types.isTruthy("hello") | isTrue
-  types.isTruthy([1]) | isTrue
-  types.isFalsy(nil) | isTrue
-  types.isFalsy() | isTrue
-  types.isFalsy([]) | isTrue
-  types.isFalsy({}) | isTrue
-  types.isFalsy({ name: 'fate' }) | isFalse
-  types.isFalsy("hello") | isFalse
-  types.isFalsy([1]) | isFalse
+  types.isTrue(nil) | isFalse
+  types.isTrue() | isFalse
+  types.isTrue([]) | isFalse
+  types.isTrue({}) | isFalse
+  types.isTrue({ name: 'fate' }) | isTrue
+  types.isTrue("hello") | isTrue
+  types.isTrue([1]) | isTrue
+  types.isFalse(nil) | isTrue
+  types.isFalse() | isTrue
+  types.isFalse([]) | isTrue
+  types.isFalse({}) | isTrue
+  types.isFalse({ name: 'fate' }) | isFalse
+  types.isFalse("hello") | isFalse
+  types.isFalse([1]) | isFalse
   test.done()
 end
 
 let tests = nodeunit.testCase({
-  "Truthy / Falsy": truthyFalsy
+  "True / False": trueFalse
 })
 
 export tests

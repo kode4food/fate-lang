@@ -40,7 +40,7 @@ namespace Fate.Types {
              module.__fateModule;
   }
 
-  export function isTruthy(value: any) {
+  export function isTrue(value: any) {
     if ( !value ) {
       return false;
     }
@@ -53,7 +53,7 @@ namespace Fate.Types {
     return true;
   }
 
-  export function isFalsy(value: any) {
+  export function isFalse(value: any) {
     if ( !value ) {
       return true;
     }

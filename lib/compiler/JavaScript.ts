@@ -81,6 +81,12 @@ namespace Fate.Compiler.JavaScript {
     'pos': '+'
   };
 
+  function canLiteralBeInlined(literalValue: any) {
+    var type = typeof literalValue;
+    return ( type === 'string' && literalValue.length < 16 ) ||
+             type === 'number' || type === 'boolean';
+  }
+
   export class Globals {
     private globals: { [index: string]: number } = {}; // name -> nextId
     private generatedLiterals: { [index: string]: GlobalId } = {};
@@ -98,16 +104,10 @@ namespace Fate.Compiler.JavaScript {
       return id;
     }
 
-    public canLiteralBeInlined(literalValue: any) {
-      var type = typeof literalValue;
-      return ( type === 'string' && literalValue.length < 16 ) ||
-             type === 'number' || type === 'boolean';
-    }
-
     public literal(literalValue: any) {
       var canonical = jsonStringify(literalValue);
 
-      if ( this.canLiteralBeInlined(literalValue) ) {
+      if ( canLiteralBeInlined(literalValue) ) {
         return canonical;
       }
 
@@ -433,7 +433,7 @@ namespace Fate.Compiler.JavaScript {
         var alias = item[1];
 
         var localName = localForAssignment(name);
-        writeMember('x', globals.literal(alias))
+        writeMember('x', globals.literal(alias));
         write('=', localName, ';');
       });
     }
@@ -449,11 +449,11 @@ namespace Fate.Compiler.JavaScript {
 
     function conditionalOperator(condition: BodyEntry, trueVal: BodyEntry,
                                  falseVal: BodyEntry) {
-      var isTruthy = globals.runtimeImport('isTruthy');
+      var isTrue = globals.runtimeImport('isTrue');
       var condCode = code(condition);
       var trueCode = code(trueVal);
       var falseCode = code(falseVal);
-      write('(', isTruthy, '(', condCode, ')?', trueCode, ':', falseCode, ')');
+      write('(', isTrue, '(', condCode, ')?', trueCode, ':', falseCode, ')');
     }
 
     function statement(bodyCallback: BodyEntry) {
@@ -462,9 +462,9 @@ namespace Fate.Compiler.JavaScript {
 
     function ifStatement(condition: BodyEntry, thenBranch: BodyEntry,
                          elseBranch: BodyEntry) {
-      var condWrapperName = 'isTruthy';
+      var condWrapperName = 'isTrue';
       if ( !thenBranch ) {
-        condWrapperName = 'isFalsy';
+        condWrapperName = 'isFalse';
         thenBranch = elseBranch;
         elseBranch = undefined;
       }

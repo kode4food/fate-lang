@@ -6,21 +6,21 @@ var types = fate.Types;
 
 exports.api = nodeunit.testCase({
 
-  "Truthy / Falsy": function (test) {
-    test.equal(types.isTruthy(null), false);
-    test.equal(types.isTruthy(), false);
-    test.equal(types.isTruthy([]), false);
-    test.equal(types.isTruthy({}), false);
-    test.equal(types.isTruthy({ name: 'fate' }), true);
-    test.equal(types.isTruthy("hello"), true);
-    test.equal(types.isTruthy([1]), true);
-    test.equal(types.isFalsy(null), true);
-    test.equal(types.isFalsy(), true);
-    test.equal(types.isFalsy([]), true);
-    test.equal(types.isFalsy({}), true);
-    test.equal(types.isFalsy({ name: 'fate' }), false);
-    test.equal(types.isFalsy("hello"), false);
-    test.equal(types.isFalsy([1]), false);
+  "True / False": function (test) {
+    test.equal(types.isTrue(null), false);
+    test.equal(types.isTrue(), false);
+    test.equal(types.isTrue([]), false);
+    test.equal(types.isTrue({}), false);
+    test.equal(types.isTrue({ name: 'fate' }), true);
+    test.equal(types.isTrue("hello"), true);
+    test.equal(types.isTrue([1]), true);
+    test.equal(types.isFalse(null), true);
+    test.equal(types.isFalse(), true);
+    test.equal(types.isFalse([]), true);
+    test.equal(types.isFalse({}), true);
+    test.equal(types.isFalse({ name: 'fate' }), false);
+    test.equal(types.isFalse("hello"), false);
+    test.equal(types.isFalse([1]), false);
     test.done();
   }
 
