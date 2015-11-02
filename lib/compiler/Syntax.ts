@@ -379,7 +379,7 @@ namespace Fate.Compiler.Syntax {
     'object': ObjectConstructor,
     'id':  Identifier,
     'self': Self,
-    'lit': Literal,
+    'literal': Literal,
     'pattern': Pattern,
     'wildcard': Wildcard,
     'statements': Statements,

@@ -317,6 +317,11 @@ namespace Fate.Compiler.Rewriter {
       if ( !hasAnnotation(node, 'pattern/local') ) {
         annotate(node, 'pattern/local', wildcardLocal);
       }
+      var contained = node.left;
+      if ( !hasTag(contained, ['object', 'array']) &&
+           !hasAnnotation(contained, 'pattern/local') ) {
+        annotate(contained, 'pattern/local', wildcardLocal);
+      }
       return node;
     }
 
@@ -374,7 +379,7 @@ namespace Fate.Compiler.Rewriter {
       var rightNode = (<Syntax.BinaryOperator>node).right;
       var rightValue = (<Syntax.Literal>rightNode).value;
       var output = constantFolders[tag](leftValue, rightValue);
-      return node.template('lit', output);
+      return node.template('literal', output);
     }
 
     // If the condition is 'not' we can roll up its argument
@@ -437,7 +442,7 @@ namespace Fate.Compiler.Rewriter {
     function rollUpArray(node: Syntax.ArrayConstructor) {
       var elements = node.elements;
       var output: LiteralArray = [];
-      var type = 'lit';
+      var type = 'literal';
 
       for ( var i = 0, len = elements.length; i < len; i++ ) {
         var element = elements[i];
@@ -453,7 +458,7 @@ namespace Fate.Compiler.Rewriter {
     function rollUpObject(node: Syntax.ObjectConstructor) {
       var elements = node.elements;
       var output: LiteralObject = {};
-      var type = 'lit';
+      var type = 'literal';
 
       for ( var i = 0, len = elements.length; i < len; i++ ) {
         var element = elements[i];

@@ -63,7 +63,7 @@ namespace Fate.Compiler.CodeGen {
       'object': createObjectEvaluator,
       'id':  createIdEvaluator,
       'self': createSelfEvaluator,
-      'lit': createLiteral,
+      'literal': createLiteral,
       'wildcard': createWildcard,
       'pattern': createPatternEvaluator
     };
@@ -615,30 +615,7 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createLikeEvaluator(node: Syntax.LikeOperator) {
-      var left = defer(node.left);
-      var right = defer(node.right);
-
-      if ( !(node.right instanceof Syntax.Literal) ) {
-        var isMatchingObject = globals.runtimeImport('isMatchingObject');
-        generate.call(isMatchingObject, [right, left]);
-        return;
-      }
-
-      if ( isLikeLiteral(node.right) ) {
-        generate.binaryOperator('eq', left, right);
-        return;
-      }
-
-      var matcher = globals.builder('buildMatcher', generate.code(right));
-      generate.call(matcher, [left]);
-    }
-
-    function isLikeLiteral(node: Syntax.Node) {
-      if ( !(node instanceof Syntax.Literal) ) {
-        return false;
-      }
-      var valueType = typeof (<Syntax.Literal>node).value;
-      return likeLiteralTypes.indexOf(valueType) !== -1;
+      createLikeComparison(node.left, node.right);
     }
 
     function createInEvaluator(node: Syntax.InOperator) {
@@ -748,9 +725,7 @@ namespace Fate.Compiler.CodeGen {
         });
 
         generate.returnStatement(function () {
-          generate.boolean(function () {
-            createPatternTemplate(node.left);
-          })
+          createPatternTemplate(node.left);
         });
       }
     }
@@ -765,8 +740,25 @@ namespace Fate.Compiler.CodeGen {
           generate.write(globals.literal(true));
           break;
         default:
+          if ( canGenerateEquality(node) ) {
+            createLikeComparison(
+              function () {
+                var localName = hasAnnotation(node, 'pattern/local');
+                localName = generate.registerAnonymous(localName);
+                generate.retrieveAnonymous(localName)
+              },
+              node
+            );
+            return;
+          }
           generate.write(defer(node));
       }
+    }
+
+    function canGenerateEquality(elementValue: Syntax.Node) {
+      return !hasAnnotation(elementValue, 'pattern/wildcard') &&
+             !(elementValue instanceof Syntax.RelationalOperator) &&
+             !(elementValue instanceof Syntax.ElementsConstructor);
     }
 
     function createPatternElements(node: Syntax.ElementsConstructor) {
@@ -810,12 +802,6 @@ namespace Fate.Compiler.CodeGen {
         expressions.push(generateNested(element, elementValue, elementIndex));
       }
 
-      function canGenerateEquality(elementValue: Syntax.Node) {
-        return !hasAnnotation(elementValue, 'pattern/wildcard') &&
-               !(elementValue instanceof Syntax.RelationalOperator) &&
-               !(elementValue instanceof Syntax.ElementsConstructor);
-      }
-
       function generateEquality(elementValue: Syntax.Node,
                                 elementIndex: string|Function) {
         // If we're just dealing with an expression,
@@ -854,6 +840,35 @@ namespace Fate.Compiler.CodeGen {
           ]);
         };
       }
+    }
+
+    function createLikeComparison(leftNode: Syntax.Node|Function,
+                                  rightNode: Syntax.Node) {
+      var left = typeof leftNode === 'function' ? <Function>leftNode
+                                                : defer(leftNode);
+      var right = defer(rightNode);
+
+      if ( !(rightNode instanceof Syntax.Literal) ) {
+        var isMatchingObject = globals.runtimeImport('isMatchingObject');
+        generate.call(isMatchingObject, [right, left]);
+        return;
+      }
+
+      if ( isLikeLiteral(rightNode) ) {
+        generate.binaryOperator('eq', left, right);
+        return;
+      }
+
+      var matcher = globals.builder('buildMatcher', generate.code(right));
+      generate.call(matcher, [left]);
+    }
+
+    function isLikeLiteral(node: Syntax.Node) {
+      if ( !(node instanceof Syntax.Literal) ) {
+        return false;
+      }
+      var valueType = typeof (<Syntax.Literal>node).value;
+      return likeLiteralTypes.indexOf(valueType) !== -1;
     }
   }
 }

@@ -20,7 +20,7 @@ namespace Fate.Compiler.JavaScript {
   type GlobalId = Id;
   type BodyEntry = string|Function;
   type BodyEntries = BodyEntry[];
-  type NameIdMap = { [index: string]: Id };
+  type NameIdsMap = { [index: string]: Ids };
 
   export type AssignmentItem = [Name, BodyEntry];
   export type AssignmentItems = AssignmentItem[];
@@ -34,7 +34,7 @@ namespace Fate.Compiler.JavaScript {
   }
 
   interface NameInfo {
-    names: NameIdMap;
+    names: NameIdsMap;
     scopeInfo: ScopeInfo;
     usesScratch: boolean;
   }
@@ -158,7 +158,7 @@ namespace Fate.Compiler.JavaScript {
   export function createModule(globals: Globals) {
     // Keeps track of name -> local mappings throughout the nesting
     var locals: { [index: string]: number } = {}; // prefix -> nextId
-    var names: NameIdMap = {};      // name -> localId
+    var names: NameIdsMap = {};  // name -> localId[]
     var scopeInfo = createScopeInfo();
     var nameStack: NameInfo[] = [];
     var selfName = 'c';
@@ -168,8 +168,6 @@ namespace Fate.Compiler.JavaScript {
     var body: BodyEntries = [];
 
     return {
-      localForRetrieval: localForRetrieval,
-      localForAssignment: localForAssignment,
       registerAnonymous: registerAnonymous,
       createAnonymous: createAnonymous,
       assignAnonymous: assignAnonymous,
@@ -195,7 +193,6 @@ namespace Fate.Compiler.JavaScript {
       compoundExpression: compoundExpression,
       returnStatement: returnStatement,
       call: call,
-      boolean: boolean,
       array: array,
       arrayAppend: arrayAppend,
       object: object,
@@ -231,9 +228,19 @@ namespace Fate.Compiler.JavaScript {
         scopeInfo: scopeInfo,
         usesScratch: usesScratch
       });
-      names = Object.create(names);
+
+      names = extendNames(names);
       usesScratch = false;
       scopeInfo = createScopeInfo();
+    }
+
+    function extendNames(names: NameIdsMap) {
+      var result: NameIdsMap = {};
+      Object.keys(names).forEach(function (name) {
+        var ids = names[name];
+        result[name] = [ids[ids.length - 1]];
+      });
+      return result;
     }
 
     function popLocalScope() {
@@ -250,30 +257,24 @@ namespace Fate.Compiler.JavaScript {
       usesScratch = tmpScratch;
     }
 
-    function localForAssignment(name: Name) {
+    function localForWrite(name: Name) {
+      if ( isAnonymous(name) ) {
+        return names[name][0];
+      }
       if ( !scopeInfo.firstAccess[name] ) {
         scopeInfo.firstAccess[name] = FirstAccess.Write;
       }
-      return localForName(name);
+      var ids = names[name] || (names[name] = []);
+      ids.push(nextId('v'));
+      return ids[ids.length - 1];
     }
 
-    function localForRetrieval(name: Name) {
+    function localForRead(name: Name) {
       if ( !scopeInfo.firstAccess[name] ) {
         scopeInfo.firstAccess[name] = FirstAccess.Read;
       }
-      return localForName(name);
-    }
-
-    function localForName(name: Name) {
-      var willMutate = hasAnnotation(scopeInfo, 'mutation/' + name);
-
-      var id = names[name];
-      if ( id && (names.hasOwnProperty(name) || !willMutate) ) {
-        return id;
-      }
-
-      id = names[name] = nextId('v');
-      return id;
+      var ids = names[name] || (names[name] = [nextId('v')]);
+      return ids[ids.length - 1];
     }
 
     function self() {
@@ -299,23 +300,25 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function retrieveAnonymous(name: Name) {
-      write(names[name]);
+      var ids = names[name];
+      write(ids[ids.length - 1]);
     }
 
     function assignAnonymous(name: Name, value: BodyEntry) {
-      write(names[name], '=', value);
+      retrieveAnonymous(name);
+      write('=', value);
     }
 
     function registerAnonymous(id: string) {
       var name = ' ' + id;
-      names[name] = id;
+      names[name] = [id];
       return name;
     }
 
     function createAnonymous() {
       var id = nextId('h');
       var name = ' ' + id;
-      names[name] = id;
+      names[name] = [id];
       return name;
     }
 
@@ -393,7 +396,7 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function getter(name: Name) {
-      write(localForRetrieval(name));
+      write(localForRead(name));
     }
 
     function assignment(name: Name, body: BodyEntry) {
@@ -405,7 +408,7 @@ namespace Fate.Compiler.JavaScript {
         var name = item[0];
         var value = code(item[1]);
 
-        var localName = localForAssignment(name);
+        var localName = localForWrite(name);
         write(localName, '=', value, ";");
       });
     }
@@ -420,7 +423,7 @@ namespace Fate.Compiler.JavaScript {
 
       varNames.forEach(function (varName, arrIndex) {
         elements.push(function () {
-          write(localForAssignment(varName), '=', anon, '[', arrIndex, ']');
+          write(localForWrite(varName), '=', anon, '[', arrIndex, ']');
         });
       });
 
@@ -432,7 +435,7 @@ namespace Fate.Compiler.JavaScript {
         var name = item[0];
         var alias = item[1];
 
-        var localName = localForAssignment(name);
+        var localName = localForRead(name);
         writeMember('x', globals.literal(alias));
         write('=', localName, ';');
       });
@@ -498,7 +501,7 @@ namespace Fate.Compiler.JavaScript {
       if ( itemName ) {
         contextArgs.push(itemName);
       }
-      var argNames = contextArgs.map(localForAssignment);
+      var argNames = contextArgs.map(localForWrite);
 
       var bodyContent = code(function () {
         generate(loopBody);
@@ -541,7 +544,7 @@ namespace Fate.Compiler.JavaScript {
       pushLocalScope();
       scopeInfo.annotations = options.annotations;
 
-      var localNames = contextArgs.map(localForRetrieval);
+      var localNames = contextArgs.map(localForRead);
 
       var bodyContent = code(function () {
         generate(funcBody);
@@ -571,29 +574,30 @@ namespace Fate.Compiler.JavaScript {
       popLocalScope();
     }
 
-    function writeLocalVariables(parentNames: NameIdMap, argNames: Names) {
+    function writeLocalVariables(parentNames: NameIdsMap, argNames: Names) {
       var undefinedVars: Names = [];
       Object.keys(names).forEach(function (name) {
-        var localName = names[name];
-        if ( isArgument(localName) ) {
+        var localNameIds = names[name];
+        var localNameId = localNameIds[0];
+
+        // All secondary locals are treated as undefined
+        undefinedVars.push.apply(undefinedVars, localNameIds.slice(1));
+
+        if ( isArgument(localNameId) || parentNames[name] ) {
           return;
         }
 
         var firstAccess = scopeInfo.firstAccess[name];
         var assignedEarly = firstAccess === FirstAccess.Write;
-
         if ( isAnonymous(name) || assignedEarly ) {
-          undefinedVars.push(localName);
+          undefinedVars.push(localNameId);
+          return;
         }
-        else if ( parentNames[name] ) {
-          // Local Assignments (inherit from parent)
-          write('let ', localName, '=', parentNames[name], ';');
-        }
-        else {
-          write('let ', localName, '=');
-          writeMember(self, globals.literal(name));
-          write(';');
-        }
+
+        // pull the value from the global context
+        write('let ', localNameId, '=');
+        writeMember(self, globals.literal(name));
+        write(';');
       });
 
       if ( undefinedVars.length ) {
@@ -628,10 +632,6 @@ namespace Fate.Compiler.JavaScript {
       write(funcId, '(');
       writeDelimited(args);
       write(')');
-    }
-
-    function boolean(value: BodyEntry) {
-      write('(!!(', value, '))');
     }
 
     function array(items: BodyEntries) {
