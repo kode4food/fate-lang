@@ -24,9 +24,6 @@ namespace Fate.Runtime {
 
   /**
    * Basic Object Matcher to support the `like` operator.
-   *
-   * @param {Mixed} template the Template to match against
-   * @param {Mixed} obj the Object being inspected
    */
   export function isMatchingObject(template: any, obj: any) {
     if ( template === null || template === undefined ) {
@@ -73,8 +70,6 @@ namespace Fate.Runtime {
 
   /**
    * Compiled matcher, for when the template has been defined as a literal.
-   *
-   * @param {Mixed} template the Template to match against
    */
   export function buildMatcher(template: any) {
     return definePattern(nestedMatcher(template));
