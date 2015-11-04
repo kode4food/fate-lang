@@ -498,40 +498,46 @@ namespace Fate.Compiler.JavaScript {
 
     // Code branches using static single assignment
     function codeBranches(...branches: BodyEntry[]) {
-      var branchNames: NameIdsMap[] = [];
       var branchContent: string[] = [];
 
       // Step 1: Code the branches, gathering the assignments
       var originalNames = names;
-      var modifications: NameModificationsMap = {};
+      var modificationSets: NameModificationsMap = {};
       branches.forEach(function (branch, index) {
-        branchNames[index] = names = extendNames(originalNames);
+        names = extendNames(originalNames);
         branchContent[index] = branch ? code(branch) : "";
         Object.keys(names).forEach(function (key) {
           var created = !originalNames[key];
           if ( created || names[key].length > 1 ) {
-            var mod = modifications[key] || (modifications[key] = []);
-            mod[index] = { ids: names[key], created: created };
+            var modificationSet = modificationSets[key];
+            if ( !modificationSet ) {
+              modificationSet = modificationSets[key] = [];
+            }
+                
+            modificationSet[index] = {
+              ids: names[key], 
+              created: created
+            };
           }
         });
       });
       names = originalNames;
 
       // Step 2: Create Phi functions for each name
-      Object.keys(modifications).forEach(function (key) {
+      Object.keys(modificationSets).forEach(function (key) {
         var parentIds = names[key] || [];
         var passthruId = parentIds.length ? lastItem(parentIds) : null;
         var sourceIds: Ids = [];
-        var mods = modifications[key];
+        var modificationSet = modificationSets[key];
 
         for ( var i = 0; i < branches.length; i++ ) {
-          var mod = mods[i];
-          if ( !mod ) {
+          var modifications = modificationSet[i];
+          if ( !modifications ) {
             sourceIds[i] = passthruId;
             continue;
           }
 
-          var ids = mod.ids.slice(mod.created ? 0 : 1);
+          var ids = modifications.ids.slice(modifications.created ? 0 : 1);
           parentIds = parentIds.concat(ids);
           sourceIds[i] = lastItem(ids);
         }
