@@ -1,0 +1,53 @@
+import nodeunit
+
+def assignment(test)
+  let val1 = 100
+  test.equals(val1, 100)
+  let val1 = 200
+  test.equals(val1, 200)
+
+  def nested(x)
+    test.equals(val1, 200)
+    let val1 = val1 + x
+    test.equals(val1 - x, 200)
+    if x > 50
+      let val1 = 1000
+    end
+    val1
+  end
+
+  test.equals(nested(25), 225)
+  test.equals(nested(75), 1000)
+  test.equals(val1, 200)
+
+  let val2 = "hello"
+  test.equals(val2, "hello")
+  if val1 = 200
+    test.equals(val2, "hello")
+    let val2 = val2 + ", there"
+  else
+    let val2 = val2 + ", you"
+  end
+  test.equals(val2, "hello, there")
+
+  if val2 = "nope"
+    let val2 = "never set"
+  else
+    test.equals(val2, "hello, there")
+    if val1 != 200
+      let val2 = "not set either"
+    end
+    test.equals(val2, "hello, there")
+    let val2 = "final value"
+    test.equals(val2, "final value")
+  end
+  test.equals(val2, "final value")
+
+  test.done()
+end
+
+let tests = nodeunit.testCase({
+  "Static Single Assignment": assignment
+})
+
+export tests
