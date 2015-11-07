@@ -1,3 +1,4 @@
+/// <reference path="./Checker.ts"/>
 /// <reference path="./Rewriter.ts"/>
 /// <reference path="./CodeGen.ts"/>
 
@@ -8,6 +9,7 @@ namespace Fate.Compiler {
   var generatedParser = require('./parser');
   var SyntaxError = generatedParser.SyntaxError;
 
+  import checkSyntaxTree = Checker.checkSyntaxTree;
   import rewriteSyntaxTree = Rewriter.rewriteSyntaxTree;
   import generateScriptBody = CodeGen.generateScriptBody;
 
@@ -31,7 +33,8 @@ namespace Fate.Compiler {
   export function compileModule(script: ScriptContent) {
     var warnings: CompileErrors = [];
     var parsed = generatedParser.parse(script);
-    var rewritten = rewriteSyntaxTree(parsed, warnings);
+    var checked = checkSyntaxTree(parsed, warnings);
+    var rewritten = rewriteSyntaxTree(checked, warnings);
 
     return {
       scriptBody: generateScriptBody(rewritten),

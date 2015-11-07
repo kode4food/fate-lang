@@ -1,4 +1,7 @@
 # A Test Script
+let a = 100
+a = 99  # should generate a warning
+
 
 def renderList(people)
   # will be shadowed

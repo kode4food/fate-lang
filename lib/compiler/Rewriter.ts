@@ -1,6 +1,7 @@
 /// <reference path="../Types.ts"/>
 /// <reference path="./Annotations.ts"/>
 /// <reference path="./Syntax.ts"/>
+/// <reference path="./Visitor.ts"/>
 
 "use strict";
 
@@ -11,27 +12,19 @@ namespace Fate.Compiler.Rewriter {
   import isFalse = Types.isFalse;
   import isIn = Types.isIn;
 
+  import MutatingVisitor = Compiler.MutatingVisitor;
   import Syntax = Compiler.Syntax;
   import hasTag = Syntax.hasTag;
   import isStatements = Syntax.isStatements;
   import isLiteral = Syntax.isLiteral;
   import annotate = Compiler.annotate;
 
-  var slice = Array.prototype.slice;
-
-  type NodeVisitor = (node: Syntax.NodeOrNodes) => Syntax.NodeOrNodes;
-  type StatementsVisitor = (node: Syntax.Statement[]) => Syntax.Statement[];
   type NodeMatcher = (node: Syntax.NodeOrNodes) => boolean;
   type LiteralArray = any[];
   type StringMap = { [index: string]: string };
   type FunctionGroups = { [index: string]: Syntax.FunctionDeclaration[] };
   type LiteralObject = { [index: string]: any };
   type FunctionMap = { [index: string]: Function };
-
-  class Index extends Syntax.Node {
-    public tag = 'index';
-    constructor(public value: number) { super(); }
-  }
 
   var inverseOperators: StringMap = {
     'eq': 'neq', 'neq': 'eq',
@@ -56,6 +49,7 @@ namespace Fate.Compiler.Rewriter {
     'lte':    function (l: any, r: any) { return l <= r; },
     'mod':    function (l: any, r: any) { return l % r; }
   };
+  var constantFolderKeys = Object.keys(constantFolders);
 
   var shortCircuitFolders: FunctionMap = {
     'or': function (node: Syntax.OrOperator) {
@@ -80,41 +74,44 @@ namespace Fate.Compiler.Rewriter {
       return isTrue(value) ? node.trueResult : node.falseResult;
     }
   };
+  var shortCircuitFolderKeys = Object.keys(shortCircuitFolders);
 
   export function rewriteSyntaxTree(syntaxTree: Syntax.Statements,
                                     warnings?: CompileErrors) {
-    var nodeStack: (Syntax.Node|Syntax.Nodes)[] = [];
+    var visit = new MutatingVisitor(warnings);
     var wildcardNumbering = 0;
 
-    var constantFolderKeys = matchTags(Object.keys(constantFolders));
-    var shortCircuitFolderKeys = matchTags(Object.keys(shortCircuitFolders));
-    var patternContainers = matchAncestorTags(['object', 'array'], 'pattern');
-    var patternWildcards = matchAncestorTags('wildcard', 'pattern');
+    var foldableShortCircuit = visit.tags(shortCircuitFolderKeys);
+    var foldableConstant = visit.tags(constantFolderKeys);
+    var nestedPattern = visit.ancestorTags('pattern', 'pattern');
+    var patternCollection = visit.ancestorTags(['object', 'array'], 'pattern');
+    var patternWildcard = visit.ancestorTags('wildcard', 'pattern');
+    var patternNode = visit.ancestorTags('*', 'pattern');
+    var collection = visit.tags(['object', 'array']);
 
     var pipeline = [
-      visitMatching(foldShortCircuits, shortCircuitFolderKeys),
-      visitMatching(foldConstants, constantFolderKeys),
+      visit.matching(foldShortCircuits, foldableShortCircuit),
+      visit.matching(foldConstants, foldableConstant),
 
-      visitMatching(rollUpPatterns, matchAncestorTags('pattern', 'pattern')),
-      visitMatching(validateWildcards, matchTags('wildcard')),
-      visitMatching(namePatterns, matchTags('pattern')),
-      visitMatching(nameWildcardAnchors, patternContainers),
-      visitMatching(nameAndAnnotateWildcards, patternWildcards),
-      visitMatching(annotatePatternNode, matchAncestorTags('*', 'pattern')),
+      visit.matching(rollUpPatterns, nestedPattern),
+      visit.matching(namePatterns, visit.tags('pattern')),
+      visit.matching(nameWildcardAnchors, patternCollection),
+      visit.matching(nameAndAnnotateWildcards, patternWildcard),
+      visit.matching(annotatePatternNode, patternNode),
 
-      visitMatching(rollUpObjectsAndArrays, matchTags(['object', 'array'])),
+      visit.matching(rollUpObjectsAndArrays, collection),
 
-      visitStatements(foldIfStatements),
-      visitMatching(flipConditionals, matchTags('conditional')),
-      visitMatching(flipEquality, matchTags('not')),
-      visitMatching(promoteNot, matchTags(['and', 'or'])),
+      visit.statements(foldIfStatements),
+      visit.matching(flipConditionals, visit.tags('conditional')),
+      visit.matching(flipEquality, visit.tags('not')),
+      visit.matching(promoteNot, visit.tags(['and', 'or'])),
 
-      visitStatementGroups(mergeFunctions, functionStatements),
+      visit.statementGroups(mergeFunctions, functionStatements),
+      
+      visit.matching(rollUpForLoops, visit.tags('for')),
+      visit.matching(assignFunctions, functionStatements),
 
-      visitMatching(rollUpForLoops, matchTags('for')),
-      visitMatching(assignFunctions, functionStatements),
-
-      visitMatching(annotateMutations, matchTags('let'))
+      visit.matching(annotateMutations, visit.tags('let'))
     ];
 
     pipeline.forEach(function (func) {
@@ -123,146 +120,12 @@ namespace Fate.Compiler.Rewriter {
 
     return syntaxTree;
 
-    function matchAncestorTags(...tags: Syntax.TagOrTags[]) {
-      return matchAncestry.apply(null, tags.map(matchTags));
-    }
-
-    function matchAncestry(matcher: NodeMatcher, ...matchers: NodeMatcher[]) {
-      return ancestryMatcher;
-
-      function ancestryMatcher(node: Syntax.Node) {
-        if ( !matcher(node) ) {
-          return false;
-        }
-        return hasAncestry.apply(null, matchers) !== undefined;
-      }
-    }
-
-    function hasAncestorTags(...tags: Syntax.TagOrTags[]) {
-      var args = tags.map(matchTags);
-      return hasAncestry.apply(null, args);
-    }
-
-    function hasAncestry(...matchers: NodeMatcher[]) {
-      var matcher = matchers.shift();
-      var stack = nodeStack.slice().reverse();
-      var result: (Syntax.Node|Syntax.Nodes)[] = [];
-      while ( stack.length ) {
-        var node = stack.shift();
-        if ( matcher(node) ) {
-          result.push(node);
-          matcher = matchers.shift();
-          if ( !matcher ) {
-            return result;
-          }
-        }
-      }
-      return undefined;
-    }
-
     function annotateNearestParent(name: string, matcher: NodeMatcher) {
-      for ( var i = nodeStack.length - 1; i >= 0; i-- ) {
-        var node = <Syntax.Node>nodeStack[i];
+      for ( var i = visit.nodeStack.length - 1; i >= 0; i-- ) {
+        var node = <Syntax.Node>visit.nodeStack[i];
         if ( matcher(node) ) {
           annotate(node, name);
           return;
-        }
-      }
-    }
-
-    function annotateUpTree(name: string, matcher: NodeMatcher) {
-      for ( var i = nodeStack.length - 1; i >= 0; i-- ) {
-        var node = <Syntax.Node>nodeStack[i];
-        annotate(node, name);
-        if ( matcher(node) ) {
-          return;
-        }
-      }
-    }
-
-    function visitNodes(node: Syntax.Node|Syntax.Nodes, visitor: NodeVisitor,
-                        matcher: NodeMatcher) {
-      return visitNode(node);
-
-      function visitNode(node: Syntax.Node|Syntax.Nodes) {
-        if ( !(node instanceof Syntax.Node) && !Array.isArray(node) ) {
-          return node;
-        }
-
-        // Depth-first Processing
-        nodeStack.push(node);
-        if ( Array.isArray(node) ) {
-          var arrNode = <Syntax.Nodes>node;
-          for ( var i = 0, len = arrNode.length; i < len; i++ ) {
-            nodeStack.push(new Index(i));
-            arrNode[i] = <Syntax.Node>visitNode(arrNode[i]);
-            nodeStack.pop();
-          }
-        }
-        else {
-          var currentNode = <Syntax.Node>node;
-          Object.keys(currentNode).forEach(function (key) {
-            currentNode[key] = visitNode(currentNode[key]);
-          });
-        }
-        nodeStack.pop();
-
-        // Now the real work
-        if ( matcher(node) ) {
-          return visitor(node);
-        }
-        return node;
-      }
-    }
-
-    function visitMatching(visitor: NodeVisitor, matcher: NodeMatcher) {
-      return nodeVisitor;
-
-      function nodeVisitor(node: Syntax.Node) {
-        return visitNodes(node, visitor, matcher);
-      }
-    }
-
-    function visitStatements(visitor: StatementsVisitor) {
-      return statementsVisitor;
-
-      function statementsVisitor(node: Syntax.Node) {
-        return visitNodes(node, statementsProcessor, isStatements);
-      }
-
-      function statementsProcessor(node: Syntax.Statements) {
-        node.statements = visitor(node.statements);
-        return node;
-      }
-    }
-
-    // Iterates over a set of statements and presents adjacent groups
-    // to the callback function for replacement
-    function visitStatementGroups(visitor: StatementsVisitor,
-                                  matcher: NodeMatcher) {
-      return visitStatements(groupProcessor);
-
-      function groupProcessor(statements: Syntax.Statement[]) {
-        var group: Syntax.Statement[] = [];
-        var output: Syntax.Statement[] = [];
-
-        statements.forEach(function (statement) {
-          if ( matcher(statement) ) {
-            group.push(statement);
-          }
-          else {
-            processMatches();
-            output.push(statement);
-          }
-        });
-
-        processMatches();
-        return output;
-
-        function processMatches() {
-          var result = group.length < 2 ? group : visitor(group);
-          output = output.concat(result);
-          group = [];
         }
       }
     }
@@ -272,38 +135,10 @@ namespace Fate.Compiler.Rewriter {
       return node.left;
     }
 
-    // A Wildcard can only exist in a pattern or call binder
-    function validateWildcards(node: Syntax.Wildcard) {
-      if ( !hasAncestorTags(['pattern', 'bind']) ) {
-        issueError(node, "Unexpected Wildcard");
-      }
-
-      var ancestors = hasAncestorTags('objectAssignment', 'pattern');
-      if ( ancestors ) {
-        var parent = <Syntax.ObjectAssignment>ancestors[0];
-        if ( parent.id === nodeStack[nodeStack.indexOf(parent) + 1] ||
-             parent.id === node ) {
-          issueError(node, "Wildcards cannot appear in Property Names");
-        }
-      }
-      return node;
-    }
-
-    function getCurrentElement() {
-      var ancestors = hasAncestorTags(['object', 'array'], 'pattern');
-      if ( !ancestors ) {
-        return null;
-      }
-      var collectionIndex = nodeStack.indexOf(ancestors[0]);
-      var collection = <Syntax.Nodes>nodeStack[collectionIndex + 1];
-      var index = <Index>(nodeStack[collectionIndex + 2]);
-      return collection[index.value];
-    }
-
     function getAnchorName() {
-      var anchor = getCurrentElement();
+      var anchor = visit.currentElement();
       if ( !anchor ) {
-        anchor = hasAncestorTags('pattern')[0];
+        anchor = visit.hasAncestorTags('pattern')[0];
       }
       var anchorName = hasAnnotation(anchor, 'pattern/local');
       if ( !anchorName ) {
@@ -346,8 +181,12 @@ namespace Fate.Compiler.Rewriter {
       if ( !hasAnnotation(node, 'pattern/local') ) {
         annotate(node, 'pattern/local', getAnchorName());
       }
-      annotateUpTree('pattern/wildcard', matchTags('pattern'));
+      visit.upTreeUntilMatch(annotateNode, visit.tags('pattern'));
       return node;
+
+      function annotateNode(node: Syntax.Node) {
+        annotate(node, 'pattern/wildcard');
+      }
     }
 
     // All nodes inside of a Pattern should be annotated as such,
@@ -500,43 +339,46 @@ namespace Fate.Compiler.Rewriter {
              !!node.signature.id;
     }
 
-    // We can combine multiple sequential compatible functions into a
-    // single branched function
+    // We can merge consecutive non-recursive functions that are
+    // argument compatible
     function mergeFunctions(statements: Syntax.FunctionDeclaration[]) {
-      var namedDefs: FunctionGroups = {};
+      var group: Syntax.FunctionDeclaration[] = [];
+      var result: Syntax.Statement[] = [];
+      var lastName: string;
+      var lastArgs: string;
+
       statements.forEach(function (statement) {
         var signature = statement.signature;
         var name = signature.id.value;
-        var group = namedDefs[name] || ( namedDefs[name] = [] );
+        var args = argumentsSignature(signature.params);
 
+        if ( name !== lastName || args !== lastArgs ) {
+          processGroup();
+        }
+        
         if ( !signature.guard && group.length ) {
-          // if we see an unguarded, blow away previous definitions
-          issueWarning(statement,
-            "The unguarded Function '" + name + "' will replace " +
-            "any previous definitions"
-          );
+          // if we see an unguarded, we can blow away the previous funcs
           group = [];
         }
 
+        lastName = name;
+        lastArgs = args;
         group.push(statement);
       });
-
-      var result: Syntax.Statement[] = [];
-      for ( var key in namedDefs ) {
-        var definitions = namedDefs[key];
-        if ( definitions.length === 1 ) {
-          result.push(definitions[0]);
-          continue;
-        }
-        result = result.concat(mergeDefinitions(key, definitions));
-      }
+      processGroup();
+      
       return result;
-
-      function mergeDefinitions(name: string,
-                                definitions: Syntax.FunctionDeclaration[]) {
-        var firstDefinition = definitions[0];
+ 
+      function processGroup() {
+        if ( group.length < 2 ) {
+          result = result.concat(group);
+          group = [];
+          return;
+        }
+        
+        var firstDefinition = group[0];
         var firstSignature = firstDefinition.signature;
-        var originalArgs = argumentsSignature(firstSignature.params);
+        var args = argumentsSignature(firstSignature.params);
         var firstStatements = firstDefinition.statements;
         var statements = firstStatements.statements.slice();
         var guard = firstSignature.guard;
@@ -551,19 +393,9 @@ namespace Fate.Compiler.Rewriter {
         }
 
         var prevStatements = firstStatements;
-        for ( var i = 1, len = definitions.length; i < len; i++ ) {
-          var definition = definitions[i];
+        for ( var i = 1, len = group.length; i < len; i++ ) {
+          var definition = group[i];
           var signature = definition.signature;
-          var theseArgs = argumentsSignature(signature.params);
-          if ( originalArgs !== theseArgs ) {
-            // Short-circuit, won't make assumptions about local names
-            issueWarning(definition,
-              "Reopened Function '" + name + "' has different " +
-              "argument names than the original definition"
-            );
-            return definitions;
-          }
-
           var theseStatements = definition.statements;
           var thisGuard = signature.guard;
 
@@ -576,38 +408,16 @@ namespace Fate.Compiler.Rewriter {
           prevStatements = theseStatements;
         }
 
-        return [
+        result.push(
           firstDefinition.template('function',
             firstSignature.template('signature',
               firstSignature.id, firstSignature.params, guard
             ),
             firstStatements.template('statements', statements)
           )
-        ];
-      }
-    }
+        );
 
-    function matchTags(tags: Syntax.TagOrTags) {
-      if ( !Array.isArray(tags) ) {
-        tags = slice.call(arguments, 0);
-      }
-      return matcher;
-
-      function matcher(node: Syntax.Node) {
-        return hasTag(node, tags);
-      }
-    }
-
-    function matchTagsOrRoot(tags: Syntax.TagOrTags) {
-      var tagMatcher = matchTags(tags);
-      return matcher;
-
-      function matcher(node: Syntax.Node) {
-        var tag = tagMatcher(node);
-        if ( tag ) {
-          return tag;
-        }
-        return node === syntaxTree;
+        group = [];
       }
     }
 
@@ -646,20 +456,10 @@ namespace Fate.Compiler.Rewriter {
       node.assignments.forEach(function (assignment) {
         annotateNearestParent(
           'mutation/' + assignment.id.value,
-          matchTagsOrRoot(['channel', 'function', 'for'])
+          visit.tagsOrRoot(['channel', 'function', 'for'])
         );
       });
       return node;
-    }
-
-    function issueError(source: Syntax.Node, message: string) {
-      throw new CompileError(message, source.line, source.column);
-    }
-
-    function issueWarning(source: Syntax.Node, message: string) {
-      warnings.push(
-        new CompileError(message, source.line, source.column)
-      );
     }
   }
 
