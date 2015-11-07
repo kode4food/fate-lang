@@ -1,17 +1,11 @@
-/// <reference path="../Types.ts"/>
 /// <reference path="./Syntax.ts"/>
 
 "use strict";
 
 namespace Fate.Compiler {
-  import isTrue = Types.isTrue;
-  import isFalse = Types.isFalse;
-  import isIn = Types.isIn;
-
   import Syntax = Compiler.Syntax;
   import hasTag = Syntax.hasTag;
   import isStatements = Syntax.isStatements;
-  import isLiteral = Syntax.isLiteral;
 
   var slice = Array.prototype.slice;
 

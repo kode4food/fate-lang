@@ -1,20 +1,11 @@
-/// <reference path="../Types.ts"/>
-/// <reference path="./Annotations.ts"/>
 /// <reference path="./Syntax.ts"/>
 /// <reference path="./Visitor.ts"/>
 
 "use strict";
 
 namespace Fate.Compiler.Checker {
-  import isTrue = Types.isTrue;
-  import isFalse = Types.isFalse;
-  import isIn = Types.isIn;
-
   import Visitor = Compiler.Visitor;
   import Syntax = Compiler.Syntax;
-  import hasTag = Syntax.hasTag;
-  import isStatements = Syntax.isStatements;
-  import isLiteral = Syntax.isLiteral;
 
   export function checkSyntaxTree(syntaxTree: Syntax.Statements,
                                   warnings?: CompileErrors) {
