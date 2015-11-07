@@ -16,8 +16,6 @@ namespace Fate.Compiler.Checker {
   import isStatements = Syntax.isStatements;
   import isLiteral = Syntax.isLiteral;
 
-  type FunctionGroups = { [index: string]: Syntax.FunctionDeclaration[] };
-
   export function checkSyntaxTree(syntaxTree: Syntax.Statements,
                                   warnings?: CompileErrors) {
     var visit = new Visitor(warnings);
@@ -57,7 +55,7 @@ namespace Fate.Compiler.Checker {
       var namesSeen: { [index: string]: boolean } = {};
       var lastName: string;
       var lastArgs: string;
-      
+
       statements.forEach(function (statement) {
         var signature = statement.signature;
         var name = signature.id.value;
@@ -69,14 +67,14 @@ namespace Fate.Compiler.Checker {
             "the previous definition(s)"
           );
         }
-        
+
         if ( name === lastName && args !== lastArgs ) {
           issueWarning(statement,
             "Reopened Function '" + name + "' has different " +
             "argument names than the original definition"
           );
         }
-        
+
         namesSeen[name] = true;
         lastName = name;
         lastArgs = args;

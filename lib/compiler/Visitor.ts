@@ -24,6 +24,10 @@ namespace Fate.Compiler {
     constructor(public value: number) { super(); }
   }
 
+  function noOpVisitor(node: Syntax.NodeOrNodes) {
+    return node;
+  }
+
   export class Visitor {
     public nodeStack: (Syntax.Node|Syntax.Nodes)[] = [];
 
@@ -88,7 +92,7 @@ namespace Fate.Compiler {
         return node;
       }
     }
-    
+
     public recurseInto(node: Syntax.Node|Syntax.Nodes,
                        visitor: NodeVisitor) {
       var nodeStack = this.nodeStack;
@@ -194,10 +198,11 @@ namespace Fate.Compiler {
       return collection[index.value];
     }
 
-    public upTreeUntilMatch(visitor: NodeVisitor, matcher: NodeMatcher) {
+    public upTreeUntilMatch(matcher: NodeMatcher,
+                            visitor = noOpVisitor): Syntax.NodeOrNodes {
       var nodeStack = this.nodeStack;
       for ( var i = nodeStack.length - 1; i >= 0; i-- ) {
-        var node = <Syntax.Node>nodeStack[i];
+        var node: Syntax.NodeOrNodes = nodeStack[i];
         visitor(node);
         if ( matcher(node) ) {
           return node;
@@ -206,7 +211,7 @@ namespace Fate.Compiler {
       return null;
     }
   }
-  
+
   export class MutatingVisitor extends Visitor {
     public recurseInto(node: Syntax.Node|Syntax.Nodes,
                        visitor: NodeVisitor) {
@@ -226,8 +231,8 @@ namespace Fate.Compiler {
           currentNode[key] = visitor(currentNode[key]);
         });
       }
-      nodeStack.pop();    
-      return node;  
-    }    
+      nodeStack.pop();
+      return node;
+    }
   }
 }

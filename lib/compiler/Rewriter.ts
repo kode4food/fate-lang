@@ -22,7 +22,6 @@ namespace Fate.Compiler.Rewriter {
   type NodeMatcher = (node: Syntax.NodeOrNodes) => boolean;
   type LiteralArray = any[];
   type StringMap = { [index: string]: string };
-  type FunctionGroups = { [index: string]: Syntax.FunctionDeclaration[] };
   type LiteralObject = { [index: string]: any };
   type FunctionMap = { [index: string]: Function };
 
@@ -107,7 +106,7 @@ namespace Fate.Compiler.Rewriter {
       visit.matching(promoteNot, visit.tags(['and', 'or'])),
 
       visit.statementGroups(mergeFunctions, functionStatements),
-      
+
       visit.matching(rollUpForLoops, visit.tags('for')),
       visit.matching(assignFunctions, functionStatements),
 
@@ -121,12 +120,9 @@ namespace Fate.Compiler.Rewriter {
     return syntaxTree;
 
     function annotateNearestParent(name: string, matcher: NodeMatcher) {
-      for ( var i = visit.nodeStack.length - 1; i >= 0; i-- ) {
-        var node = <Syntax.Node>visit.nodeStack[i];
-        if ( matcher(node) ) {
-          annotate(node, name);
-          return;
-        }
+      var node = <Syntax.Node>visit.upTreeUntilMatch(matcher);
+      if ( node ) {
+        annotate(node, name);
       }
     }
 
@@ -181,11 +177,12 @@ namespace Fate.Compiler.Rewriter {
       if ( !hasAnnotation(node, 'pattern/local') ) {
         annotate(node, 'pattern/local', getAnchorName());
       }
-      visit.upTreeUntilMatch(annotateNode, visit.tags('pattern'));
+      visit.upTreeUntilMatch(visit.tags('pattern'), annotateWildcard);
       return node;
 
-      function annotateNode(node: Syntax.Node) {
+      function annotateWildcard(node: Syntax.Node) {
         annotate(node, 'pattern/wildcard');
+        return node;
       }
     }
 
@@ -355,7 +352,7 @@ namespace Fate.Compiler.Rewriter {
         if ( name !== lastName || args !== lastArgs ) {
           processGroup();
         }
-        
+
         if ( !signature.guard && group.length ) {
           // if we see an unguarded, we can blow away the previous funcs
           group = [];
@@ -366,19 +363,18 @@ namespace Fate.Compiler.Rewriter {
         group.push(statement);
       });
       processGroup();
-      
+
       return result;
- 
+
       function processGroup() {
         if ( group.length < 2 ) {
           result = result.concat(group);
           group = [];
           return;
         }
-        
+
         var firstDefinition = group[0];
         var firstSignature = firstDefinition.signature;
-        var args = argumentsSignature(firstSignature.params);
         var firstStatements = firstDefinition.statements;
         var statements = firstStatements.statements.slice();
         var guard = firstSignature.guard;
