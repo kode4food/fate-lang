@@ -10,10 +10,9 @@ namespace Fate.Compiler.CodeGen {
   var likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
 
   /**
-   * Converts a parse tree into source code (initially JavaScript) that can
-   * be pulled into an Fate Runtime instance.  Host Language-specific
-   * constructs are avoided here and instead produced by JavaScript code
-   * generation module.
+   * Converts a parse tree into source code (initially JavaScript). Host
+   * Language-specific constructs are avoided here and instead produced 
+   * by JavaScript code generation module.
    *
    * @param {Object} strippedTree the parse tree to use
    */
@@ -606,15 +605,15 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createNotInEvaluator(node: Syntax.NotInOperator) {
-      var isIn = globals.runtimeImport('isIn');
       generate.unaryOperator('not', function () {
+        var isIn = globals.runtimeImport('isIn');
         generate.call(isIn, [defer(node.left), defer(node.right)]);
       });
     }
 
     function createNotEvaluator(node: Syntax.NotOperator) {
-      var isTrue = globals.runtimeImport('isTrue');
       generate.unaryOperator('not', function () {
+        var isTrue = globals.runtimeImport('isTrue');
         generate.call(isTrue, [defer(node.left)]);
       });
     }
