@@ -3,6 +3,11 @@
 namespace Fate.Runtime {
   type Component = [number, string|number];
 
+  interface FormatFunction {
+    (data: any | any[]): string;
+    __fateIndexes: (string | number)[];
+  }
+  
   var Digits = "0|[1-9][0-9]*";
   var Ident = "[$_a-zA-Z][$_a-zA-Z0-9]*";
   var Term = ";?";
@@ -10,11 +15,6 @@ namespace Fate.Runtime {
                /* "%" ( "%" | digits | identifier )? ";"? */
 
   var ParamRegex = new RegExp(Params, "m");
-
-  interface FormatFunction {
-    (data: any|any[]): string;
-    __fateIndexes: (string|number)[];
-  }
 
   export function isFormatter(value: string) {
     if ( !ParamRegex.test(value) ) {

@@ -3,11 +3,11 @@
 "use strict";
 
 namespace Fate.Runtime {
+  type ArgTemplate = { [index: number]: any };
+
   var slice = Array.prototype.slice;
 
   function noOp() {}
-
-  type ArgTemplate = { [index: number]: any };
 
   export function ensureFunction(func: Function): Function {
     return typeof func === 'function' ? func : noOp;

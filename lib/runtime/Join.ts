@@ -3,8 +3,6 @@
 namespace Fate.Runtime {
   var slice = Array.prototype.slice;
 
-  var noOp = defineChannel(function () {});
-
   export interface Channel {
     (...args: any[]): void;
     __fateChannel?: boolean;
@@ -14,6 +12,8 @@ namespace Fate.Runtime {
     value.__fateChannel = true;
     return value;
   }
+
+  var noOp = defineChannel(function() { });
 
   export function ensureChannel(value: Channel) {
     return isFateChannel(value) ? value : noOp;

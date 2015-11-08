@@ -3,6 +3,11 @@
 "use strict";
 
 namespace Fate.Runtime {
+  type Matcher = (value: any) => boolean;
+  type Matchers = Matcher[];
+
+  type AnyMap = { [index: string]: any };
+
   export interface Pattern {
     (obj: any): boolean;
     __fatePattern?: boolean;
@@ -17,10 +22,9 @@ namespace Fate.Runtime {
     return typeof value === 'function' && value.__fatePattern;
   }
 
-  type Matcher = (value: any) => boolean;
-  type Matchers = Matcher[];
-
-  type AnyMap = { [index: string]: any };
+  var nullMatcher = definePattern(function(obj: any) {
+    return obj === null || obj === undefined;
+  });
 
   /**
    * Basic Object Matcher to support the `like` operator.
@@ -62,11 +66,6 @@ namespace Fate.Runtime {
     }
     return true;
   }
-
-  function nullMatcher(obj: any) {
-    return obj === null || obj === undefined;
-  }
-  definePattern(nullMatcher);
 
   /**
    * Compiled matcher, for when the template has been defined as a literal.
