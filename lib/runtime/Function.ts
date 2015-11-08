@@ -9,12 +9,8 @@ namespace Fate.Runtime {
 
   type ArgTemplate = { [index: number]: any };
 
-  export function defineGuardedFunction(originalFunction: Function,
-                                        envelope: Function) {
-    if ( typeof originalFunction !== 'function' ) {
-      originalFunction = noOp;
-    }
-    return envelope(originalFunction);
+  export function ensureFunction(func: Function): Function {
+    return typeof func === 'function' ? func : noOp;
   }
 
   export function bindFunction(func: Function, args: ArgTemplate) {

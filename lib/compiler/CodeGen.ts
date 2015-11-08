@@ -278,23 +278,12 @@ namespace Fate.Compiler.CodeGen {
 
         function createGuarded() {
           var functionName = signature.id;
-          var defineFunction = globals.runtimeImport('defineGuardedChannel');
-          generate.call(defineFunction, [
-            generate.code(function () {
-              generate.getter(functionName.value);
-            }),
-            createWrapper
-          ]);
+          var originalId = generate.code(function () {
+            generate.getter(functionName.value);
+          });
 
-          function createWrapper() {
-            generate.func({
-              internalArgs: ['o'],
-              body: function () {
-                generate.returnStatement(createFunction);
-              },
-              annotations: node.annotations
-            });
-          }
+          var defineFunction = globals.runtimeImport('defineChannel');
+          generate.call(defineFunction, [createFunction]);
 
           function createFunction() {
             generate.func({
@@ -312,10 +301,15 @@ namespace Fate.Compiler.CodeGen {
               },
               null
             );
+
             generate.returnStatement(function () {
-              generate.call('o', [function () {
-                generate.retrieveAnonymous(joinArgs);
-              }]);
+              generate.call(
+                function () {
+                  var ensure = globals.runtimeImport('ensureChannel');
+                  generate.call(ensure, [originalId])
+                },
+                [function () { generate.retrieveAnonymous(joinArgs); }]
+              );
             });
           }
         }
@@ -346,31 +340,16 @@ namespace Fate.Compiler.CodeGen {
 
       function createGuarded() {
         var functionName = node.signature.id;
-        generate.call(globals.runtimeImport('defineGuardedFunction'), [
-          generate.code(function () {
+        var originalId = generate.code(function () {
             generate.getter(functionName.value);
-          }),
-          createWrapper
-        ]);
+        });
 
-        function createWrapper() {
-          generate.func({
-            internalArgs: ['o'],
-            body: function () {
-              generate.returnStatement(createFunction);
-            },
-            annotations: node.annotations
-          });
-        }
-
-        function createFunction() {
-          generate.func({
-            contextArgs: paramNames,
-            prolog: createProlog,
-            body: defer(createStatementsEvaluator, node.statements),
-            annotations: node.annotations
-          });
-        }
+        generate.func({
+          contextArgs: paramNames,
+          prolog: createProlog,
+          body: defer(createStatementsEvaluator, node.statements),
+          annotations: node.annotations
+        });
 
         function createProlog() {
           generate.ifStatement(
@@ -378,7 +357,10 @@ namespace Fate.Compiler.CodeGen {
             null,  // this is an 'else' case
             function () {
               generate.returnStatement(function () {
-                generate.call('o');
+                generate.call(function () {
+                  var ensure = globals.runtimeImport('ensureFunction');
+                  generate.call(ensure, [originalId])
+                });
               });
             }
           );
