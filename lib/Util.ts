@@ -4,7 +4,7 @@ namespace Fate.Util {
   type MixinObject = { [index: string]: any };
 
   export function mixin(target: MixinObject, ...source: any[]) {
-    for ( var i = 0, ilen = source.length; i < ilen; i++ ) {
+    for ( var i = 0; i < source.length; i++ ) {
       var src = source[i];
       if ( typeof src !== 'object' || src === null || Array.isArray(src) ) {
         continue;
