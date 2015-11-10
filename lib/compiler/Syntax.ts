@@ -128,6 +128,11 @@ namespace Fate.Compiler.Syntax {
                 public right: (Expression|Wildcard)[]) { super(); }
   }
 
+  export class LambdaExpression extends Expression {
+    constructor(public signature: Signature,
+                public statements: Statements) { super(); }
+  }
+
   // Array/Object Construction and Comprehension ******************************
 
   export class ElementsConstructor extends Operator {
@@ -344,6 +349,7 @@ namespace Fate.Compiler.Syntax {
     'export': ExportStatement,
     'channel': ChannelDeclaration,
     'function': FunctionDeclaration,
+    'lambda': LambdaExpression,
     'call': CallOperator,
     'bind': BindOperator,
     'let': LetStatement,

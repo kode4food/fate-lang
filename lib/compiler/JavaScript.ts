@@ -57,7 +57,7 @@ namespace Fate.Compiler.JavaScript {
   }
 
   interface FunctionOptions {
-    name?: string;
+    internalId?: string;
     internalArgs?: Name[];
     contextArgs?: Name[];
     prolog?: BodyEntry;
@@ -200,6 +200,7 @@ namespace Fate.Compiler.JavaScript {
       ifStatement: ifStatement,
       loopExpression: loopExpression,
       loopContinue: loopContinue,
+      funcDecl: funcDeclaration,
       func: func,
       compoundExpression: compoundExpression,
       returnStatement: returnStatement,
@@ -513,9 +514,9 @@ namespace Fate.Compiler.JavaScript {
             if ( !modificationSet ) {
               modificationSet = modificationSets[key] = [];
             }
-                
+
             modificationSet[index] = {
-              ids: names[key], 
+              ids: names[key],
               created: created
             };
           }
@@ -609,8 +610,15 @@ namespace Fate.Compiler.JavaScript {
       write('continue;');
     }
 
+    function funcDeclaration(name: Name, options: FunctionOptions) {
+      var functionId = localForWrite(name);
+      write(functionId, '=');
+      func(options);
+      write(';');
+    }
+
     function func(options: FunctionOptions) {
-      var functionName = options.name;
+      var internalId = options.internalId;
       var internalArgs = options.internalArgs || [];
       var contextArgs = options.contextArgs || [];
       var funcProlog = options.prolog;
@@ -632,8 +640,8 @@ namespace Fate.Compiler.JavaScript {
 
       var argNames = internalArgs.concat(localNames);
       write('function');
-      if ( functionName ) {
-        write(' ' + functionName);
+      if ( internalId ) {
+        write(' ' + internalId);
       }
       write('(', argNames.join(','), '){');
       if ( usesScratch ) {

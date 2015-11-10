@@ -108,7 +108,6 @@ namespace Fate.Compiler.Rewriter {
       visit.statementGroups(mergeFunctions, functionStatements),
 
       visit.matching(rollUpForLoops, visit.tags('for')),
-      visit.matching(assignFunctions, functionStatements),
 
       visit.matching(annotateMutations, visit.tags('let'))
     ];
@@ -440,12 +439,6 @@ namespace Fate.Compiler.Rewriter {
         nested.loopStatements,
         node.elseStatements
       );
-    }
-
-    // Function declarations are really 'let name = function'
-    function assignFunctions(node: Syntax.FunctionDeclaration) {
-      var id = node.signature.id;
-      return Syntax.node('let', [Syntax.node('assignment', id, node)]);
     }
 
     function annotateMutations(node: Syntax.LetStatement) {

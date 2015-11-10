@@ -32,9 +32,23 @@ def rightCalls(test)
   test.done()
 end
 
+def recursiveCalls(test)
+  def callMe(x)
+    if x > 0
+      x + ', ' + callMe(x-1)
+    else
+      'liftoff'
+    end
+  end
+
+  test.equal(callMe(10), '10, 9, 8, 7, 6, 5, 4, 3, 2, 1, liftoff')
+  test.done()
+end
+
 let tests = nodeunit.testCase({
   "Left Function Calls": leftCalls,
-  "Right Piped Calls": rightCalls
+  "Right Piped Calls": rightCalls,
+  "Recursive Calls": recursiveCalls
 })
 
 export tests

@@ -11,7 +11,7 @@ namespace Fate.Compiler.CodeGen {
 
   /**
    * Converts a parse tree into source code (initially JavaScript). Host
-   * Language-specific constructs are avoided here and instead produced 
+   * Language-specific constructs are avoided here and instead produced
    * by JavaScript code generation module.
    *
    * @param {Object} strippedTree the parse tree to use
@@ -27,6 +27,7 @@ namespace Fate.Compiler.CodeGen {
       'export': createExportEvaluator,
       'channel': createChannelEvaluator,
       'function': createFunctionEvaluator,
+      'lambda': createLambdaEvaluator,
       'call': createCallEvaluator,
       'bind': createBindEvaluator,
       'let': createLetEvaluator,
@@ -77,7 +78,7 @@ namespace Fate.Compiler.CodeGen {
 
     function createScriptFunction(parseTree: Syntax.Statements) {
       generate.func({
-        name: 's',
+        internalId: 's',
         internalArgs: ['c', 'x'],
         body: function () {
           createStatementsEvaluator(parseTree);
@@ -327,14 +328,12 @@ namespace Fate.Compiler.CodeGen {
       create();
 
       function createUnguarded() {
-        generate.parens(function () {
-            generate.func({
-              contextArgs: paramNames,
-              body: defer(createStatementsEvaluator, node.statements),
-              annotations: node.annotations
-            });
-          }
-        );
+        var functionName = node.signature.id
+        generate.funcDecl(functionName.value, {
+          contextArgs: paramNames,
+          body: defer(createStatementsEvaluator, node.statements),
+          annotations: node.annotations
+        });
       }
 
       function createGuarded() {
@@ -343,7 +342,7 @@ namespace Fate.Compiler.CodeGen {
             generate.getter(functionName.value);
         });
 
-        generate.func({
+        generate.funcDecl(functionName.value, {
           contextArgs: paramNames,
           prolog: createProlog,
           body: defer(createStatementsEvaluator, node.statements),
@@ -365,6 +364,23 @@ namespace Fate.Compiler.CodeGen {
           );
         }
       }
+    }
+
+    function createLambdaEvaluator(node: Syntax.LambdaExpression) {
+      var signature = node.signature;
+      var params = signature.params;
+
+      var paramNames = params.map(function (param: Syntax.Parameter) {
+        return param.id.value;
+      });
+
+      generate.parens(function () {
+        generate.func({
+          contextArgs: paramNames,
+          body: defer(createStatementsEvaluator, node.statements),
+          annotations: node.annotations
+        });
+      });
     }
 
     function createCallEvaluator(node: Syntax.CallOperator) {
