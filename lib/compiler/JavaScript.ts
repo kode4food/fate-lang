@@ -92,12 +92,6 @@ namespace Fate.Compiler.JavaScript {
     return arr[arr.length - 1];
   }
 
-  function canLiteralBeInlined(literalValue: any) {
-    var type = typeof literalValue;
-    return ( type === 'string' && literalValue.length < 32 ) ||
-             type === 'number' || type === 'boolean';
-  }
-
   export class Globals {
     private globals: { [index: string]: number } = {}; // name -> nextId
     private generatedLiterals: { [index: string]: GlobalId } = {};
@@ -117,11 +111,6 @@ namespace Fate.Compiler.JavaScript {
 
     public literal(literalValue: any) {
       var canonical = jsonStringify(literalValue);
-
-      if ( canLiteralBeInlined(literalValue) ) {
-        return canonical;
-      }
-
       var id = this.generatedLiterals[canonical];
       if ( id ) {
         return id;

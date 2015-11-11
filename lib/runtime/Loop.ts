@@ -1,9 +1,10 @@
 namespace Fate.Runtime {
+  export type Collection = any[]|any|Function;
+
   var generator = require('../lib/generator');
   var isGenerator = generator.isGenerator;
   var generateIndexedSet = generator.generateIndexedSet;
 
-  export type Collection = any[]|any|Function;
   var EmptyCollection: Collection = [];
 
   export function createIterator(collection: Collection) {

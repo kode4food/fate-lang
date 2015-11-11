@@ -7,13 +7,17 @@ namespace Fate.Compiler.Checker {
   import Visitor = Compiler.Visitor;
   import Syntax = Compiler.Syntax;
 
+  type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
+
   export function checkSyntaxTree(syntaxTree: Syntax.Statements,
                                   warnings?: CompileErrors) {
     var visit = new Visitor(warnings);
 
     var pipeline = [
       visit.matching(validateWildcards, visit.tags('wildcard')),
-      visit.statementGroups(mergeableFunctions, functionStatements)
+      visit.matching(validateFunctionArgs, visit.tags(['function', 'lambda'])),
+      visit.matching(validateChannelArgs, visit.tags('channel')),
+      visit.statementGroups(mergeableFunctions, visit.tags('function')),
     ];
 
     pipeline.forEach((func) => func(syntaxTree));
@@ -37,9 +41,38 @@ namespace Fate.Compiler.Checker {
       return node;
     }
 
-    function functionStatements(node: Syntax.Node) {
-      return (node instanceof Syntax.FunctionDeclaration) &&
-             !!node.signature.id;
+    function validateFunctionArgs(node: FunctionOrLambda) {
+      checkParamsForDuplication(node, [node.signature]);
+      return node;
+    }
+
+    function validateChannelArgs(node: Syntax.ChannelDeclaration) {
+      checkParamsForDuplication(node, node.signatures);
+      return node;
+    }
+
+    function checkParamsForDuplication(node: Syntax.Node,
+                                      signatures: Syntax.Signatures) {
+      var encounteredNames: { [index: string]: boolean } = { };
+      var duplicatedNames: { [index: string]: boolean } = { };
+      signatures.forEach(function (signature) {
+        signature.params.forEach(function (param) {
+          var name = param.id.value;
+          if ( encounteredNames[name] ) {
+            duplicatedNames[name] = true;
+            return;
+          }
+          encounteredNames[name] = true;
+        });
+      });
+
+      var duplicatedItems = Object.keys(duplicatedNames);
+      if ( duplicatedItems.length ) {
+        issueError(node,
+          "Argument names are repeated in declaration: " +
+          duplicatedItems.join(', ')
+        );
+      }
     }
 
     function mergeableFunctions(statements: Syntax.FunctionDeclaration[]) {

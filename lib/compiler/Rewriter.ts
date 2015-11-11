@@ -105,7 +105,7 @@ namespace Fate.Compiler.Rewriter {
       visit.matching(flipEquality, visit.tags('not')),
       visit.matching(promoteNot, visit.tags(['and', 'or'])),
 
-      visit.statementGroups(mergeFunctions, functionStatements),
+      visit.statementGroups(mergeFunctions, visit.tags('function')),
 
       visit.matching(rollUpForLoops, visit.tags('for')),
 
@@ -328,11 +328,6 @@ namespace Fate.Compiler.Rewriter {
         output = output.concat(foldedStatements);
       });
       return output;
-    }
-
-    function functionStatements(node: Syntax.Node) {
-      return (node instanceof Syntax.FunctionDeclaration) &&
-             !!node.signature.id;
     }
 
     // We can merge consecutive non-recursive functions that are

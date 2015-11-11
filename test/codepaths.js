@@ -125,6 +125,18 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
+  "Duplicated Arg Names": function (test) {
+    test.throws(function () {
+      evaluate("def someFunction(arg1, arg2, arg1, arg3, arg2)\nend");
+    }, "Duplicated arg names in a Function should explode");
+
+    test.throws(function () {
+      evaluate("when a(arg1, arg2) & b(arg3, arg2)\nend");
+    }, "Arg names duplicated across channels should explode");
+    
+    test.done();
+  },
+
   "Membership": function (test) {
     test.throws(function () {
       evaluate("nil.missing");
