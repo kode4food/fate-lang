@@ -6,7 +6,7 @@ def guardOnly(test)
   end
 
   testFunc(12) | test.equal(?, 120)
-  testFunc(9) | test.equal(?, undefined)
+  () -> testFunc(9) | test.throws
   test.done()
 end
 
@@ -16,7 +16,7 @@ def guardAndDefault(test)
   end
 
   let y = 'nomerge'
-  
+
   def testFunc(x) where x > 10
     x * 10
   end
@@ -28,7 +28,7 @@ end
 
 let tests = nodeunit.testCase({
   "Functions with Guards Only": guardOnly,
-  "Functions with Guard and Default": guardAndDefault 
+  "Functions with Guard and Default": guardAndDefault
 })
 
 export tests

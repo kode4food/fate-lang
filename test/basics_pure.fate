@@ -5,8 +5,8 @@ let data1 = {
   "title": "Famous People",
   "people" : [
     { "name": "Larry", "age": 50, "brothers": [] },
-    { "name": "Curly", "age": 45, "brothers": ["Moe", "Shemp"]},
-    { "name": "Moe", "age": 58, "brothers": ["Curly", "Shemp"]}
+    { "name": "Curly", "age": 45, "brothers": ["Moe", "Shemp"] },
+    { "name": "Moe", "age": 58, "brothers": ["Curly", "Shemp"] }
   ]
 }
 
@@ -14,12 +14,12 @@ def relational(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
-  10 * 99 > 900 | isTrue
-  100 / 5 >= 30 | isFalse
-  99 mod 6 >= 3 | isTrue
-  33 * 3 mod 6 <= 2 | isFalse
-  data1.people[0].age * 2 > 99 | isTrue
-  data1.people[0].age / 2 < 24 | isFalse
+  10 * 99 > 900                  | isTrue
+  100 / 5 >= 30                  | isFalse
+  99 mod 6 >= 3                  | isTrue
+  33 * 3 mod 6 <= 2              | isFalse
+  data1.people[0].age * 2 > 99   | isTrue
+  data1.people[0].age / 2 < 24   | isFalse
   100 / data1.people[0].age >= 2 | isTrue
   3 * data1.people[0].age <= 149 | isFalse
   test.done()
@@ -29,13 +29,13 @@ def equality(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
-  10 * 99 = 990 | isTrue
-  100 / 5 != 19 | isTrue
-  99 mod 6 = 3 | isTrue
-  33 * 3 mod 6 != 2 | isTrue
-  data1.people[0].age * 2 = 99 | isFalse
-  data1.people[0].age / 2 != 25 | isFalse
-  100 / data1.people[0].age = 2 | isTrue
+  10 * 99 = 990                  | isTrue
+  100 / 5 != 19                  | isTrue
+  99 mod 6 = 3                   | isTrue
+  33 * 3 mod 6 != 2              | isTrue
+  data1.people[0].age * 2 = 99   | isFalse
+  data1.people[0].age / 2 != 25  | isFalse
+  100 / data1.people[0].age = 2  | isTrue
   3 * data1.people[0].age != 149 | isTrue
   test.done()
 end
@@ -51,16 +51,16 @@ def inEvaluation(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
-  10 in [1,10,30] | isTrue
-  10 in data2.numbers | isTrue
-  'name' in {age:43, name:'Thom'} | isTrue
-  'name' in data2.person | isTrue
-  'name' in 'a name value' | isFalse
-  'name' in data2.stringValue | isFalse
-  'fred' in ['bill', 'ted'] | isFalse
-  'fred' in data2.names | isFalse
+  10 in [1,10,30]                    | isTrue
+  10 in data2.numbers                | isTrue
+  'name' in {age:43, name:'Thom'}    | isTrue
+  'name' in data2.person             | isTrue
+  'name' in 'a name value'           | isFalse
+  'name' in data2.stringValue        | isFalse
+  'fred' in ['bill', 'ted']          | isFalse
+  'fred' in data2.names              | isFalse
   'nothing' in {age:43, name:'Thom'} | isFalse
-  'nothing' in data2.person | isFalse
+  'nothing' in data2.person          | isFalse
   test.done()
 end
 
@@ -74,16 +74,16 @@ def notIn(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
-  10 not in [1,10,30] | isFalse
-  10 not in data3.numbers | isFalse
-  'name' not in {age:43, name:'Thom'} | isFalse
-  'name' not in data3.person | isFalse
-  'name' not in 'a name value' | isTrue
-  'name' not in data3.stringValue | isTrue
-  'fred' not in ['bill', 'ted'] | isTrue
-  'fred' not in data3.names | isTrue
+  10 not in [1,10,30]                    | isFalse
+  10 not in data3.numbers                | isFalse
+  'name' not in {age:43, name:'Thom'}    | isFalse
+  'name' not in data3.person             | isFalse
+  'name' not in 'a name value'           | isTrue
+  'name' not in data3.stringValue        | isTrue
+  'fred' not in ['bill', 'ted']          | isTrue
+  'fred' not in data3.names              | isTrue
   'nothing' not in {age:43, name:'Thom'} | isTrue
-  'nothing' not in data3.person | isTrue
+  'nothing' not in data3.person          | isTrue
   test.done()
 end
 
@@ -91,17 +91,17 @@ def bool(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
-  true and false | isFalse
-  true or false | isTrue
+  true and false                          | isFalse
+  true or false                           | isTrue
   data1.people[0].age * 2 = 100 and 'yep' | test.equal(?, "yep")
-  data1.people[0].age * 2 = 99 or 'nope' | test.equal(?, "nope")
-  'yep' and data1.people[0].age * 2 | test.equal(?, 100)
-  'yep' or data1.people[0].age * 2 | test.equal(?, "yep")
-  false or data1.people[0].age * 2 | test.equal(?, 100)
-  not true and not false | isFalse
-  not(true or false) | isFalse
-  not true or not false | isTrue
-  not(true and false) | isTrue
+  data1.people[0].age * 2 = 99 or 'nope'  | test.equal(?, "nope")
+  'yep' and data1.people[0].age * 2       | test.equal(?, 100)
+  'yep' or data1.people[0].age * 2        | test.equal(?, "yep")
+  false or data1.people[0].age * 2        | test.equal(?, 100)
+  not true and not false                  | isFalse
+  not(true or false)                      | isFalse
+  not true or not false                   | isTrue
+  not(true and false)                     | isTrue
   test.done()
 end
 
@@ -109,12 +109,12 @@ def unary(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
-  -1 | test.equal(?, -1)
-  not false | isTrue
-  not true | isFalse
-  not (----10 - 10) | isTrue
-  -data1.people[0].age | test.equal(?, -50)
-  -data1.people[0].age + 10 | test.equal(?, -40)
+  -1                             | test.equal(?, -1)
+  not false                      | isTrue
+  not true                       | isFalse
+  not (----10 - 10)              | isTrue
+  -data1.people[0].age           | test.equal(?, -50)
+  -data1.people[0].age + 10      | test.equal(?, -40)
   not (data1.people[0].age = 25) | isTrue
   test.done()
 end
@@ -123,11 +123,11 @@ def nilEvaluation(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
-  true = nil | isFalse
-  nil != nil | isFalse
-  nil = nil | isTrue
+  true = nil        | isFalse
+  nil != nil        | isFalse
+  nil = nil         | isTrue
   bogusValue != nil | isFalse
-  bogusValue = nil | isTrue
+  bogusValue = nil  | isTrue
   test.done()
 end
 
@@ -161,10 +161,10 @@ def arrayLike(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
   
-  [1, 2, 3] like [1, 2] | isTrue
+  [1, 2, 3] like [1, 2]    | isTrue
   [1, 2, 3] like [1, 2, 3] | isTrue
-  [1, 2] like [1, 2, 3] | isFalse
-  [] like [] | isTrue
+  [1, 2] like [1, 2, 3]    | isFalse
+  [] like []               | isTrue
   test.done()
 end
 
@@ -176,10 +176,10 @@ def deepPaths(test)
     }
   }]
 
-  root[0].colors[1] | test.equal(?, "green")
-  root[0].info.description | test.equal(?, "this is a description")
-  root[0].info['description'] | test.equal(?, "this is a description")
-  root[0].info.notThere | test.equal(?, undefined)
+  root[0].colors[1]                 | test.equal(?, "green")
+  root[0].info.description          | test.equal(?, "this is a description")
+  root[0].info['description']       | test.equal(?, "this is a description")
+  root[0].info.notThere             | test.equal(?, undefined)
   () -> root[1].info['description'] | test.throws
   test.done()
 end

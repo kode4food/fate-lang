@@ -7,7 +7,9 @@ namespace Fate.Runtime {
 
   var slice = Array.prototype.slice;
 
-  function noOp() {}
+  function noOp() {
+    throw new Error("Function invocation not exhaustive");
+  }
 
   export function ensureFunction(func: Function): Function {
     return typeof func === 'function' ? func : noOp;
