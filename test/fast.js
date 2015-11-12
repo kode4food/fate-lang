@@ -11,3 +11,4 @@ exports["Pure Fate Imports"] = require('./import_pure').tests;
 exports["Pure Fate Joins"] = require('./join_pure').tests;
 exports["Pure Fate Lambdas"] = require('./lambda_pure').tests;
 exports["Pure Fate Assignment"] = require('./assign_pure').tests;
+exports["Pure Fate Scopes"] = require('./scope_pure').tests;
