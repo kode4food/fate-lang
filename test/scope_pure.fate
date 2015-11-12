@@ -66,11 +66,11 @@ def conditionalScopeTest(test)
 end
 
 let tests = nodeunit.testCase({
-  "Testing Scopes": scopeTest,
-  "Testing Nested Scopes": nestedScopeTest,
-  "Testing Argument Scopes": argumentsScopeTest,
-  "Testing Scope Overrides", scopeOverrideTest,
-  "Testing Conditional Scopes": conditionalScopeTest
+	"Testing Scopes": scopeTest,
+	"Testing Nested Scopes": nestedScopeTest,
+	"Testing Argument Scopes": argumentsScopeTest,
+	"Testing Scope Overrides": scopeOverrideTest,
+	"Testing Conditional Scopes": conditionalScopeTest
 })
 
 export tests

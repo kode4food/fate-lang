@@ -11,8 +11,24 @@ def lambdas(test)
   test.done()
 end
 
+def curryTest(test)
+	let lambda1 = (x, y) -> x + y
+	let curry = lambda1(5, ?)
+	test.equals(curry(5), 10)
+
+	let lambda2 = (a, b, c) -> a + b + c
+
+	let curry1 = lambda2(1, ?, ?)
+	test.equals(curry1(2, 3), 6)
+
+	let  curry2 = curry1(2, ?)
+	test.equals(curry2(3), 6)
+	test.done()
+end
+
 let tests = nodeunit.testCase({
-  "Lambdas Expressions": lambdas
+  "Lambdas Expressions": lambdas,
+  "Lambda currying": curryTest
 })
 
 export tests
