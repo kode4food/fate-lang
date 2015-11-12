@@ -57,7 +57,7 @@ exports.lists = nodeunit.testCase({
     test.done();
   },
 
-  "Objects": function (test) {
+  "Object Construction": function (test) {
     var data = {
       name: 'hello',
       value: 9
@@ -68,6 +68,10 @@ exports.lists = nodeunit.testCase({
     test.equal(evaluate("{age:21*2}.age"), 42);
     test.equal(evaluate("{name + '1': value + 1}['hello1']", data), 10);
     test.equal(evaluate("{name + '2': value + 1}['hello2']", data), 10);
+    test.equal(evaluate('let a = "hello"\n{ "test": a }')['test'], 'hello');
+    test.equal(evaluate('let a = "hello"\n{ a }["a"]'), 'hello');
+    test.equal(evaluate('{ "hello" }["hello"]'), 'hello');
+
     test.done();
   },
 
