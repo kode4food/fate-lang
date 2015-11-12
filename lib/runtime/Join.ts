@@ -13,7 +13,11 @@ namespace Fate.Runtime {
     return value;
   }
 
-  var noOp = defineChannel(function() { });
+  var noOp = defineChannel(function(joinArgs: JoinArguments) {
+    if ( !joinArgs.provided ) {
+      throw new Error("Channel invocation not exhaustive");
+    }
+  });
 
   export function ensureChannel(value: Channel) {
     return isFateChannel(value) ? value : noOp;
@@ -24,6 +28,7 @@ namespace Fate.Runtime {
   }
 
   class JoinArguments {
+    public provided: boolean;
     public consumed: boolean;
     public argumentArray: any[];
 
@@ -48,6 +53,7 @@ namespace Fate.Runtime {
       if ( satisfied ) {
         return;
       }
+      args.provided = true;
 
       // This is not the most efficient implementation... don't care
       var argumentSet = argumentSets[signatureIndex];

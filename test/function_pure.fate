@@ -15,8 +15,6 @@ def guardAndDefault(test)
     x * 5
   end
 
-  let y = 'nomerge'
-
   def testFunc(x) where x > 10
     x * 10
   end
