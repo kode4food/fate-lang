@@ -4,19 +4,19 @@ def joinPatternTest(test)
   test.expect(10)
 
   when a({ value: 'another' } as x, y) & b(g, h)
-    x.type = 'Not' | test.ok
+    x.type = 'Not'      | test.ok
     x.value = 'another' | test.ok
-    y = 'goodbye' | test.ok
-    g = 'you' | test.ok
-    h = 40 | test.ok
+    y = 'goodbye'       | test.ok
+    g = 'you'           | test.ok
+    h = 40              | test.ok
   end
 
   when a({ type: 'Test' } as x, y) & b(g, ? > 50 as h)
-    x.type = 'Test' | test.ok
+    x.type = 'Test'    | test.ok
     x.value = 'aValue' | test.ok
-    y = 'hello' | test.ok
-    g = 'there' | test.ok
-    h = 99 | test.ok
+    y = 'hello'        | test.ok
+    g = 'there'        | test.ok
+    h = 99             | test.ok
   end
 
   setTimeout( () -> a({ type: 'Test', value: 'aValue'}, 'hello'),  10 )

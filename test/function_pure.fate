@@ -5,7 +5,7 @@ def guardOnly(test)
     x * 10
   end
 
-  testFunc(12) | test.equal(?, 120)
+  testFunc(12)      | test.equal(?, 120)
   () -> testFunc(9) | test.throws
   test.done()
 end
@@ -20,7 +20,7 @@ def guardAndDefault(test)
   end
 
   testFunc(12) | test.equal(?, 120)
-  testFunc(9) | test.equal(?, 45)
+  testFunc(9)  | test.equal(?, 45)
   test.done()
 end
 
