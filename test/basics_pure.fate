@@ -144,6 +144,19 @@ def conditional(test)
   test.done()
 end
 
+def trailingIfStatement(test)
+  def test1(value)
+    return 'cond 1' if value = 99
+    return 'cond 2' unless value = 100
+    'cond 3'
+  end
+
+  test.equal(test1(99), 'cond1')
+  test.equal(test1(0), 'cond3')
+  test.equal(test1(100), 'cond2')
+  test.done()
+end
+
 def objectLike(test)
   let isTrue = test.equal(?, true)
 
