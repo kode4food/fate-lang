@@ -78,12 +78,11 @@ namespace Fate.Compiler.CodeGen {
 
     function createScriptFunction(parseTree: Syntax.Statements) {
       generate.func({
-        internalId: 's',
-        internalArgs: ['c', 'x'],
+        internalId: generate.selfName,
+        internalArgs: [generate.contextName, generate.exportsName],
         body: function () {
           createStatementsEvaluator(parseTree);
-        },
-        annotations: parseTree.annotations
+        }
       });
     }
 
@@ -151,7 +150,7 @@ namespace Fate.Compiler.CodeGen {
 
     function createImporterArguments() {
       generate.member(function () {
-        generate.self();
+        generate.context();
       },
       globals.literal('__dirname'));
     }
@@ -214,8 +213,7 @@ namespace Fate.Compiler.CodeGen {
         joinArgs.push(function() {
           generate.func({
             contextArgs: allParamNames,
-            body: defer(createStatementsEvaluator, node.statements),
-            annotations: node.annotations
+            body: defer(createStatementsEvaluator, node.statements)
           });
         });
         signatures.forEach(function (signature) {
@@ -242,8 +240,7 @@ namespace Fate.Compiler.CodeGen {
             function () {
               generate.func({
                 contextArgs: paramNames,
-                body: unguardedBody,
-                annotations: node.annotations
+                body: unguardedBody
               });
             }
           ]);
@@ -287,8 +284,7 @@ namespace Fate.Compiler.CodeGen {
 
           function createFunction() {
             generate.func({
-              body: createFunctionBody,
-              annotations: node.annotations
+              body: createFunctionBody
             });
           }
 
@@ -316,10 +312,15 @@ namespace Fate.Compiler.CodeGen {
       }
     }
 
+    function getFuncOrLambdaInternalId(node: Syntax.Node) {
+      var hasSelf = hasAnnotation(node, 'function/self');
+      return hasSelf ? generate.selfName : undefined;
+    }
+    
     function createFunctionEvaluator(node: Syntax.FunctionDeclaration) {
       var signature = node.signature;
       var params = signature.params;
-
+      
       var paramNames = params.map(function (param: Syntax.Parameter) {
         return param.id.value;
       });
@@ -330,23 +331,23 @@ namespace Fate.Compiler.CodeGen {
       function createUnguarded() {
         var functionName = node.signature.id
         generate.funcDecl(functionName.value, {
+          internalId: getFuncOrLambdaInternalId(node),
           contextArgs: paramNames,
-          body: defer(createStatementsEvaluator, node.statements),
-          annotations: node.annotations
+          body: defer(createStatementsEvaluator, node.statements)
         });
       }
 
       function createGuarded() {
         var functionName = node.signature.id;
         var originalId = generate.code(function () {
-            generate.getter(functionName.value);
+          generate.getter(functionName.value);
         });
 
         generate.funcDecl(functionName.value, {
+          internalId: getFuncOrLambdaInternalId(node),
           contextArgs: paramNames,
           prolog: createProlog,
-          body: defer(createStatementsEvaluator, node.statements),
-          annotations: node.annotations
+          body: defer(createStatementsEvaluator, node.statements)
         });
 
         function createProlog() {
@@ -376,9 +377,9 @@ namespace Fate.Compiler.CodeGen {
 
       generate.parens(function () {
         generate.func({
+          internalId: getFuncOrLambdaInternalId(node),
           contextArgs: paramNames,
-          body: defer(createStatementsEvaluator, node.statements),
-          annotations: node.annotations
+          body: defer(createStatementsEvaluator, node.statements)
         });
       });
     }
@@ -434,8 +435,7 @@ namespace Fate.Compiler.CodeGen {
       generate.parens(function () {
         generate.call(function () {
           generate.func({
-            body: functionWrapperBody,
-            annotations: node.annotations
+            body: functionWrapperBody
           });
         }, []);
       });
@@ -554,8 +554,7 @@ namespace Fate.Compiler.CodeGen {
             guard: prolog,
             body: function () {
               processRange(i + 1);
-            },
-            annotations: annotations
+            }
           });
         }
       }
@@ -688,9 +687,9 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createSelfEvaluator(node: Syntax.Self) {
-      generate.self();
+      generate.self();  
     }
-
+    
     function createWildcard(node: Syntax.Wildcard) {
       var wildcardName = hasAnnotation(node, 'pattern/local');
       /* istanbul ignore if: untestable */
@@ -706,9 +705,8 @@ namespace Fate.Compiler.CodeGen {
       generate.call(definePattern, [
         function () {
           generate.func({
-            internalArgs: ['x'],
-            body: patternBody,
-            annotations: node.annotations
+            internalArgs: [generate.exportsName],
+            body: patternBody
           });
         }
       ]);
@@ -718,7 +716,7 @@ namespace Fate.Compiler.CodeGen {
         localName = generate.registerAnonymous(localName);
 
         generate.statement(function () {
-          generate.assignAnonymous(localName, 'x');
+          generate.assignAnonymous(localName, generate.exportsName);
         });
 
         generate.returnStatement(function () {

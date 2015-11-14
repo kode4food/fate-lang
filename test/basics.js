@@ -193,12 +193,11 @@ exports.basics = nodeunit.testCase({
     test.done();
   },
 
-  "Self": function (test) {
+  "Context": function (test) {
     var person = { name: 'thom', age: 43, colors: ['red', 'green', 'blue'] };
-    test.equal(evaluate("self.name", person), 'thom');
-    test.equal(evaluate("self.colors", person), person.colors);
-    test.equal(evaluate("self['age']", person), 43);
-    test.deepEqual(evaluate("self", person), person);
+    test.equal(evaluate("name", person), 'thom');
+    test.deepEqual(evaluate("colors", person), person.colors);
+    test.equal(evaluate("age", person), 43);
     test.done();
   }
 });

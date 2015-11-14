@@ -41,7 +41,20 @@ def recursiveCalls(test)
     end
   end
 
+  def alsoMe(x)
+    def shouldBeIgnored(x)
+      self(x)
+    end
+    
+    if x > 0
+      x + ', ' + self(x-1)
+    else
+      'liftoff'
+    end
+  end
+  
   test.equal(callMe(10), '10, 9, 8, 7, 6, 5, 4, 3, 2, 1, liftoff')
+  test.equal(alsoMe(8), '8, 7, 6, 5, 4, 3, 2, 1, liftoff')
   test.done()
 end
 

@@ -1,12 +1,10 @@
 /// <reference path="../Util.ts"/>
 /// <reference path="../Types.ts"/>
-/// <reference path="./Annotations.ts"/>
 
 "use strict";
 
 namespace Fate.Compiler.JavaScript {
   import mixin = Util.mixin;
-  import hasAnnotation = Compiler.hasAnnotation;
 
   var jsonStringify = JSON.stringify;
 
@@ -42,7 +40,6 @@ namespace Fate.Compiler.JavaScript {
   }
 
   interface ScopeInfo {
-    annotations: Annotations;
     firstAccess: { [index: string]: FirstAccess };
     snapshot: Function;
   }
@@ -53,7 +50,6 @@ namespace Fate.Compiler.JavaScript {
     collection: BodyEntry;
     guard: BodyEntry;
     body: BodyEntry;
-    annotations: Annotations;
   }
 
   interface FunctionOptions {
@@ -62,7 +58,6 @@ namespace Fate.Compiler.JavaScript {
     contextArgs?: Name[];
     prolog?: BodyEntry;
     body: BodyEntry;
-    annotations: Annotations;
   }
 
   interface Modification {
@@ -161,12 +156,16 @@ namespace Fate.Compiler.JavaScript {
     var names: NameIdsMap = {};  // name -> localId[]
     var scopeInfo = createScopeInfo();
     var nameStack: NameInfo[] = [];
-    var selfName = 'c';
     var usesScratch = false;
 
     var writerStack: BodyEntries[] = [];
     var body: BodyEntries = [];
 
+    // various names
+    var selfName = 's';
+    var contextName = 'c';
+    var exportsName = 'x';
+      
     return {
       registerAnonymous: registerAnonymous,
       createAnonymous: createAnonymous,
@@ -174,6 +173,9 @@ namespace Fate.Compiler.JavaScript {
       retrieveAnonymous: retrieveAnonymous,
       assignResult: assignResult,
       self: self,
+      selfName: selfName,
+      context: context,
+      contextName: contextName,
       member: writeMember,
       write: write,
       writeAndGroup: writeAndGroup,
@@ -182,6 +184,7 @@ namespace Fate.Compiler.JavaScript {
       assignments: assignments,
       assignFromArray: assignFromArray,
       exports: exports,
+      exportsName: exportsName,
       unaryOperator: unaryOperator,
       binaryOperator: binaryOperator,
       conditionalOperator: conditionalOperator,
@@ -215,7 +218,6 @@ namespace Fate.Compiler.JavaScript {
 
     function createScopeInfo(): ScopeInfo {
       return {
-        annotations: null,
         firstAccess: {},
         snapshot: function () {
           return mixin({}, this);
@@ -279,6 +281,10 @@ namespace Fate.Compiler.JavaScript {
 
     function self() {
       write(selfName);
+    }
+    
+    function context() {
+      write(contextName);
     }
 
     function getMemberIdentifier(name: string) {
@@ -435,7 +441,7 @@ namespace Fate.Compiler.JavaScript {
         var alias = item[1];
 
         var localName = localForRead(name);
-        writeMember('x', globals.literal(alias));
+        writeMember(exportsName, globals.literal(alias));
         write('=', localName, ';');
       });
     }
@@ -561,8 +567,7 @@ namespace Fate.Compiler.JavaScript {
 
       var parentNames = names;
       pushLocalScope();
-      scopeInfo.annotations = options.annotations;
-
+      
       var contextArgs = [itemValue];
       if ( itemName ) {
         contextArgs.push(itemName);
@@ -615,8 +620,7 @@ namespace Fate.Compiler.JavaScript {
 
       var parentNames = names;
       pushLocalScope();
-      scopeInfo.annotations = options.annotations;
-
+      
       var localNames = contextArgs.map(localForRead);
 
       var bodyContent = code(function () {
@@ -669,7 +673,7 @@ namespace Fate.Compiler.JavaScript {
 
         // pull the value from the global context
         write('let ', localNameId, '=');
-        writeMember(self, globals.literal(name));
+        writeMember(context, globals.literal(name));
         write(';');
       });
 

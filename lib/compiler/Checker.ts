@@ -15,9 +15,11 @@ namespace Fate.Compiler.Checker {
 
     var pipeline = [
       visit.matching(validateWildcards, visit.tags('wildcard')),
+      visit.matching(validateSelfReferences, visit.tags('self')),
       visit.matching(validateFunctionArgs, visit.tags(['function', 'lambda'])),
       visit.matching(validateChannelArgs, visit.tags('channel')),
       visit.statementGroups(mergeableFunctions, visit.tags('function')),
+
     ];
 
     pipeline.forEach((func) => func(syntaxTree));
@@ -39,6 +41,13 @@ namespace Fate.Compiler.Checker {
         }
       }
       return node;
+    }
+    
+    function validateSelfReferences(node: Syntax.Self) {
+      if ( !visit.hasAncestorTags(['function', 'lambda']) ) {
+        issueError(node, "'self' keyword must appear within a Function");
+      }
+      return node; 
     }
 
     function validateFunctionArgs(node: FunctionOrLambda) {

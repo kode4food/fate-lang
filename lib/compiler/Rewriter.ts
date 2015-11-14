@@ -19,12 +19,14 @@ namespace Fate.Compiler.Rewriter {
   import isLiteral = Syntax.isLiteral;
   import annotate = Compiler.annotate;
 
+  type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
+  
   type NodeMatcher = (node: Syntax.NodeOrNodes) => boolean;
   type LiteralArray = any[];
   type StringMap = { [index: string]: string };
   type LiteralObject = { [index: string]: any };
   type FunctionMap = { [index: string]: Function };
-
+  
   var inverseOperators: StringMap = {
     'eq': 'neq', 'neq': 'eq',
     'lt': 'gte', 'gte': 'lt',
@@ -87,6 +89,7 @@ namespace Fate.Compiler.Rewriter {
     var patternWildcard = visit.ancestorTags('wildcard', 'pattern');
     var patternNode = visit.ancestorTags('*', 'pattern');
     var collection = visit.tags(['object', 'array']);
+    var selfFunctions = visit.ancestorTags('self', ['function', 'lambda']);
 
     var pipeline = [
       visit.matching(foldShortCircuits, foldableShortCircuit),
@@ -109,7 +112,8 @@ namespace Fate.Compiler.Rewriter {
 
       visit.matching(rollUpForLoops, visit.tags('for')),
 
-      visit.matching(annotateMutations, visit.tags('let'))
+      visit.matching(annotateMutations, visit.tags('let')),
+      visit.matching(annotateSelfFunctions, selfFunctions)
     ];
 
     pipeline.forEach(function (func) {
@@ -443,6 +447,13 @@ namespace Fate.Compiler.Rewriter {
           visit.tagsOrRoot(['channel', 'function', 'for'])
         );
       });
+      return node;
+    }
+    
+    function annotateSelfFunctions(node: Syntax.Self) {
+      annotateNearestParent(
+        'function/self', visit.tagsOrRoot(['function', 'lambda'])
+      );
       return node;
     }
   }

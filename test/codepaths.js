@@ -125,6 +125,13 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
+  "'self' outside Function": function (test) {
+    test.throws(function () {
+      evaluate("self('hello')");
+    }, "self called outside of a Function should explode");
+    test.done();  
+  },
+  
   "Duplicated Arg Names": function (test) {
     test.throws(function () {
       evaluate("def someFunction(arg1, arg2, arg1, arg3, arg2)\nend");
