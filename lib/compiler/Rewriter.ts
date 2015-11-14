@@ -34,21 +34,21 @@ namespace Fate.Compiler.Rewriter {
   };
 
   var constantFolders: FunctionMap = {
-    'not':    function (v: any) { return isFalse(v); },
-    'neg':    function (v: any) { return -v; },
-    'add':    function (l: any, r: any) { return l + r; },
-    'sub':    function (l: any, r: any) { return l - r; },
-    'mul':    function (l: any, r: any) { return l * r; },
-    'div':    function (l: any, r: any) { return l / r; },
-    'eq':     function (l: any, r: any) { return l === r; },
-    'neq':    function (l: any, r: any) { return l !== r; },
-    'in':     function (l: any, r: any) { return isIn(l, r); },
-    'notIn':  function (l: any, r: any) { return !isIn(l, r); },
-    'gt':     function (l: any, r: any) { return l > r; },
-    'lt':     function (l: any, r: any) { return l < r; },
-    'gte':    function (l: any, r: any) { return l >= r; },
-    'lte':    function (l: any, r: any) { return l <= r; },
-    'mod':    function (l: any, r: any) { return l % r; }
+    'not':   function (v: any) { return isFalse(v); },
+    'neg':   function (v: any) { return -v; },
+    'add':   function (l: any, r: any) { return l + r; },
+    'sub':   function (l: any, r: any) { return l - r; },
+    'mul':   function (l: any, r: any) { return l * r; },
+    'div':   function (l: any, r: any) { return l / r; },
+    'eq':    function (l: any, r: any) { return l === r; },
+    'neq':   function (l: any, r: any) { return l !== r; },
+    'in':    function (l: any, r: any) { return isIn(l, r); },
+    'notIn': function (l: any, r: any) { return !isIn(l, r); },
+    'gt':    function (l: any, r: any) { return l > r; },
+    'lt':    function (l: any, r: any) { return l < r; },
+    'gte':   function (l: any, r: any) { return l >= r; },
+    'lte':   function (l: any, r: any) { return l <= r; },
+    'mod':   function (l: any, r: any) { return l % r; }
   };
   var constantFolderKeys = Object.keys(constantFolders);
 
@@ -89,7 +89,6 @@ namespace Fate.Compiler.Rewriter {
     var patternWildcard = visit.ancestorTags('wildcard', 'pattern');
     var patternNode = visit.ancestorTags('*', 'pattern');
     var collection = visit.tags(['object', 'array']);
-    var selfFunctions = visit.ancestorTags('self', ['function', 'lambda']);
 
     var pipeline = [
       visit.matching(foldShortCircuits, foldableShortCircuit),
@@ -107,13 +106,9 @@ namespace Fate.Compiler.Rewriter {
       visit.matching(flipConditionals, visit.tags('conditional')),
       visit.matching(flipEquality, visit.tags('not')),
       visit.matching(promoteNot, visit.tags(['and', 'or'])),
-
-      visit.statementGroups(mergeFunctions, visit.tags('function')),
-
       visit.matching(rollUpForLoops, visit.tags('for')),
-
-      visit.matching(annotateMutations, visit.tags('let')),
-      visit.matching(annotateSelfFunctions, selfFunctions)
+      
+      visit.statementGroups(mergeFunctions, visit.tags('function'))
     ];
 
     pipeline.forEach(function (func) {
@@ -121,13 +116,6 @@ namespace Fate.Compiler.Rewriter {
     });
 
     return syntaxTree;
-
-    function annotateNearestParent(name: string, matcher: NodeMatcher) {
-      var node = <Syntax.Node>visit.upTreeUntilMatch(matcher);
-      if ( node ) {
-        annotate(node, name);
-      }
-    }
 
     // Patterns don't have to exist within Patterns
     function rollUpPatterns(node: Syntax.Pattern) {
@@ -221,51 +209,6 @@ namespace Fate.Compiler.Rewriter {
       return node.template('literal', output);
     }
 
-    // If the condition is 'not' we can roll up its argument
-    // and flip the branches.
-    function flipConditionals(node: Syntax.ConditionalOperator) {
-      if ( !hasTag(node.condition, 'not') ) {
-        return node;
-      }
-
-      var cond = (<Syntax.NotOperator>node.condition).left;
-      return node.template(node, cond, node.falseResult, node.trueResult);
-    }
-
-    // if the operator is 'not' and it contains an equality,
-    // then we can flip the equality operator and roll it up
-    function flipEquality(node: Syntax.NotOperator) {
-      var tag = hasTag(node.left);
-      var newTag = inverseOperators[tag];
-
-      if ( !tag || !newTag ) {
-        return node;
-      }
-
-      var child = <Syntax.BinaryOperator>node.left;
-      return node.template(newTag, child.left, child.right);
-    }
-
-    // If left and right operands of an 'and' or 'or' are using the 'not'
-    // unary, then promote it to the top and flip the and/or
-    function promoteNot(node: Syntax.BinaryOperator) {
-      var leftTag = hasTag(node.left, 'not');
-      var rightTag = hasTag(node.right, 'not');
-
-      if ( !leftTag || !rightTag ) {
-        return node;
-      }
-
-      var left = <Syntax.NotOperator>node.left;
-      var right = <Syntax.NotOperator>node.right;
-
-      var tag = hasTag(node);
-      var newTag = tag === 'and' ? 'or' : 'and';
-
-      var newNode = node.template(newTag, left.left, right.left);
-      return left.template('not', newNode);
-    }
-
     // If all the elements of an Array or Array are literals, then we can
     // convert it to a literal
     function rollUpObjectsAndArrays(node: Syntax.ElementsConstructor) {
@@ -334,20 +277,89 @@ namespace Fate.Compiler.Rewriter {
       return output;
     }
 
+    // If the condition is 'not' we can roll up its argument
+    // and flip the branches.
+    function flipConditionals(node: Syntax.ConditionalOperator) {
+      if ( !hasTag(node.condition, 'not') ) {
+        return node;
+      }
+
+      var cond = (<Syntax.NotOperator>node.condition).left;
+      return node.template(node, cond, node.falseResult, node.trueResult);
+    }
+
+    // if the operator is 'not' and it contains an equality,
+    // then we can flip the equality operator and roll it up
+    function flipEquality(node: Syntax.NotOperator) {
+      var tag = hasTag(node.left);
+      var newTag = inverseOperators[tag];
+
+      if ( !tag || !newTag ) {
+        return node;
+      }
+
+      var child = <Syntax.BinaryOperator>node.left;
+      return node.template(newTag, child.left, child.right);
+    }
+
+    // If left and right operands of an 'and' or 'or' are using the 'not'
+    // unary, then promote it to the top and flip the and/or
+    function promoteNot(node: Syntax.BinaryOperator) {
+      var leftTag = hasTag(node.left, 'not');
+      var rightTag = hasTag(node.right, 'not');
+
+      if ( !leftTag || !rightTag ) {
+        return node;
+      }
+
+      var left = <Syntax.NotOperator>node.left;
+      var right = <Syntax.NotOperator>node.right;
+
+      var tag = hasTag(node);
+      var newTag = tag === 'and' ? 'or' : 'and';
+
+      var newNode = node.template(newTag, left.left, right.left);
+      return left.template('not', newNode);
+    }
+        
+    // We can roll up a single nested for loop into a containing for
+    // loop so that they share the same context
+    function rollUpForLoops(node: Syntax.ForStatement) {
+      var forStatements = node.loopStatements.statements;
+
+      if ( forStatements.length !== 1 ) {
+        return node;  // should only be one child
+      }
+      if ( !hasTag(forStatements[0], 'for') ) {
+        return node;  // should have a nested for loop
+      }
+
+      var nested = <Syntax.ForStatement>forStatements[0];
+      if ( !node.elseStatements.isEmpty() ||
+           !nested.elseStatements.isEmpty() ) {
+        return node;  // no else clauses
+      }
+
+      return node.template('for',
+        node.ranges.concat(nested.ranges),
+        nested.loopStatements,
+        node.elseStatements
+      );
+    }    
+    
     // We can merge consecutive non-recursive functions that are
-    // argument compatible
+    // argument compatible and don't recurse
     function mergeFunctions(statements: Syntax.FunctionDeclaration[]) {
       var group: Syntax.FunctionDeclaration[] = [];
       var result: Syntax.Statement[] = [];
       var lastName: string;
-      var lastArgs: string;
 
       statements.forEach(function (statement) {
         var signature = statement.signature;
         var name = signature.id.value;
-        var args = argumentsSignature(signature.params);
 
-        if ( name !== lastName || args !== lastArgs ) {
+        if ( name !== lastName ||
+             hasAnnotation(statement, 'function/no_merge') ) {
           processGroup();
         }
 
@@ -357,7 +369,6 @@ namespace Fate.Compiler.Rewriter {
         }
 
         lastName = name;
-        lastArgs = args;
         group.push(statement);
       });
       processGroup();
@@ -414,57 +425,5 @@ namespace Fate.Compiler.Rewriter {
         group = [];
       }
     }
-
-    // We can roll up a single nested for loop into a containing for
-    // loop so that they share the same context
-    function rollUpForLoops(node: Syntax.ForStatement) {
-      var forStatements = node.loopStatements.statements;
-
-      if ( forStatements.length !== 1 ) {
-        return node;  // should only be one child
-      }
-      if ( !hasTag(forStatements[0], 'for') ) {
-        return node;  // should have a nested for loop
-      }
-
-      var nested = <Syntax.ForStatement>forStatements[0];
-      if ( !node.elseStatements.isEmpty() ||
-           !nested.elseStatements.isEmpty() ) {
-        return node;  // no else clauses
-      }
-
-      return node.template('for',
-        node.ranges.concat(nested.ranges),
-        nested.loopStatements,
-        node.elseStatements
-      );
-    }
-
-    function annotateMutations(node: Syntax.LetStatement) {
-      node.assignments.forEach(function (assignment) {
-        annotateNearestParent(
-          'mutation/' + assignment.id.value,
-          visit.tagsOrRoot(['channel', 'function', 'for'])
-        );
-      });
-      return node;
-    }
-    
-    function annotateSelfFunctions(node: Syntax.Self) {
-      annotateNearestParent(
-        'function/self', visit.tagsOrRoot(['function', 'lambda'])
-      );
-      return node;
-    }
-  }
-
-  function argumentsSignature(params: Syntax.Parameters) {
-    if ( !params || !params.length ) {
-      return '';
-    }
-
-    return params.map(function (param) {
-      return param.id.value;
-    }).join(',');
   }
 }

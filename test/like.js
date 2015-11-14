@@ -29,7 +29,7 @@ exports.like = nodeunit.testCase({
     var script3 = "let p = ~{ name: ? != 'Thom', age: ? != 43 }\n" +
                   "{ name: 'Thom', age: 27 } like p";
 
-    var script4 = "let p = ~{name: 'Thom', address: { city: 'Boston' }}\n" +
+    var script4 = "let p = ~{name: 'Thom', address: ~{ city: 'Boston' }}\n" +
                   "{name: 'Thom', address: { street: '123 Main', city: 'Boston' }} like p";
 
     test.equal(evaluate(script1), true);

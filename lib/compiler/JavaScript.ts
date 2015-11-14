@@ -287,21 +287,7 @@ namespace Fate.Compiler.JavaScript {
       write(contextName);
     }
 
-    function getMemberIdentifier(name: string) {
-      var match = /^(["'])([a-zA-Z_$][0-9a-zA-Z_$]*)\1$/.exec(name);
-      if ( match && match[2] ) {
-        return match[2];
-      }
-      return null;
-    }
-
     function writeMember(object: BodyEntry, property: BodyEntry) {
-      var propertyCode = code(property);
-      var memberId = getMemberIdentifier(propertyCode);
-      if ( memberId ) {
-        write(object, '.', memberId);
-        return
-      }
       write(object, '[', property, ']');
     }
 
@@ -692,11 +678,7 @@ namespace Fate.Compiler.JavaScript {
       write(')');
     }
 
-    function returnStatement(bodyCallback?: Function) {
-      if ( bodyCallback === undefined ) {
-        write('return;');
-        return;
-      }
+    function returnStatement(bodyCallback: Function) {
       write('return ', bodyCallback, ';');
     }
 

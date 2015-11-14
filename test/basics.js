@@ -21,6 +21,7 @@ exports.basics = nodeunit.testCase({
 
   "Entry Point": function (test) {
     test.throws(function() { fate.compile(47); });
+    test.equal(evaluate(""), undefined);
     test.done();
   },
 
