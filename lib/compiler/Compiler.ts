@@ -1,3 +1,5 @@
+/// <reference path="../../typings/pegjs/pegjs.d.ts"/>
+
 /// <reference path="./Checker.ts"/>
 /// <reference path="./Rewriter.ts"/>
 /// <reference path="./CodeGen.ts"/>
@@ -8,7 +10,7 @@ namespace Fate.Compiler {
   var vm = require('vm');
   var generatedParser = require('./parser');
   var SyntaxError = generatedParser.SyntaxError;
-
+  
   import checkSyntaxTree = Checker.checkSyntaxTree;
   import rewriteSyntaxTree = Rewriter.rewriteSyntaxTree;
   import generateScriptBody = CodeGen.generateScriptBody;
@@ -83,7 +85,7 @@ namespace Fate.Compiler {
     }
 
     if ( err instanceof SyntaxError ) {
-      return formatSyntaxError(err, filePath);
+      return formatSyntaxError(<PEG.SyntaxError>err, filePath);
     }
 
     return err;
@@ -99,7 +101,7 @@ namespace Fate.Compiler {
   }
 
   // Intercepts a PEG.js Exception and generate a human-readable error message
-  function formatSyntaxError(err: SyntaxError,
+  function formatSyntaxError(err: PEG.SyntaxError,
                              filePath?: Compiler.FilePath): CompileError {
     var found = err.found;
     var line = err.line;

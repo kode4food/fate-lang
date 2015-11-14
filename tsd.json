@@ -7,6 +7,9 @@
   "installed": {
     "node/node.d.ts": {
       "commit": "983126e131a2b81739053d60e4bbdbb46d6577b7"
+    },
+    "pegjs/pegjs.d.ts": {
+      "commit": "efd40e67ff323f7147651bdbef03c03ead7b1675"
     }
   }
 }
