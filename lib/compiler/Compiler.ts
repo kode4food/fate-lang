@@ -1,6 +1,7 @@
 /// <reference path="../../typings/pegjs/pegjs.d.ts"/>
 
 /// <reference path="./Checker.ts"/>
+/// <reference path="./Patterns.ts"/>
 /// <reference path="./Rewriter.ts"/>
 /// <reference path="./CodeGen.ts"/>
 
@@ -10,9 +11,7 @@ namespace Fate.Compiler {
   var vm = require('vm');
   var generatedParser = require('./parser');
   var SyntaxError = generatedParser.SyntaxError;
-  
-  import checkSyntaxTree = Checker.checkSyntaxTree;
-  import rewriteSyntaxTree = Rewriter.rewriteSyntaxTree;
+
   import generateScriptBody = CodeGen.generateScriptBody;
 
   export type ScriptContent = string;
@@ -32,14 +31,22 @@ namespace Fate.Compiler {
 
   export type CompileErrors = CompileError[];
 
+  const compilerPipeline = [Checker, Patterns, Rewriter];
+
   export function compileModule(script: ScriptContent) {
     var warnings: CompileErrors = [];
-    var parsed = generatedParser.parse(script);
-    var checked = checkSyntaxTree(parsed, warnings);
-    var rewritten = rewriteSyntaxTree(checked, warnings);
+    var syntaxTree = generatedParser.parse(script);
+
+    compilerPipeline.forEach(function (module) {
+      var visitors = module.createVisitors(warnings);
+
+      visitors.forEach(function (visitor) {
+        syntaxTree = visitor(syntaxTree);
+      });
+    });
 
     return {
-      scriptBody: generateScriptBody(rewritten),
+      scriptBody: generateScriptBody(syntaxTree),
       err: warnings
     };
   }

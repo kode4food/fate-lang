@@ -11,25 +11,21 @@ namespace Fate.Compiler.Checker {
 
   type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
 
-  export function checkSyntaxTree(syntaxTree: Syntax.Statements,
-                                  warnings?: CompileErrors) {
+  export function createVisitors(warnings?: CompileErrors) {
     var visit = new Visitor(warnings);
 
     var selfFunctions = visit.ancestorTags('self', ['function', 'lambda']);
     var funcIdRetrieval = visit.ancestorTags('id', ['function']);
-    
-    var pipeline = [
+
+    return [
       visit.matching(validateWildcards, visit.tags('wildcard')),
       visit.matching(validateSelfReferences, visit.tags('self')),
       visit.matching(validateFunctionArgs, visit.tags(['function', 'lambda'])),
       visit.matching(validateChannelArgs, visit.tags('channel')),
       visit.matching(annotateSelfFunctions, selfFunctions),
       visit.matching(annotateRecursiveFunctions, funcIdRetrieval),
-      visit.statementGroups(mergeableFunctions, visit.tags('function'))
+      visit.statementGroups(checkMergeableFunctions, visit.tags('function'))
     ];
-
-    pipeline.forEach((func) => func(syntaxTree));
-    return syntaxTree;
 
     // A Wildcard can only exist in a pattern or call binder
     function validateWildcards(node: Syntax.Wildcard) {
@@ -48,12 +44,12 @@ namespace Fate.Compiler.Checker {
       }
       return node;
     }
-    
+
     function validateSelfReferences(node: Syntax.Self) {
       if ( !visit.hasAncestorTags(['function', 'lambda']) ) {
         issueError(node, "'self' keyword must appear within a Function");
       }
-      return node; 
+      return node;
     }
 
     function validateFunctionArgs(node: FunctionOrLambda) {
@@ -96,10 +92,10 @@ namespace Fate.Compiler.Checker {
       annotate(func, 'no_merge');
       return node;
     }
-    
+
     function annotateRecursiveFunctions(node: Syntax.Identifier) {
       var func = visit.hasAncestorTags('function')[0];
-      if ( node === func.signature.id ) { 
+      if ( node === func.signature.id ) {
         return node;
       }
       if ( node.value !== func.signature.id.value ) {
@@ -109,7 +105,7 @@ namespace Fate.Compiler.Checker {
       return node;
     }
 
-    function mergeableFunctions(statements: Syntax.FunctionDeclaration[]) {
+    function checkMergeableFunctions(statements: Syntax.FunctionDeclaration[]) {
       var namesSeen: { [index: string]: boolean } = {};
       var lastName: string;
       var lastArgs: string;

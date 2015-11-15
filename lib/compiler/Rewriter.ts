@@ -6,8 +6,6 @@
 "use strict";
 
 namespace Fate.Compiler.Rewriter {
-  var wildcardLocal = 'p';
-
   import isTrue = Types.isTrue;
   import isFalse = Types.isFalse;
   import isIn = Types.isIn;
@@ -19,14 +17,11 @@ namespace Fate.Compiler.Rewriter {
   import isLiteral = Syntax.isLiteral;
   import annotate = Compiler.annotate;
 
-  type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
-  
-  type NodeMatcher = (node: Syntax.NodeOrNodes) => boolean;
   type LiteralArray = any[];
   type StringMap = { [index: string]: string };
   type LiteralObject = { [index: string]: any };
   type FunctionMap = { [index: string]: Function };
-  
+
   var inverseOperators: StringMap = {
     'eq': 'neq', 'neq': 'eq',
     'lt': 'gte', 'gte': 'lt',
@@ -77,28 +72,16 @@ namespace Fate.Compiler.Rewriter {
   };
   var shortCircuitFolderKeys = Object.keys(shortCircuitFolders);
 
-  export function rewriteSyntaxTree(syntaxTree: Syntax.Statements,
-                                    warnings?: CompileErrors) {
+  export function createVisitors(warnings?: CompileErrors) {
     var visit = new MutatingVisitor(warnings);
-    var wildcardNumbering = 0;
 
     var foldableShortCircuit = visit.tags(shortCircuitFolderKeys);
     var foldableConstant = visit.tags(constantFolderKeys);
-    var nestedPattern = visit.ancestorTags('pattern', 'pattern');
-    var patternCollection = visit.ancestorTags(['object', 'array'], 'pattern');
-    var patternWildcard = visit.ancestorTags('wildcard', 'pattern');
-    var patternNode = visit.ancestorTags('*', 'pattern');
     var collection = visit.tags(['object', 'array']);
 
-    var pipeline = [
+    return [
       visit.matching(foldShortCircuits, foldableShortCircuit),
       visit.matching(foldConstants, foldableConstant),
-
-      visit.matching(rollUpPatterns, nestedPattern),
-      visit.matching(namePatterns, visit.tags('pattern')),
-      visit.matching(nameWildcardAnchors, patternCollection),
-      visit.matching(nameAndAnnotateWildcards, patternWildcard),
-      visit.matching(annotatePatternNode, patternNode),
 
       visit.matching(rollUpObjectsAndArrays, collection),
 
@@ -107,82 +90,9 @@ namespace Fate.Compiler.Rewriter {
       visit.matching(flipEquality, visit.tags('not')),
       visit.matching(promoteNot, visit.tags(['and', 'or'])),
       visit.matching(rollUpForLoops, visit.tags('for')),
-      
+
       visit.statementGroups(mergeFunctions, visit.tags('function'))
     ];
-
-    pipeline.forEach(function (func) {
-      syntaxTree = <Syntax.Statements>func(syntaxTree);
-    });
-
-    return syntaxTree;
-
-    // Patterns don't have to exist within Patterns
-    function rollUpPatterns(node: Syntax.Pattern) {
-      return node.left;
-    }
-
-    function getAnchorName() {
-      var anchor = visit.currentElement();
-      if ( !anchor ) {
-        anchor = visit.hasAncestorTags('pattern')[0];
-      }
-      var anchorName = hasAnnotation(anchor, 'pattern/local');
-      if ( !anchorName ) {
-        anchorName = wildcardLocal + (wildcardNumbering++);
-        annotate(anchor, 'pattern/local', anchorName);
-      }
-      return anchorName;
-    }
-
-    function namePatterns(node: Syntax.Pattern) {
-      if ( !hasAnnotation(node, 'pattern/local') ) {
-        annotate(node, 'pattern/local', wildcardLocal);
-      }
-      var contained = node.left;
-      if ( !hasTag(contained, ['object', 'array']) &&
-           !hasAnnotation(contained, 'pattern/local') ) {
-        annotate(contained, 'pattern/local', wildcardLocal);
-      }
-      return node;
-    }
-
-    function nameWildcardAnchors(node: Syntax.ElementsConstructor) {
-      if ( hasAnnotation(node, 'pattern/local') ) {
-        return node;
-      }
-
-      annotate(node, 'pattern/local', getAnchorName());
-      node.elements.forEach(function (element) {
-        if ( hasAnnotation(element, 'pattern/local') ) {
-          return;
-        }
-        var elementName = wildcardLocal + (wildcardNumbering++);
-        annotate(element, 'pattern/local', elementName);
-      });
-      return node;
-    }
-
-    // Wildcard names must correspond to their element in an object or array
-    function nameAndAnnotateWildcards(node: Syntax.Wildcard) {
-      if ( !hasAnnotation(node, 'pattern/local') ) {
-        annotate(node, 'pattern/local', getAnchorName());
-      }
-      visit.upTreeUntilMatch(visit.tags('pattern'), annotateWildcard);
-      return node;
-
-      function annotateWildcard(node: Syntax.Node) {
-        annotate(node, 'pattern/wildcard');
-        return node;
-      }
-    }
-
-    // All nodes inside of a Pattern should be annotated as such,
-    // so that the Code Generator can branch appropriately
-    function annotatePatternNode(node: Syntax.Node) {
-      annotate(node, 'pattern/node');
-      return node;
-    }
 
     // Or, And, Conditional Folding
     function foldShortCircuits(node: Syntax.Node) {
@@ -321,7 +231,7 @@ namespace Fate.Compiler.Rewriter {
       var newNode = node.template(newTag, left.left, right.left);
       return left.template('not', newNode);
     }
-        
+
     // We can roll up a single nested for loop into a containing for
     // loop so that they share the same context
     function rollUpForLoops(node: Syntax.ForStatement) {
@@ -345,8 +255,8 @@ namespace Fate.Compiler.Rewriter {
         nested.loopStatements,
         node.elseStatements
       );
-    }    
-    
+    }
+
     // We can merge consecutive non-recursive functions that are
     // argument compatible and don't recurse
     function mergeFunctions(statements: Syntax.FunctionDeclaration[]) {
