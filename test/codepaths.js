@@ -112,6 +112,7 @@ exports.codepaths = nodeunit.testCase({
     test.equal(evaluate("true_val if true_val else false", this.data), true);
     test.equal(evaluate("true_val if true else false_val", this.data), true);
     test.equal(evaluate("true_val if true_val else false_val", this.data), true);
+    test.equal(evaluate("true_val if not false_val else false_val", this.data), true);
 
     test.equal(evaluate("true if false else false", this.data), false);
     test.equal(evaluate("true if false_val else false", this.data), false);
@@ -121,6 +122,7 @@ exports.codepaths = nodeunit.testCase({
     test.equal(evaluate("true_val if false_val else false", this.data), false);
     test.equal(evaluate("true_val if false else false_val", this.data), false);
     test.equal(evaluate("true_val if false_val else false_val", this.data), false);
+    test.equal(evaluate("true_val if not true_val else false_val", this.data), false);
 
     test.done();
   },
@@ -129,9 +131,9 @@ exports.codepaths = nodeunit.testCase({
     test.throws(function () {
       evaluate("self('hello')");
     }, "self called outside of a Function should explode");
-    test.done();  
+    test.done();
   },
-  
+
   "Duplicated Arg Names": function (test) {
     test.throws(function () {
       evaluate("def someFunction(arg1, arg2, arg1, arg3, arg2)\nend");
@@ -140,7 +142,7 @@ exports.codepaths = nodeunit.testCase({
     test.throws(function () {
       evaluate("when a(arg1, arg2) & b(arg3, arg2)\nend");
     }, "Arg names duplicated across channels should explode");
-    
+
     test.done();
   },
 

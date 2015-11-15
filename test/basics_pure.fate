@@ -109,6 +109,10 @@ def unary(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
+  let a = "99"
+
+  +1                             | test.equal(?, 1)
+  +a                             | test.equal(?, 99)
   -1                             | test.equal(?, -1)
   not false                      | isTrue
   not true                       | isFalse
@@ -173,7 +177,7 @@ end
 def arrayLike(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
-  
+
   [1, 2, 3] like [1, 2]    | isTrue
   [1, 2, 3] like [1, 2, 3] | isTrue
   [1, 2] like [1, 2, 3]    | isFalse
@@ -213,12 +217,12 @@ end
 let tests = nodeunit.testCase({
   "Relational Evaluation": relational,
   "Equality Evaluation": equality,
-  "'in' Evaluation": inEvaluation, 
+  "'in' Evaluation": inEvaluation,
   "'not in' Evaluation": notIn,
   "Boolean Or/And Evaluation": bool,
   "Unary Evaluation": unary,
   "'nil' Evaluation": nilEvaluation,
-  "Conditional Evaluation": conditional, 
+  "Conditional Evaluation": conditional,
   "Object Like": objectLike,
   "Array Like": arrayLike,
   "Deep Paths": deepPaths,

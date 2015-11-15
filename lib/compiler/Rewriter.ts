@@ -27,9 +27,13 @@ namespace Fate.Compiler.Rewriter {
     'gt': 'lte', 'lte': 'gt'
   };
 
-  var constantFolders: FunctionMap = {
+  var unaryConstantFolders: FunctionMap = {
     'not':   function (v: any) { return isFalse(v); },
-    'neg':   function (v: any) { return -v; },
+    'neg':   function (v: any) { return -v; }
+  };
+  var unaryConstantFolderKeys = Object.keys(unaryConstantFolders);
+
+  var binaryConstantFolders: FunctionMap = {
     'add':   function (l: any, r: any) { return l + r; },
     'sub':   function (l: any, r: any) { return l - r; },
     'mul':   function (l: any, r: any) { return l * r; },
@@ -44,7 +48,7 @@ namespace Fate.Compiler.Rewriter {
     'lte':   function (l: any, r: any) { return l <= r; },
     'mod':   function (l: any, r: any) { return l % r; }
   };
-  var constantFolderKeys = Object.keys(constantFolders);
+  var binaryConstantFolderKeys = Object.keys(binaryConstantFolders);
 
   var shortCircuitFolders: FunctionMap = {
     'or': function (node: Syntax.OrOperator) {
@@ -73,12 +77,14 @@ namespace Fate.Compiler.Rewriter {
 
   export function createTreeProcessors(visit: Compiler.Visitor) {
     var foldableShortCircuit = visit.tags(shortCircuitFolderKeys);
-    var foldableConstant = visit.tags(constantFolderKeys);
+    var foldableUnaryConstant = visit.tags(unaryConstantFolderKeys);
+    var foldableBinaryConstant = visit.tags(binaryConstantFolderKeys);
     var collection = visit.tags(['object', 'array']);
 
     return [
       visit.matching(foldShortCircuits, foldableShortCircuit),
-      visit.matching(foldConstants, foldableConstant),
+      visit.matching(foldUnaryConstants, foldableUnaryConstant),
+      visit.matching(foldBinaryConstants, foldableBinaryConstant),
 
       visit.matching(rollUpObjectsAndArrays, collection),
 
@@ -97,22 +103,26 @@ namespace Fate.Compiler.Rewriter {
       return shortCircuitFolders[tag](node);
     }
 
-    // Simple constant folding
-    function foldConstants(node: Syntax.UnaryOperator|Syntax.BinaryOperator) {
+    function foldUnaryConstants(node: Syntax.UnaryOperator) {
       if ( !isLiteral(node.left) ) {
-        return node;
-      }
-      var leftValue = (<Syntax.Literal>node.left).value;
-
-      if ( !(node instanceof Syntax.BinaryOperator) ||
-           !isLiteral(node.right) ) {
         return node;
       }
 
       var tag = hasTag(node);
-      var rightNode = (<Syntax.BinaryOperator>node).right;
-      var rightValue = (<Syntax.Literal>rightNode).value;
-      var output = constantFolders[tag](leftValue, rightValue);
+      var leftValue = (<Syntax.Literal>node.left).value;
+      var output = unaryConstantFolders[tag](leftValue);
+      return node.template('literal', output);
+    }
+
+    function foldBinaryConstants(node: Syntax.BinaryOperator) {
+      if ( !isLiteral(node.left) || !isLiteral(node.right) ) {
+        return node;
+      }
+
+      var tag = hasTag(node);
+      var leftValue = (<Syntax.Literal>node.left).value;
+      var rightValue = (<Syntax.Literal>node.right).value;
+      var output = binaryConstantFolders[tag](leftValue, rightValue);
       return node.template('literal', output);
     }
 
@@ -192,7 +202,7 @@ namespace Fate.Compiler.Rewriter {
       }
 
       var cond = (<Syntax.NotOperator>node.condition).left;
-      return node.template(node, cond, node.falseResult, node.trueResult);
+      return node.template(node.tag, cond, node.falseResult, node.trueResult);
     }
 
     // if the operator is 'not' and it contains an equality,

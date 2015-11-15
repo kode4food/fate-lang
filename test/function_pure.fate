@@ -24,9 +24,25 @@ def guardAndDefault(test)
   test.done()
 end
 
+def noArguments(test)
+  let a = 99
+
+  def testFunc
+    'fell through'
+  end
+
+  def testFunc where a = 99
+    'guard worked'
+  end
+
+  test.equal(testFunc(), 'guard worked')
+  test.done()
+end
+
 let tests = nodeunit.testCase({
   "Functions with Guards Only": guardOnly,
-  "Functions with Guard and Default": guardAndDefault
+  "Functions with Guard and Default": guardAndDefault,
+  "Functions with No Arguments": noArguments
 })
 
 export tests
