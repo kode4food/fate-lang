@@ -12,15 +12,14 @@ namespace Fate.Compiler.Patterns {
   import isFalse = Types.isFalse;
   import isIn = Types.isIn;
 
-  import MutatingVisitor = Compiler.MutatingVisitor;
+  import Visitor = Compiler.Visitor;
   import Syntax = Compiler.Syntax;
   import hasTag = Syntax.hasTag;
   import isStatements = Syntax.isStatements;
   import isLiteral = Syntax.isLiteral;
   import annotate = Compiler.annotate;
 
-  export function createVisitors(warnings?: CompileErrors) {
-    var visit = new MutatingVisitor(warnings);
+  export function createTreeProcessors(visit: Compiler.Visitor) {
     var wildcardNumbering = 0;
 
     var nestedPattern = visit.ancestorTags('pattern', 'pattern');

@@ -13,6 +13,7 @@ namespace Fate.Compiler {
   var SyntaxError = generatedParser.SyntaxError;
 
   import generateScriptBody = CodeGen.generateScriptBody;
+  import Visitor = Compiler.Visitor;
 
   export type ScriptContent = string;
   export type GeneratedCode = string;
@@ -34,14 +35,16 @@ namespace Fate.Compiler {
   const compilerPipeline = [Checker, Patterns, Rewriter];
 
   export function compileModule(script: ScriptContent) {
-    var warnings: CompileErrors = [];
     var syntaxTree = generatedParser.parse(script);
 
-    compilerPipeline.forEach(function (module) {
-      var visitors = module.createVisitors(warnings);
+    var warnings: CompileErrors = [];
+    var visitor = new Visitor(warnings);
 
-      visitors.forEach(function (visitor) {
-        syntaxTree = visitor(syntaxTree);
+    compilerPipeline.forEach(function (module) {
+      var processors = module.createTreeProcessors(visitor);
+
+      processors.forEach(function (processor) {
+        syntaxTree = processor(syntaxTree);
       });
     });
 

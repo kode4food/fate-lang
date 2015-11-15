@@ -18,18 +18,10 @@ namespace Fate.Compiler {
     constructor(public value: number) { super(); }
   }
 
-  function noOpVisitor(node: Syntax.NodeOrNodes) {
-    return node;
-  }
-
   export class Visitor {
     public nodeStack: (Syntax.Node|Syntax.Nodes)[] = [];
 
-    constructor(public warnings?: CompileErrors) {
-      if ( !warnings ) {
-        this.warnings = [];
-      }
-    }
+    constructor(public warnings: CompileErrors) { }
 
     public ancestorTags(...tags: Syntax.TagOrTags[]) {
       return this.ancestry.apply(this, tags.map(this.tags));
@@ -87,22 +79,21 @@ namespace Fate.Compiler {
       }
     }
 
-    public recurseInto(node: Syntax.Node|Syntax.Nodes,
-                       visitor: NodeVisitor) {
+    public recurseInto(node: Syntax.Node|Syntax.Nodes, visitor: NodeVisitor) {
       var nodeStack = this.nodeStack;
       nodeStack.push(node);
       if ( Array.isArray(node) ) {
         var arrNode = <Syntax.Nodes>node;
         for ( var i = 0, len = arrNode.length; i < len; i++ ) {
           nodeStack.push(new Index(i));
-          visitor(arrNode[i]);
+          arrNode[i] = <Syntax.Node>visitor(arrNode[i]);
           nodeStack.pop();
         }
       }
       else {
         var currentNode = <Syntax.Node>node;
         Object.keys(currentNode).forEach(function (key) {
-          visitor(currentNode[key]);
+          currentNode[key] = visitor(currentNode[key]);
         });
       }
       nodeStack.pop();
@@ -156,20 +147,6 @@ namespace Fate.Compiler {
       }
     }
 
-    public tagsOrRoot(tags: Syntax.TagOrTags) {
-      var nodeStack = this.nodeStack;
-      var tagMatcher = this.tags(tags);
-      return matcher;
-
-      function matcher(node: Syntax.Node) {
-        var tag = tagMatcher(node);
-        if ( tag ) {
-          return tag;
-        }
-        return !nodeStack.length || nodeStack[0] === node;
-      }
-    }
-
     public tags(tags: Syntax.TagOrTags) {
       if ( !Array.isArray(tags) ) {
         tags = slice.call(arguments, 0);
@@ -193,7 +170,7 @@ namespace Fate.Compiler {
     }
 
     public upTreeUntilMatch(matcher: NodeMatcher,
-                            visitor = noOpVisitor): Syntax.NodeOrNodes {
+                            visitor: NodeVisitor): Syntax.NodeOrNodes {
       var nodeStack = this.nodeStack;
       for ( var i = nodeStack.length - 1; i >= 0; i-- ) {
         var node: Syntax.NodeOrNodes = nodeStack[i];
@@ -204,29 +181,15 @@ namespace Fate.Compiler {
       }
       return null;
     }
-  }
 
-  export class MutatingVisitor extends Visitor {
-    public recurseInto(node: Syntax.Node|Syntax.Nodes,
-                       visitor: NodeVisitor) {
-      var nodeStack = this.nodeStack;
-      nodeStack.push(node);
-      if ( Array.isArray(node) ) {
-        var arrNode = <Syntax.Nodes>node;
-        for ( var i = 0, len = arrNode.length; i < len; i++ ) {
-          nodeStack.push(new Index(i));
-          arrNode[i] = <Syntax.Node>visitor(arrNode[i]);
-          nodeStack.pop();
-        }
-      }
-      else {
-        var currentNode = <Syntax.Node>node;
-        Object.keys(currentNode).forEach(function (key) {
-          currentNode[key] = visitor(currentNode[key]);
-        });
-      }
-      nodeStack.pop();
-      return node;
+    public issueError(source: Syntax.Node, message: string) {
+      throw new CompileError(message, source.line, source.column);
+    }
+
+    public issueWarning(source: Syntax.Node, message: string) {
+      this.warnings.push(
+        new CompileError(message, source.line, source.column)
+      );
     }
   }
 }
