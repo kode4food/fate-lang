@@ -17,14 +17,15 @@ namespace Fate.Compiler {
     annotations[name] = value === undefined ? true : value;
   }
 
-  export function hasAnnotation(node: Annotated, name: string, value?: any) {
+  export function getAnnotation(node: Annotated, name: string) {
     var annotations = node.annotations;
     if ( !annotations ) {
       return false;
     }
-    if ( value === undefined ) {
-      return annotations[name];
-    }
-    return annotations[name] === value;
+    return annotations[name];
+  }
+
+  export function hasAnnotation(node: Annotated, name: string) {
+    return !!getAnnotation(node, name);
   }
 }

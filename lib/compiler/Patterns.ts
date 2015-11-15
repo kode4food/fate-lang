@@ -45,7 +45,7 @@ namespace Fate.Compiler.Patterns {
       if ( !anchor ) {
         anchor = visit.hasAncestorTags('pattern')[0];
       }
-      var anchorName = hasAnnotation(anchor, 'pattern/local');
+      var anchorName = getAnnotation(anchor, 'pattern/local');
       if ( !anchorName ) {
         anchorName = wildcardLocal + (wildcardNumbering++);
         annotate(anchor, 'pattern/local', anchorName);
@@ -59,7 +59,7 @@ namespace Fate.Compiler.Patterns {
       }
       var contained = node.left;
       if ( !hasTag(contained, ['object', 'array']) &&
-        !hasAnnotation(contained, 'pattern/local') ) {
+           !hasAnnotation(contained, 'pattern/local') ) {
         annotate(contained, 'pattern/local', wildcardLocal);
       }
       return node;

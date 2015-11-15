@@ -316,11 +316,11 @@ namespace Fate.Compiler.CodeGen {
       var hasSelf = hasAnnotation(node, 'function/self');
       return hasSelf ? generate.selfName : undefined;
     }
-    
+
     function createFunctionEvaluator(node: Syntax.FunctionDeclaration) {
       var signature = node.signature;
       var params = signature.params;
-      
+
       var paramNames = params.map(function (param: Syntax.Parameter) {
         return param.id.value;
       });
@@ -687,11 +687,11 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createSelfEvaluator(node: Syntax.Self) {
-      generate.self();  
+      generate.self();
     }
-    
+
     function createWildcard(node: Syntax.Wildcard) {
-      var wildcardName = hasAnnotation(node, 'pattern/local');
+      var wildcardName = getAnnotation(node, 'pattern/local');
       /* istanbul ignore if: untestable */
       if ( !wildcardName ) {
         throw new Error("Stupid Coder: wildcardName was never assigned");
@@ -712,7 +712,7 @@ namespace Fate.Compiler.CodeGen {
       ]);
 
       function patternBody() {
-        var localName = hasAnnotation(node, 'pattern/local');
+        var localName = getAnnotation(node, 'pattern/local');
         localName = generate.registerAnonymous(localName);
 
         generate.statement(function () {
@@ -738,7 +738,7 @@ namespace Fate.Compiler.CodeGen {
           if ( canGenerateEquality(node) ) {
             createLikeComparison(
               function () {
-                var localName = hasAnnotation(node, 'pattern/local');
+                var localName = getAnnotation(node, 'pattern/local');
                 localName = generate.registerAnonymous(localName);
                 generate.retrieveAnonymous(localName)
               },
@@ -757,7 +757,7 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createPatternElements(node: Syntax.ElementsConstructor) {
-      var parentLocal = hasAnnotation(node, 'pattern/local');
+      var parentLocal = getAnnotation(node, 'pattern/local');
       parentLocal = generate.registerAnonymous(parentLocal);
 
       var isObject = node.tag === 'object';
@@ -815,7 +815,7 @@ namespace Fate.Compiler.CodeGen {
 
       function generateNested(element: Syntax.Node, elementValue: Syntax.Node,
                               elementIndex: string|Function) {
-        var elementLocal = <string>hasAnnotation(element, 'pattern/local');
+        var elementLocal = getAnnotation(element, 'pattern/local');
         elementLocal = generate.registerAnonymous(elementLocal);
 
         return function () {
