@@ -1,7 +1,7 @@
 import nodeunit
 
 def joinPatternTest(test)
-  test.expect(10)
+  test.expect(11)
 
   when a({ value: 'another' } as x, y) & b(g, h)
     x.type = 'Not'      | test.ok
@@ -19,6 +19,7 @@ def joinPatternTest(test)
     h = 99             | test.ok
   end
 
+  (() -> a({ non: 'exhaustive' })) | test.throws
   setTimeout( () -> a({ type: 'Test', value: 'aValue'}, 'hello'),  10 )
   setTimeout( () -> b('there', 99), 20 )
   setTimeout( () -> a({ type: 'Not', value: 'another' }, 'goodbye'),  30 )

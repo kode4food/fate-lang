@@ -193,11 +193,11 @@ def deepPaths(test)
     }
   }]
 
-  root[0].colors[1]                 | test.equal(?, "green")
-  root[0].info.description          | test.equal(?, "this is a description")
-  root[0].info['description']       | test.equal(?, "this is a description")
-  root[0].info.notThere             | test.equal(?, undefined)
-  () -> root[1].info['description'] | test.throws
+  root[0].colors[1]                   | test.equal(?, "green")
+  root[0].info.description            | test.equal(?, "this is a description")
+  root[0].info['description']         | test.equal(?, "this is a description")
+  root[0].info.notThere               | test.equal(?, undefined)
+  (() -> root[1].info['description']) | test.throws
   test.done()
 end
 
