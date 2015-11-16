@@ -64,6 +64,7 @@ namespace Fate.Compiler.CodeGen {
       'id':  createIdEvaluator,
       'self': createSelfEvaluator,
       'literal': createLiteral,
+      'regex': createRegex,
       'wildcard': createWildcard,
       'pattern': createPatternEvaluator
     };
@@ -686,6 +687,12 @@ namespace Fate.Compiler.CodeGen {
       generate.write(literal);
     }
 
+    function createRegex(node: Syntax.Regex) {
+      var regex = globals.builder('defineRegexPattern',
+                                  globals.literal(node.value));
+      generate.write(regex);
+    }
+
     function createSelfEvaluator(node: Syntax.Self) {
       generate.self();
     }
@@ -801,7 +808,7 @@ namespace Fate.Compiler.CodeGen {
                                 elementIndex: string|Function) {
         // If we're just dealing with an expression,
         return function () {
-          generate.binaryOperator('eq',
+          createLikeComparison(
             function () {
               generate.member(
                 function () { generate.retrieveAnonymous(parentLocal) },
@@ -841,7 +848,9 @@ namespace Fate.Compiler.CodeGen {
                                   rightNode: Syntax.Node) {
       var left = typeof leftNode === 'function' ? <Function>leftNode
                                                 : defer(leftNode);
-      var right = defer(rightNode);
+
+      var right = typeof rightNode === 'function' ? <Function>rightNode
+                                                  : defer(rightNode);
 
       if ( !(rightNode instanceof Syntax.Literal) ) {
         var isMatchingObject = globals.runtimeImport('isMatchingObject');
