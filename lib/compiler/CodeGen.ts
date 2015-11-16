@@ -845,12 +845,9 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createLikeComparison(leftNode: Syntax.Node|Function,
-                                  rightNode: Syntax.Node) {
-      var left = typeof leftNode === 'function' ? <Function>leftNode
-                                                : defer(leftNode);
-
-      var right = typeof rightNode === 'function' ? <Function>rightNode
-                                                  : defer(rightNode);
+                                  rightNode: Syntax.Node|Function) {
+      var left = deferIfNotAlready(leftNode);
+      var right = deferIfNotAlready(rightNode);
 
       if ( !(rightNode instanceof Syntax.Literal) ) {
         var isMatchingObject = globals.runtimeImport('isMatchingObject');
@@ -867,10 +864,11 @@ namespace Fate.Compiler.CodeGen {
       generate.call(matcher, [left]);
     }
 
-    function isLikeLiteral(node: Syntax.Node) {
-      if ( !(node instanceof Syntax.Literal) ) {
-        return false;
-      }
+    function deferIfNotAlready(node: Syntax.Node|Function) {
+      return typeof node === 'function' ? <Function>node : defer(node);
+    }
+
+    function isLikeLiteral(node: Syntax.Node|Function) {
       var valueType = typeof (<Syntax.Literal>node).value;
       return likeLiteralTypes.indexOf(valueType) !== -1;
     }

@@ -204,18 +204,24 @@ end
 def regularExpressions(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
-  
-  let pattern = /dy$/
-  let objectPattern = ~{
-    name: /^Tho/
-  }
-  
-  "hello" like /^hell/                  | isTrue
-  "howdy" like pattern                  | isTrue
-  "however" like pattern                | isFalse
-  { name: 'Thomas' } like objectPattern | isTrue
-  { name: 'Bill' } like objectPattern   | isFalse
-  
+
+  let pattern1 = /dy$/
+  let pattern2 = ~/dy$/
+
+  let objectPattern1 = { name: /^Tho/ }
+  let objectPattern2 = ~{ name: ~/^Tho/ }
+
+  "hello" like /^hell/                   | isTrue
+  "hello" like ~/^hell/                  | isTrue
+  "howdy" like pattern1                  | isTrue
+  "however" like pattern1                | isFalse
+  "howdy" like pattern2                  | isTrue
+  "however" like pattern2                | isFalse
+  { name: 'Thomas' } like objectPattern1 | isTrue
+  { name: 'Bill' } like objectPattern1   | isFalse
+  { name: 'Thomas' } like objectPattern2 | isTrue
+  { name: 'Bill' } like objectPattern2   | isFalse
+
   test.done()
 end
 
