@@ -255,6 +255,15 @@ namespace Fate.Compiler.Syntax {
     return node instanceof Literal;
   }
 
+  export class Regex extends Symbol {
+    public value: RegExp;
+
+    constructor(pattern: string, flags: string) {
+      super();
+      this.value = new RegExp(pattern, flags);
+    }
+  }
+
   // Supporting Nodes *********************************************************
 
   export class Range extends Node {
@@ -387,6 +396,7 @@ namespace Fate.Compiler.Syntax {
     'self': Self,
     'literal': Literal,
     'pattern': Pattern,
+    'regex': Regex,
     'wildcard': Wildcard,
     'statements': Statements,
     'range': Range,

@@ -64,6 +64,7 @@ namespace Fate.Compiler.CodeGen {
       'id':  createIdEvaluator,
       'self': createSelfEvaluator,
       'literal': createLiteral,
+      'regex': createRegex,
       'wildcard': createWildcard,
       'pattern': createPatternEvaluator
     };
@@ -686,6 +687,12 @@ namespace Fate.Compiler.CodeGen {
       generate.write(literal);
     }
 
+    function createRegex(node: Syntax.Regex) {
+      var regex = globals.builder('defineRegexPattern',
+                                  globals.literal(node.value));
+      generate.write(regex);
+    }
+
     function createSelfEvaluator(node: Syntax.Self) {
       generate.self();
     }
@@ -801,7 +808,7 @@ namespace Fate.Compiler.CodeGen {
                                 elementIndex: string|Function) {
         // If we're just dealing with an expression,
         return function () {
-          generate.binaryOperator('eq',
+          createLikeComparison(
             function () {
               generate.member(
                 function () { generate.retrieveAnonymous(parentLocal) },
@@ -838,10 +845,9 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createLikeComparison(leftNode: Syntax.Node|Function,
-                                  rightNode: Syntax.Node) {
-      var left = typeof leftNode === 'function' ? <Function>leftNode
-                                                : defer(leftNode);
-      var right = defer(rightNode);
+                                  rightNode: Syntax.Node|Function) {
+      var left = deferIfNotAlready(leftNode);
+      var right = deferIfNotAlready(rightNode);
 
       if ( !(rightNode instanceof Syntax.Literal) ) {
         var isMatchingObject = globals.runtimeImport('isMatchingObject');
@@ -858,10 +864,11 @@ namespace Fate.Compiler.CodeGen {
       generate.call(matcher, [left]);
     }
 
-    function isLikeLiteral(node: Syntax.Node) {
-      if ( !(node instanceof Syntax.Literal) ) {
-        return false;
-      }
+    function deferIfNotAlready(node: Syntax.Node|Function) {
+      return typeof node === 'function' ? <Function>node : defer(node);
+    }
+
+    function isLikeLiteral(node: Syntax.Node|Function) {
       var valueType = typeof (<Syntax.Literal>node).value;
       return likeLiteralTypes.indexOf(valueType) !== -1;
     }

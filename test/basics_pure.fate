@@ -201,6 +201,30 @@ def deepPaths(test)
   test.done()
 end
 
+def regularExpressions(test)
+  let isTrue = test.equal(?, true)
+  let isFalse = test.equal(?, false)
+
+  let pattern1 = /dy$/
+  let pattern2 = ~/dy$/
+
+  let objectPattern1 = { name: /^Tho/ }
+  let objectPattern2 = ~{ name: ~/^Tho/ }
+
+  "hello" like /^hell/                   | isTrue
+  "hello" like ~/^hell/                  | isTrue
+  "howdy" like pattern1                  | isTrue
+  "however" like pattern1                | isFalse
+  "howdy" like pattern2                  | isTrue
+  "however" like pattern2                | isFalse
+  { name: 'Thomas' } like objectPattern1 | isTrue
+  { name: 'Bill' } like objectPattern1   | isFalse
+  { name: 'Thomas' } like objectPattern2 | isTrue
+  { name: 'Bill' } like objectPattern2   | isFalse
+
+  test.done()
+end
+
 def assignments(test)
   let a = 99
   test.equal(a, 99)
@@ -226,6 +250,7 @@ let tests = nodeunit.testCase({
   "Object Like": objectLike,
   "Array Like": arrayLike,
   "Deep Paths": deepPaths,
+  "Regular Expressions": regularExpressions,
   "Assignments": assignments
 })
 

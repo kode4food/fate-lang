@@ -29,6 +29,7 @@ namespace Fate.Compiler.Patterns {
 
     return [
       visit.matching(rollUpPatterns, nestedPattern),
+      visit.matching(rollUpRegexPatterns, visit.tags('pattern')),
       visit.matching(namePatterns, visit.tags('pattern')),
       visit.matching(nameWildcardAnchors, patternCollection),
       visit.matching(nameAndAnnotateWildcards, patternWildcard),
@@ -38,6 +39,14 @@ namespace Fate.Compiler.Patterns {
     // Patterns don't have to exist within Patterns
     function rollUpPatterns(node: Syntax.Pattern) {
       return node.left;
+    }
+
+    // A Regex *is* a pattern
+    function rollUpRegexPatterns(node: Syntax.Pattern) {
+      if ( node.left instanceof Syntax.Regex ) {
+        return node.left;
+      }
+      return node;
     }
 
     function getAnchorName() {

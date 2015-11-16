@@ -105,7 +105,13 @@ namespace Fate.Compiler.JavaScript {
     }
 
     public literal(literalValue: any) {
-      var canonical = jsonStringify(literalValue);
+      var canonical: string;
+      if ( literalValue instanceof RegExp ) {
+        canonical = literalValue.toString();
+      }
+      else {
+        canonical = jsonStringify(literalValue);
+      }
       var id = this.generatedLiterals[canonical];
       if ( id ) {
         return id;

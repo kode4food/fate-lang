@@ -17,6 +17,15 @@ namespace Fate.Runtime {
     value.__fatePattern = true;
     return value;
   }
+  
+  export function defineRegexPattern(regex: RegExp) {
+    (<Pattern>pattern).__fatePattern = true;
+    return pattern;
+    
+    function pattern(value: any) {
+      return regex.test(value);
+    }
+  }
 
   export function isPattern(value: any) {
     return typeof value === 'function' && value.__fatePattern;
@@ -58,7 +67,7 @@ namespace Fate.Runtime {
     if ( typeof obj !== 'object' || obj === null ) {
       return false;
     }
-
+    
     for ( var key in template ) {
       if ( !isMatchingObject(template[key], obj[key]) ) {
         return false;
