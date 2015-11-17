@@ -75,10 +75,6 @@ namespace Fate.Compiler.Patterns {
     }
 
     function nameWildcardAnchors(node: Syntax.ElementsConstructor) {
-      if ( hasAnnotation(node, 'pattern/local') ) {
-        return node;
-      }
-
       annotate(node, 'pattern/local', getAnchorName());
       node.elements.forEach(function (element) {
         if ( hasAnnotation(element, 'pattern/local') ) {

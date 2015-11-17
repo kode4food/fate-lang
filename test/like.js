@@ -55,11 +55,14 @@ exports.like = nodeunit.testCase({
     var script5 = "let p = ~[12, [1, ?, 3]]\n" +
                   "[12, [1, 5, 3], 24] like p";
 
+    var script6 = "'hello' like ~(?)";
+
     test.equal(evaluate(script1), true);
     test.equal(evaluate(script2), true);
     test.equal(evaluate(script3), true);
     test.equal(evaluate(script4), true);
     test.equal(evaluate(script5), true);
+    test.equal(evaluate(script6), true);
     test.done();
   },
 
