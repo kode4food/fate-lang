@@ -28,7 +28,7 @@ def parentFrom(test)
   test.equal(testv, 'right!')
   test.done()
 end
-
+  
 let tests = nodeunit.testCase({
   "Explicit Single Import": explicit,
   "Multiple Duplicated Imports": multiple,
@@ -37,5 +37,3 @@ let tests = nodeunit.testCase({
 })
 
 export tests
-
-
