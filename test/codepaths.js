@@ -208,5 +208,15 @@ exports.codepaths = nodeunit.testCase({
     test.equal(evaluate(script4, { a: 5, b: 8 }), "yes");
 
     test.done();
+  },
+  
+  "Formatting": function (test) {
+    var script1 = "'World' | 'Hello, %0!'";
+    var script2 = "'World' | 'Hello, %!'";
+    
+    test.equal(evaluate(script1), "Hello, World!");
+    test.equal(evaluate(script2), "Hello, World!");
+    
+    test.done();
   }
 });

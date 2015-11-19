@@ -163,25 +163,35 @@ end
 
 def objectLike(test)
   let isTrue = test.equal(?, true)
-
+  let isFalse = test.equal(?, false)
+  
   let person = {
     name: "Thom",
     age: 42,
     title: "Developer"
   }
 
+  let a = 99, b = 'hello'
+  
   person like { name: "Thom", age: 42 } | isTrue
+  nil like {(a): b}        | isFalse
+  99 like {name: b}        | isFalse
   test.done()
 end
 
 def arrayLike(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
+  
+  let a = 99, b = 'hello'
 
   [1, 2, 3] like [1, 2]    | isTrue
   [1, 2, 3] like [1, 2, 3] | isTrue
   [1, 2] like [1, 2, 3]    | isFalse
   [] like []               | isTrue
+  [] like [a]              | isFalse
+  nil like [b]             | isFalse
+  99 like [1,b,a]          | isFalse
   test.done()
 end
 
