@@ -1,5 +1,5 @@
 # Fate (Patterns & Guards & Joins, Oh My!)
-[![Build Status](https://travis-ci.org/Forty-Niner/fate-lang.svg?branch=master)](https://travis-ci.org/Forty-Niner/fate-lang)
+[![Build Status](https://travis-ci.org/kode4food/fate-lang.svg?branch=master)](https://travis-ci.org/kode4food/fate-lang)
 
 Fate is a programming language prototype.  It currently compiles into Node.js modules, but the goal is to eventually have it target the JVM.  It is a mostly functional language that includes a processing model inspired by the [Join Calculus](https://en.wikipedia.org/wiki/Join-calculus).  It also provides first-class patterns, invocation guards, list comprehensions, and flexible partial application.
 
