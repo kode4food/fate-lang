@@ -13,7 +13,7 @@
       "email": "thom@kode4food.it"
     }
   ],
-  "repository": "git@github.com/Forty-Niner/fate-lang.git",
+  "repository": "git@github.com/kode4food/fate-lang.git",
   "bin": {
     "fatec": "lib/cli.js"
   },
