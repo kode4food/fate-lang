@@ -124,7 +124,7 @@ end
 export calculateVehicleEmissions as calculate
 ```
 
-If you'd like more examples, you can always check out the scripts in the project's [Test Directory](https://github.com/Forty-Niner/fate-lang/tree/master/test).
+If you'd like more examples, you can always check out the scripts in the project's [Test Directory](https://github.com/kode4food/fate-lang/tree/master/test).
 
 ## How to Install and Use
 Until the first stable release happens, you're really pressing your luck to use this thing in production.  But if you're insane, you can install the compiler globally like so:
@@ -165,6 +165,6 @@ console.log(resultingLambda(4));
 ```
 
 ## Resources
-For source code and releases, see the [Fate GitHub Page](http://github.com/Forty-Niner/fate-lang).
+For source code and releases, see the [Fate GitHub Page](http://github.com/kode4food/fate-lang).
 
 For [Sublime Text](http://www.sublimetext.com/) support, install the [Fate](https://packagecontrol.io/packages/Fate) package using the [Package Control](https://packagecontrol.io/) package manager.
