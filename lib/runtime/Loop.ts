@@ -21,13 +21,13 @@ namespace Fate.Runtime {
         return [item, index];
       });
     }
+    if ( isGenerator(collection) ) {
+      return generateIndexedSet(collection);
+    }
     if ( isObject(collection) ) {
       return Object.keys(collection).map(function (key) {
         return [collection[key], key];
       });
-    }
-    if ( isGenerator(collection) ) {
-      return generateIndexedSet(collection);
     }
     return EmptyCollection;
   }

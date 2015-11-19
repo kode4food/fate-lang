@@ -210,6 +210,21 @@ def regularExpressions(test)
 
   let objectPattern1 = { name: /^Tho/ }
   let objectPattern2 = ~{ name: ~/^Tho/ }
+  let objectPattern3 = ~{
+    name: ~/White$/,
+    age: ? > 50,
+    colors: ['red', 'green', ?]
+  }
+
+  let testObject1 = { 
+    name: 'Fred White', age: 99,
+    colors: ['red', 'green', 'yellow']
+  } 
+
+  let testObject2 = {
+    name: 'Fred Black', age: 99,
+    colors: ['red', 'green', 'blue']
+  }
 
   "hello" like /^hell/                   | isTrue
   "hello" like ~/^hell/                  | isTrue
@@ -221,6 +236,8 @@ def regularExpressions(test)
   { name: 'Bill' } like objectPattern1   | isFalse
   { name: 'Thomas' } like objectPattern2 | isTrue
   { name: 'Bill' } like objectPattern2   | isFalse
+  testObject1 like objectPattern3        | isTrue
+  testObject2 like objectPattern3        | isFalse
 
   test.done()
 end

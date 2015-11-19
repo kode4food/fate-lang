@@ -46,8 +46,17 @@ def assignment(test)
   test.done()
 end
 
+def testMutable(test)
+  let a = mutable("there")
+  test.equal("hello " + a.get, "hello there")
+  a.set("you")
+  test.equal("hello " + a.get, "hello you")
+  test.done()
+end
+
 let tests = nodeunit.testCase({
-  "Static Single Assignment": assignment
+  "Static Single Assignment": assignment,
+  "Mutable Wrapper Assignment": testMutable
 })
 
 export tests

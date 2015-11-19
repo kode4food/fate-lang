@@ -13,7 +13,7 @@ var rename = require('gulp-rename');
 
 var tsFiles = ['index.ts', 'lib/**/*.ts'];
 var testFiles = ['./test/index.js'];
-var coverageFiles = ['./test/*.js', './build/fate.js', './lib/cli.js'];
+var coverageFiles = ['./test/*.js', './build/fate.js', './lib/**/*.js'];
 var parserFile = ['./lib/compiler/parser.pegjs'];
 var parserOutput = 'parser.js';
 

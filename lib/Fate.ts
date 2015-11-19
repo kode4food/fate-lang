@@ -1,5 +1,8 @@
 /// <reference path="./Util.ts"/>
+/// <reference path="./Types.ts"/>
 /// <reference path="./Runtime.ts"/>
+/// <reference path="./Global.ts"/>
+
 /// <reference path="./compiler/Compiler.ts"/>
 
 "use strict";
@@ -14,24 +17,16 @@ namespace Fate {
   var pkg = require('../package.json');
   export var VERSION = pkg.version;
 
-  var global = {
-    console: console,
-    require: require,
-    __filename: <string>undefined,
-    __dirname: <string>undefined,
-    setTimeout: setTimeout
-  };
-
   export function globals(extensions?: Object) {
     if ( Types.isObject(extensions) ) {
-      var result = Object.create(global);
+      var result = Object.create(Global);
       Util.mixin(result, extensions);
       if ( !result.__dirname && result.__filename ) {
         result.__dirname = path.dirname(result.__filename);
       }
       return result;
     }
-    return global;
+    return Global;
   }
 
   /**
