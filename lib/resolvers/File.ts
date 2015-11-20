@@ -14,7 +14,7 @@ namespace Fate.Resolvers {
     path: string,
   }
 
-  var explicitPathRegex = /(\.fate)?(\.js)?$/;
+  var explicitPathRegex = /(\.fate)(\.js)?$/;
   var pathSuffixes = ['.fate.js', '.fate', '/index.fate.js', '/index.fate'];
 
   /**

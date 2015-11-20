@@ -1,7 +1,7 @@
 import nodeunit
 
 def explicit(test)
-  import './basics_pure' as basics
+  import './basics_pure.fate' as basics
 
   basics.tests | test.ok
   test.done()
@@ -28,7 +28,7 @@ def parentFrom(test)
   test.equal(testv, 'right!')
   test.done()
 end
-  
+
 let tests = nodeunit.testCase({
   "Explicit Single Import": explicit,
   "Multiple Duplicated Imports": multiple,

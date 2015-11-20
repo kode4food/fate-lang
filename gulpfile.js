@@ -29,7 +29,7 @@ var nodeUnitConfig = {
 var enforcerConfig = {
   thresholds: {
     statements: 99,
-    branches: 89,
+    branches: 90,
     functions: 99,
     lines: 99
   },
