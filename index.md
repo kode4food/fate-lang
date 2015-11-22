@@ -3,7 +3,7 @@ layout: fate_title
 title: Fate Programming
 ---
 ## Patterns & Guards & Joins, Oh My!
-Fate is a programming language prototype.  It currently compiles into Node.js modules, but the goal is to eventually have it target the JVM.  It is a mostly functional language that includes a processing model inspired by the [Join Calculus](https://en.wikipedia.org/wiki/Join-calculus).  It also provides first-class patterns, invocation guards, list comprehensions, and flexible partial application.
+Fate is a programming language prototype that compiles into Node.js modules.  It is a mostly functional language, providing first-class patterns, invocation guards, list comprehensions, and flexible function application.
 
 That's a lot to take in, so maybe it's better to just demonstrate.  Let's say you needed to calculate the NOx emissions for an OBD II reporting module.  You could do it the obvious way:
 
@@ -74,6 +74,8 @@ if myAge > 50
 else
   'good to go'
 end
+
+greetWith('hello') if person like Friend
 
 unless processFinished
   'process some request'
