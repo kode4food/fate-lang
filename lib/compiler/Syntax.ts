@@ -23,11 +23,13 @@ namespace Fate.Compiler.Syntax {
 
   type FunctionMap = { [index: string]: Function };
 
+  let tagToConstructor: FunctionMap;
+
   export function node(tag: Tag, ...args: any[]) {
-    var constructor = tagToConstructor[tag];
-    var instance = Object.create(constructor.prototype);
+    let constructor = tagToConstructor[tag];
+    let instance = Object.create(constructor.prototype);
     instance.tag = tag;
-    var result = constructor.apply(instance, args);
+    let result = constructor.apply(instance, args);
     return result !== undefined ? result : instance;
   }
 
@@ -41,7 +43,7 @@ namespace Fate.Compiler.Syntax {
     public length: number;
 
     public template(...args: any[]) {
-      var result = node.apply(null, args);
+      let result = node.apply(null, args);
       result.line = this.line;
       result.column = this.column;
       result.length = this.length;
@@ -62,7 +64,7 @@ namespace Fate.Compiler.Syntax {
       return tags === node.tag;
     }
 
-    var idx = tags.indexOf(node.tag);
+    let idx = tags.indexOf(node.tag);
     if ( idx === -1 ) {
       if ( tags.indexOf('*') !== -1 ) {
         return node.tag;
@@ -164,7 +166,7 @@ namespace Fate.Compiler.Syntax {
     constructor(ranges: Ranges, public assignment: ObjectAssignment) {
       super(ranges);
       if ( !assignment ) {
-        var range = ranges[0];
+        let range = ranges[0];
         this.assignment = range.template('objectAssignment',
           range.nameId,
           range.valueId
@@ -280,7 +282,7 @@ namespace Fate.Compiler.Syntax {
                 paramDefs: Parameters,
                 public guard: Expression) {
       super();
-      var guards: Expressions = [];
+      let guards: Expressions = [];
 
       // Generate Guards from the Parameters
       (paramDefs || []).forEach((paramDef, idx) => {
@@ -289,9 +291,9 @@ namespace Fate.Compiler.Syntax {
           return;
         }
 
-        var id = paramDef.id || <Identifier>node('id', idx);
-        this.params.push(node('idParam', id));
-        guards.push(node('like', id, (<PatternParameter>paramDef).pattern));
+        let ident = paramDef.id || <Identifier>node('id', idx);
+        this.params.push(node('idParam', ident));
+        guards.push(node('like', ident, (<PatternParameter>paramDef).pattern));
       });
 
       // Combine the Guards
@@ -301,8 +303,8 @@ namespace Fate.Compiler.Syntax {
           guards.push(this.guard);
         }
         this.guard = guards.shift();
-        guards.forEach((guard) => {
-          this.guard = node('and', this.guard, guard);
+        guards.forEach((g) => {
+          this.guard = node('and', this.guard, g);
         });
       }
     }
@@ -352,7 +354,8 @@ namespace Fate.Compiler.Syntax {
 
   // Tag to Constructor Mapping ***********************************************
 
-  var tagToConstructor: FunctionMap = {
+  // initialize this here to allow forward referencing 
+  tagToConstructor = {
     'from': FromStatement,
     'import': ImportStatement,
     'export': ExportStatement,

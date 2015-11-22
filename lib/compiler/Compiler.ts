@@ -8,9 +8,9 @@
 "use strict";
 
 namespace Fate.Compiler {
-  var vm = require('vm');
-  var generatedParser = require('./parser');
-  var SyntaxError = generatedParser.SyntaxError;
+  let vm = require('vm');
+  let generatedParser = require('./parser');
+  let SyntaxError = generatedParser.SyntaxError;
 
   import generateScriptBody = CodeGen.generateScriptBody;
   import Visitor = Compiler.Visitor;
@@ -20,7 +20,7 @@ namespace Fate.Compiler {
   export type FilePath = string;
 
   export class CompileError implements Error {
-    name: string = "CompileError";
+    public name: string = "CompileError";
 
     constructor(public message: string, public line: number,
                 public column: number, public filePath?: FilePath) {}
@@ -35,13 +35,13 @@ namespace Fate.Compiler {
   const compilerPipeline = [Checker, Patterns, Rewriter];
 
   export function compileModule(script: ScriptContent) {
-    var syntaxTree = generatedParser.parse(script);
+    let syntaxTree = generatedParser.parse(script);
 
-    var warnings: CompileErrors = [];
-    var visitor = new Visitor(warnings);
+    let warnings: CompileErrors = [];
+    let visitor = new Visitor(warnings);
 
     compilerPipeline.forEach(function (module) {
-      var processors = module.createTreeProcessors(visitor);
+      let processors = module.createTreeProcessors(visitor);
 
       processors.forEach(function (processor) {
         syntaxTree = processor(syntaxTree);
@@ -55,7 +55,7 @@ namespace Fate.Compiler {
   }
 
   export function generateNodeModule(generatedCode: GeneratedCode) {
-    var buffer: string[] = [];
+    let buffer: string[] = [];
     buffer.push('"use strict";');
     buffer.push("const fate=require('fatejs');");
     buffer.push("const r=fate.Runtime;");
@@ -68,7 +68,7 @@ namespace Fate.Compiler {
   }
 
   export function generateFunctionCode(generatedCode: GeneratedCode) {
-    var buffer: string[] = [];
+    let buffer: string[] = [];
     buffer.push('"use strict";');
     buffer.push(generatedCode);
     buffer.push("module.exports=s;");
@@ -76,7 +76,7 @@ namespace Fate.Compiler {
   }
 
   export function generateFunction(generatedCode: GeneratedCode) {
-    var context = vm.createContext({
+    let context = vm.createContext({
       g: Fate.globals(),
       r: Runtime,
       module: { }
@@ -103,24 +103,24 @@ namespace Fate.Compiler {
 
   function formatCompileError(err: CompileError,
                               filePath?: Compiler.FilePath) {
-    var lineInfo = ":" + err.line + ":" + err.column;
-    var message = err.message;
+    let lineInfo = ":" + err.line + ":" + err.column;
+    let message = err.message;
 
     filePath = filePath || err.filePath || 'string';
     return filePath + lineInfo + ": " + message;
   }
 
-  // Intercepts a PEG.js Exception and generate a human-readable error message
+  // intercepts a PEG.js Exception and generate a human-readable error message
   function formatSyntaxError(err: PEG.SyntaxError,
                              filePath?: Compiler.FilePath): CompileError {
-    var found = err.found;
-    var line = err.line;
-    var column = err.column;
+    let found = err.found;
+    let line = err.line;
+    let column = err.column;
 
-    var unexpected = found ? "'" + found + "'" : "end of file";
-    var errString = "Unexpected " + unexpected;
-    var lineInfo = ":" + line + ":" + column;
-    var message = (filePath || 'string') + lineInfo + ": " + errString;
+    let unexpected = found ? "'" + found + "'" : "end of file";
+    let errString = "Unexpected " + unexpected;
+    let lineInfo = ":" + line + ":" + column;
+    let message = (filePath || 'string') + lineInfo + ": " + errString;
 
     return new CompileError(message, line, column, filePath);
   }

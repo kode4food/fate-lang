@@ -6,16 +6,16 @@
 namespace Fate.Resolvers {
   import DirPath = Types.DirPath;
 
-  var path = require('path');
+  let path = require('path');
 
   import createModule = Types.createModule;
 
   interface Options {
-    path: string,
+    path: string;
   }
 
-  var explicitPathRegex = /(\.fate)(\.js)?$/;
-  var pathSuffixes = ['.fate.js', '.fate', '/index.fate.js', '/index.fate'];
+  let explicitPathRegex = /(\.fate)(\.js)?$/;
+  let pathSuffixes = ['.fate.js', '.fate', '/index.fate.js', '/index.fate'];
 
   /**
    * Creates a new FileResolver.
@@ -24,16 +24,16 @@ namespace Fate.Resolvers {
    * @param {String} [options.path] the base directory for resolving modules
    */
   export function createFileResolver(options: Options) {
-    var cache: { [index: string]: Types.Module } = {};
-    var defaultBasePath: DirPath = options.path || process.cwd();
+    let cache: { [index: string]: Types.Module } = {};
+    let defaultBasePath: DirPath = options.path || process.cwd();
 
     return {
       resolve: resolve
     };
 
     function resolve(name: Types.ModuleName, basePath = defaultBasePath) {
-      var cacheKey = basePath + '//' + name;
-      var result = cache[cacheKey];
+      let cacheKey = basePath + '//' + name;
+      let result = cache[cacheKey];
       if ( result ) {
         return result;
       }
@@ -50,7 +50,7 @@ namespace Fate.Resolvers {
   function loadFromFileSystem(name: Types.ModuleName, basePath: DirPath) {
     if ( explicitPathRegex.test(name) ) {
       try {
-        var explicitPath = path.resolve(basePath, name);
+        let explicitPath = path.resolve(basePath, name);
         return createModule(require(explicitPath));
       }
       catch ( err ) {
@@ -58,16 +58,17 @@ namespace Fate.Resolvers {
       }
     }
 
-    var checkPaths = pathSuffixes.map(function (suffix) {
+    let checkPaths = pathSuffixes.map(function (suffix) {
       return path.resolve(basePath, name + suffix);
     });
 
-    for ( var i = 0; i < checkPaths.length; i++ ) {
+    for ( let i = 0; i < checkPaths.length; i++ ) {
       try {
-        var moduleExports = require(checkPaths[i]);
+        let moduleExports = require(checkPaths[i]);
         return createModule(moduleExports);
       }
       catch ( err ) {
+        // no-op
       }
     }
 

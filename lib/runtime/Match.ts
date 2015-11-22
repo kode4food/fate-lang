@@ -17,11 +17,11 @@ namespace Fate.Runtime {
     value.__fatePattern = true;
     return value;
   }
-  
+
   export function defineRegexPattern(regex: RegExp) {
     (<Pattern>pattern).__fatePattern = true;
     return pattern;
-    
+
     function pattern(value: any) {
       return regex.test(value);
     }
@@ -31,7 +31,7 @@ namespace Fate.Runtime {
     return typeof value === 'function' && value.__fatePattern;
   }
 
-  var nullMatcher = definePattern(function(obj: any) {
+  let nullMatcher = definePattern(function(obj: any) {
     return obj === null || obj === undefined;
   });
 
@@ -67,7 +67,7 @@ namespace Fate.Runtime {
     if ( typeof obj !== 'object' || obj === null ) {
       return false;
     }
-    
+
     for ( var key in template ) {
       if ( !isMatchingObject(template[key], obj[key]) ) {
         return false;
@@ -104,10 +104,10 @@ namespace Fate.Runtime {
   }
 
   function buildArrayMatcher(template: any[]) {
-    var matchers: Matchers = [];
-    var mlen = template.length;
+    let matchers: Matchers = [];
+    let mlen = template.length;
 
-    for ( var i = 0; i < mlen; i++ ) {
+    for ( let i = 0; i < mlen; i++ ) {
       matchers.push(nestedMatcher(template[i]));
     }
     return arrayMatcher;
@@ -119,7 +119,7 @@ namespace Fate.Runtime {
       if ( !Array.isArray(obj) || obj.length < mlen ) {
         return false;
       }
-      for ( var i = 0; i < mlen; i++ ) {
+      for ( let i = 0; i < mlen; i++ ) {
         if ( !matchers[i](obj[i]) ) {
           return false;
         }
@@ -129,11 +129,11 @@ namespace Fate.Runtime {
   }
 
   function buildObjectMatcher(template: AnyMap) {
-    var matchers: Matchers = [];
-    var keys = Object.keys(template);
-    var mlen = keys.length;
+    let matchers: Matchers = [];
+    let keys = Object.keys(template);
+    let mlen = keys.length;
 
-    for ( var i = 0; i < mlen; i++ ) {
+    for ( let i = 0; i < mlen; i++ ) {
       matchers.push(nestedMatcher(template[keys[i]]));
     }
     return objectMatcher;
@@ -145,7 +145,7 @@ namespace Fate.Runtime {
       if ( typeof obj !== 'object' || obj === null ) {
         return false;
       }
-      for ( var i = 0; i < mlen; i++ ) {
+      for ( let i = 0; i < mlen; i++ ) {
         if ( !matchers[i](obj[keys[i]]) ) {
           return false;
         }

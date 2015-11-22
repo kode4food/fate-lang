@@ -17,7 +17,7 @@ namespace Fate.Resolvers {
    * modules and native JavaScript helpers.
    */
   export function createMemoryResolver() {
-    var cache: { [index: string]: Types.Module } = {};
+    let cache: { [index: string]: Types.Module } = {};
 
     return {
       resolve: resolve,
@@ -26,7 +26,7 @@ namespace Fate.Resolvers {
     };
 
     function resolve(name: Types.ModuleName) {
-      var result = cache[name];
+      let result = cache[name];
       if ( !result ) {
         return undefined;
       }
@@ -58,8 +58,8 @@ namespace Fate.Resolvers {
 
       // *String* - An unparsed Fate script
       if ( typeof module === 'string' ) {
-        var compiled = Fate.compile(module);
-        var generatedModule = createModule();
+        let compiled = Fate.compile(module);
+        let generatedModule = createModule();
         compiled(Fate.globals(), generatedModule.exports);
         cache[name] = generatedModule;
         return;

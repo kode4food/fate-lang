@@ -6,11 +6,11 @@ namespace Fate.Runtime {
   import ModuleName = Types.ModuleName;
 
   // Register the default resolvers
-  var nodeResolver = Resolvers.createNodeResolver();
-  var fileResolver = Resolvers.createFileResolver({ path: process.cwd() });
-  var systemResolver = Resolvers.createSystemResolver();
-  var memoryResolver = Resolvers.createMemoryResolver();
-  var _resolvers: Resolvers.Resolver[] = [
+  let nodeResolver = Resolvers.createNodeResolver();
+  let fileResolver = Resolvers.createFileResolver({ path: process.cwd() });
+  let systemResolver = Resolvers.createSystemResolver();
+  let memoryResolver = Resolvers.createMemoryResolver();
+  let _resolvers: Resolvers.Resolver[] = [
     nodeResolver, fileResolver, systemResolver, memoryResolver
   ];
 
@@ -18,8 +18,8 @@ namespace Fate.Runtime {
   export var unregisterModule = memoryResolver.unregister;
 
   export function resolve(moduleName: ModuleName, basePath?: DirPath) {
-    for ( var i = _resolvers.length - 1; i >= 0; i-- ) {
-      var module = _resolvers[i].resolve(moduleName, basePath);
+    for ( let i = _resolvers.length - 1; i >= 0; i-- ) {
+      let module = _resolvers[i].resolve(moduleName, basePath);
       if ( module ) {
         return module.exports;
       }
@@ -32,11 +32,11 @@ namespace Fate.Runtime {
   }
 
   export function importer(moduleName: ModuleName) {
-    var cache: { [index: string]: Types.ModuleExports } = {};
+    let cache: { [index: string]: Types.ModuleExports } = {};
     return performImport;
 
     function performImport(basePath?: Types.DirPath) {
-      var moduleExports = cache[basePath];
+      let moduleExports = cache[basePath];
       if ( moduleExports ) {
         return moduleExports;
       }

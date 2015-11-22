@@ -3,7 +3,7 @@
 
 "use strict";
 
-var NativeString = String;
+let NativeString = String;
 
 namespace Fate.Resolvers.System.String {
   import buildFormatter = Runtime.buildFormatter;

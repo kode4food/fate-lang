@@ -5,15 +5,14 @@
 "use strict";
 
 namespace Fate.Compiler.Checker {
-  import Visitor = Compiler.Visitor;
   import Syntax = Compiler.Syntax;
   import annotate = Compiler.annotate;
 
   type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
 
   export function createTreeProcessors(visit: Compiler.Visitor) {
-    var selfFunctions = visit.ancestorTags('self', ['function', 'lambda']);
-    var functionIdRetrieval = visit.ancestorTags('id', ['function']);
+    let selfFunctions = visit.ancestorTags('self', ['function', 'lambda']);
+    let functionIdRetrieval = visit.ancestorTags('id', ['function']);
 
     return [
       visit.matching(validateWildcards, visit.tags('wildcard')),
@@ -25,16 +24,16 @@ namespace Fate.Compiler.Checker {
       visit.statementGroups(validateMergeables, visit.tags('function'))
     ];
 
-    // A Wildcard can only exist in a pattern or call binder
+    // a Wildcard can only exist in a pattern or call binder
     function validateWildcards(node: Syntax.Wildcard) {
       if ( !visit.hasAncestorTags(['pattern', 'bind']) ) {
         visit.issueError(node, "Unexpected Wildcard");
       }
 
-      var ancestors = visit.hasAncestorTags('objectAssignment', 'pattern');
+      let ancestors = visit.hasAncestorTags('objectAssignment', 'pattern');
       if ( ancestors ) {
-        var parent = <Syntax.ObjectAssignment>ancestors[0];
-        var parentIndex = visit.nodeStack.indexOf(parent);
+        let parent = <Syntax.ObjectAssignment>ancestors[0];
+        let parentIndex = visit.nodeStack.indexOf(parent);
         if ( parent.id === visit.nodeStack[parentIndex + 1] ||
              parent.id === node ) {
           visit.issueError(node,
@@ -66,11 +65,11 @@ namespace Fate.Compiler.Checker {
 
     function checkParamsForDuplication(node: Syntax.Node,
                                        signatures: Syntax.Signatures) {
-      var encounteredNames: { [index: string]: boolean } = { };
-      var duplicatedNames: { [index: string]: boolean } = { };
+      let encounteredNames: { [index: string]: boolean } = { };
+      let duplicatedNames: { [index: string]: boolean } = { };
       signatures.forEach(function (signature) {
         signature.params.forEach(function (param) {
-          var name = param.id.value;
+          let name = param.id.value;
           if ( encounteredNames[name] ) {
             duplicatedNames[name] = true;
             return;
@@ -79,7 +78,7 @@ namespace Fate.Compiler.Checker {
         });
       });
 
-      var duplicatedItems = Object.keys(duplicatedNames);
+      let duplicatedItems = Object.keys(duplicatedNames);
       if ( duplicatedItems.length ) {
         visit.issueError(node,
           "Argument names are repeated in declaration: " +
@@ -89,14 +88,14 @@ namespace Fate.Compiler.Checker {
     }
 
     function annotateSelfFunctions(node: Syntax.Self) {
-      var func = visit.hasAncestorTags(['function', 'lambda'])[0];
+      let func = visit.hasAncestorTags(['function', 'lambda'])[0];
       annotate(func, 'function/self');
       annotate(func, 'no_merge');
       return node;
     }
 
     function annotateRecursiveFunctions(node: Syntax.Identifier) {
-      var func = visit.hasAncestorTags('function')[0];
+      let func = visit.hasAncestorTags('function')[0];
       if ( node === func.signature.id ) {
         return node;
       }
@@ -108,14 +107,14 @@ namespace Fate.Compiler.Checker {
     }
 
     function validateMergeables(statements: Syntax.FunctionDeclaration[]) {
-      var namesSeen: { [index: string]: boolean } = {};
-      var lastName: string;
-      var lastArgs: string;
+      let namesSeen: { [index: string]: boolean } = {};
+      let lastName: string;
+      let lastArgs: string;
 
       statements.forEach(function (statement) {
-        var signature = statement.signature;
-        var name = signature.id.value;
-        var args = argumentsSignature(signature.params);
+        let signature = statement.signature;
+        let name = signature.id.value;
+        let args = argumentsSignature(signature.params);
 
         if ( !signature.guard && namesSeen[name] ) {
           visit.issueWarning(statement,

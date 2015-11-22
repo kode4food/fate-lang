@@ -6,7 +6,7 @@
 namespace Fate.Compiler.JavaScript {
   import mixin = Util.mixin;
 
-  var jsonStringify = JSON.stringify;
+  let jsonStringify = JSON.stringify;
 
   type StringMap = { [index: string]: string };
 
@@ -61,12 +61,12 @@ namespace Fate.Compiler.JavaScript {
   }
 
   interface Modification {
-    ids: Ids,
-    created: boolean
+    ids: Ids;
+    created: boolean;
   }
 
   // presented operators are symbolic
-  var operatorMap: StringMap = {
+  let operatorMap: StringMap = {
     'eq': '===',
     'neq': '!==',
     'gt': '>',
@@ -95,24 +95,24 @@ namespace Fate.Compiler.JavaScript {
     private globalVars: string[] = [];
 
     public nextId(prefix: string) {
-      var next = this.globals[prefix];
+      let next = this.globals[prefix];
       if ( typeof next !== 'number' ) {
         next = 0;  // seed it
       }
-      var id = prefix + next.toString(36);
+      let id = prefix + next.toString(36);
       this.globals[prefix] = next + 1;
       return id;
     }
 
     public literal(literalValue: any) {
-      var canonical: string;
+      let canonical: string;
       if ( literalValue instanceof RegExp ) {
         canonical = literalValue.toString();
       }
       else {
         canonical = jsonStringify(literalValue);
       }
-      var id = this.generatedLiterals[canonical];
+      let id = this.generatedLiterals[canonical];
       if ( id ) {
         return id;
       }
@@ -123,7 +123,7 @@ namespace Fate.Compiler.JavaScript {
     }
 
     public runtimeImport(funcName: string) {
-      var id = this.generatedImports[funcName];
+      let id = this.generatedImports[funcName];
       if ( id ) {
         return id;
       }
@@ -135,9 +135,9 @@ namespace Fate.Compiler.JavaScript {
     }
 
     public builder(funcName: string, ...literalIds: Ids) {
-      var funcId = this.runtimeImport(funcName);
-      var key = funcId + "/" + literalIds.join('/');
-      var id = this.generatedBuilders[key];
+      let funcId = this.runtimeImport(funcName);
+      let key = funcId + "/" + literalIds.join('/');
+      let id = this.generatedBuilders[key];
       if ( id ) {
         return id;
       }
@@ -157,21 +157,21 @@ namespace Fate.Compiler.JavaScript {
   }
 
   export function createModule(globals: Globals) {
-    // Keeps track of name -> local mappings throughout the nesting
-    var locals: { [index: string]: number } = {}; // prefix -> nextId
-    var names: NameIdsMap = {};  // name -> localId[]
-    var scopeInfo = createScopeInfo();
-    var nameStack: NameInfo[] = [];
-    var usesScratch = false;
+    // keeps track of name -> local mappings throughout the nesting
+    let locals: { [index: string]: number } = {}; // prefix -> nextId
+    let names: NameIdsMap = {};  // name -> localId[]
+    let scopeInfo = createScopeInfo();
+    let nameStack: NameInfo[] = [];
+    let usesScratch = false;
 
-    var writerStack: BodyEntries[] = [];
-    var body: BodyEntries = [];
+    let writerStack: BodyEntries[] = [];
+    let body: BodyEntries = [];
 
     // various names
-    var selfName = 's';
-    var contextName = 'c';
-    var exportsName = 'x';
-      
+    let selfName = 's';
+    let contextName = 'c';
+    let exportsName = 'x';
+
     return {
       registerAnonymous: registerAnonymous,
       createAnonymous: createAnonymous,
@@ -213,11 +213,11 @@ namespace Fate.Compiler.JavaScript {
     };
 
     function nextId(prefix: string) {
-      var next = locals[prefix];
+      let next = locals[prefix];
       if ( typeof next !== 'number' ) {
         next = 0;  // seed it
       }
-      var id = prefix + next;
+      let id = prefix + next;
       locals[prefix] = next + 1;
       return id;
     }
@@ -243,24 +243,24 @@ namespace Fate.Compiler.JavaScript {
       scopeInfo = createScopeInfo();
     }
 
-    function extendNames(names: NameIdsMap) {
-      var result: NameIdsMap = {};
-      Object.keys(names).forEach(function (name) {
-        result[name] = [lastItem(names[name])];
+    function extendNames(namesMap: NameIdsMap) {
+      let result: NameIdsMap = {};
+      Object.keys(namesMap).forEach(function (name) {
+        result[name] = [lastItem(namesMap[name])];
       });
       return result;
     }
 
     function popLocalScope() {
-      var info = nameStack.pop();
+      let info = nameStack.pop();
       names = info.names;
       scopeInfo = info.scopeInfo;
       usesScratch = info.usesScratch;
     }
 
     function popLocalScopeWithScratch() {
-      // Pass scratch up and through
-      var tmpScratch = usesScratch;
+      // pass scratch up and through
+      let tmpScratch = usesScratch;
       popLocalScope();
       usesScratch = tmpScratch;
     }
@@ -272,7 +272,7 @@ namespace Fate.Compiler.JavaScript {
       if ( !scopeInfo.firstAccess[name] ) {
         scopeInfo.firstAccess[name] = FirstAccess.Write;
       }
-      var ids = names[name] || (names[name] = []);
+      let ids = names[name] || (names[name] = []);
       ids.push(nextId('v'));
       return lastItem(ids);
     }
@@ -281,14 +281,14 @@ namespace Fate.Compiler.JavaScript {
       if ( !scopeInfo.firstAccess[name] ) {
         scopeInfo.firstAccess[name] = FirstAccess.Read;
       }
-      var ids = names[name] || (names[name] = [nextId('v')]);
+      let ids = names[name] || (names[name] = [nextId('v')]);
       return lastItem(ids);
     }
 
     function self() {
       write(selfName);
     }
-    
+
     function context() {
       write(contextName);
     }
@@ -307,14 +307,14 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function registerAnonymous(id: string) {
-      var name = ' ' + id;
+      let name = ' ' + id;
       names[name] = [id];
       return name;
     }
 
     function createAnonymous() {
-      var id = nextId('h');
-      var name = ' ' + id;
+      let id = nextId('h');
+      let name = ' ' + id;
       names[name] = [id];
       return name;
     }
@@ -334,14 +334,14 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function popWriter(): Compiler.GeneratedCode {
-      var result = body;
+      let result = body;
       body = writerStack.pop();
       return code(result);
     }
 
     function captureState(capturedBody: Function) {
-      var myScopeInfo = scopeInfo.snapshot();
-      var myNames = names;
+      let myScopeInfo = scopeInfo.snapshot();
+      let myNames = names;
 
       return function () {
         pushLocalScope();
@@ -353,7 +353,7 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function write(...content: any[]) {
-      var args = content.filter(function (arg) {
+      let args = content.filter(function (arg) {
         return arg !== undefined && arg !== null;
       });
       args.forEach(function (arg) {
@@ -396,24 +396,24 @@ namespace Fate.Compiler.JavaScript {
       write(localForRead(name));
     }
 
-    function assignment(name: Name, body: BodyEntry) {
-      assignments([[name, body]]);
+    function assignment(name: Name, bodyEntry: BodyEntry) {
+      assignments([[name, bodyEntry]]);
     }
 
     function assignments(items: AssignmentItems) {
       items.forEach(function (item) {
-        var name = item[0];
-        var value = code(item[1]);
+        let name = item[0];
+        let value = code(item[1]);
 
-        var localName = localForWrite(name);
+        let localName = localForWrite(name);
         write(localName, '=', value, ";");
       });
     }
 
     function assignFromArray(varNames: Names, arr: BodyEntry) {
-      var anon = createAnonymous();
+      let anon = createAnonymous();
 
-      var elements: BodyEntries = [];
+      let elements: BodyEntries = [];
       elements.push(function () {
         assignAnonymous(anon, arr);
       });
@@ -429,10 +429,10 @@ namespace Fate.Compiler.JavaScript {
 
     function exports(items: ModuleItems) {
       items.forEach(function (item) {
-        var name = item[0];
-        var alias = item[1];
+        let name = item[0];
+        let alias = item[1];
 
-        var localName = localForRead(name);
+        let localName = localForRead(name);
         writeMember(exportsName, globals.literal(alias));
         write('=', localName, ';');
       });
@@ -449,10 +449,10 @@ namespace Fate.Compiler.JavaScript {
 
     function conditionalOperator(condition: BodyEntry, trueVal: BodyEntry,
                                  falseVal: BodyEntry) {
-      var isTrue = globals.runtimeImport('isTrue');
-      var condCode = code(condition);
-      var trueCode = code(trueVal);
-      var falseCode = code(falseVal);
+      let isTrue = globals.runtimeImport('isTrue');
+      let condCode = code(condition);
+      let trueCode = code(trueVal);
+      let falseCode = code(falseVal);
       write('(', isTrue, '(', condCode, ')?', trueCode, ':', falseCode, ')');
     }
 
@@ -462,16 +462,16 @@ namespace Fate.Compiler.JavaScript {
 
     function ifStatement(condition: BodyEntry, thenBranch: BodyEntry,
                          elseBranch: BodyEntry) {
-      var condWrapperName = 'isTrue';
+      let condWrapperName = 'isTrue';
       if ( !thenBranch ) {
         condWrapperName = 'isFalse';
         thenBranch = elseBranch;
         elseBranch = undefined;
       }
 
-      var condWrapper = globals.runtimeImport(condWrapperName);
-      var condCode = code(condition);
-      var [thenCode, elseCode] = codeBranches(thenBranch, elseBranch);
+      let condWrapper = globals.runtimeImport(condWrapperName);
+      let condCode = code(condition);
+      let [thenCode, elseCode] = codeBranches(thenBranch, elseBranch);
 
       write('if(', condWrapper, '(', condCode, ')){');
       write(thenCode);
@@ -484,20 +484,20 @@ namespace Fate.Compiler.JavaScript {
       }
     }
 
-    // Code branches using static single assignment
+    // code branches using static single assignment
     function codeBranches(...branches: BodyEntry[]) {
-      var branchContent: string[] = [];
+      let branchContent: string[] = [];
 
-      // Step 1: Code the branches, gathering the assignments
-      var originalNames = names;
-      var modificationSets: NameModificationsMap = {};
+      // step 1: Code the branches, gathering the assignments
+      let originalNames = names;
+      let modificationSets: NameModificationsMap = {};
       branches.forEach(function (branch, index) {
         names = extendNames(originalNames);
         branchContent[index] = branch ? code(branch) : "";
         Object.keys(names).forEach(function (key) {
-          var created = !originalNames[key];
+          let created = !originalNames[key];
           if ( created || names[key].length > 1 ) {
-            var modificationSet = modificationSets[key];
+            let modificationSet = modificationSets[key];
             if ( !modificationSet ) {
               modificationSet = modificationSets[key] = [];
             }
@@ -511,32 +511,32 @@ namespace Fate.Compiler.JavaScript {
       });
       names = originalNames;
 
-      // Step 2: Create Phi functions for each name
+      // step 2: Create Phi functions for each name
       Object.keys(modificationSets).forEach(function (key) {
-        var parentIds = names[key] || [];
-        var passthruId = parentIds.length ? lastItem(parentIds) : null;
-        var sourceIds: Ids = [];
-        var modificationSet = modificationSets[key];
+        let parentIds = names[key] || [];
+        let passthruId = parentIds.length ? lastItem(parentIds) : null;
+        let sourceIds: Ids = [];
+        let modificationSet = modificationSets[key];
 
-        for ( var i = 0; i < branches.length; i++ ) {
-          var modifications = modificationSet[i];
+        for ( let i = 0; i < branches.length; i++ ) {
+          let modifications = modificationSet[i];
           if ( !modifications ) {
             sourceIds[i] = passthruId;
             continue;
           }
 
-          var ids = modifications.ids.slice(modifications.created ? 0 : 1);
+          let ids = modifications.ids.slice(modifications.created ? 0 : 1);
           parentIds = parentIds.concat(ids);
           sourceIds[i] = lastItem(ids);
         }
         names[key] = parentIds;
 
-        var targetId = localForWrite(key);
+        let targetId = localForWrite(key);
         sourceIds.forEach(function (sourceId, index) {
           if ( !sourceId ) {
             return;
           }
-          var content = [targetId, '=', sourceId, ';'].join('');
+          let content = [targetId, '=', sourceId, ';'].join('');
           branchContent[index] += content;
         });
       });
@@ -545,37 +545,37 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function loopExpression(options: LoopOptions) {
-      var itemValue = options.value;
-      var itemName = options.name;
-      var collection = options.collection;
-      var loopGuard = options.guard;
-      var loopBody = options.body;
+      let itemValue = options.value;
+      let itemName = options.name;
+      let collection = options.collection;
+      let loopGuard = options.guard;
+      let loopBody = options.body;
 
-      var iteratorName = itemName ? 'createNamedIterator' : 'createIterator';
-      var iterator = globals.runtimeImport(iteratorName);
-      var iteratorContent = code(function () {
+      let iteratorName = itemName ? 'createNamedIterator' : 'createIterator';
+      let iterator = globals.runtimeImport(iteratorName);
+      let iteratorContent = code(function () {
         write(iterator, '(', collection, ')');
       });
 
-      var parentNames = names;
+      let parentNames = names;
       pushLocalScope();
-      
-      var contextArgs = [itemValue];
+
+      let contextArgs = [itemValue];
       if ( itemName ) {
         contextArgs.push(itemName);
       }
-      var argNames = contextArgs.map(localForWrite);
+      let argNames = contextArgs.map(localForWrite);
 
-      var bodyContent = code(function () {
+      let bodyContent = code(function () {
         generate(loopBody);
       });
 
-      var guardContent = code(function () {
+      let guardContent = code(function () {
         generate(loopGuard);
       });
 
       if ( itemName ) {
-        var wrapper = globals.nextId('i');
+        let wrapper = globals.nextId('i');
         write('for(let ', wrapper, ' of ', iteratorContent, '){');
         write('let ', argNames[0], '=', wrapper, '[0],');
         write(argNames[1], '=', wrapper, '[1];');
@@ -597,33 +597,33 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function funcDeclaration(name: Name, options: FunctionOptions) {
-      var functionId = localForWrite(name);
+      let functionId = localForWrite(name);
       write(functionId, '=');
       func(options);
       write(';');
     }
 
     function func(options: FunctionOptions) {
-      var internalId = options.internalId;
-      var internalArgs = options.internalArgs || [];
-      var contextArgs = options.contextArgs || [];
-      var funcProlog = options.prolog;
-      var funcBody = options.body;
+      let internalId = options.internalId;
+      let internalArgs = options.internalArgs || [];
+      let contextArgs = options.contextArgs || [];
+      let funcProlog = options.prolog;
+      let funcBody = options.body;
 
-      var parentNames = names;
+      let parentNames = names;
       pushLocalScope();
-      
-      var localNames = contextArgs.map(localForRead);
 
-      var bodyContent = code(function () {
+      let localNames = contextArgs.map(localForRead);
+
+      let bodyContent = code(function () {
         generate(funcBody);
       });
 
-      var prologContent = code(function () {
+      let prologContent = code(function () {
         generate(funcProlog);
       });
 
-      var argNames = internalArgs.concat(localNames);
+      let argNames = internalArgs.concat(localNames);
       write('function');
       if ( internalId ) {
         write(' ' + internalId);
@@ -644,20 +644,20 @@ namespace Fate.Compiler.JavaScript {
     }
 
     function writeLocalVariables(parentNames: NameIdsMap, argNames: Names) {
-      var undefinedVars: Names = [];
+      let undefinedVars: Names = [];
       Object.keys(names).forEach(function (name) {
-        var localNameIds = names[name];
-        var localNameId = localNameIds[0];
+        let localNameIds = names[name];
+        let localNameId = localNameIds[0];
 
-        // All secondary locals are treated as undefined
+        // all secondary locals are treated as undefined
         undefinedVars.push.apply(undefinedVars, localNameIds.slice(1));
 
         if ( isArgument(localNameId) || parentNames[name] ) {
           return;
         }
 
-        var firstAccess = scopeInfo.firstAccess[name];
-        var assignedEarly = firstAccess === FirstAccess.Write;
+        let firstAccess = scopeInfo.firstAccess[name];
+        let assignedEarly = firstAccess === FirstAccess.Write;
         if ( isAnonymous(name) || assignedEarly ) {
           undefinedVars.push(localNameId);
           return;
@@ -690,7 +690,7 @@ namespace Fate.Compiler.JavaScript {
 
     function call(funcId: Id|BodyEntry, args?: BodyEntries) {
       if ( !args ) {
-        // Pass through local arguments (for function chaining)
+        // pass through local arguments (for function chaining)
         write(funcId, '.apply(null,arguments)');
         return;
       }
@@ -715,17 +715,17 @@ namespace Fate.Compiler.JavaScript {
         return item;
       });
 
-      var literals: ObjectAssignmentItems = [];
-      var expressions: ObjectAssignmentItems = [];
+      let literals: ObjectAssignmentItems = [];
+      let expressions: ObjectAssignmentItems = [];
 
       items.forEach(function (item) {
-        var target = item[2] ? expressions : literals;
+        let target = item[2] ? expressions : literals;
         target.push(item);
       });
 
       if ( expressions.length ) {
-        var dictVar = createAnonymous();
-        var components: BodyEntries = [];
+        let dictVar = createAnonymous();
+        let components: BodyEntries = [];
 
         components.push(function () {
           assignAnonymous(dictVar, writeLiterals);
@@ -733,7 +733,7 @@ namespace Fate.Compiler.JavaScript {
 
         expressions.forEach(function (item) {
           components.push(function () {
-            var name = item[2] ? item[0] : globals.literal(item[0]);
+            let name = item[2] ? item[0] : globals.literal(item[0]);
             writeMember(dictVar, name);
             write('=', item[1]);
           });

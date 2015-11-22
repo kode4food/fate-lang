@@ -6,26 +6,19 @@
 "use strict";
 
 namespace Fate.Compiler.Patterns {
-  var wildcardLocal = 'p';
+  let wildcardLocal = 'p';
 
-  import isTrue = Types.isTrue;
-  import isFalse = Types.isFalse;
-  import isIn = Types.isIn;
-
-  import Visitor = Compiler.Visitor;
   import Syntax = Compiler.Syntax;
   import hasTag = Syntax.hasTag;
-  import isStatements = Syntax.isStatements;
-  import isLiteral = Syntax.isLiteral;
   import annotate = Compiler.annotate;
 
   export function createTreeProcessors(visit: Compiler.Visitor) {
-    var wildcardNumbering = 0;
+    let wildcardNumbering = 0;
 
-    var nestedPattern = visit.ancestorTags('pattern', 'pattern');
-    var patternCollection = visit.ancestorTags(['object', 'array'], 'pattern');
-    var patternWildcard = visit.ancestorTags('wildcard', 'pattern');
-    var patternNode = visit.ancestorTags('*', 'pattern');
+    let nestedPattern = visit.ancestorTags('pattern', 'pattern');
+    let patternCollection = visit.ancestorTags(['object', 'array'], 'pattern');
+    let patternWildcard = visit.ancestorTags('wildcard', 'pattern');
+    let patternNode = visit.ancestorTags('*', 'pattern');
 
     return [
       visit.matching(rollUpPatterns, nestedPattern),
@@ -36,12 +29,12 @@ namespace Fate.Compiler.Patterns {
       visit.matching(annotatePatternNode, patternNode)
     ];
 
-    // Patterns don't have to exist within Patterns
+    // patterns don't have to exist within Patterns
     function rollUpPatterns(node: Syntax.Pattern) {
       return node.left;
     }
 
-    // A Regex *is* a pattern
+    // a Regex *is* a pattern
     function rollUpRegexPatterns(node: Syntax.Pattern) {
       if ( node.left instanceof Syntax.Regex ) {
         return node.left;
@@ -50,11 +43,11 @@ namespace Fate.Compiler.Patterns {
     }
 
     function getAnchorName() {
-      var anchor = visit.currentElement();
+      let anchor = visit.currentElement();
       if ( !anchor ) {
         anchor = visit.hasAncestorTags('pattern')[0];
       }
-      var anchorName = getAnnotation(anchor, 'pattern/local');
+      let anchorName = getAnnotation(anchor, 'pattern/local');
       if ( !anchorName ) {
         anchorName = wildcardLocal + (wildcardNumbering++);
         annotate(anchor, 'pattern/local', anchorName);
@@ -66,7 +59,7 @@ namespace Fate.Compiler.Patterns {
       if ( !hasAnnotation(node, 'pattern/local') ) {
         annotate(node, 'pattern/local', wildcardLocal);
       }
-      var contained = node.left;
+      let contained = node.left;
       if ( !hasTag(contained, ['object', 'array']) &&
            !hasAnnotation(contained, 'pattern/local') ) {
         annotate(contained, 'pattern/local', wildcardLocal);
@@ -80,19 +73,19 @@ namespace Fate.Compiler.Patterns {
         if ( hasAnnotation(element, 'pattern/local') ) {
           return;
         }
-        var elementName = wildcardLocal + (wildcardNumbering++);
+        let elementName = wildcardLocal + (wildcardNumbering++);
         annotate(element, 'pattern/local', elementName);
       });
       return node;
     }
 
-    // Wildcard names must correspond to their element in an object or array
-    function nameAndAnnotateWildcards(node: Syntax.Wildcard) {
-      if ( !hasAnnotation(node, 'pattern/local') ) {
-        annotate(node, 'pattern/local', getAnchorName());
+    // wildcard names must correspond to their element in an object or array
+    function nameAndAnnotateWildcards(wildcardNode: Syntax.Wildcard) {
+      if ( !hasAnnotation(wildcardNode, 'pattern/local') ) {
+        annotate(wildcardNode, 'pattern/local', getAnchorName());
       }
       visit.upTreeUntilMatch(visit.tags('pattern'), annotateWildcard);
-      return node;
+      return wildcardNode;
 
       function annotateWildcard(node: Syntax.Node) {
         annotate(node, 'pattern/wildcard');
@@ -100,7 +93,7 @@ namespace Fate.Compiler.Patterns {
       }
     }
 
-    // All nodes inside of a Pattern should be annotated as such,
+    // all nodes inside of a Pattern should be annotated as such,
     // so that the Code Generator can branch appropriately
     function annotatePatternNode(node: Syntax.Node) {
       annotate(node, 'pattern/node');

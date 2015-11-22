@@ -10,6 +10,7 @@ var istanbul = require('gulp-istanbul');
 var enforcer = require('gulp-istanbul-enforcer');
 var pegjs = require('gulp-peg');
 var rename = require('gulp-rename');
+var tslint = require('gulp-tslint');
 
 var tsFiles = ['index.ts', 'lib/**/*.ts'];
 var testFiles = ['./test/index.js'];
@@ -54,6 +55,12 @@ gulp.task('parser', function (done) {
       .pipe(rename(parserOutput))
       .pipe(gulp.dest(buildDir()))
       .on('end', done);
+});
+
+gulp.task('lint', function() {
+  return gulp.src(tsFiles).pipe(tslint()).pipe(tslint.report('verbose', {
+    summarizeFailureOutput: true
+  }));
 });
 
 gulp.task('compile', ['parser'], function() {

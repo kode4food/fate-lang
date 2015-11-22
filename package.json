@@ -32,6 +32,7 @@
     "gulp-nodeunit": "0.0.5",
     "gulp-peg": "^0.1.2",
     "gulp-rename": "^1.2.2",
+    "gulp-tslint": "^3.6.0",
     "gulp-typescript": "^2.8.2",
     "nodeunit": "^0.9.1"
   },

@@ -1,11 +1,11 @@
 namespace Fate.Runtime {
   export type Collection = any[]|any|Function;
 
-  var generator = require('../lib/generator');
-  var isGenerator = generator.isGenerator;
-  var generateIndexedSet = generator.generateIndexedSet;
+  let generator = require('../lib/generator');
+  let isGenerator = generator.isGenerator;
+  let generateIndexedSet = generator.generateIndexedSet;
 
-  var EmptyCollection: Collection = [];
+  let EmptyCollection: Collection = [];
 
   export function createIterator(collection: Collection) {
     if ( Array.isArray(collection) || isObject(collection) ||

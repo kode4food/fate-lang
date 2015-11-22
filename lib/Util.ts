@@ -4,14 +4,14 @@ namespace Fate.Util {
   type MixinObject = { [index: string]: any };
 
   export function mixin(target: MixinObject, ...source: any[]) {
-    for ( var i = 0; i < source.length; i++ ) {
-      var src = source[i];
+    for ( let i = 0; i < source.length; i++ ) {
+      let src = source[i];
       if ( typeof src !== 'object' || src === null || Array.isArray(src) ) {
         continue;
       }
-      var keys = Object.keys(src);
-      for ( var j = keys.length - 1; j >= 0; j-- ) {
-        var key = keys[j];
+      let keys = Object.keys(src);
+      for ( let j = keys.length - 1; j >= 0; j-- ) {
+        let key = keys[j];
         target[key] = src[key];
       }
     }

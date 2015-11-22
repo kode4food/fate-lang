@@ -10,7 +10,7 @@ namespace Fate.Compiler {
   }
 
   export function annotate(node: Annotated, name: string, value?: any) {
-    var annotations = node.annotations;
+    let annotations = node.annotations;
     if ( !annotations ) {
       node.annotations = annotations = new Annotations();
     }
@@ -18,7 +18,7 @@ namespace Fate.Compiler {
   }
 
   export function getAnnotation(node: Annotated, name: string) {
-    var annotations = node.annotations;
+    let annotations = node.annotations;
     if ( !annotations ) {
       return false;
     }
