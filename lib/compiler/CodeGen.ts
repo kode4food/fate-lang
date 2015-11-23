@@ -14,9 +14,9 @@ namespace Fate.Compiler.CodeGen {
    * Language-specific constructs are avoided here and instead produced
    * by JavaScript code generation module.
    *
-   * @param {Object} strippedTree the parse tree to use
+   * @param {Object} parseTree the parse tree to use
    */
-  export function generateScriptBody(strippedTree: Syntax.Statements) {
+  export function generateScriptBody(parseTree: Syntax.Statements) {
     let globals = new JavaScript.Globals();
     let generate = JavaScript.createModule(globals);
 
@@ -70,7 +70,7 @@ namespace Fate.Compiler.CodeGen {
     };
 
     // generate the module function and return the source code
-    createScriptFunction(strippedTree);
+    createScriptFunction(parseTree);
     let body = generate.toString();
     let buffer: string[] = [];
     buffer.push(globals.toString());

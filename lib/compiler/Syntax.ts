@@ -23,16 +23,6 @@ namespace Fate.Compiler.Syntax {
 
   type FunctionMap = { [index: string]: Function };
 
-  let tagToConstructor: FunctionMap;
-
-  export function node(tag: Tag, ...args: any[]) {
-    let constructor = tagToConstructor[tag];
-    let instance = Object.create(constructor.prototype);
-    instance.tag = tag;
-    let result = constructor.apply(instance, args);
-    return result !== undefined ? result : instance;
-  }
-
   export class Node implements Annotated {
     [index: string]: any;
 
@@ -278,8 +268,7 @@ namespace Fate.Compiler.Syntax {
   export class Signature extends Node {
     public params: Parameters = [];
 
-    constructor(public id: Identifier,
-                paramDefs: Parameters,
+    constructor(public id: Identifier, paramDefs: Parameters,
                 public guard: Expression) {
       super();
       let guards: Expressions = [];
@@ -354,8 +343,7 @@ namespace Fate.Compiler.Syntax {
 
   // Tag to Constructor Mapping ***********************************************
 
-  // initialize this here to allow forward referencing 
-  tagToConstructor = {
+  let tagToConstructor: FunctionMap = {
     'from': FromStatement,
     'import': ImportStatement,
     'export': ExportStatement,
@@ -412,4 +400,12 @@ namespace Fate.Compiler.Syntax {
     'assignment': Assignment,
     'objectAssignment': ObjectAssignment
   };
+
+  export function node(tag: Tag, ...args: any[]) {
+    let constructor = tagToConstructor[tag];
+    let instance = Object.create(constructor.prototype);
+    instance.tag = tag;
+    let result = constructor.apply(instance, args);
+    return result !== undefined ? result : instance;
+  }
 }

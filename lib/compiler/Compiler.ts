@@ -114,8 +114,8 @@ namespace Fate.Compiler {
   function formatSyntaxError(err: PEG.SyntaxError,
                              filePath?: Compiler.FilePath): CompileError {
     let found = err.found;
-    let line = err.line;
-    let column = err.column;
+    let line = err.location.start.line;
+    let column = err.location.start.column;
 
     let unexpected = found ? "'" + found + "'" : "end of file";
     let errString = "Unexpected " + unexpected;
