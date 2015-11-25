@@ -34,7 +34,7 @@ def calculateVehicleEmissions(car)
   car.emissions
 end
 
-def calculateVehicleEmissions({ wheelsInMotion: ? <= 2 } as car)
+def calculateVehicleEmissions({ wheelsInMotion: self <= 2 } as car)
   car.emissions / 40
 end
 ```
@@ -47,7 +47,7 @@ def calculateVehicleEmissions(car)
   car.emissions
 end
 
-let VehicleUnderTest = ~{ wheelsInMotion: ? <= 2 }
+let VehicleUnderTest = ~{ wheelsInMotion: self <= 2 }
 
 def calculateVehicleEmissions(VehicleUnderTest as car)
   car.emissions / 40
@@ -100,9 +100,9 @@ let deidentified = {for name:value in person
 
 # More Advanced Patterns
 let LargeOrangeShape = ~{
-  type: ? in ['square', 'circle', 'triangle'],
-  colors: 'orange' in ?,
-  size: ? > 50
+  type: self in ['square', 'circle', 'triangle'],
+  colors: 'orange' in self,
+  size: self > 50
 }
 
 if shape like LargeOrangeShape

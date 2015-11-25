@@ -24,10 +24,19 @@ namespace Fate.Compiler.Checker {
       visit.statementGroups(validateMergeables, visit.tags('function'))
     ];
 
-    // a Wildcard can only exist in a pattern or call binder
+    // a Wildcard can only exist in a call binder
     function validateWildcards(node: Syntax.Wildcard) {
-      if ( !visit.hasAncestorTags(['pattern', 'bind']) ) {
+      if ( !visit.hasAncestorTags('bind') ) {
         visit.issueError(node, "Unexpected Wildcard");
+      }
+      return node;
+    }
+
+    function validateSelfReferences(node: Syntax.Self) {
+      if ( !visit.hasAncestorTags(['function', 'lambda', 'pattern']) ) {
+        visit.issueError(node,
+          "'self' keyword must appear within a Function or Pattern"
+        );
       }
 
       let ancestors = visit.hasAncestorTags('objectAssignment', 'pattern');
@@ -37,19 +46,11 @@ namespace Fate.Compiler.Checker {
         if ( parent.id === visit.nodeStack[parentIndex + 1] ||
              parent.id === node ) {
           visit.issueError(node,
-            "Wildcards cannot appear in Property Names"
+            "'self' keyword cannot appear in a Pattern's Property Names"
           );
         }
       }
-      return node;
-    }
 
-    function validateSelfReferences(node: Syntax.Self) {
-      if ( !visit.hasAncestorTags(['function', 'lambda']) ) {
-        visit.issueError(node,
-          "'self' keyword must appear within a Function"
-        );
-      }
       return node;
     }
 
@@ -88,6 +89,9 @@ namespace Fate.Compiler.Checker {
     }
 
     function annotateSelfFunctions(node: Syntax.Self) {
+      if ( visit.hasAncestorTags('pattern') ) {
+        return node;
+      }
       let func = visit.hasAncestorTags(['function', 'lambda'])[0];
       annotate(func, 'function/self');
       annotate(func, 'no_merge');

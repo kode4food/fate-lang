@@ -6,26 +6,26 @@
 "use strict";
 
 namespace Fate.Compiler.Patterns {
-  let wildcardLocal = 'p';
+  let selfPatternLocal = 'p';
 
   import Syntax = Compiler.Syntax;
   import hasTag = Syntax.hasTag;
   import annotate = Compiler.annotate;
 
   export function createTreeProcessors(visit: Compiler.Visitor) {
-    let wildcardNumbering = 0;
+    let selfPatternNumbering = 0;
 
     let nestedPattern = visit.ancestorTags('pattern', 'pattern');
     let patternCollection = visit.ancestorTags(['object', 'array'], 'pattern');
-    let patternWildcard = visit.ancestorTags('wildcard', 'pattern');
+    let selfPattern = visit.ancestorTags('self', 'pattern');
     let patternNode = visit.ancestorTags('*', 'pattern');
 
     return [
       visit.matching(rollUpPatterns, nestedPattern),
       visit.matching(rollUpRegexPatterns, visit.tags('pattern')),
       visit.matching(namePatterns, visit.tags('pattern')),
-      visit.matching(nameWildcardAnchors, patternCollection),
-      visit.matching(nameAndAnnotateWildcards, patternWildcard),
+      visit.matching(nameSelfPatternAnchors, patternCollection),
+      visit.matching(nameAndAnnotateSelfPatterns, selfPattern),
       visit.matching(annotatePatternNode, patternNode)
     ];
 
@@ -49,7 +49,7 @@ namespace Fate.Compiler.Patterns {
       }
       let anchorName = getAnnotation(anchor, 'pattern/local');
       if ( !anchorName ) {
-        anchorName = wildcardLocal + (wildcardNumbering++);
+        anchorName = selfPatternLocal + (selfPatternNumbering++);
         annotate(anchor, 'pattern/local', anchorName);
       }
       return anchorName;
@@ -57,38 +57,38 @@ namespace Fate.Compiler.Patterns {
 
     function namePatterns(node: Syntax.Pattern) {
       if ( !hasAnnotation(node, 'pattern/local') ) {
-        annotate(node, 'pattern/local', wildcardLocal);
+        annotate(node, 'pattern/local', selfPatternLocal);
       }
       let contained = node.left;
       if ( !hasTag(contained, ['object', 'array']) &&
            !hasAnnotation(contained, 'pattern/local') ) {
-        annotate(contained, 'pattern/local', wildcardLocal);
+        annotate(contained, 'pattern/local', selfPatternLocal);
       }
       return node;
     }
 
-    function nameWildcardAnchors(node: Syntax.ElementsConstructor) {
+    function nameSelfPatternAnchors(node: Syntax.ElementsConstructor) {
       annotate(node, 'pattern/local', getAnchorName());
       node.elements.forEach(function (element) {
         if ( hasAnnotation(element, 'pattern/local') ) {
           return;
         }
-        let elementName = wildcardLocal + (wildcardNumbering++);
+        let elementName = selfPatternLocal + (selfPatternNumbering++);
         annotate(element, 'pattern/local', elementName);
       });
       return node;
     }
 
-    // wildcard names must correspond to their element in an object or array
-    function nameAndAnnotateWildcards(wildcardNode: Syntax.Wildcard) {
-      if ( !hasAnnotation(wildcardNode, 'pattern/local') ) {
-        annotate(wildcardNode, 'pattern/local', getAnchorName());
+    // pattern names must correspond to their element in an object or array
+    function nameAndAnnotateSelfPatterns(node: Syntax.Self) {
+      if ( !hasAnnotation(node, 'pattern/local') ) {
+        annotate(node, 'pattern/local', getAnchorName());
       }
-      visit.upTreeUntilMatch(visit.tags('pattern'), annotateWildcard);
-      return wildcardNode;
+      visit.upTreeUntilMatch(visit.tags('pattern'), annotateSelfPattern);
+      return node;
 
-      function annotateWildcard(node: Syntax.Node) {
-        annotate(node, 'pattern/wildcard');
+      function annotateSelfPattern(node: Syntax.Node) {
+        annotate(node, 'pattern/self');
         return node;
       }
     }

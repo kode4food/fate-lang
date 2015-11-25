@@ -164,7 +164,7 @@ end
 def objectLike(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
-  
+
   let person = {
     name: "Thom",
     age: 42,
@@ -172,7 +172,7 @@ def objectLike(test)
   }
 
   let a = 99, b = 'hello'
-  
+
   person like { name: "Thom", age: 42 } | isTrue
   nil like {(a): b}        | isFalse
   99 like {name: b}        | isFalse
@@ -182,7 +182,7 @@ end
 def arrayLike(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
-  
+
   let a = 99, b = 'hello'
 
   [1, 2, 3] like [1, 2]    | isTrue
@@ -222,14 +222,14 @@ def regularExpressions(test)
   let objectPattern2 = ~{ name: ~/^Tho/ }
   let objectPattern3 = ~{
     name: ~/White$/,
-    age: ? > 50,
-    colors: ['red', 'green', ?]
+    age: self > 50,
+    colors: ['red', 'green', self]
   }
 
-  let testObject1 = { 
+  let testObject1 = {
     name: 'Fred White', age: 99,
     colors: ['red', 'green', 'yellow']
-  } 
+  }
 
   let testObject2 = {
     name: 'Fred Black', age: 99,

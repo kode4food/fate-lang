@@ -237,7 +237,7 @@ namespace Fate.Compiler.Syntax {
     constructor(public value: string) { super(); }
   }
 
-  export class Self extends Identifier { }
+  export class Self extends Identifier {}
 
   export class Literal extends Symbol {
     constructor(public value: any) { super(); }
@@ -338,7 +338,7 @@ namespace Fate.Compiler.Syntax {
 
   export class ObjectAssignment extends Node {
     constructor(public id: Expression,
-                public value: Expression|Wildcard) { super(); }
+                public value: Expression) { super(); }
   }
 
   // Tag to Constructor Mapping ***********************************************

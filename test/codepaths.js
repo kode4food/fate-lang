@@ -134,6 +134,13 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
+  "Wildcard outside Binding": function (test) {
+    test.throws(function () {
+      evaluate("? < 99");
+    }, "Wildcard used outside of a binding");
+    test.done();
+  },
+
   "Duplicated Arg Names": function (test) {
     test.throws(function () {
       evaluate("def someFunction(arg1, arg2, arg1, arg3, arg2)\nend");
@@ -209,14 +216,14 @@ exports.codepaths = nodeunit.testCase({
 
     test.done();
   },
-  
+
   "Formatting": function (test) {
     var script1 = "'World' | 'Hello, %0!'";
     var script2 = "'World' | 'Hello, %!'";
-    
+
     test.equal(evaluate(script1), "Hello, World!");
     test.equal(evaluate(script2), "Hello, World!");
-    
+
     test.done();
   }
 });

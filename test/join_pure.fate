@@ -11,7 +11,7 @@ def joinPatternTest(test)
     h = 40              | test.ok
   end
 
-  when a({ type: 'Test' } as x, y) & b(g, ? > 50 as h)
+  when a({ type: 'Test' } as x, y) & b(g, self > 50 as h)
     x.type = 'Test'    | test.ok
     x.value = 'aValue' | test.ok
     y = 'hello'        | test.ok

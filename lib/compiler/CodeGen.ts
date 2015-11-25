@@ -65,7 +65,6 @@ namespace Fate.Compiler.CodeGen {
       'self': createSelfEvaluator,
       'literal': createLiteral,
       'regex': createRegex,
-      'wildcard': createWildcard,
       'pattern': createPatternEvaluator
     };
 
@@ -694,17 +693,13 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createSelfEvaluator(node: Syntax.Self) {
-      generate.self();
-    }
-
-    function createWildcard(node: Syntax.Wildcard) {
-      let wildcardName = getAnnotation(node, 'pattern/local');
-      /* istanbul ignore if: untestable */
-      if ( !wildcardName ) {
-        throw new Error("Stupid Coder: wildcardName was never assigned");
+      let selfPatternName = getAnnotation(node, 'pattern/local');
+      if ( !selfPatternName ) {
+        generate.self();
+        return;
       }
-      wildcardName = generate.registerAnonymous(wildcardName);
-      generate.retrieveAnonymous(wildcardName);
+      selfPatternName = generate.registerAnonymous(selfPatternName);
+      generate.retrieveAnonymous(selfPatternName);
     }
 
     function createPatternEvaluator(node: Syntax.Pattern) {
@@ -738,7 +733,7 @@ namespace Fate.Compiler.CodeGen {
         case 'array':
           createPatternElements(<Syntax.ElementsConstructor>node);
           break;
-        case 'wildcard':
+        case 'self':
           generate.write(globals.literal(true));
           break;
         default:
@@ -758,7 +753,7 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function canGenerateEquality(elementValue: Syntax.Node) {
-      return !hasAnnotation(elementValue, 'pattern/wildcard') &&
+      return !hasAnnotation(elementValue, 'pattern/self') &&
              !(elementValue instanceof Syntax.RelationalOperator) &&
              !(elementValue instanceof Syntax.ElementsConstructor);
     }
@@ -792,7 +787,7 @@ namespace Fate.Compiler.CodeGen {
 
       function pushElement(element: Syntax.Node, elementValue: Syntax.Node,
                            elementIndex: string|Function) {
-        if ( elementValue.tag === 'wildcard' ) {
+        if ( elementValue.tag === 'self' ) {
           return;
         }
 
@@ -806,16 +801,21 @@ namespace Fate.Compiler.CodeGen {
 
       function generateEquality(elementValue: Syntax.Node,
                                 elementIndex: string|Function) {
-        // if we're just dealing with an expression,
+        if ( elementValue instanceof Syntax.Literal ) {
+          return function () {
+            createLikeComparison(value, elementValue);
+          };
+        }
         return function () {
           createLikeComparison(
-            function () {
-              generate.member(
-                function () { generate.retrieveAnonymous(parentLocal); },
-                elementIndex
-              );
-            },
-            defer(elementValue, createPatternTemplate)
+            value, defer(elementValue, createPatternTemplate)
+          );
+        };
+
+        function value() {
+          generate.member(
+            function () { generate.retrieveAnonymous(parentLocal); },
+            elementIndex
           );
         };
       }
