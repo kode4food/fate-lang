@@ -41,29 +41,13 @@ namespace Fate.Types {
   }
 
   export function isTrue(value: any) {
-    if ( !value ) {
-      return false;
-    }
-    if ( Array.isArray(value) ) {
-      return value.length > 0;
-    }
-    if ( typeof value === 'object' && value !== null ) {
-      return Object.keys(value).length > 0;
-    }
-    return true;
+    return value !== false && value !== null &&
+           value !== undefined && value !== 0;
   }
 
   export function isFalse(value: any) {
-    if ( !value ) {
-      return true;
-    }
-    if ( Array.isArray(value) ) {
-      return value.length === 0;
-    }
-    if ( typeof value === 'object' && value !== null ) {
-      return Object.keys(value).length === 0;
-    }
-    return false;
+    return value === false || value === null ||
+           value === undefined || value === 0;
   }
 
   export function isIn(value: any, list: any) {

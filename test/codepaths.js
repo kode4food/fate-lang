@@ -127,6 +127,20 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
+  "'if' with literals": function (test) {
+    var script1 = "if true\n'was true'\nelse\n'was false'\nend";
+    var script2 = "if false\n'was true'\nelse\n'was false'\nend";
+    var script3 = "if true\n'was true'\nend";
+    var script4 = "if false\n'was true'\nend";
+
+    test.equal(evaluate(script1), 'was true');
+    test.equal(evaluate(script2), 'was false');
+    test.equal(evaluate(script3), 'was true');
+    test.equal(evaluate(script4), undefined);
+
+    test.done();
+  },
+
   "'self' outside Function": function (test) {
     test.throws(function () {
       evaluate("self('hello')");
@@ -181,7 +195,7 @@ exports.codepaths = nodeunit.testCase({
 
   "Truthy": function (test) {
     test.equal(evaluate("if [1,2,3]\ntrue\nend"), true);
-    test.equal(evaluate("unless []\ntrue\nend"), true);
+    test.equal(evaluate("if []\ntrue\nend"), true);
     test.done();
   },
 
