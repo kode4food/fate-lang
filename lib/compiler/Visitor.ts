@@ -119,7 +119,8 @@ namespace Fate.Compiler {
 
     // Iterates over a set of statements and presents adjacent groups
     // to the callback function for replacement
-    public statementGroups(visitor: StatementsVisitor, matcher: NodeMatcher) {
+    public statementGroups(visitor: StatementsVisitor, matcher: NodeMatcher,
+                           minGroupSize = 2) {
       return this.statements(groupProcessor);
 
       function groupProcessor(statements: Syntax.Statement[]) {
@@ -140,7 +141,7 @@ namespace Fate.Compiler {
         return output;
 
         function processMatches() {
-          let result = group.length < 2 ? group : visitor(group);
+          let result = group.length < minGroupSize ? group : visitor(group);
           output = output.concat(result);
           group = [];
         }

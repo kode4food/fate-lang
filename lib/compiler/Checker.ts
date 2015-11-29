@@ -21,7 +21,7 @@ namespace Fate.Compiler.Checker {
       visit.matching(validateChannelArgs, visit.tags('channel')),
       visit.matching(annotateSelfFunctions, selfFunctions),
       visit.matching(annotateRecursiveFunctions, functionIdRetrieval),
-      visit.statementGroups(validateAssignments, visit.tags('let')),
+      visit.statementGroups(validateAssignments, visit.tags('let'), 1),
       visit.statementGroups(validateMergeables, visit.tags('function'))
     ];
 
