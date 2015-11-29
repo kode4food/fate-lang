@@ -10,8 +10,8 @@ namespace Fate.Resolvers.System.List {
       return value[0];
     }
     if ( typeof value === 'object' && value !== null ) {
-      var name = Object.keys(value)[0];
-      var val = value[name];
+      let name = Object.keys(value)[0];
+      let val = value[name];
       return {
         name: name,
         value: val === null ? undefined : val
@@ -40,9 +40,9 @@ namespace Fate.Resolvers.System.List {
       return value[value.length - 1];
     }
     if ( typeof value === 'object' && value !== null ) {
-      var keys = Object.keys(value);
-      var name = keys[keys.length - 1];
-      var val = value[name];
+      let keys = Object.keys(value);
+      let name = keys[keys.length - 1];
+      let val = value[name];
       return {
         name: name,
         value: val === null ? undefined : val
@@ -86,9 +86,9 @@ namespace Fate.Resolvers.System.List {
     if ( typeof value !== 'object' || value === null ) {
       return undefined;
     }
-    var keys = Object.keys(value);
-    var result: any[] = [];
-    for ( var i = 0, len = keys.length; i < len; i++ ) {
+    let keys = Object.keys(value);
+    let result: any[] = [];
+    for ( let i = 0, len = keys.length; i < len; i++ ) {
       result[i] = value[keys[i]];
     }
     return result;

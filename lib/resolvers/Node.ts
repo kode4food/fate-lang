@@ -7,7 +7,7 @@ namespace Fate.Resolvers {
 
   export function createNodeResolver() {
     return {
-      resolve: resolve,
+      resolve: resolve
     };
 
     function resolve(name: Types.ModuleName) {

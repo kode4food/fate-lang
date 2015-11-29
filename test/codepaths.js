@@ -112,6 +112,7 @@ exports.codepaths = nodeunit.testCase({
     test.equal(evaluate("true_val if true_val else false", this.data), true);
     test.equal(evaluate("true_val if true else false_val", this.data), true);
     test.equal(evaluate("true_val if true_val else false_val", this.data), true);
+    test.equal(evaluate("true_val if not false_val else false_val", this.data), true);
 
     test.equal(evaluate("true if false else false", this.data), false);
     test.equal(evaluate("true if false_val else false", this.data), false);
@@ -121,7 +122,36 @@ exports.codepaths = nodeunit.testCase({
     test.equal(evaluate("true_val if false_val else false", this.data), false);
     test.equal(evaluate("true_val if false else false_val", this.data), false);
     test.equal(evaluate("true_val if false_val else false_val", this.data), false);
+    test.equal(evaluate("true_val if not true_val else false_val", this.data), false);
 
+    test.done();
+  },
+
+  "'if' with literals": function (test) {
+    var script1 = "if true\n'was true'\nelse\n'was false'\nend";
+    var script2 = "if false\n'was true'\nelse\n'was false'\nend";
+    var script3 = "if true\n'was true'\nend";
+    var script4 = "if false\n'was true'\nend";
+
+    test.equal(evaluate(script1), 'was true');
+    test.equal(evaluate(script2), 'was false');
+    test.equal(evaluate(script3), 'was true');
+    test.equal(evaluate(script4), undefined);
+
+    test.done();
+  },
+
+  "'self' outside Function": function (test) {
+    test.throws(function () {
+      evaluate("self('hello')");
+    }, "self called outside of a Function should explode");
+    test.done();
+  },
+
+  "Wildcard outside Binding": function (test) {
+    test.throws(function () {
+      evaluate("? < 99");
+    }, "Wildcard used outside of a binding");
     test.done();
   },
 
@@ -133,7 +163,7 @@ exports.codepaths = nodeunit.testCase({
     test.throws(function () {
       evaluate("when a(arg1, arg2) & b(arg3, arg2)\nend");
     }, "Arg names duplicated across channels should explode");
-    
+
     test.done();
   },
 
@@ -165,7 +195,7 @@ exports.codepaths = nodeunit.testCase({
 
   "Truthy": function (test) {
     test.equal(evaluate("if [1,2,3]\ntrue\nend"), true);
-    test.equal(evaluate("unless []\ntrue\nend"), true);
+    test.equal(evaluate("if []\ntrue\nend"), true);
     test.done();
   },
 
@@ -197,6 +227,16 @@ exports.codepaths = nodeunit.testCase({
     test.equal(evaluate(script3, { a: 10, b: 4 }), "no");
     test.equal(evaluate(script4, { a: 10, b: 8 }), "no");
     test.equal(evaluate(script4, { a: 5, b: 8 }), "yes");
+
+    test.done();
+  },
+
+  "Formatting": function (test) {
+    var script1 = "'World' | 'Hello, %0!'";
+    var script2 = "'World' | 'Hello, %!'";
+
+    test.equal(evaluate(script1), "Hello, World!");
+    test.equal(evaluate(script2), "Hello, World!");
 
     test.done();
   }

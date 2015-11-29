@@ -4,3 +4,5 @@ node_js:
   - "4.0"
   - "stable"
   - "iojs"
+notifications:
+  slack: 49er:CXuKchwgiZUCoBfykSaYMlgr

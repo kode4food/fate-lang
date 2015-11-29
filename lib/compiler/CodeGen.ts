@@ -6,22 +6,22 @@
 namespace Fate.Compiler.CodeGen {
   type FunctionMap = { [index: string]: Function };
 
-  var slice = Array.prototype.slice;
-  var likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
+  let slice = Array.prototype.slice;
+  let likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
 
   /**
    * Converts a parse tree into source code (initially JavaScript). Host
    * Language-specific constructs are avoided here and instead produced
    * by JavaScript code generation module.
    *
-   * @param {Object} strippedTree the parse tree to use
+   * @param {Object} parseTree the parse tree to use
    */
-  export function generateScriptBody(strippedTree: Syntax.Statements) {
-    var globals = new JavaScript.Globals();
-    var generate = JavaScript.createModule(globals);
+  export function generateScriptBody(parseTree: Syntax.Statements) {
+    let globals = new JavaScript.Globals();
+    let generate = JavaScript.createModule(globals);
 
-    // A lookup table of code generators
-    var Evaluators: FunctionMap = {
+    // a lookup table of code generators
+    let Evaluators: FunctionMap = {
       'import': createImportEvaluator,
       'from': createFromEvaluator,
       'export': createExportEvaluator,
@@ -64,31 +64,30 @@ namespace Fate.Compiler.CodeGen {
       'id':  createIdEvaluator,
       'self': createSelfEvaluator,
       'literal': createLiteral,
-      'wildcard': createWildcard,
+      'regex': createRegex,
       'pattern': createPatternEvaluator
     };
 
-    // Generate the module function and return the source code
-    createScriptFunction(strippedTree);
-    var body = generate.toString();
-    var buffer: string[] = [];
+    // generate the module function and return the source code
+    createScriptFunction(parseTree);
+    let body = generate.toString();
+    let buffer: string[] = [];
     buffer.push(globals.toString());
     buffer.push(body);
     return buffer.join('');
 
     function createScriptFunction(parseTree: Syntax.Statements) {
       generate.func({
-        internalId: 's',
-        internalArgs: ['c', 'x'],
+        internalId: generate.selfName,
+        internalArgs: [generate.contextName, generate.exportsName],
         body: function () {
           createStatementsEvaluator(parseTree);
-        },
-        annotations: parseTree.annotations
+        }
       });
     }
 
     function defer(...args: any[]) {
-      var func: Function;
+      let func: Function;
       if ( typeof args[0] === 'function' ) {
         func = args[0];
         args = slice.call(args, 1);
@@ -111,8 +110,8 @@ namespace Fate.Compiler.CodeGen {
         throw new Error("Stupid Coder: createEvaluator called without a Node");
       }
 
-      var nodeType = node.tag;
-      var createFunction = Evaluators[nodeType];
+      let nodeType = node.tag;
+      let createFunction = Evaluators[nodeType];
 
       /* istanbul ignore if: untestable */
       if ( !createFunction ) {
@@ -131,13 +130,13 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createImportEvaluator(node: Syntax.ImportStatement) {
-      var assigns: JavaScript.AssignmentItems = [];
+      let assigns: JavaScript.AssignmentItems = [];
       node.modules.forEach(function (module: Syntax.ModuleSpecifier) {
-        var moduleName = module.path.value;
-        var moduleAlias = module.alias.value;
+        let moduleName = module.path.value;
+        let moduleAlias = module.alias.value;
 
-        var moduleNameId = globals.literal(moduleName);
-        var importer = globals.builder('importer', moduleNameId);
+        let moduleNameId = globals.literal(moduleName);
+        let importer = globals.builder('importer', moduleNameId);
 
         assigns.push([
           moduleAlias,
@@ -151,18 +150,18 @@ namespace Fate.Compiler.CodeGen {
 
     function createImporterArguments() {
       generate.member(function () {
-        generate.self();
+        generate.context();
       },
       globals.literal('__dirname'));
     }
 
     function createFromEvaluator(node: Syntax.FromStatement) {
-      var assigns: any[] = [];
-      var modulePath = node.path.value;
-      var modulePathId = globals.literal(modulePath);
-      var importer = globals.builder('importer', modulePathId);
+      let assigns: any[] = [];
+      let modulePath = node.path.value;
+      let modulePathId = globals.literal(modulePath);
+      let importer = globals.builder('importer', modulePathId);
 
-      var anon = generate.createAnonymous();
+      let anon = generate.createAnonymous();
       assigns.push([
         anon,
         function () {
@@ -188,9 +187,9 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createExportEvaluator(node: Syntax.ExportStatement) {
-      var exports = node.exportList.map(function (item: Syntax.ModuleItem) {
-        var name = item.name.value;
-        var alias = item.alias.value;
+      let exports = node.exportList.map(function (item: Syntax.ModuleItem) {
+        let name = item.name.value;
+        let alias = item.alias.value;
         return <JavaScript.ModuleItem>[name, alias];
       });
 
@@ -198,8 +197,8 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createChannelEvaluator(node: Syntax.ChannelDeclaration) {
-      var signatures = node.signatures;
-      var allParamNames: string[] = [];
+      let signatures = node.signatures;
+      let allParamNames: string[] = [];
       signatures.forEach(function (signature: Syntax.Signature) {
         allParamNames = allParamNames.concat(
           signature.params.map(function (param: Syntax.Parameter) {
@@ -208,14 +207,13 @@ namespace Fate.Compiler.CodeGen {
         );
       });
 
-      var joinName = generate.createAnonymous();
+      let joinName = generate.createAnonymous();
       generate.assignment(joinName, function() {
-        var joinArgs: any[] = [];
+        let joinArgs: any[] = [];
         joinArgs.push(function() {
           generate.func({
             contextArgs: allParamNames,
-            body: defer(createStatementsEvaluator, node.statements),
-            annotations: node.annotations
+            body: defer(createStatementsEvaluator, node.statements)
           });
         });
         signatures.forEach(function (signature) {
@@ -228,12 +226,12 @@ namespace Fate.Compiler.CodeGen {
 
       function createChannelSignature(signature: Syntax.Signature,
                                       signatureIndex: number) {
-        var paramNames = signature.params.map(
+        let paramNames = signature.params.map(
           function (param: Syntax.Parameter) { return param.id.value; }
         );
 
         generate.assignment(signature.id.value, function () {
-          var create = signature.guard ? createGuarded : createUnguarded;
+          let create = signature.guard ? createGuarded : createUnguarded;
           create();
         });
 
@@ -242,21 +240,20 @@ namespace Fate.Compiler.CodeGen {
             function () {
               generate.func({
                 contextArgs: paramNames,
-                body: unguardedBody,
-                annotations: node.annotations
+                body: unguardedBody
               });
             }
           ]);
         }
 
         function unguardedBody() {
-          var joinArgs = createArgumentsProlog();
+          let joinArgs = createArgumentsProlog();
           joinDispatcher(joinArgs);
         }
 
         function createArgumentsProlog() {
-          var joinArgs = generate.createAnonymous();
-          var assignedNames = [joinArgs].concat(paramNames);
+          let joinArgs = generate.createAnonymous();
+          let assignedNames = [joinArgs].concat(paramNames);
           generate.statement(function () {
             generate.assignFromArray(assignedNames, function () {
               generate.call(globals.runtimeImport('joinArguments'));
@@ -270,30 +267,29 @@ namespace Fate.Compiler.CodeGen {
             generate.call(joinName, [
               globals.literal(signatureIndex),
               function () {
-                generate.retrieveAnonymous(joinArgs)
+                generate.retrieveAnonymous(joinArgs);
               }
             ]);
           });
         }
 
         function createGuarded() {
-          var functionName = signature.id;
-          var originalId = generate.code(function () {
+          let functionName = signature.id;
+          let originalId = generate.code(function () {
             generate.getter(functionName.value);
           });
 
-          var defineFunction = globals.runtimeImport('defineChannel');
+          let defineFunction = globals.runtimeImport('defineChannel');
           generate.call(defineFunction, [createFunction]);
 
           function createFunction() {
             generate.func({
-              body: createFunctionBody,
-              annotations: node.annotations
+              body: createFunctionBody
             });
           }
 
           function createFunctionBody() {
-            var joinArgs = createArgumentsProlog();
+            let joinArgs = createArgumentsProlog();
             generate.ifStatement(
               defer(signature.guard),
               function () {
@@ -305,8 +301,8 @@ namespace Fate.Compiler.CodeGen {
             generate.returnStatement(function () {
               generate.call(
                 function () {
-                  var ensure = globals.runtimeImport('ensureChannel');
-                  generate.call(ensure, [originalId])
+                  let ensure = globals.runtimeImport('ensureChannel');
+                  generate.call(ensure, [originalId]);
                 },
                 [function () { generate.retrieveAnonymous(joinArgs); }]
               );
@@ -316,37 +312,42 @@ namespace Fate.Compiler.CodeGen {
       }
     }
 
-    function createFunctionEvaluator(node: Syntax.FunctionDeclaration) {
-      var signature = node.signature;
-      var params = signature.params;
+    function getFuncOrLambdaInternalId(node: Syntax.Node) {
+      let hasSelf = hasAnnotation(node, 'function/self');
+      return hasSelf ? generate.selfName : undefined;
+    }
 
-      var paramNames = params.map(function (param: Syntax.Parameter) {
+    function createFunctionEvaluator(node: Syntax.FunctionDeclaration) {
+      let signature = node.signature;
+      let params = signature.params;
+
+      let paramNames = params.map(function (param: Syntax.Parameter) {
         return param.id.value;
       });
 
-      var create = signature.guard ? createGuarded : createUnguarded;
+      let create = signature.guard ? createGuarded : createUnguarded;
       create();
 
       function createUnguarded() {
-        var functionName = node.signature.id
+        let functionName = node.signature.id;
         generate.funcDecl(functionName.value, {
+          internalId: getFuncOrLambdaInternalId(node),
           contextArgs: paramNames,
-          body: defer(createStatementsEvaluator, node.statements),
-          annotations: node.annotations
+          body: defer(createStatementsEvaluator, node.statements)
         });
       }
 
       function createGuarded() {
-        var functionName = node.signature.id;
-        var originalId = generate.code(function () {
-            generate.getter(functionName.value);
+        let functionName = node.signature.id;
+        let originalId = generate.code(function () {
+          generate.getter(functionName.value);
         });
 
         generate.funcDecl(functionName.value, {
+          internalId: getFuncOrLambdaInternalId(node),
           contextArgs: paramNames,
           prolog: createProlog,
-          body: defer(createStatementsEvaluator, node.statements),
-          annotations: node.annotations
+          body: defer(createStatementsEvaluator, node.statements)
         });
 
         function createProlog() {
@@ -356,8 +357,8 @@ namespace Fate.Compiler.CodeGen {
             function () {
               generate.returnStatement(function () {
                 generate.call(function () {
-                  var ensure = globals.runtimeImport('ensureFunction');
-                  generate.call(ensure, [originalId])
+                  let ensure = globals.runtimeImport('ensureFunction');
+                  generate.call(ensure, [originalId]);
                 });
               });
             }
@@ -367,18 +368,18 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createLambdaEvaluator(node: Syntax.LambdaExpression) {
-      var signature = node.signature;
-      var params = signature.params;
+      let signature = node.signature;
+      let params = signature.params;
 
-      var paramNames = params.map(function (param: Syntax.Parameter) {
+      let paramNames = params.map(function (param: Syntax.Parameter) {
         return param.id.value;
       });
 
       generate.parens(function () {
         generate.func({
+          internalId: getFuncOrLambdaInternalId(node),
           contextArgs: paramNames,
-          body: defer(createStatementsEvaluator, node.statements),
-          annotations: node.annotations
+          body: defer(createStatementsEvaluator, node.statements)
         });
       });
     }
@@ -396,7 +397,7 @@ namespace Fate.Compiler.CodeGen {
       generate.call(globals.runtimeImport('bindFunction'), [
         defer(node.left),
         function () {
-          var elems: JavaScript.ObjectAssignmentItems = [];
+          let elems: JavaScript.ObjectAssignmentItems = [];
           node.right.forEach(function (argNode, index) {
             if ( argNode instanceof Syntax.Wildcard ) {
               return;
@@ -409,7 +410,7 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createLetEvaluator(node: Syntax.LetStatement) {
-      var decls = node.assignments.map(function (assign: Syntax.Assignment) {
+      let decls = node.assignments.map(function (assign: Syntax.Assignment) {
         return <JavaScript.AssignmentItem>[
           assign.id.value,
           defer(assign.value)
@@ -434,17 +435,16 @@ namespace Fate.Compiler.CodeGen {
       generate.parens(function () {
         generate.call(function () {
           generate.func({
-            body: functionWrapperBody,
-            annotations: node.annotations
+            body: functionWrapperBody
           });
         }, []);
       });
 
       function functionWrapperBody() {
-        var isObject = node instanceof Syntax.ObjectComprehension;
-        var genContainer = isObject ? generate.object : generate.array;
-        var createBody = isObject ? createNameValueBody : createValueBody;
-        var result = generate.createAnonymous();
+        let isObject = node instanceof Syntax.ObjectComprehension;
+        let genContainer = isObject ? generate.object : generate.array;
+        let createBody = isObject ? createNameValueBody : createValueBody;
+        let result = generate.createAnonymous();
 
         generate.statement(function () {
           generate.assignAnonymous(result, function () {
@@ -459,15 +459,15 @@ namespace Fate.Compiler.CodeGen {
         });
 
         function createValueBody() {
-          var arrayCompNode = <Syntax.ArrayComprehension>node;
+          let arrayCompNode = <Syntax.ArrayComprehension>node;
           generate.statement(function () {
             generate.arrayAppend(result, defer(arrayCompNode.value));
           });
         }
 
         function createNameValueBody() {
-          var objectCompNode = <Syntax.ObjectComprehension>node;
-          var assign = objectCompNode.assignment;
+          let objectCompNode = <Syntax.ObjectComprehension>node;
+          let assign = objectCompNode.assignment;
           generate.statement(function () {
             generate.objectAssign(
               result, defer(assign.id), defer(assign.value)
@@ -478,8 +478,8 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createForEvaluator(node: Syntax.ForStatement) {
-      var elseStatements = node.elseStatements;
-      var successVar: string;
+      let elseStatements = node.elseStatements;
+      let successVar: string;
 
       if ( !elseStatements.isEmpty() ) {
         successVar = generate.createAnonymous();
@@ -521,13 +521,13 @@ namespace Fate.Compiler.CodeGen {
           return;
         }
 
-        var range = ranges[i];
-        var valueId = range.valueId.value;
-        var nameId = range.nameId ? range.nameId.value : null;
-        var prolog: Function;
+        let range = ranges[i];
+        let valueId = range.valueId.value;
+        let nameId = range.nameId ? range.nameId.value : null;
+        let prolog: Function;
 
         if ( range.guard ) {
-          // We have a guard
+          // we have a guard
           prolog = function () {
             generate.ifStatement(
               defer(range.guard),
@@ -554,8 +554,7 @@ namespace Fate.Compiler.CodeGen {
             guard: prolog,
             body: function () {
               processRange(i + 1);
-            },
-            annotations: annotations
+            }
           });
         }
       }
@@ -570,8 +569,8 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createIfEvaluator(node: Syntax.IfStatement) {
-      var thens = node.thenStatements.isEmpty() ? null: node.thenStatements;
-      var elses = node.elseStatements.isEmpty() ? null : node.elseStatements;
+      let thens = node.thenStatements.isEmpty() ? null : node.thenStatements;
+      let elses = node.elseStatements.isEmpty() ? null : node.elseStatements;
       generate.ifStatement(
         defer(node.condition),
         thens ? defer(createStatementsEvaluator, thens) : null,
@@ -580,7 +579,7 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createOrEvaluator(node: Syntax.OrOperator) {
-      var leftAnon = generate.createAnonymous();
+      let leftAnon = generate.createAnonymous();
       generate.compoundExpression([
         function () {
           generate.assignAnonymous(leftAnon, defer(node.left));
@@ -596,7 +595,7 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createAndEvaluator(node: Syntax.AndOperator) {
-      var leftAnon = generate.createAnonymous();
+      let leftAnon = generate.createAnonymous();
       generate.compoundExpression([
         function () {
           generate.assignAnonymous(leftAnon, defer(node.left));
@@ -616,20 +615,20 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createInEvaluator(node: Syntax.InOperator) {
-      var isIn = globals.runtimeImport('isIn');
+      let isIn = globals.runtimeImport('isIn');
       generate.call(isIn, [defer(node.left), defer(node.right)]);
     }
 
     function createNotInEvaluator(node: Syntax.NotInOperator) {
       generate.unaryOperator('not', function () {
-        var isIn = globals.runtimeImport('isIn');
+        let isIn = globals.runtimeImport('isIn');
         generate.call(isIn, [defer(node.left), defer(node.right)]);
       });
     }
 
     function createNotEvaluator(node: Syntax.NotOperator) {
       generate.unaryOperator('not', function () {
-        var isTrue = globals.runtimeImport('isTrue');
+        let isTrue = globals.runtimeImport('isTrue');
         generate.call(isTrue, [defer(node.left)]);
       });
     }
@@ -643,8 +642,8 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createFormatEvaluator(node: Syntax.FormatOperator) {
-      var formatStr = globals.literal((<Syntax.Literal>node.left).value);
-      var formatter = globals.builder('buildFormatter', formatStr);
+      let formatStr = globals.literal((<Syntax.Literal>node.left).value);
+      let formatter = globals.builder('buildFormatter', formatStr);
       generate.write(formatter);
     }
 
@@ -665,8 +664,8 @@ namespace Fate.Compiler.CodeGen {
         createPatternTemplate(node);
         return;
       }
-      var elems = node.elements.map(function (elem: Syntax.ObjectAssignment) {
-        var name: string|Function;
+      let elems = node.elements.map(function (elem: Syntax.ObjectAssignment) {
+        let name: string|Function;
         if ( elem.id instanceof Syntax.Literal ) {
           name = (<Syntax.Literal>elem.id).value;
         }
@@ -683,42 +682,43 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createLiteral(node: Syntax.Literal) {
-      var literal = globals.literal(node.value);
+      let literal = globals.literal(node.value);
       generate.write(literal);
     }
 
-    function createSelfEvaluator(node: Syntax.Self) {
-      generate.self();
+    function createRegex(node: Syntax.Regex) {
+      let regex = globals.builder('defineRegexPattern',
+                                  globals.literal(node.value));
+      generate.write(regex);
     }
 
-    function createWildcard(node: Syntax.Wildcard) {
-      var wildcardName = hasAnnotation(node, 'pattern/local');
-      /* istanbul ignore if: untestable */
-      if ( !wildcardName ) {
-        throw new Error("Stupid Coder: wildcardName was never assigned");
+    function createSelfEvaluator(node: Syntax.Self) {
+      let selfPatternName = getAnnotation(node, 'pattern/local');
+      if ( !selfPatternName ) {
+        generate.self();
+        return;
       }
-      wildcardName = generate.registerAnonymous(wildcardName);
-      generate.retrieveAnonymous(wildcardName);
+      selfPatternName = generate.registerAnonymous(selfPatternName);
+      generate.retrieveAnonymous(selfPatternName);
     }
 
     function createPatternEvaluator(node: Syntax.Pattern) {
-      var definePattern = globals.runtimeImport('definePattern');
+      let definePattern = globals.runtimeImport('definePattern');
       generate.call(definePattern, [
         function () {
           generate.func({
-            internalArgs: ['x'],
-            body: patternBody,
-            annotations: node.annotations
+            internalArgs: [generate.exportsName],
+            body: patternBody
           });
         }
       ]);
 
       function patternBody() {
-        var localName = hasAnnotation(node, 'pattern/local');
+        let localName = getAnnotation(node, 'pattern/local');
         localName = generate.registerAnonymous(localName);
 
         generate.statement(function () {
-          generate.assignAnonymous(localName, 'x');
+          generate.assignAnonymous(localName, generate.exportsName);
         });
 
         generate.returnStatement(function () {
@@ -733,16 +733,16 @@ namespace Fate.Compiler.CodeGen {
         case 'array':
           createPatternElements(<Syntax.ElementsConstructor>node);
           break;
-        case 'wildcard':
+        case 'self':
           generate.write(globals.literal(true));
           break;
         default:
           if ( canGenerateEquality(node) ) {
             createLikeComparison(
               function () {
-                var localName = hasAnnotation(node, 'pattern/local');
+                let localName = getAnnotation(node, 'pattern/local');
                 localName = generate.registerAnonymous(localName);
-                generate.retrieveAnonymous(localName)
+                generate.retrieveAnonymous(localName);
               },
               node
             );
@@ -753,23 +753,23 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function canGenerateEquality(elementValue: Syntax.Node) {
-      return !hasAnnotation(elementValue, 'pattern/wildcard') &&
+      return !hasAnnotation(elementValue, 'pattern/self') &&
              !(elementValue instanceof Syntax.RelationalOperator) &&
              !(elementValue instanceof Syntax.ElementsConstructor);
     }
 
     function createPatternElements(node: Syntax.ElementsConstructor) {
-      var parentLocal = hasAnnotation(node, 'pattern/local');
+      let parentLocal = getAnnotation(node, 'pattern/local');
       parentLocal = generate.registerAnonymous(parentLocal);
 
-      var isObject = node.tag === 'object';
-      var containerCheckName = isObject ? 'isObject' : 'isArray';
+      let isObject = node.tag === 'object';
+      let containerCheckName = isObject ? 'isObject' : 'isArray';
 
-      var expressions: Function[] = [];
+      let expressions: Function[] = [];
       expressions.push(function () {
-        var checker = globals.runtimeImport(containerCheckName);
+        let checker = globals.runtimeImport(containerCheckName);
         generate.call(checker, [function () {
-          generate.retrieveAnonymous(parentLocal)
+          generate.retrieveAnonymous(parentLocal);
         }]);
       });
 
@@ -787,7 +787,7 @@ namespace Fate.Compiler.CodeGen {
 
       function pushElement(element: Syntax.Node, elementValue: Syntax.Node,
                            elementIndex: string|Function) {
-        if ( elementValue.tag === 'wildcard' ) {
+        if ( elementValue.tag === 'self' ) {
           return;
         }
 
@@ -801,23 +801,28 @@ namespace Fate.Compiler.CodeGen {
 
       function generateEquality(elementValue: Syntax.Node,
                                 elementIndex: string|Function) {
-        // If we're just dealing with an expression,
+        if ( elementValue instanceof Syntax.Literal ) {
+          return function () {
+            createLikeComparison(value, elementValue);
+          };
+        }
         return function () {
-          generate.binaryOperator('eq',
-            function () {
-              generate.member(
-                function () { generate.retrieveAnonymous(parentLocal) },
-                elementIndex
-              );
-            },
-            defer(elementValue, createPatternTemplate)
+          createLikeComparison(
+            value, defer(elementValue, createPatternTemplate)
+          );
+        };
+
+        function value() {
+          generate.member(
+            function () { generate.retrieveAnonymous(parentLocal); },
+            elementIndex
           );
         };
       }
 
       function generateNested(element: Syntax.Node, elementValue: Syntax.Node,
                               elementIndex: string|Function) {
-        var elementLocal = <string>hasAnnotation(element, 'pattern/local');
+        let elementLocal = getAnnotation(element, 'pattern/local');
         elementLocal = generate.registerAnonymous(elementLocal);
 
         return function () {
@@ -827,7 +832,7 @@ namespace Fate.Compiler.CodeGen {
                 elementLocal,
                 function () {
                   generate.member(
-                    function () { generate.retrieveAnonymous(parentLocal) },
+                    function () { generate.retrieveAnonymous(parentLocal); },
                     elementIndex
                   );
                 }
@@ -840,13 +845,12 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createLikeComparison(leftNode: Syntax.Node|Function,
-                                  rightNode: Syntax.Node) {
-      var left = typeof leftNode === 'function' ? <Function>leftNode
-                                                : defer(leftNode);
-      var right = defer(rightNode);
+                                  rightNode: Syntax.Node|Function) {
+      let left = deferIfNotAlready(leftNode);
+      let right = deferIfNotAlready(rightNode);
 
       if ( !(rightNode instanceof Syntax.Literal) ) {
-        var isMatchingObject = globals.runtimeImport('isMatchingObject');
+        let isMatchingObject = globals.runtimeImport('isMatchingObject');
         generate.call(isMatchingObject, [right, left]);
         return;
       }
@@ -856,15 +860,16 @@ namespace Fate.Compiler.CodeGen {
         return;
       }
 
-      var matcher = globals.builder('buildMatcher', generate.code(right));
+      let matcher = globals.builder('buildMatcher', generate.code(right));
       generate.call(matcher, [left]);
     }
 
-    function isLikeLiteral(node: Syntax.Node) {
-      if ( !(node instanceof Syntax.Literal) ) {
-        return false;
-      }
-      var valueType = typeof (<Syntax.Literal>node).value;
+    function deferIfNotAlready(node: Syntax.Node|Function) {
+      return typeof node === 'function' ? <Function>node : defer(node);
+    }
+
+    function isLikeLiteral(node: Syntax.Node|Function) {
+      let valueType = typeof (<Syntax.Literal>node).value;
       return likeLiteralTypes.indexOf(valueType) !== -1;
     }
   }

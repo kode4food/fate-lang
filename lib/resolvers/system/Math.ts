@@ -1,9 +1,9 @@
 "use strict";
 
-var NativeMath = Math;
+let NativeMath = Math;
 
 namespace Fate.Resolvers.System.Math {
-  var createRangeGenerator = require('../lib/generator').createRangeGenerator;
+  let createRangeGenerator = require('../lib/generator').createRangeGenerator;
 
   function numberSort(left: number, right: number): number {
     return left - right;
@@ -23,7 +23,8 @@ namespace Fate.Resolvers.System.Math {
     if ( value.length === 0 ) {
       return 0;
     }
-    for ( var i = 0, r = 0, l = value.length; i < l; r += value[i++] ) {
+    let r = 0, l = value.length;
+    for ( let i = 0; i < l; r += value[i++] ) {
       // no-op
     }
     return r / l;
@@ -46,9 +47,9 @@ namespace Fate.Resolvers.System.Math {
     if ( value.length === 0 ) {
       return 0;
     }
-    var temp = value.slice(0).sort(numberSort);
+    let temp = value.slice(0).sort(numberSort);
     if ( temp.length % 2 === 0 ) {
-      var mid = temp.length / 2;
+      let mid = temp.length / 2;
       return (temp[mid - 1] + temp[mid]) / 2;
     }
     return temp[((temp.length + 1) / 2) - 1];
@@ -68,7 +69,9 @@ namespace Fate.Resolvers.System.Math {
     if ( !Array.isArray(value) ) {
       return typeof value === 'number' ? value : NaN;
     }
-    for ( var i = 0, res = 0, l = value.length; i < l; res += value[i++] ) {
+    let res = 0;
+    for ( let i = 0, l = value.length; i < l; res += value[i++] ) {
+      // no-op
     }
     return res;
   }

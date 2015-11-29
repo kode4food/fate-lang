@@ -2,7 +2,7 @@
   "name": "fatejs",
   "description": "Patterns & Guards & Joins, Oh My!",
   "author": "Thomas S. Bradford",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "homepage": "http://www.fate-lang.org/",
   "main": "build/fate.js",
@@ -13,7 +13,7 @@
       "email": "thom@kode4food.it"
     }
   ],
-  "repository": "git@github.com/Forty-Niner/fate-lang.git",
+  "repository": "git@github.com/kode4food/fate-lang.git",
   "bin": {
     "fatec": "lib/cli.js"
   },
@@ -21,21 +21,22 @@
     "build": "gulp",
     "test": "gulp test"
   },
+  "engines": {
+    "node": ">=4.0.0"
+  },
   "dependencies": {
-    "glob": "^5.0.14",
+    "glob": "^6.0.1",
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
-    "gulp-istanbul": "^0.10.0",
+    "gulp-istanbul": "^0.10.2",
     "gulp-istanbul-enforcer": "^1.0.3",
     "gulp-nodeunit": "0.0.5",
-    "gulp-peg": "^0.1.2",
+    "gulp-peg": "^0.2.0",
     "gulp-rename": "^1.2.2",
-    "gulp-typescript": "^2.8.2",
+    "gulp-tslint": "^3.6.0",
+    "gulp-typescript": "^2.9.2",
     "nodeunit": "^0.9.1"
-  },
-  "engines": {
-    "node": ">=4.0.0"
   }
 }

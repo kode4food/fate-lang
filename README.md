@@ -1,7 +1,7 @@
 # Fate (Patterns & Guards & Joins, Oh My!)
-[![Build Status](https://travis-ci.org/Forty-Niner/fate-lang.svg?branch=master)](https://travis-ci.org/Forty-Niner/fate-lang)
+[![Build Status](https://travis-ci.org/kode4food/fate-lang.svg?branch=master)](https://travis-ci.org/kode4food/fate-lang)
 
-Fate is a programming language prototype.  It currently compiles into Node.js modules, but the goal is to eventually have it target the JVM.  It is a mostly functional language that includes a processing model inspired by the [Join Calculus](https://en.wikipedia.org/wiki/Join-calculus).  It also provides first-class patterns, invocation guards, list comprehensions, and flexible partial application.
+Fate is a programming language prototype that compiles into Node.js modules.  It is a mostly functional language, providing first-class patterns, invocation guards, list comprehensions, and flexible function application.
 
 That's a lot to take in, so maybe it's better to just demonstrate.  Let's say you needed to calculate the NOx emissions for an OBD II reporting module.  You could do it the obvious way:
 
@@ -34,7 +34,7 @@ def calculateVehicleEmissions(car)
   car.emissions
 end
 
-def calculateVehicleEmissions({ wheelsInMotion: ? <= 2 } as car)
+def calculateVehicleEmissions({ wheelsInMotion: self <= 2 } as car)
   car.emissions / 40
 end
 ```
@@ -47,7 +47,7 @@ def calculateVehicleEmissions(car)
   car.emissions
 end
 
-let VehicleUnderTest = ~{ wheelsInMotion: ? <= 2 }
+let VehicleUnderTest = ~{ wheelsInMotion: self <= 2 }
 
 def calculateVehicleEmissions(VehicleUnderTest as car)
   car.emissions / 40
@@ -72,6 +72,8 @@ if myAge > 50
 else
   'good to go'
 end
+
+greetWith('hello') if person like Friend
 
 unless processFinished
   'process some request'
@@ -98,9 +100,9 @@ let deidentified = {for name:value in person
 
 # More Advanced Patterns
 let LargeOrangeShape = ~{
-  type: ? in ['square', 'circle', 'triangle'],
-  colors: 'orange' in ?,
-  size: ? > 50
+  type: self in ['square', 'circle', 'triangle'],
+  colors: 'orange' in self,
+  size: self > 50
 }
 
 if shape like LargeOrangeShape

@@ -13,8 +13,8 @@ exports.loops = nodeunit.testCase({
       "title": "Famous People",
       "people" : [
         { "name": "Larry", "age": 50, "brothers": [] },
-        { "name": "Curly", "age": 45, "brothers": ["Moe", "Shemp"]},
-        { "name": "Moe", "age": 58, "brothers": ["Curly", "Shemp"]}
+        { "name": "Curly", "age": 45, "brothers": ["Moe", "Shemp"] },
+        { "name": "Moe", "age": 58, "brothers": ["Curly", "Shemp"] }
       ]
     };
 
@@ -104,6 +104,23 @@ exports.loops = nodeunit.testCase({
     test.deepEqual(evaluateEmit(script5), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     test.deepEqual(evaluate(script6), [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]);
     test.deepEqual(evaluate(script7), [1, 2, 3, 4]);
+    test.done();
+  },
+
+  "Indexed Loops": function (test) {
+    function* colors() {
+      yield "red";
+      yield "green";
+      yield "blue";
+    }
+
+    var script1 = '[for idx:brother in people[2].brothers ' +
+                  'select brother + ":" + idx]';
+
+    var script2 = '[for idx:color in colors() select color + ":" + idx]';
+
+    test.deepEqual(evaluate(script1, this.data), ['Curly:0', 'Shemp:1']);
+    test.deepEqual(evaluate(script2, {colors}), ['red:0', 'green:1', 'blue:2']);
     test.done();
   }
 });

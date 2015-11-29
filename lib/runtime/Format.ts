@@ -7,14 +7,14 @@ namespace Fate.Runtime {
     (data: any | any[]): string;
     __fateIndexes: (string | number)[];
   }
-  
-  var Digits = "0|[1-9][0-9]*";
-  var Ident = "[$_a-zA-Z][$_a-zA-Z0-9]*";
-  var Term = ";?";
-  var Params = "%((%)|(" + Digits + ")|(" + Ident + "))?" + Term;
+
+  let Digits = "0|[1-9][0-9]*";
+  let Ident = "[$_a-zA-Z][$_a-zA-Z0-9]*";
+  let Term = ";?";
+  let Params = "%((%)|(" + Digits + ")|(" + Ident + "))?" + Term;
                /* "%" ( "%" | digits | identifier )? ";"? */
 
-  var ParamRegex = new RegExp(Params, "m");
+  let ParamRegex = new RegExp(Params, "m");
 
   export function isFormatter(value: string) {
     if ( !ParamRegex.test(value) ) {
@@ -32,22 +32,22 @@ namespace Fate.Runtime {
    * @param {String} formatStr the String to be used for interpolation
    */
   export function buildFormatter(formatStr: string): FormatFunction {
-    var components: Component[] = [];
-    var requiredIndexes: (number|string)[] = [];
-    var clen = 0;
-    var autoIdx = 0;
+    let components: Component[] = [];
+    let requiredIndexes: (number|string)[] = [];
+    let clen = 0;
+    let autoIdx = 0;
 
-    var workStr = '' + formatStr;
+    let workStr = '' + formatStr;
     while ( workStr && workStr.length ) {
-      var paramMatch = ParamRegex.exec(workStr);
+      let paramMatch = ParamRegex.exec(workStr);
       if ( !paramMatch ) {
         components.push(createLiteralComponent(workStr));
         break;
       }
 
-      var match = paramMatch[0];
-      var matchIdx = paramMatch.index;
-      var matchLen = match.length;
+      let match = paramMatch[0];
+      let matchIdx = paramMatch.index;
+      let matchLen = match.length;
 
       if ( matchIdx ) {
         components.push(createLiteralComponent(workStr.substring(0, matchIdx)));
@@ -59,7 +59,7 @@ namespace Fate.Runtime {
         continue;
       }
 
-      var idx: (string|number) = autoIdx++;
+      let idx: (string|number) = autoIdx++;
       if ( paramMatch[4] ) {
         idx = paramMatch[4];
       }
@@ -73,7 +73,7 @@ namespace Fate.Runtime {
     }
     clen = components.length;
 
-    var returnFunction = <FormatFunction>formatFunction;
+    let returnFunction = <FormatFunction>formatFunction;
     returnFunction.toString = toString;
     returnFunction.__fateIndexes = requiredIndexes;
     return returnFunction;
@@ -87,9 +87,9 @@ namespace Fate.Runtime {
         data = [data];
       }
 
-      var result = '';
-      for ( var i = 0; i < clen; i++ ) {
-        var component = components[i];
+      let result = '';
+      for ( let i = 0; i < clen; i++ ) {
+        let component = components[i];
         switch ( component[0] ) {
           case 0:
             result += component[1];

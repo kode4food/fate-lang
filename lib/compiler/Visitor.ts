@@ -7,7 +7,7 @@ namespace Fate.Compiler {
   import hasTag = Syntax.hasTag;
   import isStatements = Syntax.isStatements;
 
-  var slice = Array.prototype.slice;
+  let slice = Array.prototype.slice;
 
   type NodeVisitor = (node: Syntax.NodeOrNodes) => any;
   type StatementsVisitor = (node: Syntax.Statement[]) => any;
@@ -18,18 +18,10 @@ namespace Fate.Compiler {
     constructor(public value: number) { super(); }
   }
 
-  function noOpVisitor(node: Syntax.NodeOrNodes) {
-    return node;
-  }
-
   export class Visitor {
     public nodeStack: (Syntax.Node|Syntax.Nodes)[] = [];
 
-    constructor(public warnings?: CompileErrors) {
-      if ( !warnings ) {
-        this.warnings = [];
-      }
-    }
+    constructor(public warnings: CompileErrors) { }
 
     public ancestorTags(...tags: Syntax.TagOrTags[]) {
       return this.ancestry.apply(this, tags.map(this.tags));
@@ -45,16 +37,16 @@ namespace Fate.Compiler {
     }
 
     public hasAncestorTags(...tags: Syntax.TagOrTags[]) {
-      var args = tags.map(this.tags);
+      let args = tags.map(this.tags);
       return this.hasAncestry.apply(this, args);
     }
 
     public hasAncestry(...matchers: NodeMatcher[]) {
-      var matcher = matchers.shift();
-      var stack = this.nodeStack.slice().reverse();
-      var result: (Syntax.Node|Syntax.Nodes)[] = [];
+      let matcher = matchers.shift();
+      let stack = this.nodeStack.slice().reverse();
+      let result: (Syntax.Node|Syntax.Nodes)[] = [];
       while ( stack.length ) {
-        var node = stack.shift();
+        let node = stack.shift();
         if ( matcher(node) ) {
           result.push(node);
           matcher = matchers.shift();
@@ -66,10 +58,10 @@ namespace Fate.Compiler {
       return undefined;
     }
 
-    public nodes(node: Syntax.Node|Syntax.Nodes, visitor: NodeVisitor,
+    public nodes(startNode: Syntax.Node|Syntax.Nodes, visitor: NodeVisitor,
                  matcher: NodeMatcher) {
-      var self = this;
-      return visitNode(node);
+      let self = this;
+      return visitNode(startNode);
 
       function visitNode(node: Syntax.Node|Syntax.Nodes) {
         if ( !(node instanceof Syntax.Node) && !Array.isArray(node) ) {
@@ -87,22 +79,21 @@ namespace Fate.Compiler {
       }
     }
 
-    public recurseInto(node: Syntax.Node|Syntax.Nodes,
-                       visitor: NodeVisitor) {
-      var nodeStack = this.nodeStack;
+    public recurseInto(node: Syntax.Node|Syntax.Nodes, visitor: NodeVisitor) {
+      let nodeStack = this.nodeStack;
       nodeStack.push(node);
       if ( Array.isArray(node) ) {
-        var arrNode = <Syntax.Nodes>node;
-        for ( var i = 0, len = arrNode.length; i < len; i++ ) {
+        let arrNode = <Syntax.Nodes>node;
+        for ( let i = 0, len = arrNode.length; i < len; i++ ) {
           nodeStack.push(new Index(i));
-          visitor(arrNode[i]);
+          arrNode[i] = <Syntax.Node>visitor(arrNode[i]);
           nodeStack.pop();
         }
       }
       else {
-        var currentNode = <Syntax.Node>node;
+        let currentNode = <Syntax.Node>node;
         Object.keys(currentNode).forEach(function (key) {
-          visitor(currentNode[key]);
+          currentNode[key] = visitor(currentNode[key]);
         });
       }
       nodeStack.pop();
@@ -132,8 +123,8 @@ namespace Fate.Compiler {
       return this.statements(groupProcessor);
 
       function groupProcessor(statements: Syntax.Statement[]) {
-        var group: Syntax.Statement[] = [];
-        var output: Syntax.Statement[] = [];
+        let group: Syntax.Statement[] = [];
+        let output: Syntax.Statement[] = [];
 
         statements.forEach(function (statement) {
           if ( matcher(statement) ) {
@@ -149,24 +140,10 @@ namespace Fate.Compiler {
         return output;
 
         function processMatches() {
-          var result = group.length < 2 ? group : visitor(group);
+          let result = group.length < 2 ? group : visitor(group);
           output = output.concat(result);
           group = [];
         }
-      }
-    }
-
-    public tagsOrRoot(tags: Syntax.TagOrTags) {
-      var nodeStack = this.nodeStack;
-      var tagMatcher = this.tags(tags);
-      return matcher;
-
-      function matcher(node: Syntax.Node) {
-        var tag = tagMatcher(node);
-        if ( tag ) {
-          return tag;
-        }
-        return !nodeStack.length || nodeStack[0] === node;
       }
     }
 
@@ -182,21 +159,21 @@ namespace Fate.Compiler {
     }
 
     public currentElement() {
-      var ancestors = this.hasAncestorTags(['object', 'array'], 'pattern');
+      let ancestors = this.hasAncestorTags(['object', 'array'], 'pattern');
       if ( !ancestors ) {
         return null;
       }
-      var collectionIndex = this.nodeStack.indexOf(ancestors[0]);
-      var collection = <Syntax.Nodes>this.nodeStack[collectionIndex + 1];
-      var index = <Index>(this.nodeStack[collectionIndex + 2]);
+      let collectionIndex = this.nodeStack.indexOf(ancestors[0]);
+      let collection = <Syntax.Nodes>this.nodeStack[collectionIndex + 1];
+      let index = <Index>(this.nodeStack[collectionIndex + 2]);
       return collection[index.value];
     }
 
     public upTreeUntilMatch(matcher: NodeMatcher,
-                            visitor = noOpVisitor): Syntax.NodeOrNodes {
-      var nodeStack = this.nodeStack;
-      for ( var i = nodeStack.length - 1; i >= 0; i-- ) {
-        var node: Syntax.NodeOrNodes = nodeStack[i];
+                            visitor: NodeVisitor): Syntax.NodeOrNodes {
+      let nodeStack = this.nodeStack;
+      for ( let i = nodeStack.length - 1; i >= 0; i-- ) {
+        let node: Syntax.NodeOrNodes = nodeStack[i];
         visitor(node);
         if ( matcher(node) ) {
           return node;
@@ -204,29 +181,15 @@ namespace Fate.Compiler {
       }
       return null;
     }
-  }
 
-  export class MutatingVisitor extends Visitor {
-    public recurseInto(node: Syntax.Node|Syntax.Nodes,
-                       visitor: NodeVisitor) {
-      var nodeStack = this.nodeStack;
-      nodeStack.push(node);
-      if ( Array.isArray(node) ) {
-        var arrNode = <Syntax.Nodes>node;
-        for ( var i = 0, len = arrNode.length; i < len; i++ ) {
-          nodeStack.push(new Index(i));
-          arrNode[i] = <Syntax.Node>visitor(arrNode[i]);
-          nodeStack.pop();
-        }
-      }
-      else {
-        var currentNode = <Syntax.Node>node;
-        Object.keys(currentNode).forEach(function (key) {
-          currentNode[key] = visitor(currentNode[key]);
-        });
-      }
-      nodeStack.pop();
-      return node;
+    public issueError(source: Syntax.Node, message: string) {
+      throw new CompileError(message, source.line, source.column);
+    }
+
+    public issueWarning(source: Syntax.Node, message: string) {
+      this.warnings.push(
+        new CompileError(message, source.line, source.column)
+      );
     }
   }
 }

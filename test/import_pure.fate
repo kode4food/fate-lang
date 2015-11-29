@@ -1,7 +1,7 @@
 import nodeunit
 
 def explicit(test)
-  import './basics_pure' as basics
+  import './basics_pure.fate' as basics
 
   basics.tests | test.ok
   test.done()
@@ -37,5 +37,3 @@ let tests = nodeunit.testCase({
 })
 
 export tests
-
-

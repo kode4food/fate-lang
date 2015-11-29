@@ -9,20 +9,23 @@ namespace Fate {
     private _queueLength: number = 0;
 
     public queue(callback: Function, args: any[]): void {
-      var queueLength = this._queueLength;
+      let queueLength = this._queueLength;
       this[queueLength] = callback;
       this[queueLength + 1] = args;
       this._queueLength = queueLength + 2;
       if ( !this._isFlushing ) {
         this._isFlushing = true;
-        setImmediate(() => { this.flushQueue() });
+        setImmediate(() => { this.flushQueue(); });
       }
     }
 
     private collapseQueue(): void {
-      var queueIndex = this._queueIndex;
-      var queueLength = this._queueLength;
-      for ( var i = 0, len = queueLength - queueIndex; i < len; i++ ) {
+      let queueIndex = this._queueIndex;
+      let queueLength = this._queueLength;
+      let i = 0;
+      let len = queueLength - queueIndex;
+
+      for ( ; i < len; i++ ) {
         this[i] = this[queueIndex + i];
       }
       while ( i < queueLength ) {
@@ -34,9 +37,9 @@ namespace Fate {
 
     private flushQueue(): void {
       while ( this._queueIndex < this._queueLength ) {
-        var queueIndex = this._queueIndex;
-        var callback = this[queueIndex];
-        var args = this[queueIndex + 1];
+        let queueIndex = this._queueIndex;
+        let callback = this[queueIndex];
+        let args = this[queueIndex + 1];
         this._queueIndex = queueIndex + 2;
 
         if ( this._queueLength > this._capacity ) {

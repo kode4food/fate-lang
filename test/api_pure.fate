@@ -8,15 +8,15 @@ def trueFalse(test)
 
   types.isTrue(nil)               | isFalse
   types.isTrue()                  | isFalse
-  types.isTrue([])                | isFalse
-  types.isTrue({})                | isFalse
+  types.isTrue([])                | isTrue
+  types.isTrue({})                | isTrue
   types.isTrue({ name: 'fate' })  | isTrue
   types.isTrue("hello")           | isTrue
   types.isTrue([1])               | isTrue
   types.isFalse(nil)              | isTrue
   types.isFalse()                 | isTrue
-  types.isFalse([])               | isTrue
-  types.isFalse({})               | isTrue
+  types.isFalse([])               | isFalse
+  types.isFalse({})               | isFalse
   types.isFalse({ name: 'fate' }) | isFalse
   types.isFalse("hello")          | isFalse
   types.isFalse([1])              | isFalse

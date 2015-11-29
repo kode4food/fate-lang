@@ -5,7 +5,7 @@
 namespace Fate.Runtime {
   type ArgTemplate = { [index: number]: any };
 
-  var slice = Array.prototype.slice;
+  let slice = Array.prototype.slice;
 
   function noOp() {
     throw new Error("Function invocation not exhaustive");
@@ -16,12 +16,12 @@ namespace Fate.Runtime {
   }
 
   export function bindFunction(func: Function, args: ArgTemplate) {
-    var indexes = Object.keys(args).map(Number);
-    var templateSize = indexes.length ? Math.max.apply(null, indexes): 0;
-    var template: any[] = [];
-    var argMap: number[] = [];
+    let indexes = Object.keys(args).map(Number);
+    let templateSize = indexes.length ? Math.max.apply(null, indexes) : 0;
+    let template: any[] = [];
+    let argMap: number[] = [];
 
-    for ( var i = 0; i <= templateSize; i++ ) {
+    for ( let i = 0; i <= templateSize; i++ ) {
       if ( indexes.indexOf(i) !== -1 ) {
         template[i] = args[i];
       }
@@ -30,15 +30,15 @@ namespace Fate.Runtime {
       }
     }
 
-    var sliceIndex = argMap.length;
+    let sliceIndex = argMap.length;
     return boundFunction;
 
     function boundFunction() {
-      var args = template.slice().concat(slice.call(arguments, sliceIndex));
-      for ( var i = 0; i < argMap.length; i++ ) {
-        args[argMap[i]] = arguments[i];
+      let funcArgs = template.slice().concat(slice.call(arguments, sliceIndex));
+      for ( let i = 0; i < argMap.length; i++ ) {
+        funcArgs[argMap[i]] = arguments[i];
       }
-      return func.apply(this, args);
+      return func.apply(this, funcArgs);
     }
   }
 }

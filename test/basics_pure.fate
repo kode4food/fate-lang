@@ -109,6 +109,10 @@ def unary(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
+  let a = "99"
+
+  +1                             | test.equal(?, 1)
+  +a                             | test.equal(?, 99)
   -1                             | test.equal(?, -1)
   not false                      | isTrue
   not true                       | isFalse
@@ -144,8 +148,22 @@ def conditional(test)
   test.done()
 end
 
+def trailingIfStatement(test)
+  def test1(value)
+    return 'cond 1' if value = 99
+    return 'cond 2' unless value = 100
+    'cond 3'
+  end
+
+  test.equal(test1(99), 'cond1')
+  test.equal(test1(0), 'cond3')
+  test.equal(test1(100), 'cond2')
+  test.done()
+end
+
 def objectLike(test)
   let isTrue = test.equal(?, true)
+  let isFalse = test.equal(?, false)
 
   let person = {
     name: "Thom",
@@ -153,18 +171,27 @@ def objectLike(test)
     title: "Developer"
   }
 
+  let a = 99, b = 'hello'
+
   person like { name: "Thom", age: 42 } | isTrue
+  nil like {(a): b}        | isFalse
+  99 like {name: b}        | isFalse
   test.done()
 end
 
 def arrayLike(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
-  
+
+  let a = 99, b = 'hello'
+
   [1, 2, 3] like [1, 2]    | isTrue
   [1, 2, 3] like [1, 2, 3] | isTrue
   [1, 2] like [1, 2, 3]    | isFalse
   [] like []               | isTrue
+  [] like [a]              | isFalse
+  nil like [b]             | isFalse
+  99 like [1,b,a]          | isFalse
   test.done()
 end
 
@@ -176,11 +203,52 @@ def deepPaths(test)
     }
   }]
 
-  root[0].colors[1]                 | test.equal(?, "green")
-  root[0].info.description          | test.equal(?, "this is a description")
-  root[0].info['description']       | test.equal(?, "this is a description")
-  root[0].info.notThere             | test.equal(?, undefined)
-  () -> root[1].info['description'] | test.throws
+  root[0].colors[1]                   | test.equal(?, "green")
+  root[0].info.description            | test.equal(?, "this is a description")
+  root[0].info['description']         | test.equal(?, "this is a description")
+  root[0].info.notThere               | test.equal(?, undefined)
+  (() -> root[1].info['description']) | test.throws
+  test.done()
+end
+
+def regularExpressions(test)
+  let isTrue = test.equal(?, true)
+  let isFalse = test.equal(?, false)
+
+  let pattern1 = /dy$/
+  let pattern2 = ~/dy$/
+
+  let objectPattern1 = { name: /^Tho/ }
+  let objectPattern2 = ~{ name: ~/^Tho/ }
+  let objectPattern3 = ~{
+    name: ~/White$/,
+    age: self > 50,
+    colors: ['red', 'green', self]
+  }
+
+  let testObject1 = {
+    name: 'Fred White', age: 99,
+    colors: ['red', 'green', 'yellow']
+  }
+
+  let testObject2 = {
+    name: 'Fred Black', age: 99,
+    colors: ['red', 'green', 'blue']
+  }
+
+  "hello" like /^hell/                   | isTrue
+  "hello" like ~/^hell/                  | isTrue
+  "howdy" like pattern1                  | isTrue
+  "however" like pattern1                | isFalse
+  "howdy" like pattern2                  | isTrue
+  "however" like pattern2                | isFalse
+  { name: 'Thomas' } like objectPattern1 | isTrue
+  { name: 'Bill' } like objectPattern1   | isFalse
+  { name: 'Thomas' } like objectPattern2 | isTrue
+  { name: 'Bill' } like objectPattern2   | isFalse
+  testObject1 like objectPattern3        | isTrue
+  testObject2 like objectPattern3        | isFalse
+
   test.done()
 end
 
@@ -200,15 +268,16 @@ end
 let tests = nodeunit.testCase({
   "Relational Evaluation": relational,
   "Equality Evaluation": equality,
-  "'in' Evaluation": inEvaluation, 
+  "'in' Evaluation": inEvaluation,
   "'not in' Evaluation": notIn,
   "Boolean Or/And Evaluation": bool,
   "Unary Evaluation": unary,
   "'nil' Evaluation": nilEvaluation,
-  "Conditional Evaluation": conditional, 
+  "Conditional Evaluation": conditional,
   "Object Like": objectLike,
   "Array Like": arrayLike,
   "Deep Paths": deepPaths,
+  "Regular Expressions": regularExpressions,
   "Assignments": assignments
 })
 

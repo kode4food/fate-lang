@@ -6,7 +6,7 @@ var evaluate = fate.evaluate;
 
 exports.like = nodeunit.testCase({
   "Guard Patterns": function (test) {
-    var script1 = "let p = ~{ name: ? != 'Thom', age: ? != 43 }\n" +
+    var script1 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
                   "def func(person)\n" +
                   "  'normal person: ' + person.name\n" +
                   "end\n" +
@@ -20,16 +20,16 @@ exports.like = nodeunit.testCase({
   },
 
   "Object Patterns": function (test) {
-    var script1 = "let p = ~{ name: ? != 'Thom', age: ? != 43 }\n" +
+    var script1 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
                   "{ name: 'Bill', age: 27 } like p";
 
-    var script2 = "let p = ~[?, { name: 'Thom', age: ? > 20 }, 99]\n" +
+    var script2 = "let p = ~[self, { name: 'Thom', age: self > 20 }, 99]\n" +
                   "['crap', { name: 'Thom', age: 30 }, 99] like p";
 
-    var script3 = "let p = ~{ name: ? != 'Thom', age: ? != 43 }\n" +
+    var script3 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
                   "{ name: 'Thom', age: 27 } like p";
 
-    var script4 = "let p = ~{name: 'Thom', address: { city: 'Boston' }}\n" +
+    var script4 = "let p = ~{name: 'Thom', address: ~{ city: 'Boston' }}\n" +
                   "{name: 'Thom', address: { street: '123 Main', city: 'Boston' }} like p";
 
     test.equal(evaluate(script1), true);
@@ -40,37 +40,40 @@ exports.like = nodeunit.testCase({
   },
 
   "Array Patterns": function (test) {
-    var script1 = "let p = ~(? > 50 and ? < 100)\n" +
+    var script1 = "let p = ~(self > 50 and self < 100)\n" +
                   "p(75)";
 
-    var script2 = "let p = ~(? > 50 and ? < 100)\n" +
+    var script2 = "let p = ~(self > 50 and self < 100)\n" +
                   "75 like p";
 
-    var script3 = "let p = ~[12, ?, 99]\n" +
+    var script3 = "let p = ~[12, self, 99]\n" +
                   "[12, 88, 99] like p";
 
-    var script4 = "let p = ~([12, ?, 99] and ?[1]=88)\n" +
+    var script4 = "let p = ~([12, self, 99] and self[1]=88)\n" +
                   "[12, 88, 99] like p";
 
-    var script5 = "let p = ~[12, [1, ?, 3]]\n" +
+    var script5 = "let p = ~[12, [1, self, 3]]\n" +
                   "[12, [1, 5, 3], 24] like p";
+
+    var script6 = "'hello' like ~(self)";
 
     test.equal(evaluate(script1), true);
     test.equal(evaluate(script2), true);
     test.equal(evaluate(script3), true);
     test.equal(evaluate(script4), true);
     test.equal(evaluate(script5), true);
+    test.equal(evaluate(script6), true);
     test.done();
   },
 
-  "Invalid Wildcards": function (test) {
+  "Invalid 'self' Patterns": function (test) {
     test.throws(function () {
-      evaluate("? > 99");
-    }, "Invalid top level wildcard");
+      evaluate("self > 99");
+    }, "Invalid top level self keyword");
 
     test.throws(function () {
-      evaluate("~{ ?: 'hello' }");
-    }, "Invalid object id wildcard");
+      evaluate("~{ self: 'hello' }");
+    }, "Invalid object id 'self' keyword");
 
     test.done();
   },

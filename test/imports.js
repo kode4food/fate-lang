@@ -13,6 +13,7 @@ exports.imports = nodeunit.testCase({
   "helper imports": nodeunit.testCase({
     setUp: function (callback) {
       var resolver = createMemoryResolver();
+      this.memoryResolver = resolver;
       fate.Runtime.resolvers().push(resolver);
 
       resolver.register('hello', "'hello world!'");
@@ -26,16 +27,18 @@ exports.imports = nodeunit.testCase({
     },
 
     tearDown: function (callback) {
+      this.memoryResolver.unregister('hello');
+      this.memoryResolver.unregister('helpers');
       fate.Runtime.resolvers().pop();
       callback();
     },
 
     "Helper Import": function (test) {
       var script1 = "import helpers\n" +
-        "helpers.testHelper(1,2)";
+                    "helpers.testHelper(1,2)";
 
       var script2 = "from helpers import testHelper as test\n" +
-        "test(5,6)";
+                    "test(5,6)";
 
       var exports1 = fate.Runtime.resolve('hello');
       var exports2 = fate.Runtime.resolve('helpers');
@@ -72,7 +75,7 @@ exports.imports = nodeunit.testCase({
 
     "File Import": function (test) {
       var script = "import test as t\n" +
-        "t.renderTest('Curly')";
+                   "t.renderTest('Curly')";
 
       test.equal(evaluate(script), "Hello Curly");
       test.done();
@@ -84,8 +87,14 @@ exports.imports = nodeunit.testCase({
       var script3 = "import module1.index\nindex.test_value";
 
       test.equal(evaluate(script1), "right!");
+      test.equal(evaluate(script1), "right!"); // still works!
       test.equal(evaluate(script2), "right!");
       test.equal(evaluate(script3), "wrong!");
+
+      test.throws(function () {
+        evaluate("import './bogus2.fate.js' as module");
+      }, "should throw module not resolved");
+
       test.done();
     }
   }),
@@ -127,7 +136,7 @@ exports.imports = nodeunit.testCase({
 
     "Missing Module Import": function (test) {
       test.throws(function () {
-        evaluate("import bogus");
+        evaluate("import bogus1");
       }, "should throw module not resolved");
       test.done();
     }

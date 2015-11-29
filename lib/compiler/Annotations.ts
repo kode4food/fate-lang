@@ -10,21 +10,22 @@ namespace Fate.Compiler {
   }
 
   export function annotate(node: Annotated, name: string, value?: any) {
-    var annotations = node.annotations;
+    let annotations = node.annotations;
     if ( !annotations ) {
       node.annotations = annotations = new Annotations();
     }
     annotations[name] = value === undefined ? true : value;
   }
 
-  export function hasAnnotation(node: Annotated, name: string, value?: any) {
-    var annotations = node.annotations;
+  export function getAnnotation(node: Annotated, name: string) {
+    let annotations = node.annotations;
     if ( !annotations ) {
       return false;
     }
-    if ( value === undefined ) {
-      return annotations[name];
-    }
-    return annotations[name] === value;
+    return annotations[name];
+  }
+
+  export function hasAnnotation(node: Annotated, name: string) {
+    return !!getAnnotation(node, name);
   }
 }

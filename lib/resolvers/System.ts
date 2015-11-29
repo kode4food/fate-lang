@@ -11,7 +11,7 @@ namespace Fate.Resolvers {
   import createMemoryResolver = Resolvers.createMemoryResolver;
 
   export function createSystemResolver() {
-    var resolver = createMemoryResolver();
+    let resolver = createMemoryResolver();
 
     resolver.register('math', <any>(System.Math));
     resolver.register('list', <any>(System.List));

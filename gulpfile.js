@@ -10,10 +10,11 @@ var istanbul = require('gulp-istanbul');
 var enforcer = require('gulp-istanbul-enforcer');
 var pegjs = require('gulp-peg');
 var rename = require('gulp-rename');
+var tslint = require('gulp-tslint');
 
 var tsFiles = ['index.ts', 'lib/**/*.ts'];
 var testFiles = ['./test/index.js'];
-var coverageFiles = ['./test/*.js', './build/fate.js', './lib/cli.js'];
+var coverageFiles = ['./test/*.js', './build/fate.js', './lib/**/*.js'];
 var parserFile = ['./lib/compiler/parser.pegjs'];
 var parserOutput = 'parser.js';
 
@@ -28,10 +29,10 @@ var nodeUnitConfig = {
 
 var enforcerConfig = {
   thresholds: {
-    statements: 98,
-    branches: 87,
-    functions: 98,
-    lines: 98
+    statements: 99,
+    branches: 90,
+    functions: 99,
+    lines: 99
   },
   coverageDirectory: 'coverage',
   rootDirectory: ''
@@ -54,6 +55,12 @@ gulp.task('parser', function (done) {
       .pipe(rename(parserOutput))
       .pipe(gulp.dest(buildDir()))
       .on('end', done);
+});
+
+gulp.task('lint', function() {
+  return gulp.src(tsFiles).pipe(tslint()).pipe(tslint.report('verbose', {
+    summarizeFailureOutput: true
+  }));
 });
 
 gulp.task('compile', ['parser'], function() {

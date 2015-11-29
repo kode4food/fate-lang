@@ -1,43 +1,56 @@
+/// <reference path="./Annotations.ts"/>
 /// <reference path="./Syntax.ts"/>
 /// <reference path="./Visitor.ts"/>
 
 "use strict";
 
 namespace Fate.Compiler.Checker {
-  import Visitor = Compiler.Visitor;
   import Syntax = Compiler.Syntax;
+  import annotate = Compiler.annotate;
 
   type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
 
-  export function checkSyntaxTree(syntaxTree: Syntax.Statements,
-                                  warnings?: CompileErrors) {
-    var visit = new Visitor(warnings);
+  export function createTreeProcessors(visit: Compiler.Visitor) {
+    let selfFunctions = visit.ancestorTags('self', ['function', 'lambda']);
+    let functionIdRetrieval = visit.ancestorTags('id', ['function']);
 
-    var pipeline = [
+    return [
       visit.matching(validateWildcards, visit.tags('wildcard')),
+      visit.matching(validateSelfReferences, visit.tags('self')),
       visit.matching(validateFunctionArgs, visit.tags(['function', 'lambda'])),
       visit.matching(validateChannelArgs, visit.tags('channel')),
-      visit.statementGroups(mergeableFunctions, visit.tags('function')),
+      visit.matching(annotateSelfFunctions, selfFunctions),
+      visit.matching(annotateRecursiveFunctions, functionIdRetrieval),
+      visit.statementGroups(validateMergeables, visit.tags('function'))
     ];
 
-    pipeline.forEach((func) => func(syntaxTree));
-    return syntaxTree;
-
-    // A Wildcard can only exist in a pattern or call binder
+    // a Wildcard can only exist in a call binder
     function validateWildcards(node: Syntax.Wildcard) {
-      if ( !visit.hasAncestorTags(['pattern', 'bind']) ) {
-        issueError(node, "Unexpected Wildcard");
+      if ( !visit.hasAncestorTags('bind') ) {
+        visit.issueError(node, "Unexpected Wildcard");
+      }
+      return node;
+    }
+
+    function validateSelfReferences(node: Syntax.Self) {
+      if ( !visit.hasAncestorTags(['function', 'lambda', 'pattern']) ) {
+        visit.issueError(node,
+          "'self' keyword must appear within a Function or Pattern"
+        );
       }
 
-      var ancestors = visit.hasAncestorTags('objectAssignment', 'pattern');
+      let ancestors = visit.hasAncestorTags('objectAssignment', 'pattern');
       if ( ancestors ) {
-        var parent = <Syntax.ObjectAssignment>ancestors[0];
-        var parentIndex = visit.nodeStack.indexOf(parent);
+        let parent = <Syntax.ObjectAssignment>ancestors[0];
+        let parentIndex = visit.nodeStack.indexOf(parent);
         if ( parent.id === visit.nodeStack[parentIndex + 1] ||
              parent.id === node ) {
-          issueError(node, "Wildcards cannot appear in Property Names");
+          visit.issueError(node,
+            "'self' keyword cannot appear in a Pattern's Property Names"
+          );
         }
       }
+
       return node;
     }
 
@@ -52,12 +65,12 @@ namespace Fate.Compiler.Checker {
     }
 
     function checkParamsForDuplication(node: Syntax.Node,
-                                      signatures: Syntax.Signatures) {
-      var encounteredNames: { [index: string]: boolean } = { };
-      var duplicatedNames: { [index: string]: boolean } = { };
+                                       signatures: Syntax.Signatures) {
+      let encounteredNames: { [index: string]: boolean } = { };
+      let duplicatedNames: { [index: string]: boolean } = { };
       signatures.forEach(function (signature) {
         signature.params.forEach(function (param) {
-          var name = param.id.value;
+          let name = param.id.value;
           if ( encounteredNames[name] ) {
             duplicatedNames[name] = true;
             return;
@@ -66,34 +79,57 @@ namespace Fate.Compiler.Checker {
         });
       });
 
-      var duplicatedItems = Object.keys(duplicatedNames);
+      let duplicatedItems = Object.keys(duplicatedNames);
       if ( duplicatedItems.length ) {
-        issueError(node,
+        visit.issueError(node,
           "Argument names are repeated in declaration: " +
           duplicatedItems.join(', ')
         );
       }
     }
 
-    function mergeableFunctions(statements: Syntax.FunctionDeclaration[]) {
-      var namesSeen: { [index: string]: boolean } = {};
-      var lastName: string;
-      var lastArgs: string;
+    function annotateSelfFunctions(node: Syntax.Self) {
+      if ( visit.hasAncestorTags('pattern') ) {
+        return node;
+      }
+      let func = visit.hasAncestorTags(['function', 'lambda'])[0];
+      annotate(func, 'function/self');
+      annotate(func, 'no_merge');
+      return node;
+    }
+
+    function annotateRecursiveFunctions(node: Syntax.Identifier) {
+      let func = visit.hasAncestorTags('function')[0];
+      if ( node === func.signature.id ) {
+        return node;
+      }
+      if ( node.value !== func.signature.id.value ) {
+        return node;
+      }
+      annotate(func, 'function/no_merge');
+      return node;
+    }
+
+    function validateMergeables(statements: Syntax.FunctionDeclaration[]) {
+      let namesSeen: { [index: string]: boolean } = {};
+      let lastName: string;
+      let lastArgs: string;
 
       statements.forEach(function (statement) {
-        var signature = statement.signature;
-        var name = signature.id.value;
-        var args = argumentsSignature(signature.params);
+        let signature = statement.signature;
+        let name = signature.id.value;
+        let args = argumentsSignature(signature.params);
 
         if ( !signature.guard && namesSeen[name] ) {
-          issueWarning(statement,
+          visit.issueWarning(statement,
             "The unguarded Function '" + name + "' will replace " +
             "the previous definition(s)"
           );
         }
 
         if ( name === lastName && args !== lastArgs ) {
-          issueWarning(statement,
+          annotate(statement, 'function/no_merge');
+          visit.issueWarning(statement,
             "Reopened Function '" + name + "' has different " +
             "argument names than the original definition"
           );
@@ -104,16 +140,6 @@ namespace Fate.Compiler.Checker {
         lastArgs = args;
       });
       return statements;
-    }
-
-    function issueError(source: Syntax.Node, message: string) {
-      throw new CompileError(message, source.line, source.column);
-    }
-
-    function issueWarning(source: Syntax.Node, message: string) {
-      warnings.push(
-        new CompileError(message, source.line, source.column)
-      );
     }
   }
 

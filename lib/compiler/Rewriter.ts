@@ -6,97 +6,83 @@
 "use strict";
 
 namespace Fate.Compiler.Rewriter {
-  var wildcardLocal = 'p';
-
   import isTrue = Types.isTrue;
   import isFalse = Types.isFalse;
   import isIn = Types.isIn;
 
-  import MutatingVisitor = Compiler.MutatingVisitor;
   import Syntax = Compiler.Syntax;
   import hasTag = Syntax.hasTag;
-  import isStatements = Syntax.isStatements;
   import isLiteral = Syntax.isLiteral;
-  import annotate = Compiler.annotate;
 
-  type NodeMatcher = (node: Syntax.NodeOrNodes) => boolean;
   type LiteralArray = any[];
   type StringMap = { [index: string]: string };
   type LiteralObject = { [index: string]: any };
   type FunctionMap = { [index: string]: Function };
 
-  var inverseOperators: StringMap = {
+  let inverseOperators: StringMap = {
     'eq': 'neq', 'neq': 'eq',
     'lt': 'gte', 'gte': 'lt',
     'gt': 'lte', 'lte': 'gt'
   };
 
-  var constantFolders: FunctionMap = {
-    'not':    function (v: any) { return isFalse(v); },
-    'neg':    function (v: any) { return -v; },
-    'add':    function (l: any, r: any) { return l + r; },
-    'sub':    function (l: any, r: any) { return l - r; },
-    'mul':    function (l: any, r: any) { return l * r; },
-    'div':    function (l: any, r: any) { return l / r; },
-    'eq':     function (l: any, r: any) { return l === r; },
-    'neq':    function (l: any, r: any) { return l !== r; },
-    'in':     function (l: any, r: any) { return isIn(l, r); },
-    'notIn':  function (l: any, r: any) { return !isIn(l, r); },
-    'gt':     function (l: any, r: any) { return l > r; },
-    'lt':     function (l: any, r: any) { return l < r; },
-    'gte':    function (l: any, r: any) { return l >= r; },
-    'lte':    function (l: any, r: any) { return l <= r; },
-    'mod':    function (l: any, r: any) { return l % r; }
+  let unaryConstantFolders: FunctionMap = {
+    'not':   function (v: any) { return isFalse(v); },
+    'neg':   function (v: any) { return -v; }
   };
-  var constantFolderKeys = Object.keys(constantFolders);
+  let unaryConstantFolderKeys = Object.keys(unaryConstantFolders);
 
-  var shortCircuitFolders: FunctionMap = {
+  let binaryConstantFolders: FunctionMap = {
+    'add':   function (l: any, r: any) { return l + r; },
+    'sub':   function (l: any, r: any) { return l - r; },
+    'mul':   function (l: any, r: any) { return l * r; },
+    'div':   function (l: any, r: any) { return l / r; },
+    'eq':    function (l: any, r: any) { return l === r; },
+    'neq':   function (l: any, r: any) { return l !== r; },
+    'in':    function (l: any, r: any) { return isIn(l, r); },
+    'notIn': function (l: any, r: any) { return !isIn(l, r); },
+    'gt':    function (l: any, r: any) { return l > r; },
+    'lt':    function (l: any, r: any) { return l < r; },
+    'gte':   function (l: any, r: any) { return l >= r; },
+    'lte':   function (l: any, r: any) { return l <= r; },
+    'mod':   function (l: any, r: any) { return l % r; }
+  };
+  let binaryConstantFolderKeys = Object.keys(binaryConstantFolders);
+
+  let shortCircuitFolders: FunctionMap = {
     'or': function (node: Syntax.OrOperator) {
       if ( !isLiteral(node.left) ) {
         return node;
       }
-      var value = (<Syntax.Literal>node.left).value;
+      let value = (<Syntax.Literal>node.left).value;
       return isTrue(value) ? node.left : node.right;
     },
     'and': function (node: Syntax.AndOperator) {
       if ( !isLiteral(node.left) ) {
         return node;
       }
-      var value = (<Syntax.Literal>node.left).value;
+      let value = (<Syntax.Literal>node.left).value;
       return isFalse(value) ? node.left : node.right;
     },
     'conditional': function (node: Syntax.ConditionalOperator) {
       if ( !isLiteral(node.condition) ) {
         return node;
       }
-      var value = (<Syntax.Literal>node.condition).value;
+      let value = (<Syntax.Literal>node.condition).value;
       return isTrue(value) ? node.trueResult : node.falseResult;
     }
   };
-  var shortCircuitFolderKeys = Object.keys(shortCircuitFolders);
+  let shortCircuitFolderKeys = Object.keys(shortCircuitFolders);
 
-  export function rewriteSyntaxTree(syntaxTree: Syntax.Statements,
-                                    warnings?: CompileErrors) {
-    var visit = new MutatingVisitor(warnings);
-    var wildcardNumbering = 0;
+  export function createTreeProcessors(visit: Compiler.Visitor) {
+    let foldableShortCircuit = visit.tags(shortCircuitFolderKeys);
+    let foldableUnaryConstant = visit.tags(unaryConstantFolderKeys);
+    let foldableBinaryConstant = visit.tags(binaryConstantFolderKeys);
+    let collection = visit.tags(['object', 'array']);
 
-    var foldableShortCircuit = visit.tags(shortCircuitFolderKeys);
-    var foldableConstant = visit.tags(constantFolderKeys);
-    var nestedPattern = visit.ancestorTags('pattern', 'pattern');
-    var patternCollection = visit.ancestorTags(['object', 'array'], 'pattern');
-    var patternWildcard = visit.ancestorTags('wildcard', 'pattern');
-    var patternNode = visit.ancestorTags('*', 'pattern');
-    var collection = visit.tags(['object', 'array']);
-
-    var pipeline = [
+    return [
       visit.matching(foldShortCircuits, foldableShortCircuit),
-      visit.matching(foldConstants, foldableConstant),
-
-      visit.matching(rollUpPatterns, nestedPattern),
-      visit.matching(namePatterns, visit.tags('pattern')),
-      visit.matching(nameWildcardAnchors, patternCollection),
-      visit.matching(nameAndAnnotateWildcards, patternWildcard),
-      visit.matching(annotatePatternNode, patternNode),
+      visit.matching(foldUnaryConstants, foldableUnaryConstant),
+      visit.matching(foldBinaryConstants, foldableBinaryConstant),
 
       visit.matching(rollUpObjectsAndArrays, collection),
 
@@ -104,165 +90,41 @@ namespace Fate.Compiler.Rewriter {
       visit.matching(flipConditionals, visit.tags('conditional')),
       visit.matching(flipEquality, visit.tags('not')),
       visit.matching(promoteNot, visit.tags(['and', 'or'])),
-
-      visit.statementGroups(mergeFunctions, visit.tags('function')),
-
       visit.matching(rollUpForLoops, visit.tags('for')),
 
-      visit.matching(annotateMutations, visit.tags('let'))
+      visit.statementGroups(mergeFunctions, visit.tags('function'))
     ];
 
-    pipeline.forEach(function (func) {
-      syntaxTree = <Syntax.Statements>func(syntaxTree);
-    });
-
-    return syntaxTree;
-
-    function annotateNearestParent(name: string, matcher: NodeMatcher) {
-      var node = <Syntax.Node>visit.upTreeUntilMatch(matcher);
-      if ( node ) {
-        annotate(node, name);
-      }
-    }
-
-    // Patterns don't have to exist within Patterns
-    function rollUpPatterns(node: Syntax.Pattern) {
-      return node.left;
-    }
-
-    function getAnchorName() {
-      var anchor = visit.currentElement();
-      if ( !anchor ) {
-        anchor = visit.hasAncestorTags('pattern')[0];
-      }
-      var anchorName = hasAnnotation(anchor, 'pattern/local');
-      if ( !anchorName ) {
-        anchorName = wildcardLocal + (wildcardNumbering++);
-        annotate(anchor, 'pattern/local', anchorName);
-      }
-      return anchorName;
-    }
-
-    function namePatterns(node: Syntax.Pattern) {
-      if ( !hasAnnotation(node, 'pattern/local') ) {
-        annotate(node, 'pattern/local', wildcardLocal);
-      }
-      var contained = node.left;
-      if ( !hasTag(contained, ['object', 'array']) &&
-           !hasAnnotation(contained, 'pattern/local') ) {
-        annotate(contained, 'pattern/local', wildcardLocal);
-      }
-      return node;
-    }
-
-    function nameWildcardAnchors(node: Syntax.ElementsConstructor) {
-      if ( hasAnnotation(node, 'pattern/local') ) {
-        return node;
-      }
-
-      annotate(node, 'pattern/local', getAnchorName());
-      node.elements.forEach(function (element) {
-        if ( hasAnnotation(element, 'pattern/local') ) {
-          return;
-        }
-        var elementName = wildcardLocal + (wildcardNumbering++);
-        annotate(element, 'pattern/local', elementName);
-      });
-      return node;
-    }
-
-    // Wildcard names must correspond to their element in an object or array
-    function nameAndAnnotateWildcards(node: Syntax.Wildcard) {
-      if ( !hasAnnotation(node, 'pattern/local') ) {
-        annotate(node, 'pattern/local', getAnchorName());
-      }
-      visit.upTreeUntilMatch(visit.tags('pattern'), annotateWildcard);
-      return node;
-
-      function annotateWildcard(node: Syntax.Node) {
-        annotate(node, 'pattern/wildcard');
-        return node;
-      }
-    }
-
-    // All nodes inside of a Pattern should be annotated as such,
-    // so that the Code Generator can branch appropriately
-    function annotatePatternNode(node: Syntax.Node) {
-      annotate(node, 'pattern/node');
-      return node;
-    }
-
-    // Or, And, Conditional Folding
+    // or, and, conditional Folding
     function foldShortCircuits(node: Syntax.Node) {
-      var tag = hasTag(node);
+      let tag = hasTag(node);
       return shortCircuitFolders[tag](node);
     }
 
-    // Simple constant folding
-    function foldConstants(node: Syntax.UnaryOperator|Syntax.BinaryOperator) {
+    function foldUnaryConstants(node: Syntax.UnaryOperator) {
       if ( !isLiteral(node.left) ) {
         return node;
       }
-      var leftValue = (<Syntax.Literal>node.left).value;
 
-      if ( !(node instanceof Syntax.BinaryOperator) ||
-           !isLiteral(node.right) ) {
-        return node;
-      }
-
-      var tag = hasTag(node);
-      var rightNode = (<Syntax.BinaryOperator>node).right;
-      var rightValue = (<Syntax.Literal>rightNode).value;
-      var output = constantFolders[tag](leftValue, rightValue);
+      let tag = hasTag(node);
+      let leftValue = (<Syntax.Literal>node.left).value;
+      let output = unaryConstantFolders[tag](leftValue);
       return node.template('literal', output);
     }
 
-    // If the condition is 'not' we can roll up its argument
-    // and flip the branches.
-    function flipConditionals(node: Syntax.ConditionalOperator) {
-      if ( !hasTag(node.condition, 'not') ) {
+    function foldBinaryConstants(node: Syntax.BinaryOperator) {
+      if ( !isLiteral(node.left) || !isLiteral(node.right) ) {
         return node;
       }
 
-      var cond = (<Syntax.NotOperator>node.condition).left;
-      return node.template(node, cond, node.falseResult, node.trueResult);
+      let tag = hasTag(node);
+      let leftValue = (<Syntax.Literal>node.left).value;
+      let rightValue = (<Syntax.Literal>node.right).value;
+      let output = binaryConstantFolders[tag](leftValue, rightValue);
+      return node.template('literal', output);
     }
 
-    // if the operator is 'not' and it contains an equality,
-    // then we can flip the equality operator and roll it up
-    function flipEquality(node: Syntax.NotOperator) {
-      var tag = hasTag(node.left);
-      var newTag = inverseOperators[tag];
-
-      if ( !tag || !newTag ) {
-        return node;
-      }
-
-      var child = <Syntax.BinaryOperator>node.left;
-      return node.template(newTag, child.left, child.right);
-    }
-
-    // If left and right operands of an 'and' or 'or' are using the 'not'
-    // unary, then promote it to the top and flip the and/or
-    function promoteNot(node: Syntax.BinaryOperator) {
-      var leftTag = hasTag(node.left, 'not');
-      var rightTag = hasTag(node.right, 'not');
-
-      if ( !leftTag || !rightTag ) {
-        return node;
-      }
-
-      var left = <Syntax.NotOperator>node.left;
-      var right = <Syntax.NotOperator>node.right;
-
-      var tag = hasTag(node);
-      var newTag = tag === 'and' ? 'or' : 'and';
-
-      var newNode = node.template(newTag, left.left, right.left);
-      return left.template('not', newNode);
-    }
-
-    // If all the elements of an Array or Array are literals, then we can
+    // if all the elements of an Array or Array are literals, then we can
     // convert it to a literal
     function rollUpObjectsAndArrays(node: Syntax.ElementsConstructor) {
       if ( hasAnnotation(node, 'pattern/node') ) {
@@ -275,12 +137,12 @@ namespace Fate.Compiler.Rewriter {
     }
 
     function rollUpArray(node: Syntax.ArrayConstructor) {
-      var elements = node.elements;
-      var output: LiteralArray = [];
-      var type = 'literal';
+      let elements = node.elements;
+      let output: LiteralArray = [];
+      let type = 'literal';
 
-      for ( var i = 0, len = elements.length; i < len; i++ ) {
-        var element = elements[i];
+      for ( let i = 0, len = elements.length; i < len; i++ ) {
+        let element = elements[i];
         if ( !isLiteral(element) ) {
           return node;
         }
@@ -291,14 +153,14 @@ namespace Fate.Compiler.Rewriter {
     }
 
     function rollUpObject(node: Syntax.ObjectConstructor) {
-      var elements = node.elements;
-      var output: LiteralObject = {};
-      var type = 'literal';
+      let elements = node.elements;
+      let output: LiteralObject = {};
+      let type = 'literal';
 
-      for ( var i = 0, len = elements.length; i < len; i++ ) {
-        var element = elements[i];
-        var name = element.id;
-        var value = element.value;
+      for ( let i = 0, len = elements.length; i < len; i++ ) {
+        let element = elements[i];
+        let name = element.id;
+        let value = element.value;
         if ( !isLiteral(name) || !isLiteral(value) ) {
           return node;
         }
@@ -311,14 +173,14 @@ namespace Fate.Compiler.Rewriter {
     // if an 'if' statement is evaluating a constant, then we can eliminate
     // the inapplicable branch and just inline the matching statements
     function foldIfStatements(statements: Syntax.IfStatement[]) {
-      var output: Syntax.Statement[] = [];
+      let output: Syntax.Statement[] = [];
       statements.forEach(function (statement) {
         if ( !hasTag(statement, 'if') || !isLiteral(statement.condition ) ) {
           output.push(statement);
           return;
         }
 
-        var foldedStatements: Syntax.Statement[];
+        let foldedStatements: Syntax.Statement[];
         if ( isTrue((<Syntax.Literal>statement.condition).value) ) {
           foldedStatements = statement.thenStatements.statements;
         }
@@ -330,20 +192,89 @@ namespace Fate.Compiler.Rewriter {
       return output;
     }
 
-    // We can merge consecutive non-recursive functions that are
-    // argument compatible
-    function mergeFunctions(statements: Syntax.FunctionDeclaration[]) {
-      var group: Syntax.FunctionDeclaration[] = [];
-      var result: Syntax.Statement[] = [];
-      var lastName: string;
-      var lastArgs: string;
+    // if the condition is 'not' we can roll up its argument
+    // and flip the branches.
+    function flipConditionals(node: Syntax.ConditionalOperator) {
+      if ( !hasTag(node.condition, 'not') ) {
+        return node;
+      }
 
-      statements.forEach(function (statement) {
-        var signature = statement.signature;
-        var name = signature.id.value;
-        var args = argumentsSignature(signature.params);
+      let cond = (<Syntax.NotOperator>node.condition).left;
+      return node.template(node.tag, cond, node.falseResult, node.trueResult);
+    }
 
-        if ( name !== lastName || args !== lastArgs ) {
+    // if the operator is 'not' and it contains an equality,
+    // then we can flip the equality operator and roll it up
+    function flipEquality(node: Syntax.NotOperator) {
+      let tag = hasTag(node.left);
+      let newTag = inverseOperators[tag];
+
+      if ( !tag || !newTag ) {
+        return node;
+      }
+
+      let child = <Syntax.BinaryOperator>node.left;
+      return node.template(newTag, child.left, child.right);
+    }
+
+    // if left and right operands of an 'and' or 'or' are using the 'not'
+    // unary, then promote it to the top and flip the and/or
+    function promoteNot(node: Syntax.BinaryOperator) {
+      let leftTag = hasTag(node.left, 'not');
+      let rightTag = hasTag(node.right, 'not');
+
+      if ( !leftTag || !rightTag ) {
+        return node;
+      }
+
+      let left = <Syntax.NotOperator>node.left;
+      let right = <Syntax.NotOperator>node.right;
+
+      let tag = hasTag(node);
+      let newTag = tag === 'and' ? 'or' : 'and';
+
+      let newNode = node.template(newTag, left.left, right.left);
+      return left.template('not', newNode);
+    }
+
+    // we can roll up a single nested for loop into a containing for
+    // loop so that they share the same context
+    function rollUpForLoops(node: Syntax.ForStatement) {
+      let forStatements = node.loopStatements.statements;
+
+      if ( forStatements.length !== 1 ) {
+        return node;  // should only be one child
+      }
+      if ( !hasTag(forStatements[0], 'for') ) {
+        return node;  // should have a nested for loop
+      }
+
+      let nested = <Syntax.ForStatement>forStatements[0];
+      if ( !node.elseStatements.isEmpty() ||
+           !nested.elseStatements.isEmpty() ) {
+        return node;  // no else clauses
+      }
+
+      return node.template('for',
+        node.ranges.concat(nested.ranges),
+        nested.loopStatements,
+        node.elseStatements
+      );
+    }
+
+    // we can merge consecutive non-recursive functions that are
+    // argument compatible and don't recurse
+    function mergeFunctions(functionDeclarations: Syntax.FunctionDeclaration[]) {
+      let group: Syntax.FunctionDeclaration[] = [];
+      let result: Syntax.Statement[] = [];
+      let lastName: string;
+
+      functionDeclarations.forEach(function (statement) {
+        let signature = statement.signature;
+        let name = signature.id.value;
+
+        if ( name !== lastName ||
+             hasAnnotation(statement, 'function/no_merge') ) {
           processGroup();
         }
 
@@ -353,7 +284,6 @@ namespace Fate.Compiler.Rewriter {
         }
 
         lastName = name;
-        lastArgs = args;
         group.push(statement);
       });
       processGroup();
@@ -367,11 +297,11 @@ namespace Fate.Compiler.Rewriter {
           return;
         }
 
-        var firstDefinition = group[0];
-        var firstSignature = firstDefinition.signature;
-        var firstStatements = firstDefinition.statements;
-        var statements = firstStatements.statements.slice();
-        var guard = firstSignature.guard;
+        let firstDefinition = group[0];
+        let firstSignature = firstDefinition.signature;
+        let firstStatements = firstDefinition.statements;
+        let statements = firstStatements.statements.slice();
+        let guard = firstSignature.guard;
 
         if ( guard ) {
           statements = [
@@ -382,12 +312,12 @@ namespace Fate.Compiler.Rewriter {
           ];
         }
 
-        var prevStatements = firstStatements;
-        for ( var i = 1, len = group.length; i < len; i++ ) {
-          var definition = group[i];
-          var signature = definition.signature;
-          var theseStatements = definition.statements;
-          var thisGuard = signature.guard;
+        let prevStatements = firstStatements;
+        for ( let i = 1, len = group.length; i < len; i++ ) {
+          let definition = group[i];
+          let signature = definition.signature;
+          let theseStatements = definition.statements;
+          let thisGuard = signature.guard;
 
           statements = [
             thisGuard.template('if', thisGuard, theseStatements,
@@ -410,50 +340,5 @@ namespace Fate.Compiler.Rewriter {
         group = [];
       }
     }
-
-    // We can roll up a single nested for loop into a containing for
-    // loop so that they share the same context
-    function rollUpForLoops(node: Syntax.ForStatement) {
-      var forStatements = node.loopStatements.statements;
-
-      if ( forStatements.length !== 1 ) {
-        return node;  // should only be one child
-      }
-      if ( !hasTag(forStatements[0], 'for') ) {
-        return node;  // should have a nested for loop
-      }
-
-      var nested = <Syntax.ForStatement>forStatements[0];
-      if ( !node.elseStatements.isEmpty() ||
-           !nested.elseStatements.isEmpty() ) {
-        return node;  // no else clauses
-      }
-
-      return node.template('for',
-        node.ranges.concat(nested.ranges),
-        nested.loopStatements,
-        node.elseStatements
-      );
-    }
-
-    function annotateMutations(node: Syntax.LetStatement) {
-      node.assignments.forEach(function (assignment) {
-        annotateNearestParent(
-          'mutation/' + assignment.id.value,
-          visit.tagsOrRoot(['channel', 'function', 'for'])
-        );
-      });
-      return node;
-    }
-  }
-
-  function argumentsSignature(params: Syntax.Parameters) {
-    if ( !params || !params.length ) {
-      return '';
-    }
-
-    return params.map(function (param) {
-      return param.id.value;
-    }).join(',');
   }
 }

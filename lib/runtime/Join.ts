@@ -1,7 +1,7 @@
 /// <reference path="../Scheduler.ts"/>
 
 namespace Fate.Runtime {
-  var slice = Array.prototype.slice;
+  let slice = Array.prototype.slice;
 
   export interface Channel {
     (...args: any[]): void;
@@ -13,7 +13,7 @@ namespace Fate.Runtime {
     return value;
   }
 
-  var noOp = defineChannel(function(joinArgs: JoinArguments) {
+  let noOp = defineChannel(function(joinArgs: JoinArguments) {
     if ( !joinArgs.provided ) {
       throw new Error("Channel invocation not exhaustive");
     }
@@ -45,8 +45,8 @@ namespace Fate.Runtime {
   }
 
   export function join(body: Function, ...argCount: number[]) {
-    var satisfied = false;
-    var argumentSets: JoinArguments[][] = [];
+    let satisfied = false;
+    let argumentSets: JoinArguments[][] = [];
     return provideArguments;
 
     function provideArguments(signatureIndex: number, args: JoinArguments) {
@@ -56,7 +56,7 @@ namespace Fate.Runtime {
       args.provided = true;
 
       // This is not the most efficient implementation... don't care
-      var argumentSet = argumentSets[signatureIndex];
+      let argumentSet = argumentSets[signatureIndex];
       if ( argumentSet ) {
         argumentSet.push(args);
       }
@@ -67,15 +67,15 @@ namespace Fate.Runtime {
     }
 
     function attemptToSatisfy() {
-      var argumentIndexes:number[] = [];
-      for ( var i = 0; i < argCount.length; i++ ) {
-        var argumentSet = argumentSets[i];
+      let argumentIndexes: number[] = [];
+      for ( let i = 0; i < argCount.length; i++ ) {
+        let argumentSet = argumentSets[i];
         if ( !argumentSet ) {
           return;
         }
 
-        for ( var j = 0; j < argumentSet.length; j++ ) {
-          var args = argumentSet[j];
+        for ( let j = 0; j < argumentSet.length; j++ ) {
+          let args = argumentSet[j];
           if ( !args || args.consumed ) {
             continue;
           }
@@ -91,12 +91,12 @@ namespace Fate.Runtime {
     }
 
     function satisfyWith(argumentIndexes: number[]) {
-      var args: any[] = [];
-      var argsLength = 0;
+      let args: any[] = [];
+      let argsLength = 0;
 
       argumentIndexes.forEach(function (argumentIndex, setIndex) {
-        var argumentSet = argumentSets[setIndex];
-        var inputArgs = argumentSet[argumentIndex];
+        let argumentSet = argumentSets[setIndex];
+        let inputArgs = argumentSet[argumentIndex];
         inputArgs.consumed = true;
         args = args.concat(inputArgs.argumentArray.slice(1));
         argsLength += argCount[setIndex];

@@ -23,14 +23,6 @@ namespace Fate.Compiler.Syntax {
 
   type FunctionMap = { [index: string]: Function };
 
-  export function node(tag: Tag, ...args: any[]) {
-    var constructor = tagToConstructor[tag];
-    var instance = Object.create(constructor.prototype);
-    instance.tag = tag;
-    var result = constructor.apply(instance, args);
-    return result !== undefined ? result : instance;
-  }
-
   export class Node implements Annotated {
     [index: string]: any;
 
@@ -41,7 +33,7 @@ namespace Fate.Compiler.Syntax {
     public length: number;
 
     public template(...args: any[]) {
-      var result = node.apply(null, args);
+      let result = node.apply(null, args);
       result.line = this.line;
       result.column = this.column;
       result.length = this.length;
@@ -62,7 +54,7 @@ namespace Fate.Compiler.Syntax {
       return tags === node.tag;
     }
 
-    var idx = tags.indexOf(node.tag);
+    let idx = tags.indexOf(node.tag);
     if ( idx === -1 ) {
       if ( tags.indexOf('*') !== -1 ) {
         return node.tag;
@@ -164,7 +156,7 @@ namespace Fate.Compiler.Syntax {
     constructor(ranges: Ranges, public assignment: ObjectAssignment) {
       super(ranges);
       if ( !assignment ) {
-        var range = ranges[0];
+        let range = ranges[0];
         this.assignment = range.template('objectAssignment',
           range.nameId,
           range.valueId
@@ -245,7 +237,7 @@ namespace Fate.Compiler.Syntax {
     constructor(public value: string) { super(); }
   }
 
-  export class Self extends Identifier { }
+  export class Self extends Identifier {}
 
   export class Literal extends Symbol {
     constructor(public value: any) { super(); }
@@ -253,6 +245,15 @@ namespace Fate.Compiler.Syntax {
 
   export function isLiteral(node: Node) {
     return node instanceof Literal;
+  }
+
+  export class Regex extends Symbol {
+    public value: RegExp;
+
+    constructor(pattern: string, flags: string) {
+      super();
+      this.value = new RegExp(pattern, flags);
+    }
   }
 
   // Supporting Nodes *********************************************************
@@ -267,11 +268,10 @@ namespace Fate.Compiler.Syntax {
   export class Signature extends Node {
     public params: Parameters = [];
 
-    constructor(public id: Identifier,
-                paramDefs: Parameters,
+    constructor(public id: Identifier, paramDefs: Parameters,
                 public guard: Expression) {
       super();
-      var guards: Expressions = [];
+      let guards: Expressions = [];
 
       // Generate Guards from the Parameters
       (paramDefs || []).forEach((paramDef, idx) => {
@@ -280,9 +280,9 @@ namespace Fate.Compiler.Syntax {
           return;
         }
 
-        var id = paramDef.id || <Identifier>node('id', idx);
-        this.params.push(node('idParam', id));
-        guards.push(node('like', id, (<PatternParameter>paramDef).pattern));
+        let ident = paramDef.id || <Identifier>node('id', idx);
+        this.params.push(node('idParam', ident));
+        guards.push(node('like', ident, (<PatternParameter>paramDef).pattern));
       });
 
       // Combine the Guards
@@ -292,8 +292,8 @@ namespace Fate.Compiler.Syntax {
           guards.push(this.guard);
         }
         this.guard = guards.shift();
-        guards.forEach((guard) => {
-          this.guard = node('and', this.guard, guard);
+        guards.forEach((g) => {
+          this.guard = node('and', this.guard, g);
         });
       }
     }
@@ -338,12 +338,12 @@ namespace Fate.Compiler.Syntax {
 
   export class ObjectAssignment extends Node {
     constructor(public id: Expression,
-                public value: Expression|Wildcard) { super(); }
+                public value: Expression) { super(); }
   }
 
   // Tag to Constructor Mapping ***********************************************
 
-  var tagToConstructor: FunctionMap = {
+  let tagToConstructor: FunctionMap = {
     'from': FromStatement,
     'import': ImportStatement,
     'export': ExportStatement,
@@ -387,6 +387,7 @@ namespace Fate.Compiler.Syntax {
     'self': Self,
     'literal': Literal,
     'pattern': Pattern,
+    'regex': Regex,
     'wildcard': Wildcard,
     'statements': Statements,
     'range': Range,
@@ -399,4 +400,12 @@ namespace Fate.Compiler.Syntax {
     'assignment': Assignment,
     'objectAssignment': ObjectAssignment
   };
+
+  export function node(tag: Tag, ...args: any[]) {
+    let constructor = tagToConstructor[tag];
+    let instance = Object.create(constructor.prototype);
+    instance.tag = tag;
+    let result = constructor.apply(instance, args);
+    return result !== undefined ? result : instance;
+  }
 }
