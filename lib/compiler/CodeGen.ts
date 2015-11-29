@@ -115,7 +115,7 @@ namespace Fate.Compiler.CodeGen {
 
       /* istanbul ignore if: untestable */
       if ( !createFunction ) {
-        throw new Error("Stupid Coder: Invalid tag in Node: " + nodeType);
+        throw new Error(`Stupid Coder: Invalid tag in Node: ${nodeType}`);
       }
 
       createFunction(node);

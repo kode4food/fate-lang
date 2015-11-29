@@ -1,8 +1,14 @@
 # Simple test for warning parse
 
+let a = 99, a = 100
+
 def query(name, age) where age > 25
   "They are older than 25"
 end
+
+let b = 50
+let b = 65
+let b = 100, c = 99
 
 def query(name, age)
   "This will shadow the previous, and generate a warning"

@@ -11,7 +11,7 @@ namespace Fate.Runtime {
   let Digits = "0|[1-9][0-9]*";
   let Ident = "[$_a-zA-Z][$_a-zA-Z0-9]*";
   let Term = ";?";
-  let Params = "%((%)|(" + Digits + ")|(" + Ident + "))?" + Term;
+  let Params = `%((%)|(${Digits})|(${Ident}))?${Term}`;
                /* "%" ( "%" | digits | identifier )? ";"? */
 
   let ParamRegex = new RegExp(Params, "m");

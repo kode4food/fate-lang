@@ -43,7 +43,7 @@ namespace Fate.Runtime {
 
       moduleExports = resolve(moduleName, basePath);
       if ( !moduleExports ) {
-        throw new Error("Module '" + moduleName + "' not resolved");
+        throw new Error(`Module '${moduleName}' not resolved`);
       }
       cache[basePath] = moduleExports;
       return moduleExports;

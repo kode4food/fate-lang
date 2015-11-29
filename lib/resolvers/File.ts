@@ -32,7 +32,7 @@ namespace Fate.Resolvers {
     };
 
     function resolve(name: Types.ModuleName, basePath = defaultBasePath) {
-      let cacheKey = basePath + '//' + name;
+      let cacheKey = `${basePath}//${name}`;
       let result = cache[cacheKey];
       if ( result ) {
         return result;

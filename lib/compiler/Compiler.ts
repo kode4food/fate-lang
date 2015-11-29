@@ -103,11 +103,11 @@ namespace Fate.Compiler {
 
   function formatCompileError(err: CompileError,
                               filePath?: Compiler.FilePath) {
-    let lineInfo = ":" + err.line + ":" + err.column;
+    let lineInfo = `:${err.line}:${err.column}`;
     let message = err.message;
 
     filePath = filePath || err.filePath || 'string';
-    return filePath + lineInfo + ": " + message;
+    return `${filePath}${lineInfo}: ${message}`;
   }
 
   // intercepts a PEG.js Exception and generate a human-readable error message
@@ -117,10 +117,10 @@ namespace Fate.Compiler {
     let line = err.location.start.line;
     let column = err.location.start.column;
 
-    let unexpected = found ? "'" + found + "'" : "end of file";
-    let errString = "Unexpected " + unexpected;
-    let lineInfo = ":" + line + ":" + column;
-    let message = (filePath || 'string') + lineInfo + ": " + errString;
+    let unexpected = found ? `'${found}'` : "end of file";
+    let errString = `Unexpected ${unexpected}`;
+    let lineInfo = `:${line}:${column}`;
+    let message = `${filePath || 'string'}${lineInfo}: ${errString}`;
 
     return new CompileError(message, line, column, filePath);
   }

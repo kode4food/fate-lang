@@ -21,6 +21,7 @@ namespace Fate.Compiler.Checker {
       visit.matching(validateChannelArgs, visit.tags('channel')),
       visit.matching(annotateSelfFunctions, selfFunctions),
       visit.matching(annotateRecursiveFunctions, functionIdRetrieval),
+      visit.statementGroups(validateAssignments, visit.tags('let')),
       visit.statementGroups(validateMergeables, visit.tags('function'))
     ];
 
@@ -110,6 +111,22 @@ namespace Fate.Compiler.Checker {
       return node;
     }
 
+    function validateAssignments(statements: Syntax.LetStatement[]) {
+      let namesSeen: { [index: string]: boolean } = {};
+      statements.forEach(function (statement) {
+        statement.assignments.forEach(function (assignment) {
+          var name = assignment.id.value;
+          if ( namesSeen[name] ) {
+            visit.issueWarning(assignment,
+              `Are you sure you wanted to immediately reassign '${name}'?`
+            );
+          }
+          namesSeen[name] = true;
+        });
+      });
+      return statements;
+    }
+
     function validateMergeables(statements: Syntax.FunctionDeclaration[]) {
       let namesSeen: { [index: string]: boolean } = {};
       let lastName: string;
@@ -122,16 +139,16 @@ namespace Fate.Compiler.Checker {
 
         if ( !signature.guard && namesSeen[name] ) {
           visit.issueWarning(statement,
-            "The unguarded Function '" + name + "' will replace " +
-            "the previous definition(s)"
+            `The unguarded Function '${name}' will replace ` +
+            `the previous definition(s)`
           );
         }
 
         if ( name === lastName && args !== lastArgs ) {
           annotate(statement, 'function/no_merge');
           visit.issueWarning(statement,
-            "Reopened Function '" + name + "' has different " +
-            "argument names than the original definition"
+            `Reopened Function '${name}' has different ` +
+            `argument names than the original definition`
           );
         }
 

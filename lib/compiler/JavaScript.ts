@@ -118,7 +118,7 @@ namespace Fate.Compiler.JavaScript {
       }
       id = this.generatedLiterals[canonical] = this.nextId('l');
 
-      this.globalVars.push(id + "=" + canonical);
+      this.globalVars.push(`${id}=${canonical}`);
       return id;
     }
 
@@ -136,21 +136,21 @@ namespace Fate.Compiler.JavaScript {
 
     public builder(funcName: string, ...literalIds: Ids) {
       let funcId = this.runtimeImport(funcName);
-      let key = funcId + "/" + literalIds.join('/');
+      let key = `${funcId}/${literalIds.join('/')}`;
       let id = this.generatedBuilders[key];
       if ( id ) {
         return id;
       }
       id = this.generatedBuilders[key] = this.nextId('b');
       this.globalVars.push(
-        id + "=" + funcId + "(" + literalIds.join(',') + ")"
+        `${ id }=${ funcId }(${ literalIds.join(',') })`
       );
       return id;
     }
 
     public toString() {
       if ( this.globalVars.length ) {
-        return 'const ' + this.globalVars.join(',') + ';';
+        return `const ${ this.globalVars.join(',') };`;
       }
       return '';
     }
