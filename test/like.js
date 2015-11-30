@@ -149,8 +149,9 @@ exports.like = nodeunit.testCase({
     test.equal(evaluate(script5, data), "They don't match!");
     test.equal(evaluate(script5, { person1: null }), "They don't match!");
 
-    test.equal(evaluate("None like null_value", data), false);
+    test.equal(evaluate("None like null_value", data), true);
     test.equal(evaluate("null_value like None", data), true);
+    test.equal(evaluate("person1 like person1", data), true);
 
     test.done();
   }

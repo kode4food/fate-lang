@@ -33,24 +33,20 @@ namespace Fate.Runtime {
     return value === null || value === undefined || value === none;
   });
 
-  export function isNone(value: any) {
-    return value === none || none(value);
-  }
+  export let isNone = none;
 
   export let some = definePattern(function(value: any) {
     return value !== null && value !== undefined && value !== none;
   });
 
-  export function isSome(value: any) {
-    return value === some || some(value);
-  }
+  export let isSome = some;
 
   /**
    * Basic Object Matcher to support the `like` operator.
    */
   export function isMatchingObject(template: any, obj: any) {
-    if ( template === null || template === undefined ) {
-      return obj === null || obj === undefined;
+    if ( isNone(template) ) {
+      return isNone(obj);
     }
 
     if ( typeof template !== 'object' ) {
@@ -94,7 +90,7 @@ namespace Fate.Runtime {
   }
 
   function nestedMatcher(template: any) {
-    if ( template === null || template === undefined ) {
+    if ( isNone(template) ) {
       return none;
     }
     if ( typeof template !== 'object' ) {
