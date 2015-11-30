@@ -123,15 +123,26 @@ def unary(test)
   test.done()
 end
 
-def nilEvaluation(test)
+def noneSomeEvaluation(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
-  true = nil        | isFalse
-  nil != nil        | isFalse
-  nil = nil         | isTrue
-  bogusValue != nil | isFalse
-  bogusValue = nil  | isTrue
+  true = None          | isFalse
+  None != None         | isFalse
+  None = None          | isTrue
+  bogusValue != None   | isTrue
+  bogusValue = None    | isFalse
+  bogusValue like None | isTrue
+
+  Some("hello")             | isTrue
+  Some(undefined)           | isFalse
+  None("hello")             | isFalse
+  None(undefined)           | isTrue
+  Some(Some)                | isTrue
+  None(None)                | isTrue
+  Some(None)                | isFalse
+  None(Some)                | isFalse
+
   test.done()
 end
 
@@ -174,8 +185,8 @@ def objectLike(test)
   let a = 99, b = 'hello'
 
   person like { name: "Thom", age: 42 } | isTrue
-  nil like {(a): b}        | isFalse
-  99 like {name: b}        | isFalse
+  None like {(a): b}                    | isFalse
+  99 like {name: b}                     | isFalse
   test.done()
 end
 
@@ -190,7 +201,7 @@ def arrayLike(test)
   [1, 2] like [1, 2, 3]    | isFalse
   [] like []               | isTrue
   [] like [a]              | isFalse
-  nil like [b]             | isFalse
+  None like [b]            | isFalse
   99 like [1,b,a]          | isFalse
   test.done()
 end
@@ -272,7 +283,7 @@ let tests = nodeunit.testCase({
   "'not in' Evaluation": notIn,
   "Boolean Or/And Evaluation": bool,
   "Unary Evaluation": unary,
-  "'nil' Evaluation": nilEvaluation,
+  "None/Some Evaluation": noneSomeEvaluation,
   "Conditional Evaluation": conditional,
   "Object Like": objectLike,
   "Array Like": arrayLike,

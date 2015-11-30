@@ -116,12 +116,13 @@ exports.basics = nodeunit.testCase({
     test.done();
   },
 
-  "Nil Evaluation": function (test ) {
-    test.equal(evaluate("true = nil"), false);
-    test.equal(evaluate("nil != nil"), false);
-    test.equal(evaluate("nil = nil"), true);
-    test.equal(evaluate("bogusValue != nil"), false);
-    test.equal(evaluate("bogusValue = nil"), true);
+  "'None' Evaluation": function (test ) {
+    test.equal(evaluate("true = None"), false);
+    test.equal(evaluate("None != None"), false);
+    test.equal(evaluate("None = None"), true);
+    test.equal(evaluate("bogusValue != None"), true);
+    test.equal(evaluate("bogusValue = None"), false);
+    test.equal(evaluate("bogusValue like None"), true);
     test.done();
   },
 

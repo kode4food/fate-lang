@@ -139,19 +139,18 @@ exports.like = nodeunit.testCase({
     test.equal(evaluate(script1, data), "They match!");
     test.equal(evaluate(script1, { person1: null }), "They match!");
     test.equal(evaluate(script2, data), "They don't match!");
-    test.equal(evaluate(script3,
-              { person1: person1, person3: 88 }),
-              "They don't match!");
+    test.equal(evaluate(script3, { person1: person1, person3: 88 }),
+               "They don't match!");
     test.equal(evaluate(script3, data), "They don't match!");
     test.equal(evaluate(script4, data), "They match!");
     test.equal(evaluate(script4, { array: [] }), "They don't match!");
     test.equal(evaluate(script4, { array: ['blue', 'white', 'green'] }),
-              "They don't match!");
+               "They don't match!");
     test.equal(evaluate(script5, data), "They don't match!");
     test.equal(evaluate(script5, { person1: null }), "They don't match!");
 
-    test.equal(evaluate("nil like null_value", data), true);
-    test.equal(evaluate("null_value like nil", data), true);
+    test.equal(evaluate("None like null_value", data), false);
+    test.equal(evaluate("null_value like None", data), true);
 
     test.done();
   }
