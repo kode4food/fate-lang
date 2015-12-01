@@ -1,8 +1,11 @@
 /// <reference path="./Util.ts"/>
+/// <reference path="./runtime/Match.ts"/>
 
 "use strict";
 
 namespace Fate.Types {
+  import Runtime = Fate.Runtime;
+
   export type DirPath = string;
   export type ModuleName = string;
 
@@ -42,12 +45,14 @@ namespace Fate.Types {
 
   export function isTrue(value: any) {
     return value !== false && value !== null &&
-           value !== undefined && value !== 0;
+           value !== undefined && value !== 0 &&
+           value !== Runtime.none;
   }
 
   export function isFalse(value: any) {
     return value === false || value === null ||
-           value === undefined || value === 0;
+           value === undefined || value === 0 ||
+           value === Runtime.none;
   }
 
   export function isIn(value: any, list: any) {

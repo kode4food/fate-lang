@@ -3,12 +3,18 @@
 "use strict";
 
 namespace Fate {
-  export var Global = {
+  interface AnyMap {
+    [index: string]: any;
+  }
+  
+  export var Global: AnyMap = {
+    null: null,
+    undefined: undefined,
     mutable: createMutable,
     console: console,
     require: require,
-    __filename: <string>undefined,
-    __dirname: <string>undefined,
+    __filename: undefined,
+    __dirname: undefined,
     setTimeout: setTimeout
   };
 

@@ -239,6 +239,7 @@ namespace Fate.Compiler.Syntax {
 
   export class Self extends Identifier {}
 
+
   export class Literal extends Symbol {
     constructor(public value: any) { super(); }
   }
@@ -247,7 +248,11 @@ namespace Fate.Compiler.Syntax {
     return node instanceof Literal;
   }
 
-  export class Regex extends Symbol {
+  export class PatternSymbol extends Symbol { }
+  export class None extends PatternSymbol { }
+  export class Some extends PatternSymbol { }
+
+  export class Regex extends PatternSymbol {
     public value: RegExp;
 
     constructor(pattern: string, flags: string) {
@@ -385,6 +390,8 @@ namespace Fate.Compiler.Syntax {
     'object': ObjectConstructor,
     'id':  Identifier,
     'self': Self,
+    'none': None,
+    'some': Some,
     'literal': Literal,
     'pattern': Pattern,
     'regex': Regex,

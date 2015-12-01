@@ -29,10 +29,10 @@ var nodeUnitConfig = {
 
 var enforcerConfig = {
   thresholds: {
-    statements: 99,
-    branches: 90,
-    functions: 99,
-    lines: 99
+    statements: 99.76,
+    branches: 91.17,
+    functions: 100,
+    lines: 99.81
   },
   coverageDirectory: 'coverage',
   rootDirectory: ''

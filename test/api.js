@@ -3,11 +3,15 @@
 var nodeunit = require('nodeunit');
 var fate = require('../build/fate');
 var types = fate.Types;
+var runtime = fate.Runtime;
 
 exports.api = nodeunit.testCase({
 
   "True / False": function (test) {
+    test.equal(types.isTrue(runtime.none), false);
+    test.equal(types.isTrue(runtime.some), true);
     test.equal(types.isTrue(null), false);
+    test.equal(types.isTrue(undefined), false);
     test.equal(types.isTrue(), false);
     test.equal(types.isTrue([]), true);
     test.equal(types.isTrue({}), true);

@@ -25,14 +25,16 @@ exports.strings = nodeunit.testCase({
     var script1 = "from string import lower\nlower('CAP STRING')";
     var script2 = "from string import split\nsplit('1\\n2\\n3')[2]";
     var script3 = "from string import split\nsplit('1-2-3', '-')[1]";
-    var script4 = "from string import build\n" +
+    var script4 = "from string import upper\nupper('lc string')";
+    var script5 = "from string import build\n" +
                   "let b=build('%name is %age')\n" +
                   "{ name: 'Thom', age: 43 } | b";
 
     test.equal(evaluate(script1), "cap string");
     test.equal(evaluate(script2), "3");
     test.equal(evaluate(script3), "2");
-    test.equal(evaluate(script4), "Thom is 43");
+    test.equal(evaluate(script4), "LC STRING");
+    test.equal(evaluate(script5), "Thom is 43");
     test.done();
   }
 

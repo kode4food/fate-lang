@@ -1,5 +1,3 @@
-/// <reference path="../Types.ts"/>
-
 "use strict";
 
 namespace Fate.Runtime {
@@ -31,16 +29,24 @@ namespace Fate.Runtime {
     return typeof value === 'function' && value.__fatePattern;
   }
 
-  let nullMatcher = definePattern(function(obj: any) {
-    return obj === null || obj === undefined;
+  export let none: Pattern = definePattern(function(value: any) {
+    return value === null || value === undefined || value === none;
   });
+
+  export let isNone = none;
+
+  export let some = definePattern(function(value: any) {
+    return value !== null && value !== undefined && value !== none;
+  });
+
+  export let isSome = some;
 
   /**
    * Basic Object Matcher to support the `like` operator.
    */
   export function isMatchingObject(template: any, obj: any) {
-    if ( template === null || template === undefined ) {
-      return obj === null || obj === undefined;
+    if ( isNone(template) ) {
+      return isNone(obj);
     }
 
     if ( typeof template !== 'object' ) {
@@ -84,13 +90,7 @@ namespace Fate.Runtime {
   }
 
   function nestedMatcher(template: any) {
-    if ( template === null || template === undefined ) {
-      return nullMatcher;
-    }
     if ( typeof template !== 'object' ) {
-      if ( isPattern(template) ) {
-        return template;
-      }
       return valueMatcher;
     }
     if ( Array.isArray(template) ) {
@@ -139,9 +139,6 @@ namespace Fate.Runtime {
     return objectMatcher;
 
     function objectMatcher(obj: any) {
-      if ( template === obj ) {
-        return true;
-      }
       if ( typeof obj !== 'object' || obj === null ) {
         return false;
       }

@@ -22,7 +22,7 @@ namespace Fate.Compiler.Patterns {
 
     return [
       visit.matching(rollUpPatterns, nestedPattern),
-      visit.matching(rollUpRegexPatterns, visit.tags('pattern')),
+      visit.matching(rollUpPatternSymbols, visit.tags('pattern')),
       visit.matching(namePatterns, visit.tags('pattern')),
       visit.matching(nameSelfPatternAnchors, patternCollection),
       visit.matching(nameAndAnnotateSelfPatterns, selfPattern),
@@ -34,9 +34,8 @@ namespace Fate.Compiler.Patterns {
       return node.left;
     }
 
-    // a Regex *is* a pattern
-    function rollUpRegexPatterns(node: Syntax.Pattern) {
-      if ( node.left instanceof Syntax.Regex ) {
+    function rollUpPatternSymbols(node: Syntax.Pattern) {
+      if ( node.left instanceof Syntax.PatternSymbol ) {
         return node.left;
       }
       return node;

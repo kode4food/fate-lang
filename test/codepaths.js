@@ -11,7 +11,8 @@ exports.codepaths = nodeunit.testCase({
       high_number: 20,
       true_val: true,
       false_val: false,
-      nil_value: null,
+      null_value: null,
+      undefined_value: undefined,
       obj_value: {
         name: 'Thom',
         age: 42
@@ -169,15 +170,7 @@ exports.codepaths = nodeunit.testCase({
 
   "Membership": function (test) {
     test.throws(function () {
-      evaluate("nil.missing");
-    });
-
-    test.throws(function () {
-      evaluate("nil_value[nil_value]", this.data);
-    });
-
-    test.throws(function () {
-      evaluate("nil[nil_value]", this.data);
+      evaluate("null_value[null_value]", this.data);
     });
 
     test.equal(evaluate("obj_value.name", this.data), "Thom");
@@ -185,10 +178,6 @@ exports.codepaths = nodeunit.testCase({
     test.equal(evaluate("obj_value[name_key]", this.data), "Thom");
     test.equal(evaluate("obj_value.missing", this.data), undefined);
     test.equal(evaluate("obj_value[missing_key]", this.data), undefined);
-
-    test.throws(function () {
-      evaluate("nil_value.missing", this.data);
-    });
 
     test.done();
   },
