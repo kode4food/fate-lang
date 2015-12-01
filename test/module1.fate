@@ -1,4 +1,4 @@
-# File Resolver's Import should attempt to load a file.int before venturing
+# File Resolver's Import should attempt to load a file.fate before venturing
 # into directories.  Therefore this module should be the one exposed by a
 # File Resolver
 
