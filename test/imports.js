@@ -16,6 +16,11 @@ exports.imports = nodeunit.testCase({
       this.memoryResolver = resolver;
       fate.Runtime.resolvers().push(resolver);
 
+      var compiled = fate.compile("'hello compiled!'");
+      var generatedModule = fate.Types.createModule();
+      compiled(fate.globals(), generatedModule.exports);
+      resolver.register('compiled', generatedModule);
+        
       resolver.register('hello', "'hello world!'");
       resolver.register('helpers', {
         testHelper: function testHelper(arg1, arg2) {

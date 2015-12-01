@@ -48,8 +48,7 @@ namespace Fate.Resolvers {
      * @param {String} name the name of the module to be registered
      * @param {Function|String|Object} module the module to register
      */
-    function register(name: Types.ModuleName,
-                      module: Types.Module|string|AnyMap) {
+    function register(name: Types.ModuleName, module: string|AnyMap) {
       // A compiled Fate Module function
       if ( isFateModule(module) ) {
         cache[name] = <Types.Module>module;

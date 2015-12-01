@@ -17,7 +17,7 @@ namespace Fate.Runtime {
 
   export function bindFunction(func: Function, args: ArgTemplate) {
     let indexes = Object.keys(args).map(Number);
-    let templateSize = indexes.length ? Math.max.apply(null, indexes) : 0;
+    let templateSize = Math.max.apply(null, indexes);
     let template: any[] = [];
     let argMap: number[] = [];
 

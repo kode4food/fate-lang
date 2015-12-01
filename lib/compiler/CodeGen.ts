@@ -232,20 +232,20 @@ namespace Fate.Compiler.CodeGen {
           function (param: Syntax.Parameter) { return param.id.value; }
         );
 
-        generate.assignment(signature.id.value, function () {
-          let create = signature.guard ? createGuarded : createUnguarded;
-          create();
-        });
+        let create = signature.guard ? createGuarded : createUnguarded;
+        create();
 
         function createUnguarded() {
-          generate.call(globals.runtimeImport('defineChannel'), [
-            function () {
-              generate.func({
-                contextArgs: paramNames,
-                body: unguardedBody
-              });
-            }
-          ]);
+          generate.assignment(signature.id.value, function () {
+            generate.call(globals.runtimeImport('defineChannel'), [
+              function () {
+                generate.func({
+                  contextArgs: paramNames,
+                  body: unguardedBody
+                });
+              }
+            ]);
+          });
         }
 
         function unguardedBody() {
@@ -277,12 +277,12 @@ namespace Fate.Compiler.CodeGen {
 
         function createGuarded() {
           let functionName = signature.id;
-          let originalId = generate.code(function () {
-            generate.getter(functionName.value);
+          let ensuredId = generateEnsured(functionName, 'Channel');
+          
+          generate.assignment(signature.id.value, function () {
+            let defineFunction = globals.runtimeImport('defineChannel');
+            generate.call(defineFunction, [createFunction]);
           });
-
-          let defineFunction = globals.runtimeImport('defineChannel');
-          generate.call(defineFunction, [createFunction]);
 
           function createFunction() {
             generate.func({
@@ -301,11 +301,7 @@ namespace Fate.Compiler.CodeGen {
             );
 
             generate.returnStatement(function () {
-              generate.call(
-                function () {
-                  let ensure = globals.runtimeImport('ensureChannel');
-                  generate.call(ensure, [originalId]);
-                },
+              generate.call(ensuredId,
                 [function () { generate.retrieveAnonymous(joinArgs); }]
               );
             });
@@ -317,6 +313,22 @@ namespace Fate.Compiler.CodeGen {
     function getFuncOrLambdaInternalId(node: Syntax.Node) {
       let hasSelf = hasAnnotation(node, 'function/self');
       return hasSelf ? generate.selfName : undefined;
+    }
+
+    function generateEnsured(signatureName: Syntax.Identifier, 
+                             signatureType: string) {
+      let ensure = globals.runtimeImport('ensure' + signatureType);    
+      var ensuredId = generate.createAnonymous();
+                 
+      generate.statement(function () {
+        generate.assignAnonymous(ensuredId, function () {
+          generate.call(ensure, [function () {
+            generate.getter(signatureName.value);
+          }]);
+        });
+      });
+      
+      return ensuredId;         
     }
 
     function createFunctionEvaluator(node: Syntax.FunctionDeclaration) {
@@ -338,12 +350,10 @@ namespace Fate.Compiler.CodeGen {
           body: defer(createStatementsEvaluator, node.statements)
         });
       }
-
+      
       function createGuarded() {
         let functionName = node.signature.id;
-        let originalId = generate.code(function () {
-          generate.getter(functionName.value);
-        });
+        let ensuredId = generateEnsured(functionName, 'Function');
 
         generate.funcDecl(functionName.value, {
           internalId: getFuncOrLambdaInternalId(node),
@@ -358,10 +368,7 @@ namespace Fate.Compiler.CodeGen {
             null,  // this is an 'else' case
             function () {
               generate.returnStatement(function () {
-                generate.call(function () {
-                  let ensure = globals.runtimeImport('ensureFunction');
-                  generate.call(ensure, [originalId]);
-                });
+                generate.call(ensuredId);
               });
             }
           );

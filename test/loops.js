@@ -118,9 +118,12 @@ exports.loops = nodeunit.testCase({
                   'select brother + ":" + idx]';
 
     var script2 = '[for idx:color in colors() select color + ":" + idx]';
+    
+    var script3 = '[for idx:color in 97]';
 
     test.deepEqual(evaluate(script1, this.data), ['Curly:0', 'Shemp:1']);
     test.deepEqual(evaluate(script2, {colors}), ['red:0', 'green:1', 'blue:2']);
+    test.deepEqual(evaluate(script3), []);
     test.done();
   }
 });

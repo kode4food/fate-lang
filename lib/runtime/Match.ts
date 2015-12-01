@@ -90,13 +90,7 @@ namespace Fate.Runtime {
   }
 
   function nestedMatcher(template: any) {
-    if ( isNone(template) ) {
-      return none;
-    }
     if ( typeof template !== 'object' ) {
-      if ( isPattern(template) ) {
-        return template;
-      }
       return valueMatcher;
     }
     if ( Array.isArray(template) ) {
@@ -145,9 +139,6 @@ namespace Fate.Runtime {
     return objectMatcher;
 
     function objectMatcher(obj: any) {
-      if ( template === obj ) {
-        return true;
-      }
       if ( typeof obj !== 'object' || obj === null ) {
         return false;
       }
