@@ -175,7 +175,7 @@ namespace Fate.Compiler.Rewriter {
     function foldIfStatements(statements: Syntax.IfStatement[]) {
       let output: Syntax.Statement[] = [];
       statements.forEach(function (statement) {
-        if ( !hasTag(statement, 'if') || !isLiteral(statement.condition ) ) {
+        if ( !hasTag(statement, 'if') || !isLiteral(statement.condition) ) {
           output.push(statement);
           return;
         }

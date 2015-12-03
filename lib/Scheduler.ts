@@ -52,5 +52,5 @@ namespace Fate {
     }
   }
 
-  export var GlobalScheduler = new Scheduler();
+  export let GlobalScheduler = new Scheduler();
 }

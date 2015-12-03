@@ -6,16 +6,20 @@ namespace Fate {
   interface AnyMap {
     [index: string]: any;
   }
-  
-  export var Global: AnyMap = {
-    null: null,
-    undefined: undefined,
+
+  export let Global: AnyMap = {
+    node: {
+      null: null,
+      undefined: undefined,
+      console: console,
+      setTimeout: setTimeout,
+      require: require
+    },
     mutable: createMutable,
-    console: console,
-    require: require,
+    print: console.log.bind(console.log),
+    timeout: setTimeout,
     __filename: undefined,
     __dirname: undefined,
-    setTimeout: setTimeout
   };
 
   class Mutable {

@@ -11,8 +11,8 @@
 
 namespace Fate.Runtime {
   export import isObject = Types.isObject;
-  export var isTrue = Types.isTrue;
-  export var isFalse = Types.isFalse;
-  export var isIn = Types.isIn;
-  export var isArray = Array.isArray;
+  export let isTrue = Types.isTrue;
+  export let isFalse = Types.isFalse;
+  export let isIn = Types.isIn;
+  export let isArray = Array.isArray;
 }

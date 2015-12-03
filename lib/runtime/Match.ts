@@ -61,7 +61,7 @@ namespace Fate.Runtime {
         return false;
       }
 
-      for ( var i = 0, len = template.length; i < len; i++ ) {
+      for ( let i = 0, len = template.length; i < len; i++ ) {
         if ( !isMatchingObject(template[i], obj[i]) ) {
           return false;
         }
@@ -74,7 +74,7 @@ namespace Fate.Runtime {
       return false;
     }
 
-    for ( var key in template ) {
+    for ( let key in template ) {
       if ( !isMatchingObject(template[key], obj[key]) ) {
         return false;
       }

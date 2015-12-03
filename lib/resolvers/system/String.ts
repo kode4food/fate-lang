@@ -46,5 +46,5 @@ namespace Fate.Resolvers.System.String {
   }
 
   // `string(value)` converts value to a String
-  export var string = NativeString;
+  export let string = NativeString;
 }

@@ -115,7 +115,7 @@ namespace Fate.Compiler.Checker {
       let namesSeen: { [index: string]: boolean } = {};
       statements.forEach(function (statement) {
         statement.assignments.forEach(function (assignment) {
-          var name = assignment.id.value;
+          let name = assignment.id.value;
           if ( namesSeen[name] ) {
             visit.issueWarning(assignment,
               `Are you sure you wanted to immediately reassign '${name}'?`

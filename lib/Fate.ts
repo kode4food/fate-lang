@@ -15,7 +15,7 @@ namespace Fate {
   import generateFunction = Compiler.generateFunction;
 
   let pkg = require('../package.json');
-  export var VERSION = pkg.version;
+  export const VERSION = pkg.version;
 
   export function globals(extensions?: Object) {
     if ( Types.isObject(extensions) ) {
@@ -31,7 +31,7 @@ namespace Fate {
 
   /**
    * Fate compiler entry point.  Takes a script and returns a closure
-   * for rendering it.  The script must be a String.
+   * for invoking it.  The script must be a String.
    *
    * @param {String} script the script to be compiled
    */

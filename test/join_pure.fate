@@ -20,12 +20,12 @@ def joinPatternTest(test)
   end
 
   (() -> a({ non: 'exhaustive' })) | test.throws
-  setTimeout( () -> a({ type: 'Test', value: 'aValue'}, 'hello'),  10 )
-  setTimeout( () -> b('there', 99), 20 )
-  setTimeout( () -> a({ type: 'Not', value: 'another' }, 'goodbye'),  30 )
-  setTimeout( () -> b('you', 40),  40 )
-  setTimeout( () -> b('there', 120), 60 )
-  setTimeout( () -> test.done(), 100)
+  timeout( () -> a({ type: 'Test', value: 'aValue'}, 'hello'),  10 )
+  timeout( () -> b('there', 99), 20 )
+  timeout( () -> a({ type: 'Not', value: 'another' }, 'goodbye'),  30 )
+  timeout( () -> b('you', 40),  40 )
+  timeout( () -> b('there', 120), 60 )
+  timeout( () -> test.done(), 100)
 end
 
 let tests = nodeunit.testCase({

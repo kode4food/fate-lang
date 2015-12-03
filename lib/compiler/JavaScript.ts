@@ -196,6 +196,7 @@ namespace Fate.Compiler.JavaScript {
       conditionalOperator: conditionalOperator,
       statement: statement,
       ifStatement: ifStatement,
+      nestedScope: nestedScope,
       loopExpression: loopExpression,
       loopContinue: loopContinue,
       funcDecl: funcDeclaration,
@@ -542,6 +543,15 @@ namespace Fate.Compiler.JavaScript {
       });
 
       return branchContent;
+    }
+
+    function nestedScope(body: BodyEntry) {
+      var parentNames = names;
+      pushLocalScope();
+      var bodyContent = code(body);
+      writeLocalVariables(parentNames, []);
+      write(bodyContent);
+      popLocalScopeWithScratch();
     }
 
     function loopExpression(options: LoopOptions) {

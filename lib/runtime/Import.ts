@@ -14,8 +14,8 @@ namespace Fate.Runtime {
     nodeResolver, fileResolver, systemResolver, memoryResolver
   ];
 
-  export var registerModule = memoryResolver.register;
-  export var unregisterModule = memoryResolver.unregister;
+  export let registerModule = memoryResolver.register;
+  export let unregisterModule = memoryResolver.unregister;
 
   export function resolve(moduleName: ModuleName, basePath?: DirPath) {
     for ( let i = _resolvers.length - 1; i >= 0; i-- ) {

@@ -79,56 +79,56 @@ namespace Fate.Resolvers.System.Math {
   // Math functions
 
   // `number(value)` convert value to a Number
-  export var number = Number;
+  export let number = Number;
   // `abs(value)` returns the absolute value
-  export var abs = NativeMath.abs;
+  export let abs = NativeMath.abs;
   // `acos(value)` returns the arc-cosine of value (in radians)
-  export var acos = NativeMath.acos;
+  export let acos = NativeMath.acos;
   // `asin(value)` returns the arc-sine of value (in radians)
-  export var asin = NativeMath.asin;
+  export let asin = NativeMath.asin;
   // `atan(value)` returns the arc-tangent of value (in radians)
-  export var atan = NativeMath.atan;
+  export let atan = NativeMath.atan;
   // `atan2(x,y)` returns the arc-tangent of the coords
-  export var atan2 = NativeMath.atan2;
+  export let atan2 = NativeMath.atan2;
   // `ceil(value)` rounds to the next highest integer
-  export var ceil = NativeMath.ceil;
+  export let ceil = NativeMath.ceil;
   // `cos(value)` returns the cosine of value (in radians)
-  export var cos = NativeMath.cos;
+  export let cos = NativeMath.cos;
   // `exp(x)` returns E to the power of x
-  export var exp = NativeMath.exp;
+  export let exp = NativeMath.exp;
   // `floor(value)` rounds to the next lowest integer
-  export var floor = NativeMath.floor;
+  export let floor = NativeMath.floor;
   // `log(value)` returns the natural logarithm
-  export var log = NativeMath.log;
+  export let log = NativeMath.log;
   // `pow(x,y)` returns x raised to the power of y
-  export var pow = NativeMath.pow;
+  export let pow = NativeMath.pow;
   // `random()` returns a random number (0 <= x < 1)
-  export var random = NativeMath.random;
+  export let random = NativeMath.random;
   // `round(value)` rounds up or down to the closest integer
-  export var round = NativeMath.round;
+  export let round = NativeMath.round;
   // `sin(value)` returns the sine of value (in radians)
-  export var sin = NativeMath.sin;
+  export let sin = NativeMath.sin;
   // `sqrt(value)` returns the square root
-  export var sqrt = NativeMath.sqrt;
+  export let sqrt = NativeMath.sqrt;
   // `tan(value)` returns the tangent of value (in radians)
-  export var tan = NativeMath.tan;
+  export let tan = NativeMath.tan;
 
   // ### Constants
 
   // `E` is Euler's Number
-  export var E = NativeMath.E;
+  export let E = NativeMath.E;
   // `LN2` is the Natural Logarithm of 2
-  export var LN2 = NativeMath.LN2;
+  export let LN2 = NativeMath.LN2;
   // `LN10` is the Natural Logarithm of 10
-  export var LN10 = NativeMath.LN10;
+  export let LN10 = NativeMath.LN10;
   // `LOG2E` is the Base-2 Logarithm of E
-  export var LOG2E = NativeMath.LOG2E;
+  export let LOG2E = NativeMath.LOG2E;
   // `LOG10E` is the Base-10 Logarithm of E
-  export var LOG10E = NativeMath.LOG10E;
+  export let LOG10E = NativeMath.LOG10E;
   // `PI` is Pi
-  export var PI = NativeMath.PI;
+  export let PI = NativeMath.PI;
   // `SQRT1_2` is the Square Root of 1/2
-  export var SQRT1_2 = NativeMath.SQRT1_2;
+  export let SQRT1_2 = NativeMath.SQRT1_2;
   // `SQRT2` is the Square Root of 2
-  export var SQRT2 = NativeMath.SQRT2;
+  export let SQRT2 = NativeMath.SQRT2;
 }

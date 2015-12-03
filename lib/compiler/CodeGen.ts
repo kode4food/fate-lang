@@ -38,6 +38,7 @@ namespace Fate.Compiler.CodeGen {
       'for': createForEvaluator,
       'conditional': createConditionalEvaluator,
       'if':  createIfEvaluator,
+      'ifLet': createIfLetEvaluator,
       'or':  createOrEvaluator,
       'and': createAndEvaluator,
       'like': createLikeEvaluator,
@@ -278,7 +279,7 @@ namespace Fate.Compiler.CodeGen {
         function createGuarded() {
           let functionName = signature.id;
           let ensuredId = generateEnsured(functionName, 'Channel');
-          
+
           generate.assignment(signature.id.value, function () {
             let defineFunction = globals.runtimeImport('defineChannel');
             generate.call(defineFunction, [createFunction]);
@@ -315,11 +316,11 @@ namespace Fate.Compiler.CodeGen {
       return hasSelf ? generate.selfName : undefined;
     }
 
-    function generateEnsured(signatureName: Syntax.Identifier, 
+    function generateEnsured(signatureName: Syntax.Identifier,
                              signatureType: string) {
-      let ensure = globals.runtimeImport('ensure' + signatureType);    
-      var ensuredId = generate.createAnonymous();
-                 
+      let ensure = globals.runtimeImport('ensure' + signatureType);
+      let ensuredId = generate.createAnonymous();
+
       generate.statement(function () {
         generate.assignAnonymous(ensuredId, function () {
           generate.call(ensure, [function () {
@@ -327,8 +328,8 @@ namespace Fate.Compiler.CodeGen {
           }]);
         });
       });
-      
-      return ensuredId;         
+
+      return ensuredId;
     }
 
     function createFunctionEvaluator(node: Syntax.FunctionDeclaration) {
@@ -350,7 +351,7 @@ namespace Fate.Compiler.CodeGen {
           body: defer(createStatementsEvaluator, node.statements)
         });
       }
-      
+
       function createGuarded() {
         let functionName = node.signature.id;
         let ensuredId = generateEnsured(functionName, 'Function');
@@ -587,6 +588,31 @@ namespace Fate.Compiler.CodeGen {
       );
     }
 
+    function createIfLetEvaluator(node: Syntax.IfLetStatement) {
+      let thens = node.thenStatements.isEmpty() ? null : node.thenStatements;
+      let elses = node.elseStatements.isEmpty() ? null : node.elseStatements;
+      
+      generate.nestedScope(function () {
+        var some = globals.runtimeImport('some');
+        var letStatement = node.condition;
+        createLetEvaluator(letStatement);
+        var assignments = letStatement.assignments;
+        var conditions = assignments.map(function (assignment) {
+          return generate.code(function () {
+            generate.call(some, [function () {
+              generate.getter(assignment.id.value);
+            }]);
+          });
+        });
+
+        generate.ifStatement(
+          function () { generate.writeAndGroup(conditions); },
+          thens ? defer(createStatementsEvaluator, thens) : null,
+          elses ? defer(createStatementsEvaluator, elses) : null
+        );
+      });
+    }
+
     function createOrEvaluator(node: Syntax.OrOperator) {
       let leftAnon = generate.createAnonymous();
       generate.compoundExpression([
@@ -720,7 +746,7 @@ namespace Fate.Compiler.CodeGen {
       let some = globals.runtimeImport('some');
       generate.write(some);
     }
-    
+
     function createPatternEvaluator(node: Syntax.Pattern) {
       let definePattern = globals.runtimeImport('definePattern');
       generate.call(definePattern, [

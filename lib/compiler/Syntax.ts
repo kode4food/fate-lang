@@ -191,6 +191,12 @@ namespace Fate.Compiler.Syntax {
                 public elseStatements: Statements) { super(); }
   }
 
+  export class IfLetStatement extends Statement {
+    constructor(public condition: LetStatement,
+                public thenStatements: Statements,
+                public elseStatements: Statements) { super(); }
+  }
+
   export class ForStatement extends Statement {
     constructor(public ranges: Ranges,
                 public loopStatements: Statements,
@@ -365,6 +371,7 @@ namespace Fate.Compiler.Syntax {
     'for': ForStatement,
     'conditional': ConditionalOperator,
     'if': IfStatement,
+    'ifLet': IfLetStatement,
     'or': OrOperator,
     'and': AndOperator,
     'like': LikeOperator,
