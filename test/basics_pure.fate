@@ -149,8 +149,8 @@ def noneSomeEvaluation(test)
   null like Some            | isFalse
   undefined like Some       | isFalse
   None like Some            | isFalse
-  Some like Some            | isTrue  
-  
+  Some like Some            | isTrue
+
   let n = None, s = Some
   null like n               | isTrue
   undefined like n          | isTrue
@@ -167,8 +167,8 @@ def noneSomeEvaluation(test)
   null like s               | isFalse
   undefined like s          | isFalse
   n like s                  | isFalse
-  s like s                  | isTrue  
-    
+  s like s                  | isTrue
+
   Some("hello")             | isTrue
   Some(undefined)           | isFalse
   None("hello")             | isFalse
@@ -204,6 +204,37 @@ def trailingIfStatement(test)
   test.equal(test1(99), 'cond1')
   test.equal(test1(0), 'cond3')
   test.equal(test1(100), 'cond2')
+  test.done()
+end
+
+def ifLetStatement(test)
+  def test1(val1, val2, val3)
+    if let a = val1, b = val2, c = val3
+      {a, b, c} | "%a-%b-%c"
+    else if a like None
+      "a was None"
+    else if b like None
+      "b was None"
+    else
+      "c was None"
+    end
+  end
+
+  def test2(val)
+    if let a = val
+      {a} | "%a returned"
+    else
+      "a was None"
+    end
+  end
+
+  test.equal(test1("aVal", "bVal", "cVal"), "aVal-bVal-cVal")
+  test.equal(test1("aVal"), "b was None")
+  test.equal(test1(None, "bVal"), "a was None")
+  test.equal(test1("aVal", "bVal"), "c was None")
+
+  test.equal(test2("aVal"), "aVal returned")
+  test.equal(test2(), "a was None")
   test.done()
 end
 
@@ -315,9 +346,9 @@ end
 def nestedMatchers(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
-  
+
   let n = None, p = ~(42)
-  
+
   39 like ~(p)   | isFalse
   42 like ~(p)   | isTrue
   null like ~(n) | isTrue
@@ -335,6 +366,7 @@ let tests = nodeunit.testCase({
   "Unary Evaluation": unary,
   "None/Some Evaluation": noneSomeEvaluation,
   "Conditional Evaluation": conditional,
+  "'if let' Evaluation": ifLetStatement,
   "Object Like": objectLike,
   "Array Like": arrayLike,
   "Deep Paths": deepPaths,

@@ -579,38 +579,45 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createIfEvaluator(node: Syntax.IfStatement) {
-      let thens = node.thenStatements.isEmpty() ? null : node.thenStatements;
-      let elses = node.elseStatements.isEmpty() ? null : node.elseStatements;
-      generate.ifStatement(
+      generateIf(
         defer(node.condition),
-        thens ? defer(createStatementsEvaluator, thens) : null,
-        elses ? defer(createStatementsEvaluator, elses) : null
+        node.thenStatements,
+        node.elseStatements
       );
     }
 
     function createIfLetEvaluator(node: Syntax.IfLetStatement) {
-      let thens = node.thenStatements.isEmpty() ? null : node.thenStatements;
-      let elses = node.elseStatements.isEmpty() ? null : node.elseStatements;
-      
-      generate.nestedScope(function () {
-        var some = globals.runtimeImport('some');
-        var letStatement = node.condition;
-        createLetEvaluator(letStatement);
-        var assignments = letStatement.assignments;
-        var conditions = assignments.map(function (assignment) {
-          return generate.code(function () {
-            generate.call(some, [function () {
-              generate.getter(assignment.id.value);
-            }]);
-          });
-        });
+      var some = globals.runtimeImport('some');
+      var letStatement = node.condition;
+      createLetEvaluator(letStatement);
 
-        generate.ifStatement(
-          function () { generate.writeAndGroup(conditions); },
-          thens ? defer(createStatementsEvaluator, thens) : null,
-          elses ? defer(createStatementsEvaluator, elses) : null
-        );
+      var assignments = letStatement.assignments;
+      var conditions = assignments.map(function (assignment) {
+        return generate.code(function () {
+          generate.call(some, [function () {
+            generate.getter(assignment.id.value);
+          }]);
+        });
       });
+
+      generateIf(
+        function () { generate.writeAndGroup(conditions); },
+        node.thenStatements,
+        node.elseStatements
+      );
+    }
+
+    function generateIf(condition: Function,
+                        thenStatements: Syntax.Statements,
+                        elseStatements: Syntax.Statements) {
+      let thens = thenStatements.isEmpty() ? null : thenStatements;
+      let elses = elseStatements.isEmpty() ? null : elseStatements;
+
+      generate.ifStatement(
+        condition,
+        thens ? defer(createStatementsEvaluator, thens) : null,
+        elses ? defer(createStatementsEvaluator, elses) : null
+      );
     }
 
     function createOrEvaluator(node: Syntax.OrOperator) {
