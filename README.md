@@ -79,6 +79,10 @@ unless processFinished
   'process some request'
 end
 
+if let a=getSomeValue(), b=getAnotherValue()
+  # as they're not Nothing, do something with those values
+end  
+
 # Branching Expressions
 let result = 'green' unless turnedOff else 'red'
 
