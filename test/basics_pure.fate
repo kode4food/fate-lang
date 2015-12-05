@@ -1,5 +1,7 @@
 from pattern import Nothing, Something
 
+let null = node.null, undefined = node.undefined
+
 import nodeunit
 
 let data1 = {

@@ -1,6 +1,8 @@
 import pattern
 import nodeunit
 
+let null = node.null, undefined = node.undefined
+
 def numberPatterns(test)
   let isTrue = test.equal(?, true),
       isFalse = test.equal(?, false)
