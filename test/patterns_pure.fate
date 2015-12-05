@@ -1,0 +1,109 @@
+import pattern
+import nodeunit
+
+def numberPatterns(test)
+  let isTrue = test.equal(?, true),
+      isFalse = test.equal(?, false)
+
+  "hello" like pattern.Number         | isFalse
+  99.6 like pattern.Number            | isTrue
+  {} like pattern.Number              | isFalse
+  pattern.Nothing like pattern.Number | isFalse
+
+  99.6 like pattern.Integer           | isFalse
+  99 like pattern.Integer             | isTrue
+  
+  -99 like pattern.PositiveInteger    | isFalse
+  99.6 like pattern.PositiveInteger   | isFalse
+  0 like pattern.PositiveInteger      | isFalse
+  -99 like pattern.NegativeInteger    | isTrue
+  -99.6 like pattern.NegativeInteger  | isFalse
+  0 like pattern.NegativeInteger      | isFalse
+  
+  99.6 like pattern.PositiveNumber    | isTrue
+  99 like pattern.PositiveNumber      | isTrue
+  -99 like pattern.PositiveNumber     | isFalse
+  0 like pattern.PositiveNumber       | isFalse
+  -99.6 like pattern.NegativeNumber   | isTrue
+  -99 like pattern.NegativeNumber     | isTrue
+  99 like pattern.NegativeNumber      | isFalse
+  0 like pattern.NegativeNumber       | isFalse
+
+	test.done()
+end
+
+def stringPatterns(test)
+  let isTrue = test.equal(?, true),
+      isFalse = test.equal(?, false)
+
+  "" like pattern.String              | isTrue
+  "hello" like pattern.String         | isTrue
+  "" like pattern.NonEmptyString      | isFalse
+  "" like pattern.EmptyString         | isTrue
+  "hello" like pattern.EmptyString    | isFalse
+  "hello" like pattern.NonEmptyString | isTrue
+  99 like pattern.String              | isFalse
+  {} like pattern.String              | isFalse
+  [] like pattern.EmptyString         | isFalse
+  null like pattern.String            | isFalse
+  
+  test.done()
+end
+
+def booleanPatterns(test)
+  let isTrue = test.equal(?, true),
+      isFalse = test.equal(?, false)
+
+  true like pattern.Boolean    | isTrue
+  false like pattern.Boolean   | isTrue
+  "" like pattern.Boolean      | isFalse
+  "hello" like pattern.Boolean | isFalse
+  99 like pattern.Boolean      | isFalse
+  {} like pattern.Boolean      | isFalse
+  [] like pattern.Boolean      | isFalse
+  null like pattern.Boolean    | isFalse
+  
+  test.done()
+end
+
+def objectPatterns(test)
+  let isTrue = test.equal(?, true),
+      isFalse = test.equal(?, false)
+
+  true like pattern.Object    | isFalse
+  false like pattern.Object   | isFalse
+  "" like pattern.Object      | isFalse
+  "hello" like pattern.Object | isFalse
+  99 like pattern.Object      | isFalse
+  {} like pattern.Object      | isTrue
+  [] like pattern.Object      | isFalse
+  null like pattern.Object    | isFalse
+  
+  test.done()
+end
+
+def arrayPatterns(test)
+  let isTrue = test.equal(?, true),
+      isFalse = test.equal(?, false)
+
+  true like pattern.Array    | isFalse
+  false like pattern.Array   | isFalse
+  "" like pattern.Array      | isFalse
+  "hello" like pattern.Array | isFalse
+  99 like pattern.Array      | isFalse
+  {} like pattern.Array      | isFalse
+  [] like pattern.Array      | isTrue
+  null like pattern.Array    | isFalse
+  
+  test.done()
+end
+
+let tests = nodeunit.testCase({
+	"Numbers": numberPatterns,
+  "Strings": stringPatterns,
+  "Boolean": booleanPatterns,
+  "Objects": objectPatterns,
+  "Arrays": arrayPatterns
+})
+
+export tests
