@@ -116,13 +116,15 @@ exports.basics = nodeunit.testCase({
     test.done();
   },
 
-  "'None' Evaluation": function (test ) {
-    test.equal(evaluate("true = None"), false);
-    test.equal(evaluate("None != None"), false);
-    test.equal(evaluate("None = None"), true);
-    test.equal(evaluate("bogusValue != None"), true);
-    test.equal(evaluate("bogusValue = None"), false);
-    test.equal(evaluate("bogusValue like None"), true);
+  "'Nothing' Evaluation": function (test ) {
+    var importNothing = "from pattern import Nothing\n";
+
+    test.equal(evaluate(importNothing + "true = Nothing"), false);
+    test.equal(evaluate(importNothing + "Nothing != Nothing"), false);
+    test.equal(evaluate(importNothing + "Nothing = Nothing"), true);
+    test.equal(evaluate(importNothing + "bogusValue != Nothing"), true);
+    test.equal(evaluate(importNothing + "bogusValue = Nothing"), false);
+    test.equal(evaluate(importNothing + "bogusValue like Nothing"), true);
     test.done();
   },
 

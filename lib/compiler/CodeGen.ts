@@ -66,8 +66,6 @@ namespace Fate.Compiler.CodeGen {
       'literal': createLiteral,
       'regex': createRegex,
       'self': createSelfEvaluator,
-      'none': createNone,
-      'some': createSome,
       'pattern': createPatternEvaluator
     };
 
@@ -587,7 +585,7 @@ namespace Fate.Compiler.CodeGen {
     }
 
     function createIfLetEvaluator(node: Syntax.IfLetStatement) {
-      var some = globals.runtimeImport('some');
+      var some = globals.runtimeImport('isSomething');
       var letStatement = node.condition;
       createLetEvaluator(letStatement);
 
@@ -742,16 +740,6 @@ namespace Fate.Compiler.CodeGen {
       }
       selfPatternName = generate.registerAnonymous(selfPatternName);
       generate.retrieveAnonymous(selfPatternName);
-    }
-
-    function createNone(node: Syntax.None) {
-      let none = globals.runtimeImport('none');
-      generate.write(none);
-    }
-
-    function createSome(node: Syntax.Some) {
-      let some = globals.runtimeImport('some');
-      generate.write(some);
     }
 
     function createPatternEvaluator(node: Syntax.Pattern) {

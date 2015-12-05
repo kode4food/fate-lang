@@ -1,3 +1,5 @@
+from pattern import Nothing, Something
+
 import nodeunit
 import '../build/fate.js' as fate
 let types = fate.Types
@@ -7,8 +9,8 @@ def trueFalse(test)
   let isFalse = test.equal(?, false),
       isTrue = test.equal(?, true)
 
-  types.isTrue(None)              | isFalse
-  types.isTrue(Some)              | isTrue
+  types.isTrue(Nothing)           | isFalse
+  types.isTrue(Something)         | isTrue
   types.isTrue(null)              | isFalse
   types.isTrue(undefined)         | isFalse
   types.isTrue()                  | isFalse
@@ -17,7 +19,7 @@ def trueFalse(test)
   types.isTrue({ name: 'fate' })  | isTrue
   types.isTrue("hello")           | isTrue
   types.isTrue([1])               | isTrue
-  types.isFalse(None)             | isTrue
+  types.isFalse(Nothing)          | isTrue
   types.isFalse()                 | isTrue
   types.isFalse([])               | isFalse
   types.isFalse({})               | isFalse
@@ -27,26 +29,26 @@ def trueFalse(test)
   test.done()
 end
 
-def someNone(test)
+def somethingNothing(test)
   let isFalse = test.equal(?, false),
       isTrue = test.equal(?, true)
 
-  runtime.isSome(null)      | isFalse
-  runtime.isSome(undefined) | isFalse
-  runtime.isSome(Some)      | isTrue
-  runtime.isSome("hello")   | isTrue
-  runtime.isSome(false)     | isTrue
-  runtime.isNone(null)      | isTrue
-  runtime.isNone(undefined) | isTrue
-  runtime.isNone(None)      | isTrue
-  runtime.isNone("hello")   | isFalse
-  runtime.isNone(false)     | isFalse
+  runtime.isSomething(null)      | isFalse
+  runtime.isSomething(undefined) | isFalse
+  runtime.isSomething(Something) | isTrue
+  runtime.isSomething("hello")   | isTrue
+  runtime.isSomething(false)     | isTrue
+  runtime.isNothing(null)        | isTrue
+  runtime.isNothing(undefined)   | isTrue
+  runtime.isNothing(Nothing)     | isTrue
+  runtime.isNothing("hello")     | isFalse
+  runtime.isNothing(false)       | isFalse
   test.done()
 end
 
 let tests = nodeunit.testCase({
   "True / False": trueFalse,
-  "Some / None": someNone
+  "Something / Nothing": somethingNothing
 })
 
 export tests

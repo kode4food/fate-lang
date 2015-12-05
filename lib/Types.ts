@@ -46,13 +46,13 @@ namespace Fate.Types {
   export function isTrue(value: any) {
     return value !== false && value !== null &&
            value !== undefined && value !== 0 &&
-           value !== Runtime.none;
+           value !== Runtime.isNothing;
   }
 
   export function isFalse(value: any) {
     return value === false || value === null ||
            value === undefined || value === 0 ||
-           value === Runtime.none;
+           value === Runtime.isNothing;
   }
 
   export function isIn(value: any, list: any) {

@@ -4,6 +4,7 @@
 /// <reference path="./system/List.ts"/>
 /// <reference path="./system/Math.ts"/>
 /// <reference path="./system/String.ts"/>
+/// <reference path="./system/Pattern.ts"/>
 
 "use strict";
 
@@ -16,6 +17,7 @@ namespace Fate.Resolvers {
     resolver.register('math', <any>(System.Math));
     resolver.register('list', <any>(System.List));
     resolver.register('string', <any>(System.String));
+    resolver.register('pattern', <any>(System.Pattern));
 
     delete resolver.register;
     delete resolver.unregister;

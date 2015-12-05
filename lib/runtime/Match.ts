@@ -29,24 +29,20 @@ namespace Fate.Runtime {
     return typeof value === 'function' && value.__fatePattern;
   }
 
-  export let none: Pattern = definePattern(function(value: any) {
-    return value === null || value === undefined || value === none;
+  export let isNothing: Pattern = definePattern(function(value: any) {
+    return value === null || value === undefined || value === isNothing;
   });
 
-  export let isNone = none;
-
-  export let some = definePattern(function(value: any) {
-    return value !== null && value !== undefined && value !== none;
+  export let isSomething: Pattern = definePattern(function(value: any) {
+    return value !== null && value !== undefined && value !== isNothing;
   });
-
-  export let isSome = some;
 
   /**
    * Basic Object Matcher to support the `like` operator.
    */
   export function isMatchingObject(template: any, obj: any) {
-    if ( isNone(template) ) {
-      return isNone(obj);
+    if ( isNothing(template) ) {
+      return isNothing(obj);
     }
 
     if ( typeof template !== 'object' ) {

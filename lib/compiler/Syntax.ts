@@ -255,8 +255,6 @@ namespace Fate.Compiler.Syntax {
   }
 
   export class PatternSymbol extends Symbol { }
-  export class None extends PatternSymbol { }
-  export class Some extends PatternSymbol { }
 
   export class Regex extends PatternSymbol {
     public value: RegExp;
@@ -397,8 +395,6 @@ namespace Fate.Compiler.Syntax {
     'object': ObjectConstructor,
     'id':  Identifier,
     'self': Self,
-    'none': None,
-    'some': Some,
     'literal': Literal,
     'pattern': Pattern,
     'regex': Regex,

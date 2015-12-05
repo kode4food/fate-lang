@@ -1,3 +1,5 @@
+from pattern import Nothing, Something
+
 import nodeunit
 
 let data1 = {
@@ -123,35 +125,35 @@ def unary(test)
   test.done()
 end
 
-def noneSomeEvaluation(test)
+def nothingSomething(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
-  true = None          | isFalse
-  None != None         | isFalse
-  None = None          | isTrue
-  bogusValue != None   | isTrue
-  bogusValue = None    | isFalse
-  bogusValue like None | isTrue
+  true = Nothing            | isFalse
+  Nothing != Nothing        | isFalse
+  Nothing = Nothing         | isTrue
+  bogusValue != Nothing     | isTrue
+  bogusValue = Nothing      | isFalse
+  bogusValue like Nothing   | isTrue
 
-  null like None            | isTrue
-  undefined like None       | isTrue
-  None like None            | isTrue
-  Some like None            | isFalse
+  null like Nothing         | isTrue
+  undefined like Nothing    | isTrue
+  Nothing like Nothing      | isTrue
+  Something like Nothing    | isFalse
   null like null            | isTrue
   undefined like null       | isTrue
-  None like null            | isTrue
-  Some like null            | isFalse
+  Nothing like null         | isTrue
+  Something like null       | isFalse
   null like undefined       | isTrue
   undefined like undefined  | isTrue
-  None like undefined       | isTrue
-  Some like undefined       | isFalse
-  null like Some            | isFalse
-  undefined like Some       | isFalse
-  None like Some            | isFalse
-  Some like Some            | isTrue
+  Nothing like undefined    | isTrue
+  Something like undefined  | isFalse
+  null like Something       | isFalse
+  undefined like Something  | isFalse
+  Nothing like Something    | isFalse
+  Something like Something  | isTrue
 
-  let n = None, s = Some
+  let n = Nothing, s = Something
   null like n               | isTrue
   undefined like n          | isTrue
   n like n                  | isTrue
@@ -169,14 +171,14 @@ def noneSomeEvaluation(test)
   n like s                  | isFalse
   s like s                  | isTrue
 
-  Some("hello")             | isTrue
-  Some(undefined)           | isFalse
-  None("hello")             | isFalse
-  None(undefined)           | isTrue
-  Some(Some)                | isTrue
-  None(None)                | isTrue
-  Some(None)                | isFalse
-  None(Some)                | isFalse
+  Something("hello")        | isTrue
+  Something(undefined)      | isFalse
+  Nothing("hello")          | isFalse
+  Nothing(undefined)        | isTrue
+  Something(Something)      | isTrue
+  Nothing(Nothing)          | isTrue
+  Something(Nothing)        | isFalse
+  Nothing(Something)        | isFalse
 
   test.done()
 end
@@ -211,12 +213,12 @@ def ifLetStatement(test)
   def test1(val1, val2, val3)
     if let a = val1, b = val2, c = val3
       {a, b, c} | "%a-%b-%c"
-    else if a like None
-      "a was None"
-    else if b like None
-      "b was None"
+    else if a like Nothing
+      "a was Nothing"
+    else if b like Nothing
+      "b was Nothing"
     else
-      "c was None"
+      "c was Nothing"
     end
   end
 
@@ -224,17 +226,17 @@ def ifLetStatement(test)
     if let a = val
       {a} | "%a returned"
     else
-      "a was None"
+      "a was Nothing"
     end
   end
 
   test.equal(test1("aVal", "bVal", "cVal"), "aVal-bVal-cVal")
-  test.equal(test1("aVal"), "b was None")
-  test.equal(test1(None, "bVal"), "a was None")
-  test.equal(test1("aVal", "bVal"), "c was None")
+  test.equal(test1("aVal"), "b was Nothing")
+  test.equal(test1(Nothing, "bVal"), "a was Nothing")
+  test.equal(test1("aVal", "bVal"), "c was Nothing")
 
   test.equal(test2("aVal"), "aVal returned")
-  test.equal(test2(), "a was None")
+  test.equal(test2(), "a was Nothing")
   test.done()
 end
 
@@ -252,7 +254,7 @@ def objectLike(test)
 
   person like { name: "Thom", age: 42 } | isTrue
   person like person                    | isTrue
-  None like {(a): b}                    | isFalse
+  Nothing like {(a): b}                 | isFalse
   99 like {name: b}                     | isFalse
   test.done()
 end
@@ -268,7 +270,7 @@ def arrayLike(test)
   [1, 2] like [1, 2, 3]    | isFalse
   [] like []               | isTrue
   [] like [a]              | isFalse
-  None like [b]            | isFalse
+  Nothing like [b]         | isFalse
   99 like [1,b,a]          | isFalse
   c like c                 | isTrue
   test.done()
@@ -347,13 +349,13 @@ def nestedMatchers(test)
   let isTrue = test.equal(?, true)
   let isFalse = test.equal(?, false)
 
-  let n = None, p = ~(42)
+  let n = Nothing, p = ~(42)
 
-  39 like ~(p)   | isFalse
-  42 like ~(p)   | isTrue
-  null like ~(n) | isTrue
-  42 like ~(n)   | isFalse
-  None like ~(n) | isTrue
+  39 like ~(p)      | isFalse
+  42 like ~(p)      | isTrue
+  null like ~(n)    | isTrue
+  42 like ~(n)      | isFalse
+  Nothing like ~(n) | isTrue
   test.done()
 end
 
@@ -364,7 +366,7 @@ let tests = nodeunit.testCase({
   "'not in' Evaluation": notIn,
   "Boolean Or/And Evaluation": bool,
   "Unary Evaluation": unary,
-  "None/Some Evaluation": noneSomeEvaluation,
+  "Nothing/Something Evaluation": nothingSomething,
   "Conditional Evaluation": conditional,
   "'if let' Evaluation": ifLetStatement,
   "Object Like": objectLike,

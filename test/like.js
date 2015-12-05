@@ -136,6 +136,12 @@ exports.like = nodeunit.testCase({
                   '  "They don\'t match!"\n' +
                   'end';
 
+    var script6 = "import pattern\n" +
+                  "pattern.Nothing like null_value";
+
+    var script7 = "import pattern\n" +
+                  "null_value like pattern.Nothing";
+
     test.equal(evaluate(script1, data), "They match!");
     test.equal(evaluate(script1, { person1: null }), "They match!");
     test.equal(evaluate(script2, data), "They don't match!");
@@ -149,8 +155,8 @@ exports.like = nodeunit.testCase({
     test.equal(evaluate(script5, data), "They don't match!");
     test.equal(evaluate(script5, { person1: null }), "They don't match!");
 
-    test.equal(evaluate("None like null_value", data), true);
-    test.equal(evaluate("null_value like None", data), true);
+    test.equal(evaluate(script6, data), true);
+    test.equal(evaluate(script7, data), true);
     test.equal(evaluate("person1 like person1", data), true);
 
     test.done();
