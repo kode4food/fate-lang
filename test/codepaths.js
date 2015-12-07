@@ -228,5 +228,19 @@ exports.codepaths = nodeunit.testCase({
     test.equal(evaluate(script2), "Hello, World!");
 
     test.done();
+  },
+
+  "Keywords": function (test) {
+    var script = "{self: 'isSelf', for: 'isFor', where: 'isWhere'}";
+
+    test.equal(evaluate(script + ".self"), "isSelf");
+    test.equal(evaluate(script + ".for"), "isFor");
+    test.equal(evaluate(script + ".where"), "isWhere");
+    
+    test.throws(function () {
+      evaluate("let for = 'hello'");
+    }, "Keyword used as an identifier");
+
+    test.done();
   }
 });

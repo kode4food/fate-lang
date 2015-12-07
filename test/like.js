@@ -67,13 +67,18 @@ exports.like = nodeunit.testCase({
   },
 
   "Invalid 'self' Patterns": function (test) {
+    var script1 = "{ self: 'hello', age: 90 } | ~{ self: 'hello' }";
+
     test.throws(function () {
       evaluate("self > 99");
     }, "Invalid top level self keyword");
 
     test.throws(function () {
-      evaluate("~{ self: 'hello' }");
+      evaluate("~{ self + 1: 'hello' }");
     }, "Invalid object id 'self' keyword");
+
+    test.equal(evaluate("{ self: 'hello' }.self"), "hello");
+    test.equal(evaluate(script1), true);
 
     test.done();
   },
