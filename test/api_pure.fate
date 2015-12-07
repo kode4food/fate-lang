@@ -1,5 +1,7 @@
 from pattern import Nothing, Something
 
+let null = node.null, undefined = node.undefined
+
 import nodeunit
 import '../build/fate.js' as fate
 let types = fate.Types
