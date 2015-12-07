@@ -74,6 +74,10 @@ exports.like = nodeunit.testCase({
     }, "Invalid top level self keyword");
 
     test.throws(function () {
+      evaluate("{ self }");
+    }, "Invalid top level self keyword");
+
+    test.throws(function () {
       evaluate("~{ self + 1: 'hello' }");
     }, "Invalid object id 'self' keyword");
 
