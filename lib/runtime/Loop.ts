@@ -1,4 +1,8 @@
+"use strict";
+
 namespace Fate.Runtime {
+  const isArray = Array.isArray;
+
   export type Collection = any[]|any|Function;
 
   let generator = require('../lib/generator');
@@ -8,7 +12,7 @@ namespace Fate.Runtime {
   let EmptyCollection: Collection = [];
 
   export function createIterator(collection: Collection) {
-    if ( Array.isArray(collection) || isObject(collection) ||
+    if ( isArray(collection) || isObject(collection) ||
          isGenerator(collection) ) {
       return collection;
     }
@@ -16,7 +20,7 @@ namespace Fate.Runtime {
   }
 
   export function createNamedIterator(collection: Collection) {
-    if ( Array.isArray(collection) ) {
+    if ( isArray(collection) ) {
       return collection.map(function (item: any, index: number) {
         return [item, index];
       });

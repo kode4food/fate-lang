@@ -27,8 +27,10 @@ namespace Fate.Types {
     [index: string]: any;
   }
 
+  export let isArray = Array.isArray;
+
   export function isObject(obj: any) {
-    return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
+    return typeof obj === 'object' && obj !== null && !isArray(obj);
   }
 
   export function createModule(moduleExports?: ModuleExports) {
@@ -56,7 +58,7 @@ namespace Fate.Types {
   }
 
   export function isIn(value: any, list: any) {
-    if ( Array.isArray(list) ) {
+    if ( isArray(list) ) {
       return list.indexOf(value) !== -1;
     }
     if ( typeof list === 'object' && list !== null ) {

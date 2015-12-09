@@ -1,5 +1,4 @@
 /// <reference path="../Util.ts"/>
-/// <reference path="../Types.ts"/>
 
 "use strict";
 

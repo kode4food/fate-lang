@@ -1,8 +1,8 @@
 "use strict";
 
-let NativeMath = Math;
+namespace Fate.Resolvers.System.MathModule {
+  const isArray = Array.isArray;
 
-namespace Fate.Resolvers.System.Math {
   let createRangeGenerator = require('../lib/generator').createRangeGenerator;
 
   function numberSort(left: number, right: number): number {
@@ -17,7 +17,7 @@ namespace Fate.Resolvers.System.Math {
   // `avg(value)` if an Array, returns the average (mathematical mean) of
   // value's elements
   export function avg(value: number[]) {
-    if ( !Array.isArray(value) ) {
+    if ( !isArray(value) ) {
       return typeof value === 'number' ? value : NaN;
     }
     if ( value.length === 0 ) {
@@ -32,16 +32,16 @@ namespace Fate.Resolvers.System.Math {
 
   // `max(value)` if an Array, return the greatest value in it
   export function max(value: number[]) {
-    if ( !Array.isArray(value) ) {
+    if ( !isArray(value) ) {
       return typeof value === 'number' ? value : NaN;
     }
-    return NativeMath.max.apply(Math, value);
+    return Math.max.apply(Math, value);
   }
 
   // `median(value)` if an Array, return the mathematical median of
   // value's elements
   export function median(value: number[]) {
-    if ( !Array.isArray(value) ) {
+    if ( !isArray(value) ) {
       return typeof value === 'number' ? value : NaN;
     }
     if ( value.length === 0 ) {
@@ -57,16 +57,16 @@ namespace Fate.Resolvers.System.Math {
 
   // `min(value)` if an Array, return the lowest value in it
   export function min(value: number[]) {
-    if ( !Array.isArray(value) ) {
+    if ( !isArray(value) ) {
       return typeof value === 'number' ? value : NaN;
     }
-    return NativeMath.min.apply(Math, value);
+    return Math.min.apply(Math, value);
   }
 
   // `sum(value)` if an Array, return the mathematical sum of value's
   // elements
   export function sum(value: number[]) {
-    if ( !Array.isArray(value) ) {
+    if ( !isArray(value) ) {
       return typeof value === 'number' ? value : NaN;
     }
     let res = 0;
@@ -81,54 +81,54 @@ namespace Fate.Resolvers.System.Math {
   // `number(value)` convert value to a Number
   export let number = Number;
   // `abs(value)` returns the absolute value
-  export let abs = NativeMath.abs;
+  export let abs = Math.abs;
   // `acos(value)` returns the arc-cosine of value (in radians)
-  export let acos = NativeMath.acos;
+  export let acos = Math.acos;
   // `asin(value)` returns the arc-sine of value (in radians)
-  export let asin = NativeMath.asin;
+  export let asin = Math.asin;
   // `atan(value)` returns the arc-tangent of value (in radians)
-  export let atan = NativeMath.atan;
+  export let atan = Math.atan;
   // `atan2(x,y)` returns the arc-tangent of the coords
-  export let atan2 = NativeMath.atan2;
+  export let atan2 = Math.atan2;
   // `ceil(value)` rounds to the next highest integer
-  export let ceil = NativeMath.ceil;
+  export let ceil = Math.ceil;
   // `cos(value)` returns the cosine of value (in radians)
-  export let cos = NativeMath.cos;
+  export let cos = Math.cos;
   // `exp(x)` returns E to the power of x
-  export let exp = NativeMath.exp;
+  export let exp = Math.exp;
   // `floor(value)` rounds to the next lowest integer
-  export let floor = NativeMath.floor;
+  export let floor = Math.floor;
   // `log(value)` returns the natural logarithm
-  export let log = NativeMath.log;
+  export let log = Math.log;
   // `pow(x,y)` returns x raised to the power of y
-  export let pow = NativeMath.pow;
+  export let pow = Math.pow;
   // `random()` returns a random number (0 <= x < 1)
-  export let random = NativeMath.random;
+  export let random = Math.random;
   // `round(value)` rounds up or down to the closest integer
-  export let round = NativeMath.round;
+  export let round = Math.round;
   // `sin(value)` returns the sine of value (in radians)
-  export let sin = NativeMath.sin;
+  export let sin = Math.sin;
   // `sqrt(value)` returns the square root
-  export let sqrt = NativeMath.sqrt;
+  export let sqrt = Math.sqrt;
   // `tan(value)` returns the tangent of value (in radians)
-  export let tan = NativeMath.tan;
+  export let tan = Math.tan;
 
   // ### Constants
 
   // `E` is Euler's Number
-  export let E = NativeMath.E;
+  export let E = Math.E;
   // `LN2` is the Natural Logarithm of 2
-  export let LN2 = NativeMath.LN2;
+  export let LN2 = Math.LN2;
   // `LN10` is the Natural Logarithm of 10
-  export let LN10 = NativeMath.LN10;
+  export let LN10 = Math.LN10;
   // `LOG2E` is the Base-2 Logarithm of E
-  export let LOG2E = NativeMath.LOG2E;
+  export let LOG2E = Math.LOG2E;
   // `LOG10E` is the Base-10 Logarithm of E
-  export let LOG10E = NativeMath.LOG10E;
+  export let LOG10E = Math.LOG10E;
   // `PI` is Pi
-  export let PI = NativeMath.PI;
+  export let PI = Math.PI;
   // `SQRT1_2` is the Square Root of 1/2
-  export let SQRT1_2 = NativeMath.SQRT1_2;
+  export let SQRT1_2 = Math.SQRT1_2;
   // `SQRT2` is the Square Root of 2
-  export let SQRT2 = NativeMath.SQRT2;
+  export let SQRT2 = Math.SQRT2;
 }

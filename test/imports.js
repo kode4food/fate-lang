@@ -20,7 +20,7 @@ exports.imports = nodeunit.testCase({
       var generatedModule = fate.Types.createModule();
       compiled(fate.globals(), generatedModule.exports);
       resolver.register('compiled', generatedModule);
-        
+
       resolver.register('hello', "'hello world!'");
       resolver.register('helpers', {
         testHelper: function testHelper(arg1, arg2) {
@@ -112,24 +112,24 @@ exports.imports = nodeunit.testCase({
     "System Import": function (test) {
       test.equal(evaluate("import math\nmath.round(9.5)"), 10);
 
-      var list = fate.Runtime.resolve('list');
+      var array = fate.Runtime.resolve('array');
 
-      test.equal(typeof list, 'object');
-      test.equal(typeof list.join, 'function');
-      test.equal(list.first('hello'), 'hello');
-      test.equal(list.last('hello'), 'hello');
-      test.equal(list.length(37), 0);
-      test.equal(list.length({ name: 'fate', age: 1 }), 2);
+      test.equal(typeof array, 'object');
+      test.equal(typeof array.join, 'function');
+      test.equal(array.first('hello'), 'hello');
+      test.equal(array.last('hello'), 'hello');
+      test.equal(array.length(37), 0);
+      test.equal(array.length({ name: 'fate', age: 1 }), 0);
       test.done();
     },
 
     "Bound System Import": function (test) {
-      var script = "from list import join\n" +
-                   "let a = ['this', 'is', 'a', 'list']\n" +
+      var script = "from array import join\n" +
+                   "let a = ['this', 'is', 'an', 'array']\n" +
                    "let j = join(?, '///')\n" +
                    "a | j";
 
-      test.equal(evaluate(script), "this///is///a///list");
+      test.equal(evaluate(script), "this///is///an///array");
       test.done();
     },
 

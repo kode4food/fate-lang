@@ -20,7 +20,7 @@ exports.calls = nodeunit.testCase({
 
   "Left Calls": function (test) {
     var script1 = 'from string import title\n' +
-                  'from list import join\n' +
+                  'from array import join\n' +
                   'let formatted = title(join(name))\n' +
                   '{ formatted } | "Hello, %formatted!"';
 
@@ -31,7 +31,7 @@ exports.calls = nodeunit.testCase({
 
   "Right Calls": function (test) {
     var script1 = 'from string import title\n' +
-                  'from list import join\n' +
+                  'from array import join\n' +
                   'let formatted = name | join | title\n' +
                   '{ formatted } | "Hello, %formatted!"';
 

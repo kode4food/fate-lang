@@ -14,14 +14,14 @@ def numberPatterns(test)
 
   99.6 like pattern.Integer           | isFalse
   99 like pattern.Integer             | isTrue
-  
+
   -99 like pattern.PositiveInteger    | isFalse
   99.6 like pattern.PositiveInteger   | isFalse
   0 like pattern.PositiveInteger      | isFalse
   -99 like pattern.NegativeInteger    | isTrue
   -99.6 like pattern.NegativeInteger  | isFalse
   0 like pattern.NegativeInteger      | isFalse
-  
+
   99.6 like pattern.PositiveNumber    | isTrue
   99 like pattern.PositiveNumber      | isTrue
   -99 like pattern.PositiveNumber     | isFalse
@@ -48,7 +48,7 @@ def stringPatterns(test)
   {} like pattern.String              | isFalse
   [] like pattern.EmptyString         | isFalse
   null like pattern.String            | isFalse
-  
+
   test.done()
 end
 
@@ -64,7 +64,7 @@ def booleanPatterns(test)
   {} like pattern.Boolean      | isFalse
   [] like pattern.Boolean      | isFalse
   null like pattern.Boolean    | isFalse
-  
+
   test.done()
 end
 
@@ -80,7 +80,7 @@ def objectPatterns(test)
   {} like pattern.Object      | isTrue
   [] like pattern.Object      | isFalse
   null like pattern.Object    | isFalse
-  
+
   test.done()
 end
 
@@ -96,7 +96,20 @@ def arrayPatterns(test)
   {} like pattern.Array      | isFalse
   [] like pattern.Array      | isTrue
   null like pattern.Array    | isFalse
-  
+
+  let IntegerArray = pattern.ArrayOf(pattern.Integer)
+  let BadArray = pattern.ArrayOf("hello")
+
+  [1,2,3] like IntegerArray  | isTrue
+  [1.2, 3] like IntegerArray | isFalse
+  ['hi'] like IntegerArray   | isFalse
+  [] like IntegerArray       | isTrue
+  'hi' like IntegerArray     | isFalse
+
+  ['hi'] like BadArray       | isTrue
+  [] like BadArray           | isTrue
+  'hi' like BadArray         | isFalse
+
   test.done()
 end
 

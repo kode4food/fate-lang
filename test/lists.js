@@ -50,10 +50,10 @@ exports.lists = nodeunit.testCase({
 
   "Arrays": function (test) {
     test.equal(evaluate("[9,8,'Hello',7,3][2]"), "Hello");
-    test.equal(evaluate("import list\nlist.length([9,8,'Hello',7,3])"), 5);
+    test.equal(evaluate("import array\narray.length([9,8,'Hello',7,3])"), 5);
     test.equal(evaluate("[3 * 3, 2 * 4, 'Hel'+'lo', 14 / 2, 9 / 3][2]"), "Hello");
-    test.equal(evaluate("import list\nlist.length(1000)"), 0);
-    test.equal(evaluate("import list\nlist.length([1000])"), 1);
+    test.equal(evaluate("import array\narray.length(1000)"), 0);
+    test.equal(evaluate("import array\narray.length([1000])"), 1);
     test.done();
   },
 
@@ -88,37 +88,39 @@ exports.lists = nodeunit.testCase({
 
     test.equal(evaluate("" + base + ".title"), "Famous People");
     test.equal(evaluate("" + base + ".people[1].name"), "Curly");
-    test.equal(evaluate("import list\nlist.length(" + base + ".people)"), 3);
+    test.equal(evaluate("import array\narray.length(" + base + ".people)"), 3);
     test.done();
   },
 
   "Functions": function (test) {
-    test.equal(evaluate("import list\nlist.join(['this','is','fate'])"), "this is fate");
-    test.equal(evaluate("import list\nlist.join(['this','is','fate'], '-=-')"), "this-=-is-=-fate");
-    test.equal(evaluate("import list\nlist.join('hello', '-=-')"), "hello");
+    test.equal(evaluate("import array\narray.join(['this','is','fate'])"), "this is fate");
+    test.equal(evaluate("import array\narray.join(['this','is','fate'], '-=-')"), "this-=-is-=-fate");
+    test.equal(evaluate("import array\narray.join('hello', '-=-')"), "hello");
 
-    test.equal(evaluate("import list\nlist.first([1,2,3])"), 1);
-    test.equal(evaluate("import list\nlist.first([9])"), 9);
-    test.equal(evaluate("import list\nlist.first({name:'Bill',age:42}).value"), 'Bill');
+    test.equal(evaluate("import array\narray.first([1,2,3])"), 1);
+    test.equal(evaluate("import array\narray.first([9])"), 9);
+    test.deepEqual(evaluate("import array\narray.first({name:'Bill',age:42})"),
+                   { name: 'Bill', age: 42 });
 
-    test.equal(evaluate("import list\nlist.last([1,2,3])"), 3);
-    test.equal(evaluate("import list\nlist.last([])"), undefined);
-    test.equal(evaluate("import list\nlist.last([9])"), 9);
-    test.equal(evaluate("import list\nlist.last({name:'Bill',age:42}).value"), 42);
+    test.equal(evaluate("import array\narray.last([1,2,3])"), 3);
+    test.equal(evaluate("import array\narray.last([])"), undefined);
+    test.equal(evaluate("import array\narray.last([9])"), 9);
+    test.deepEqual(evaluate("import array\narray.last({name:'Bill',age:42})"),
+                   { name: 'Bill', age: 42 });
 
-    test.equal(evaluate("import list\nlist.length([1,2,3])"), 3);
-    test.equal(evaluate("import list\nlist.length([9])"), 1);
+    test.equal(evaluate("import array\narray.length([1,2,3])"), 3);
+    test.equal(evaluate("import array\narray.length([9])"), 1);
 
-    test.equal(evaluate("import list\nlist.empty([1,2,3])"), false);
-    test.equal(evaluate("import list\nlist.empty([])"), true);
-    test.equal(evaluate("import list\nlist.empty(9)"), true);
-    test.equal(evaluate("import list\nlist.empty({name:'Bill'})"), false);
+    test.equal(evaluate("import array\narray.empty([1,2,3])"), false);
+    test.equal(evaluate("import array\narray.empty([])"), true);
+    test.equal(evaluate("import array\narray.empty(9)"), true);
+    test.equal(evaluate("import array\narray.empty({name:'Bill'})"), true);
 
-    test.deepEqual(evaluate("import list\nlist.keys({name:'Thom',age:42})"), ['name','age']);
-    test.equal(evaluate("import list\nlist.keys(62)"), undefined);
+    test.deepEqual(evaluate("import object\nobject.keys({name:'Thom',age:42})"), ['name','age']);
+    test.equal(evaluate("import object\nobject.keys(62)"), undefined);
 
-    test.deepEqual(evaluate("import list\nlist.values({name:'Thom',age:42})"), ['Thom',42]);
-    test.equal(evaluate("import list\nlist.values(62)"), undefined);
+    test.deepEqual(evaluate("import object\nobject.values({name:'Thom',age:42})"), ['Thom',42]);
+    test.equal(evaluate("import object\nobject.values(62)"), undefined);
 
     test.done();
   }

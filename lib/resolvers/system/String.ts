@@ -1,11 +1,8 @@
-/// <reference path="../../Types.ts"/>
 /// <reference path="../../Runtime.ts"/>
 
 "use strict";
 
-let NativeString = String;
-
-namespace Fate.Resolvers.System.String {
+namespace Fate.Resolvers.System.StringModule {
   import buildFormatter = Runtime.buildFormatter;
 
   // `build(value, supportFunctions)` converts the provided string and
@@ -46,5 +43,5 @@ namespace Fate.Resolvers.System.String {
   }
 
   // `string(value)` converts value to a String
-  export let string = NativeString;
+  export let string = String;
 }

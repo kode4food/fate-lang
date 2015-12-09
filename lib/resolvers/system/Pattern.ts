@@ -3,14 +3,15 @@
 
 "use strict";
 
-let isArray = Array.isArray;
+const isArray = Array.isArray;
 
-namespace Fate.Resolvers.System.Pattern {
+namespace Fate.Resolvers.System.PatternModule {
+  import isPattern = Runtime.isPattern;
   import definePattern = Runtime.definePattern;
 
   export import Nothing = Runtime.isNothing;
   export import Something = Runtime.isSomething;
-  
+
   export let String = definePattern(function (value) {
     return typeof value === 'string';
   });
@@ -53,4 +54,21 @@ namespace Fate.Resolvers.System.Pattern {
 
   export let Array = definePattern(isArray);
   export let Object = definePattern(Types.isObject);
+
+  export function ArrayOf(elementPattern?: Runtime.Pattern) {
+    if ( !isPattern(elementPattern) ) {
+      return Array;
+    }
+    return definePattern(function (value) {
+      if ( !isArray(value) ) {
+        return false;
+      }
+      for ( let i = 0; i < value.length; i++ ) {
+        if ( !elementPattern(value[i]) ) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
 }

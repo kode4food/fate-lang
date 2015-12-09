@@ -1,6 +1,8 @@
 "use strict";
 
 namespace Fate.Runtime {
+  const isArray = Array.isArray;
+
   type Matcher = (value: any) => boolean;
   type Matchers = Matcher[];
 
@@ -52,8 +54,8 @@ namespace Fate.Runtime {
       return template === obj;
     }
 
-    if ( Array.isArray(template) ) {
-      if ( !Array.isArray(obj) || obj.length < template.length ) {
+    if ( isArray(template) ) {
+      if ( !isArray(obj) || obj.length < template.length ) {
         return false;
       }
 
@@ -89,7 +91,7 @@ namespace Fate.Runtime {
     if ( typeof template !== 'object' ) {
       return valueMatcher;
     }
-    if ( Array.isArray(template) ) {
+    if ( isArray(template) ) {
       return buildArrayMatcher(template);
     }
     return buildObjectMatcher(template);
@@ -112,7 +114,7 @@ namespace Fate.Runtime {
       if ( template === obj ) {
         return true;
       }
-      if ( !Array.isArray(obj) || obj.length < mlen ) {
+      if ( !isArray(obj) || obj.length < mlen ) {
         return false;
       }
       for ( let i = 0; i < mlen; i++ ) {

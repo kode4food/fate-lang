@@ -11,7 +11,7 @@ let data = {
 
 def leftCalls(test)
   from string import title
-  from list import join
+  from array import join
   let formatted = title(join(data.name))
   let result = { formatted } | "Hello, %formatted!"
 
@@ -21,7 +21,7 @@ end
 
 def rightCalls(test)
   from string import title
-  from list import join
+  from array import join
   let formatted = data.name | join | title
   let result1 = { formatted } | "Hello, %formatted!"
 
@@ -45,14 +45,14 @@ def recursiveCalls(test)
     def shouldBeIgnored(x)
       self(x)
     end
-    
+
     if x > 0
       x + ', ' + self(x-1)
     else
       'liftoff'
     end
   end
-  
+
   test.equal(callMe(10), '10, 9, 8, 7, 6, 5, 4, 3, 2, 1, liftoff')
   test.equal(alsoMe(8), '8, 7, 6, 5, 4, 3, 2, 1, liftoff')
   test.done()
