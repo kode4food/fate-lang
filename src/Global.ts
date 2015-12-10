@@ -29,5 +29,5 @@ export default {
   print: console.log.bind(console.log),
   timeout: setTimeout,
   __filename: undefined,
-  __dirname: undefined,
+  __dirname: undefined
 };

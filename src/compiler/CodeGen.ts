@@ -78,12 +78,12 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   buffer.push(body);
   return buffer.join('');
 
-  function createScriptFunction(parseTree: Syntax.Statements) {
+  function createScriptFunction(statements: Syntax.Statements) {
     generate.func({
       internalId: generate.selfName,
       internalArgs: [generate.contextName, generate.exportsName],
       body: function () {
-        createStatementsEvaluator(parseTree);
+        createStatementsEvaluator(statements);
       }
     });
   }
@@ -586,12 +586,12 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createIfLetEvaluator(node: Syntax.IfLetStatement) {
-    var some = globals.runtimeImport('isSomething');
-    var letStatement = node.condition;
+    let some = globals.runtimeImport('isSomething');
+    let letStatement = node.condition;
     createLetEvaluator(letStatement);
 
-    var assignments = letStatement.assignments;
-    var conditions = assignments.map(function (assignment) {
+    let assignments = letStatement.assignments;
+    let conditions = assignments.map(function (assignment) {
       return generate.code(function () {
         generate.call(some, [function () {
           generate.getter(assignment.id.value);
@@ -858,7 +858,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
           function () { generate.retrieveAnonymous(parentLocal); },
           elementIndex
         );
-      };
+      }
     }
 
     function generateNested(element: Syntax.Node, elementValue: Syntax.Node,

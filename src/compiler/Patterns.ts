@@ -82,9 +82,9 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.upTreeUntilMatch(visit.tags('pattern'), annotateSelfPattern);
     return node;
 
-    function annotateSelfPattern(node: Syntax.Node) {
-      annotate(node, 'pattern/self');
-      return node;
+    function annotateSelfPattern(nodeToAnnotate: Syntax.Node) {
+      annotate(nodeToAnnotate, 'pattern/self');
+      return nodeToAnnotate;
     }
   }
 

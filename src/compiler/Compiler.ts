@@ -78,9 +78,9 @@ export function generateFunctionCode(generatedCode: GeneratedCode) {
 
 export function generateFunction(generatedCode: GeneratedCode) {
   interface FateContext {
-    g: any,
-    r: any,
-    module: any
+    g: any;
+    r: any;
+    module: any;
   }
 
   let context = <FateContext>createContext({
