@@ -1,8 +1,7 @@
 "use strict";
 
 var nodeunit = require('nodeunit');
-var fate = require('../build/fate');
-var GlobalScheduler = fate.GlobalScheduler;
+var GlobalScheduler = require('../build/Scheduler').GlobalScheduler;
 
 exports.scheduler = nodeunit.testCase({
 

@@ -1,9 +1,8 @@
 "use strict";
 
 var nodeunit = require('nodeunit');
-var fate = require('../build/fate');
-var types = fate.Types;
-var runtime = fate.Runtime;
+var types = require('../build/Types');
+var runtime = require('../build/Runtime');
 
 exports.api = nodeunit.testCase({
 

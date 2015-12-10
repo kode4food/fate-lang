@@ -1,7 +1,7 @@
 "use strict";
 
 var nodeunit = require('nodeunit');
-var fate = require('../build/fate');
+var fate = require('../build/Fate');
 var evaluate = fate.evaluate;
 var helpers = require('./helpers');
 var evaluateAsync = helpers.evaluateAsync;

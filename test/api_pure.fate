@@ -3,9 +3,9 @@ from pattern import Nothing, Something
 let null = node.null, undefined = node.undefined
 
 import nodeunit
-import '../build/fate.js' as fate
-let types = fate.Types
-let runtime = fate.Runtime
+
+import '../build/Types' as types
+import '../build/Runtime' as runtime
 
 def trueFalse(test)
   let isFalse = test.equal(?, false),

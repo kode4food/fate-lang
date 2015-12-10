@@ -3,11 +3,12 @@
 var fs = require('fs');
 var path = require('path');
 var nodeunit = require('nodeunit');
-var commandLine = require('../lib/cli').commandLine;
+var commandLine = require('../build/cli').commandLine;
 var helpers = require('./helpers');
 var createConsole = helpers.createConsole;
 
-var fate = require('../build/fate');
+var fate = require('../build/Fate');
+var isObject = require('../build/Types').isObject;
 
 exports.cli = nodeunit.testCase({
   "Command Line Help": function (test) {
@@ -27,11 +28,11 @@ exports.cli = nodeunit.testCase({
       test.ok(!cons.contains("Failures"));
 
       helpers.monkeyPatchRequires('./test', {
-        'fatejs': '../../build/fate'
+        'fatejs': '../../build/Fate'
       });
 
       var compiled = require('./cli_success/test1.fate.js');
-      test.ok(fate.Types.isObject(compiled));
+      test.ok(isObject(compiled));
 
       // cleanup
       fs.unlinkSync("./test/cli_success/test1.fate.js");

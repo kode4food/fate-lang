@@ -1,8 +1,8 @@
 "use strict";
 
-var fate = require('../build/fate');
+var mixin = require('../build/Util').mixin;
 
-fate.Util.mixin(exports,
+mixin(exports,
   require('./slow'),
   require('./fast')
 );

@@ -10,15 +10,18 @@ var istanbul = require('gulp-istanbul');
 var enforcer = require('gulp-istanbul-enforcer');
 var pegjs = require('gulp-peg');
 var rename = require('gulp-rename');
+var copy = require('gulp-copy');
 var tslint = require('gulp-tslint');
 
-var tsFiles = ['index.ts', 'lib/**/*.ts'];
+var jsFiles = ['src/**/*.js'];
+var tsFiles = ['src/**/*.ts'];
 var testFiles = ['./test/index.js'];
-var coverageFiles = ['./test/*.js', './build/fate.js', './lib/**/*.js'];
-var parserFile = ['./lib/compiler/parser.pegjs'];
+var coverageFiles = ['./test/**/*.js', './build/**/*.js',
+                     '!./build/compiler/parser.js'];
+var parserFile = ['./src/compiler/parser.pegjs'];
 var parserOutput = 'parser.js';
 
-var tsProject = typescript.createProject('tsconfig.json');
+var tsProject = typescript.createProject('./src/tsconfig.json');
 
 var nodeUnitConfig = {
   reporter: 'default',
@@ -29,8 +32,8 @@ var nodeUnitConfig = {
 
 var enforcerConfig = {
   thresholds: {
-    statements: 99.76,
-    branches: 90.85,
+    statements: 99.7,
+    branches: 96.44,
     functions: 100,
     lines: 99.81
   },
@@ -49,23 +52,37 @@ function createUnitTests() {
   return gulp.src(testFiles).pipe(nodeunit(nodeUnitConfig));
 }
 
+gulp.task('prepare', function (done) {
+  gulp.src(jsFiles)
+      .pipe(copy(buildDir(), { prefix: 1 }))
+      .on('end', done);
+});
+
 gulp.task('parser', function (done) {
   gulp.src(parserFile)
       .pipe(pegjs())
       .pipe(rename(parserOutput))
-      .pipe(gulp.dest(buildDir()))
+      .pipe(gulp.dest(buildDir('compiler')))
       .on('end', done);
 });
 
 gulp.task('lint', function() {
-  return gulp.src(tsFiles).pipe(tslint()).pipe(tslint.report('verbose', {
-    summarizeFailureOutput: true
-  }));
+  return gulp.src(tsFiles)
+             .pipe(tslint())
+             .pipe(tslint.report('verbose', {
+               summarizeFailureOutput: true
+             }));
 });
 
-gulp.task('compile', ['parser'], function() {
-  var tsResult = tsProject.src().pipe(typescript(tsProject));
-  return tsResult.js.pipe(gulp.dest('.'));
+gulp.task('compile', ['prepare', 'parser'], function(done) {
+  gulp.src(tsFiles)
+      .pipe(typescript(tsProject))
+      .js
+      .pipe(gulp.dest('./build'))
+      .on('end', done);
+
+//  var tsResult = tsProject.src().pipe(typescript(tsProject));
+//  return tsResult.js.pipe(gulp.dest('.'));
 });
 
 gulp.task('test', ['compile'], function (done) {

@@ -3,8 +3,9 @@
 var fs = require('fs');
 var path = require('path');
 var glob = require('glob');
-var fate = require('../build/fate');
-var mixin = fate.Util.mixin;
+
+var evaluate = require('../build/Fate').evaluate;
+var mixin = require('../build/Util').mixin;
 
 /**
  * Creates a mock console, primarily for intercepting the results of the
@@ -42,7 +43,7 @@ function createConsole() {
 
 function evaluateEmit(script, data) {
   var result = [];
-  fate.evaluate(script, mixin({ emit: emit }, data));
+  evaluate(script, mixin({ emit: emit }, data));
   return result;
 
   function emit(value) {
@@ -52,7 +53,7 @@ function evaluateEmit(script, data) {
 
 function evaluateAsync(script, callback) {
   var result = [];
-  return fate.evaluate(script, { emit: emit });
+  return evaluate(script, { emit: emit });
 
   function emit(value) {
     result.push(value);

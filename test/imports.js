@@ -3,10 +3,20 @@
 var nodeunit = require('nodeunit');
 var helpers = require('./helpers');
 
-var fate = require('../build/fate');
-var createMemoryResolver = fate.Resolvers.createMemoryResolver;
-var createFileResolver = fate.Resolvers.createFileResolver;
+var fate = require('../build/Fate');
+var compile = fate.compile;
 var evaluate = fate.evaluate;
+var globals = fate.globals;
+
+var types = require('../build/Types');
+var isObject = types.isObject;
+var createModule = types.createModule;
+
+var resolvers = require('../build/resolvers');
+var createMemoryResolver = resolvers.createMemoryResolver;
+var createFileResolver = resolvers.createFileResolver;
+
+var Runtime = require('../build/Runtime');
 
 exports.imports = nodeunit.testCase({
 
@@ -14,11 +24,11 @@ exports.imports = nodeunit.testCase({
     setUp: function (callback) {
       var resolver = createMemoryResolver();
       this.memoryResolver = resolver;
-      fate.Runtime.resolvers().push(resolver);
+      Runtime.resolvers().push(resolver);
 
-      var compiled = fate.compile("'hello compiled!'");
-      var generatedModule = fate.Types.createModule();
-      compiled(fate.globals(), generatedModule.exports);
+      var compiled = compile("'hello compiled!'");
+      var generatedModule = createModule();
+      compiled(globals(), generatedModule.exports);
       resolver.register('compiled', generatedModule);
 
       resolver.register('hello', "'hello world!'");
@@ -34,7 +44,7 @@ exports.imports = nodeunit.testCase({
     tearDown: function (callback) {
       this.memoryResolver.unregister('hello');
       this.memoryResolver.unregister('helpers');
-      fate.Runtime.resolvers().pop();
+      Runtime.resolvers().pop();
       callback();
     },
 
@@ -45,15 +55,15 @@ exports.imports = nodeunit.testCase({
       var script2 = "from helpers import testHelper as test\n" +
                     "test(5,6)";
 
-      var exports1 = fate.Runtime.resolve('hello');
-      var exports2 = fate.Runtime.resolve('helpers');
+      var exports1 = Runtime.resolve('hello');
+      var exports2 = Runtime.resolve('helpers');
 
-      test.ok(fate.Types.isObject(exports1));
-      test.ok(fate.Types.isObject(exports2));
+      test.ok(isObject(exports1));
+      test.ok(isObject(exports2));
       test.equal(evaluate(script1), "arg1=1:arg2=2");
       test.equal(evaluate(script2), "arg1=5:arg2=6");
       test.throws(function () {
-        fate.Runtime.registerModule(99);
+        Runtime.registerModule(99);
       }, "Registering nonsense should explode");
       test.done();
     }
@@ -61,19 +71,19 @@ exports.imports = nodeunit.testCase({
 
   "file system importer": nodeunit.testCase({
     setUp: function (callback) {
-      fate.Runtime.resolvers().push(createFileResolver({ path: "./test" }));
+      Runtime.resolvers().push(createFileResolver({ path: "./test" }));
       callback();
     },
 
     tearDown: function (callback) {
-      fate.Runtime.resolvers().pop();
+      Runtime.resolvers().pop();
       callback();
     },
 
     "Module Retrieval": function (test) {
-      var found = fate.Runtime.resolve('test');
-      var notFound = fate.Runtime.resolve('unknown');
-      test.ok(fate.Types.isObject(found));
+      var found = Runtime.resolve('test');
+      var notFound = Runtime.resolve('unknown');
+      test.ok(isObject(found));
       test.equal(notFound, undefined);
       test.done();
     },
@@ -112,7 +122,7 @@ exports.imports = nodeunit.testCase({
     "System Import": function (test) {
       test.equal(evaluate("import math\nmath.round(9.5)"), 10);
 
-      var array = fate.Runtime.resolve('array');
+      var array = Runtime.resolve('array');
 
       test.equal(typeof array, 'object');
       test.equal(typeof array.join, 'function');

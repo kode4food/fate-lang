@@ -1,7 +1,7 @@
 "use strict";
 
 // Needed to enable Fate script require()
-var fate = require('../build/fate');
+var fate = require('../build/Fate');
 
 exports["Pure Fate API"] = require('./api_pure').tests;
 exports["Pure Fate Basics"] = require('./basics_pure').tests;

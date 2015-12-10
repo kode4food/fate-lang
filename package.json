@@ -5,7 +5,7 @@
   "version": "0.3.0",
   "license": "MIT",
   "homepage": "http://www.fate-lang.org/",
-  "main": "build/fate.js",
+  "main": "build/Fate.js",
   "keywords": [],
   "contributors": [
     {
@@ -15,7 +15,7 @@
   ],
   "repository": "git@github.com/kode4food/fate-lang.git",
   "bin": {
-    "fatec": "lib/cli.js"
+    "fatec": "build/cli.js"
   },
   "scripts": {
     "build": "gulp",
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "gulp": "^3.9.0",
+    "gulp-copy": "0.0.2",
     "gulp-istanbul": "^0.10.2",
     "gulp-istanbul-enforcer": "^1.0.3",
     "gulp-nodeunit": "0.0.5",
