@@ -1,12 +1,12 @@
 "use strict";
 
-import { createMemoryResolver } from './Memory';
-
 import * as ArrayModule from './system/Array';
 import * as MathModule from './system/Math';
 import * as ObjectModule from './system/Object';
 import * as PatternModule from './system/Pattern';
 import * as StringModule from './system/String';
+
+import { createMemoryResolver } from './Memory';
 
 export function createSystemResolver() {
   let resolver = createMemoryResolver();

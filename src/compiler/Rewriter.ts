@@ -1,10 +1,9 @@
 "use strict";
 
+import Visitor from './Visitor';
+import * as Syntax from './Syntax';
 import { isTrue, isFalse, isIn } from '../Types';
 import { hasAnnotation } from './Annotations';
-import * as Syntax from './Syntax';
-
-import Visitor from './Visitor';
 
 let hasTag = Syntax.hasTag;
 let isLiteral = Syntax.isLiteral;

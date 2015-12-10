@@ -1,8 +1,8 @@
 "use strict";
 
-import { annotate, getAnnotation, hasAnnotation } from './Annotations';
-import * as Syntax from './Syntax';
 import Visitor from './Visitor';
+import * as Syntax from './Syntax';
+import { annotate, getAnnotation, hasAnnotation } from './Annotations';
 
 let selfPatternLocal = 'p';
 

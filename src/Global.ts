@@ -1,9 +1,5 @@
 "use strict";
 
-interface AnyMap {
-  [index: string]: any;
-}
-
 class Mutable {
   constructor(public value: any) {}
 

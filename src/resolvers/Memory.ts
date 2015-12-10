@@ -1,11 +1,10 @@
 "use strict";
 
-import * as Types from '../Types';
-
 import { compile, globals } from '../Fate';
 
-import isFateModule = Types.isFateModule;
-import createModule = Types.createModule;
+import {
+  isObject, Module, isFateModule, createModule, ModuleName, ModuleExports
+} from '../Types';
 
 type AnyMap = { [index: string]: any };
 
@@ -17,7 +16,7 @@ type AnyMap = { [index: string]: any };
   * modules and native JavaScript helpers.
   */
 export function createMemoryResolver() {
-  let cache: { [index: string]: Types.Module } = {};
+  let cache: { [index: string]: Module } = {};
 
   return {
     resolve: resolve,
@@ -25,7 +24,7 @@ export function createMemoryResolver() {
     register: register
   };
 
-  function resolve(name: Types.ModuleName) {
+  function resolve(name: ModuleName) {
     let result = cache[name];
     if ( !result ) {
       return undefined;
@@ -38,7 +37,7 @@ export function createMemoryResolver() {
     *
     * @param {String} name the name of the module to remove
     */
-  function unregister(name: Types.ModuleName) {
+  function unregister(name: ModuleName) {
     delete cache[name];
   }
 
@@ -48,10 +47,10 @@ export function createMemoryResolver() {
     * @param {String} name the name of the module to be registered
     * @param {Function|String|Object} module the module to register
     */
-  function register(name: Types.ModuleName, module: string|AnyMap) {
+  function register(name: ModuleName, module: string|AnyMap) {
     // A compiled Fate Module function
     if ( isFateModule(module) ) {
-      cache[name] = <Types.Module>module;
+      cache[name] = <Module>module;
       return;
     }
 
@@ -65,8 +64,8 @@ export function createMemoryResolver() {
     }
 
     // *Object* - A hash of Helpers (name->Function)
-    if ( Types.isObject(module) ) {
-      cache[name] = createModule(<Types.ModuleExports>module);
+    if ( isObject(module) ) {
+      cache[name] = createModule(<ModuleExports>module);
       return;
     }
 

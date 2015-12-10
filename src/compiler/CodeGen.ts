@@ -1,9 +1,9 @@
 "use strict";
 
-import { hasAnnotation, getAnnotation, Annotations } from './Annotations';
-
 import * as JavaScript from './JavaScript';
 import * as Syntax from './Syntax';
+
+import { hasAnnotation, getAnnotation, Annotations } from './Annotations';
 
 type FunctionMap = { [index: string]: Function };
 

@@ -2,8 +2,8 @@
 
 const isArray = Array.isArray;
 
-// `first(value)` returns the first item of the provided array (or `null` if
-// the array is empty).
+// `first(value)` returns the first item of the provided array, or itself if
+// value is not an array.
 export function first(value: any[]) {
   return isArray(value) ? value[0] : value;
 }
@@ -15,8 +15,8 @@ export function join(value: any[], delim = ' '): string {
   return (isArray(value) ? value : [value]).join(delim);
 }
 
-// `last(value)` returns the last item of the provided array (or `nil` if
-// the array is empty).
+// `last(value)` returns the last item of the provided array, or itself if
+// value is not an array.
 export function last(value: any[]) {
   return isArray(value) ? value[value.length - 1] : value;
 }

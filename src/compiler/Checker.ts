@@ -1,8 +1,8 @@
 "use strict";
 
-import { annotate } from './Annotations';
-import * as Syntax from './Syntax';
 import Visitor from './Visitor';
+import * as Syntax from './Syntax';
+import { annotate } from './Annotations';
 
 type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
 

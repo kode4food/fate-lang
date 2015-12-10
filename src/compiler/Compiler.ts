@@ -1,19 +1,17 @@
 /// <reference path="../../typings/tsd.d.ts"/>
-/// <reference path="../../typings/pegjs/pegjs.d.ts"/>
 
 "use strict";
 
-import { createContext, runInContext } from 'vm';
-
-import { generateScriptBody } from './CodeGen';
-
-import { globals } from '../Fate';
-import * as Runtime from '../Runtime';
-
-import Visitor from './Visitor'; 
+import Visitor from './Visitor';
 import Checker from './Checker';
 import Patterns from './Patterns';
 import Rewriter from './Rewriter';
+
+import * as Runtime from '../Runtime';
+
+import { createContext, runInContext } from 'vm';
+import { generateScriptBody } from './CodeGen';
+import { globals } from '../Fate';
 
 let generatedParser = require('./parser');
 let SyntaxError = generatedParser.SyntaxError;
@@ -90,7 +88,7 @@ export function generateFunction(generatedCode: GeneratedCode) {
     r: Runtime,
     module: { }
   });
-  
+
   runInContext(generateFunctionCode(generatedCode), context);
   return context.module.exports;
 }

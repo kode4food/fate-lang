@@ -1,11 +1,15 @@
-import { DirPath, ModuleName, ModuleExports } from '../Types';
+"use strict";
+
 import * as Resolvers from '../resolvers';
+
+import { DirPath, ModuleName, ModuleExports } from '../Types';
 
 // Register the default resolvers
 let nodeResolver = Resolvers.createNodeResolver();
 let fileResolver = Resolvers.createFileResolver({ path: process.cwd() });
 let systemResolver = Resolvers.createSystemResolver();
 let memoryResolver = Resolvers.createMemoryResolver();
+
 let _resolvers: Resolvers.Resolver[] = [
   nodeResolver, fileResolver, systemResolver, memoryResolver
 ];
@@ -36,7 +40,7 @@ export function importer(moduleName: ModuleName) {
     if ( moduleExports ) {
       return moduleExports;
     }
-    
+
     moduleExports = resolve(moduleName, basePath);
     if ( !moduleExports ) {
       throw new Error(`Module '${moduleName}' not resolved`);

@@ -1,7 +1,6 @@
 "use strict";
 
-import * as path from 'path';
-
+import { resolve as resolvePath } from 'path';
 import { createModule, ModuleName, DirPath } from '../Types';
 
 const relativePathRegex = /^\.|\../;
@@ -14,7 +13,7 @@ export function createNodeResolver() {
   function resolve(name: ModuleName, basePath?: DirPath) {
     try {
       if ( basePath && relativePathRegex.test(name) ) {
-        name = path.resolve(basePath, name);
+        name = resolvePath(basePath, name);
       }
       return createModule(require(name));
     }
