@@ -4,9 +4,9 @@ import Visitor from './Visitor';
 import * as Syntax from './Syntax';
 import { annotate, getAnnotation, hasAnnotation } from './Annotations';
 
-let selfPatternLocal = 'p';
-
 import hasTag = Syntax.hasTag;
+
+let selfPatternLocal = 'p';
 
 export default function createTreeProcessors(visit: Visitor) {
   let selfPatternNumbering = 0;

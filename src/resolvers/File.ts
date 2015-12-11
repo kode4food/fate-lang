@@ -1,8 +1,8 @@
 "use strict";
 
-import { DirPath, createModule, Module, ModuleName } from '../Types';
+import { resolve as resolvePath } from 'path';
 
-let path = require('path');
+import { DirPath, createModule, Module, ModuleName } from '../Types';
 
 interface Options {
   path: string;
@@ -44,7 +44,7 @@ export function createFileResolver(options: Options) {
 function loadFromFileSystem(name: ModuleName, basePath: DirPath) {
   if ( explicitPathRegex.test(name) ) {
     try {
-      let explicitPath = path.resolve(basePath, name);
+      let explicitPath = resolvePath(basePath, name);
       return createModule(require(explicitPath));
     }
     catch ( err ) {
@@ -53,7 +53,7 @@ function loadFromFileSystem(name: ModuleName, basePath: DirPath) {
   }
 
   let checkPaths = pathSuffixes.map(function (suffix) {
-    return path.resolve(basePath, name + suffix);
+    return resolvePath(basePath, name + suffix);
   });
 
   for ( let i = 0; i < checkPaths.length; i++ ) {
