@@ -93,7 +93,7 @@ export function generateFunction(generatedCode: GeneratedCode) {
   return context.module.exports;
 }
 
-export function wrapCompileError(err: Error, filePath?: FilePath) {
+export function wrapCompileError(err: Error, filePath?: FilePath): Error {
   if ( err instanceof CompileError ) {
     if ( filePath ) {
       err.filePath = filePath;
