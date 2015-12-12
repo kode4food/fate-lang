@@ -10,12 +10,20 @@ import { sync as glob } from 'glob';
 import { sync as mkdirp } from 'mkdirp';
 
 import {
-  compileModule, generateNodeModule, wrapCompileError, CompileErrors
+  compileModule, generateNodeModule, wrapCompileError
 } from "./compiler/Compiler";
 
 import { VERSION } from './Fate';
 
 const ext = '.js';
+
+interface ParsedArguments {
+  help?: boolean;
+  parse?: boolean;
+  in?: string|string[];
+  out?: string;
+  files?: string;
+}
 
 interface CompilerOutput {
   filePath: string;
@@ -34,24 +42,24 @@ export function commandLine(inputArgs: string[], console: Console,
                             exitCallback: Function) {
   let badArg = false;
 
-  let args = minimist(inputArgs, {
+  let args = <ParsedArguments>minimist(inputArgs, {
     boolean: ['parse', 'help'],
     string: ['in', 'out', 'files'],
     unknown: () => { badArg = true; return false; }
   });
 
-  if ( !inputArgs.length || badArg || args['help'] ) {
+  if ( !inputArgs.length || badArg || args.help ) {
     displayUsage();
     exitCallback(0);
     return;
   }
 
-  let inDirs = makeArray(args['in']);
-  let skipWrite = args['parse'];
-  let pattern = args['files'] || '**/*.fate';
-  let success: number = 0;
+  let inDirs = makeArray(args.in);
+  let skipWrite = args.parse;
+  let pattern = args.files || '**/*.fate';
   let errors: CompilerOutput[] = [];
   let warnings: CompilerOutput[] = [];
+  let success = 0;
 
   try {
     // Iterate over the `-in` directories
@@ -79,7 +87,7 @@ export function commandLine(inputArgs: string[], console: Console,
   }
 
   function processDirectory(inDir: string) {
-    let outDir = args['out'] || inDir;
+    let outDir = args.out || inDir;
     let files = glob(pattern, { cwd: inDir });
 
     if ( !files.length ) {
