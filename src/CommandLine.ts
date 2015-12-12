@@ -40,14 +40,13 @@ export function commandLine(inputArgs: string[], console: Console,
     unknown: () => { badArg = true; return false; }
   });
 
-  let inDirs = makeArray(args['in']);
-
-  if ( badArg || args['help'] || !inDirs.length ) {
+  if ( !inputArgs.length || badArg || args['help'] ) {
     displayUsage();
     exitCallback(0);
     return;
   }
 
+  let inDirs = makeArray(args['in']);
   let skipWrite = args['parse'];
   let pattern = args['files'] || '**/*.fate';
   let success: number = 0;
@@ -176,24 +175,26 @@ export function commandLine(inputArgs: string[], console: Console,
 
   function displayVersion() {
     console.info("Fate v" + VERSION);
-    console.info("");
   }
 
   function displayUsage() {
     displayVersion();
-    console.info("Usage:");
-    console.info("");
-    console.info("  fatec (options)");
-    console.info("");
-    console.info("Where:");
-    console.info("");
-    console.info("  Options:");
-    console.info("");
-    console.info("  --help         - You're looking at me right now");
-    console.info("  --in <path>    - Location of scripts to parse");
-    console.info("  --out <path>   - Location of compiled output (or -in dir)");
-    console.info("  --files <glob> - Filename pattern to parse (or **/*.fate)");
-    console.info("  --parse        - Parse only! Don't generate any output");
-    console.info("");
+    console.info(
+`
+  Usage:
+
+    fatec (options)
+
+  Where:
+
+    Options:
+
+    --help         - You're looking at me right now
+    --in <path>    - Location of scripts to parse
+    --out <path>   - Location of compiled output (or --in path)
+    --files <glob> - Filename pattern to parse (**/*.fate)
+    --parse        - Parse only! Don't generate any output
+`
+    );
   }
 }
