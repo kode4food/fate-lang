@@ -173,4 +173,6 @@ console.log(resultingLambda(4));
 ## Resources
 For source code and releases, see the [Fate GitHub Page](http://github.com/kode4food/fate-lang).
 
-For [Sublime Text](http://www.sublimetext.com/) support, install the [Fate](https://packagecontrol.io/packages/Fate) package using the [Package Control](https://packagecontrol.io/) package manager.
+For [Visual Studio Code](https://code.visualstudio.com/) support, install the [Fate Extension](https://marketplace.visualstudio.com/items/kode4food.fate).
+
+For [Sublime Text](http://www.sublimetext.com/) support, install the [Fate package](https://packagecontrol.io/packages/Fate) using [Package Control](https://packagecontrol.io/).
