@@ -12,6 +12,7 @@ var pegjs = require('gulp-peg');
 var rename = require('gulp-rename');
 var copy = require('gulp-copy');
 var tslint = require('gulp-tslint');
+var del = require('del');
 
 var jsFiles = ['src/**/*.js'];
 var tsFiles = ['src/**/*.ts'];
@@ -43,7 +44,7 @@ var enforcerConfig = {
 
 function buildDir(filename) {
   if ( filename ) {
-    return './' + path.join('./build', filename);
+    return path.join('./build', filename);
   }
   return './build';
 }
@@ -52,7 +53,11 @@ function createUnitTests() {
   return gulp.src(testFiles).pipe(nodeunit(nodeUnitConfig));
 }
 
-gulp.task('prepare', function (done) {
+gulp.task('clean', function () {
+  return del([buildDir('**/*')]);
+});
+
+gulp.task('prepare', ['clean'], function (done) {
   gulp.src(jsFiles)
       .pipe(copy(buildDir(), { prefix: 1 }))
       .on('end', done);
