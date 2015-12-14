@@ -39,9 +39,9 @@ export let isSomething: Pattern = definePattern(function(value: any) {
 });
 
 /**
- * Basic Object Matcher to support the `like` operator.
+ * Basic dynamic matcher to support the `like` operator.
  */
-export function isMatchingObject(template: any, obj: any) {
+export function isMatch(template: any, obj: any) {
   if ( isNothing(template) ) {
     return isNothing(obj);
   }
@@ -59,7 +59,7 @@ export function isMatchingObject(template: any, obj: any) {
     }
 
     for ( let i = 0, len = template.length; i < len; i++ ) {
-      if ( !isMatchingObject(template[i], obj[i]) ) {
+      if ( !isMatch(template[i], obj[i]) ) {
         return false;
       }
     }
@@ -72,7 +72,7 @@ export function isMatchingObject(template: any, obj: any) {
   }
 
   for ( let key in template ) {
-    if ( !isMatchingObject(template[key], obj[key]) ) {
+    if ( !isMatch(template[key], obj[key]) ) {
       return false;
     }
   }

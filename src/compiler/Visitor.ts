@@ -176,7 +176,8 @@ export default class Visitor {
         return node;
       }
     }
-    return null;
+    /* istanbul ignore next: should be properly matched */
+    throw new Error("Stupid Coder: upTreeUntilMatch didn't match");
   }
 
   public issueError(source: Syntax.Node, message: string) {

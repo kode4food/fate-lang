@@ -18,11 +18,11 @@ import { VERSION } from './Fate';
 const ext = '.js';
 
 interface ParsedArguments {
-  help?: boolean;
-  parse?: boolean;
-  in?: string|string[];
-  out?: string;
-  files?: string;
+  'help'?: boolean;
+  'parse'?: boolean;
+  'in'?: string|string[];
+  'out'?: string;
+  'files'?: string;
 }
 
 interface CompilerOutput {

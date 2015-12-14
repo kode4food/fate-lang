@@ -33,10 +33,10 @@ var nodeUnitConfig = {
 
 var enforcerConfig = {
   thresholds: {
-    statements: 99.83,
+    statements: 99.89,
     branches: 97.11,
     functions: 100,
-    lines: 99.94
+    lines: 100
   },
   coverageDirectory: 'coverage',
   rootDirectory: ''
@@ -65,9 +65,9 @@ gulp.task('prepare', ['clean'], function () {
 
 gulp.task('parser', ['prepare'], function () {
   return gulp.src(parserFile)
-    .pipe(pegjs())
-    .pipe(rename(parserOutput))
-    .pipe(gulp.dest(buildDir('compiler')));
+             .pipe(pegjs())
+             .pipe(rename(parserOutput))
+             .pipe(gulp.dest(buildDir('compiler')));
 });
 
 gulp.task('compile', ['parser'], function() {
@@ -83,10 +83,10 @@ gulp.task('test', ['compile'], function () {
 
 gulp.task('lint', function() {
   return gulp.src(tsFiles)
-    .pipe(tslint())
-    .pipe(tslint.report('verbose', {
-      summarizeFailureOutput: true
-    }));
+             .pipe(tslint())
+             .pipe(tslint.report('verbose', {
+               summarizeFailureOutput: true
+             }));
 });
 
 gulp.task('coverage', ['compile'], function (done) {

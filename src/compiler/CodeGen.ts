@@ -891,8 +891,8 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     let right = deferIfNotAlready(rightNode);
 
     if ( !(rightNode instanceof Syntax.Literal) ) {
-      let isMatchingObject = globals.runtimeImport('isMatchingObject');
-      generate.call(isMatchingObject, [right, left]);
+      let isMatch = globals.runtimeImport('isMatch');
+      generate.call(isMatch, [right, left]);
       return;
     }
 

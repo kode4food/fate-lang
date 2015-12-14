@@ -18,16 +18,16 @@ function createMutable(value: any) {
 }
 
 export default {
-  node: {
-    null: null,
-    undefined: undefined,
-    console: console,
-    setTimeout: setTimeout,
-    require: require
+  'node': {
+    'null': null,
+    'undefined': undefined,
+    'console': console,
+    'setTimeout': setTimeout,
+    'require': require
   },
-  mutable: createMutable,
-  print: console.log.bind(console.log),
-  timeout: setTimeout,
-  __filename: undefined,
-  __dirname: undefined
+  'mutable': createMutable,
+  'print': console.log.bind(console.log),
+  'timeout': setTimeout,
+  '__filename': undefined,
+  '__dirname': undefined
 };

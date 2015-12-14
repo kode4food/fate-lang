@@ -106,6 +106,7 @@ export function wrapCompileError(err: Error, filePath?: FilePath): Error {
     return formatSyntaxError(<PEG.SyntaxError>err, filePath);
   }
 
+  /* istanbul ignore next: CompileError and SyntaxError are all we have */
   return err;
 }
 
