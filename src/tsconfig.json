@@ -5,6 +5,7 @@
     "removeComments": false,
     "outDir": "../build",
     "sourceMap": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "noEmitOnError": true
   }
 }
