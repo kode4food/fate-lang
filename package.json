@@ -15,7 +15,8 @@
   ],
   "repository": "git@github.com/kode4food/fate-lang.git",
   "bin": {
-    "fatec": "build/cli.js"
+    "fate": "bin/fate.js",
+    "fatec": "bin/fatec.js"
   },
   "scripts": {
     "build": "gulp",

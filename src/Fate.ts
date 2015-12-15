@@ -33,11 +33,11 @@ export function globals(extensions?: Object) {
 }
 
 /**
-  * Fate compiler entry point.  Takes a script and returns a closure
-  * for invoking it.  The script must be a String.
-  *
-  * @param {String} script the script to be compiled
-  */
+ * Fate compiler entry point.  Takes a script and returns a closure
+ * for invoking it.  The script must be a String.
+ *
+ * @param {String} script the script to be compiled
+ */
 export function compile(script: ScriptContent) {
   if ( typeof script !== 'string' ) {
     throw new Error("script must be a string");
@@ -48,9 +48,9 @@ export function compile(script: ScriptContent) {
 }
 
 /**
-  * Convenience function to compile and execute a script against a context
-  * Object.  Not generally recommended.
-  */
+ * Convenience function to compile and execute a script against a context
+ * Object.  Not generally recommended.
+ */
 export function evaluate(script: ScriptContent, context?: Object) {
   let compiled = compile(script);
   let module = { exports: {} };
@@ -58,13 +58,21 @@ export function evaluate(script: ScriptContent, context?: Object) {
 }
 
 /**
-  * Register the require() extension
-  */
-require.extensions['.fate'] = fateRequireExtension;
-
-function fateRequireExtension(module: any, filename: string) {
+ * Loads and immediately invokes the named script.  Any exported symbols will
+ * be placed in the exports Object.
+ */
+export function runScript(filename: string, exports: Object) {
   let content = readFileSync(filename, 'utf8');
   let compiledOutput = compileModule(content).scriptBody;
   let generatedModule = generateFunction(compiledOutput);
-  generatedModule(globals({ __filename: filename }), module.exports);
+  generatedModule(globals({ __filename: filename }), exports);
 }
+
+/**
+ * Register the require() extension
+ */
+function fateRequireExtension(module: any, filename: string) {
+  runScript(filename, module.exports);
+}
+
+require.extensions['.fate'] = fateRequireExtension;

@@ -1,4 +1,4 @@
-/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../../typings/tsd.d.ts" />
 
 "use strict";
 
@@ -11,9 +11,9 @@ import { sync as mkdirp } from 'mkdirp';
 
 import {
   compileModule, generateNodeModule, wrapCompileError
-} from "./compiler/Compiler";
+} from "../compiler/Compiler";
 
-import { VERSION } from './Fate';
+import { VERSION } from '../Fate';
 
 const ext = '.js';
 
@@ -39,7 +39,7 @@ interface CompilerOutput {
  *     commandLine("-in", "./scripts", "-out", "./output");
  */
 export function commandLine(inputArgs: string[], console: Console,
-                            exitCallback: Function) {
+                            completedCallback: Function) {
   let badArg = false;
 
   let args = <ParsedArguments>minimist(inputArgs, {
@@ -50,7 +50,7 @@ export function commandLine(inputArgs: string[], console: Console,
 
   if ( !inputArgs.length || badArg || args.help ) {
     displayUsage();
-    exitCallback(0);
+    completedCallback(0);
     return;
   }
 
@@ -76,7 +76,7 @@ export function commandLine(inputArgs: string[], console: Console,
     }
 
     // Done!
-    exitCallback(errors.length ? 1 : 0);
+    completedCallback(errors.length ? 1 : 0);
   }
   catch ( err ) {
     errorOut(err);
@@ -178,7 +178,8 @@ export function commandLine(inputArgs: string[], console: Console,
     console.error("");
     console.error("  " + message);
     console.error("");
-    exitCallback(1);
+
+    completedCallback(1);
   }
 
   function displayVersion() {

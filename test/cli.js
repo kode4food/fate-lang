@@ -3,7 +3,9 @@
 var fs = require('fs');
 var path = require('path');
 var nodeunit = require('nodeunit');
-var commandLine = require('../build/CommandLine').commandLine;
+var compiler = require('../build/cli/Compiler').commandLine;
+var interpreter = require('../build/cli/Interpreter').commandLine;
+var Global = require('../build/Global').default;
 var helpers = require('./helpers');
 var createConsole = helpers.createConsole;
 
@@ -13,7 +15,7 @@ var isObject = require('../build/Types').isObject;
 exports.cli = nodeunit.testCase({
   "Command Line Help": function (test) {
     var cons = createConsole();
-    commandLine([], cons, function (exitCode) {
+    compiler([], cons, function (exitCode) {
       test.ok(cons.contains("Usage"));
       test.done();
     });
@@ -21,7 +23,7 @@ exports.cli = nodeunit.testCase({
 
   "Bad Arguments": function (test) {
     var cons = createConsole();
-    commandLine(["--poo"], cons, function (exitCode) {
+    compiler(["--poo"], cons, function (exitCode) {
       test.ok(cons.contains("Usage"));
       test.done();
     });
@@ -29,7 +31,7 @@ exports.cli = nodeunit.testCase({
 
   "Successful Parse": function (test) {
     var cons = createConsole();
-    commandLine(["--in", "./test/cli_success"], cons, function () {
+    compiler(["--in", "./test/cli_success"], cons, function () {
       test.ok(cons.contains("Fate Parsing Complete"));
       test.ok(cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
@@ -52,7 +54,7 @@ exports.cli = nodeunit.testCase({
 
   "Warning Parse": function (test) {
     var cons = createConsole();
-    commandLine(["--in", "./test/cli_warning"], cons, function (exitCode) {
+    compiler(["--in", "./test/cli_warning"], cons, function (exitCode) {
       test.ok(cons.contains("Fate Parsing Complete"));
       test.ok(cons.contains("Success"));
       test.ok(cons.contains("Warnings"));
@@ -64,7 +66,7 @@ exports.cli = nodeunit.testCase({
 
   "Failure Parse": function (test) {
     var cons = createConsole();
-    commandLine(["--in", "./test/cli_failure"], cons, function (exitCode) {
+    compiler(["--in", "./test/cli_failure"], cons, function (exitCode) {
       test.ok(cons.contains("Fate Parsing Complete"));
       test.ok(!cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
@@ -75,7 +77,7 @@ exports.cli = nodeunit.testCase({
 
   "Empty Path": function (test) {
     var cons = createConsole();
-    commandLine(["--in", "./test/cli_empty"], cons, function (exitCode) {
+    compiler(["--in", "./test/cli_empty"], cons, function (exitCode) {
       test.ok(!cons.contains("Fate Parsing Complete"));
       test.ok(!cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
@@ -87,7 +89,7 @@ exports.cli = nodeunit.testCase({
 
   "Parse Only": function (test) {
     var cons = createConsole();
-    commandLine(["--parse", "--in", "./test/cli_success"], cons, function (exitCode) {
+    compiler(["--parse", "--in", "./test/cli_success"], cons, function (exitCode) {
       test.ok(cons.contains("Fate Parsing Complete"));
       test.ok(cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
@@ -98,13 +100,49 @@ exports.cli = nodeunit.testCase({
 
   "Multiple Input Paths": function (test) {
     var cons = createConsole();
-    commandLine(["--parse", "--in", "./test/cli_success",
-                 "--in", "./test/cli_warning"], cons, function (exitCode) {
+    compiler(["--parse", "--in", "./test/cli_success",
+              "--in", "./test/cli_warning"], cons, function (exitCode) {
       test.ok(cons.contains("Fate Parsing Complete"));
       test.ok(cons.contains("Success"));
       test.ok(cons.contains("Warnings"));
       test.ok(!cons.contains("Failures"));
       test.done();
     });
+  },
+
+  "Interpreter": function (test) {
+    var cons, printHolder, consoleHolder;
+    start();
+
+    function start() {
+      cons = createConsole();
+      printHolder = Global.print;
+      consoleHolder = Global.node.console;
+      Global.print = cons.log.bind(cons.log);
+      Global.node.console = cons;
+      successTest();
+    }
+
+    function successTest() {
+      interpreter(["./test/hello"], cons, function (exitCode) {
+        test.equal(exitCode, 0);
+        test.ok(cons.contains("Hello, World!"));
+        failureTest();
+      });
+    }
+
+    function failureTest() {
+      interpreter([], cons, function (exitCode) {
+        test.equal(exitCode, -1);
+        test.ok(cons.contains("Usage"));
+        finish();
+      });
+    }
+
+    function finish() {
+      Global.print = printHolder;
+      Global.node.console = consoleHolder;
+      test.done();
+    }
   }
 });
