@@ -18,7 +18,7 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(annotateSelfFunctions, selfFunctions),
     visit.matching(annotateRecursiveFunctions, functionIdRetrieval),
     visit.statementGroups(validateAssignments, visit.tags('let'), 1),
-    visit.statementGroups(validateMergeables, visit.tags('function'))
+    visit.statementGroups(warnFunctionShadowing, visit.tags('function'))
   ];
 
   // a Wildcard can only exist in a call binder
@@ -123,15 +123,13 @@ export default function createTreeProcessors(visit: Visitor) {
     return statements;
   }
 
-  function validateMergeables(statements: Syntax.FunctionDeclaration[]) {
+  function warnFunctionShadowing(statements: Syntax.FunctionDeclaration[]) {
     let namesSeen: { [index: string]: boolean } = {};
     let lastName: string;
-    let lastArgs: string;
 
     statements.forEach(function (statement) {
       let signature = statement.signature;
       let name = signature.id.value;
-      let args = argumentsSignature(signature.params);
 
       if ( !signature.guard && namesSeen[name] ) {
         visit.issueWarning(statement,
@@ -140,28 +138,9 @@ export default function createTreeProcessors(visit: Visitor) {
         );
       }
 
-      if ( name === lastName && args !== lastArgs ) {
-        annotate(statement, 'function/no_merge');
-        visit.issueWarning(statement,
-          `Reopened Function '${name}' has different ` +
-          `argument names than the original definition`
-        );
-      }
-
       namesSeen[name] = true;
       lastName = name;
-      lastArgs = args;
     });
     return statements;
   }
-}
-
-function argumentsSignature(params: Syntax.Parameters) {
-  if ( !params || !params.length ) {
-    return '';
-  }
-
-  return params.map(function (param) {
-    return param.id.value;
-  }).join(',');
 }

@@ -629,8 +629,9 @@ export function createModule(globals: Globals) {
     if ( usesScratch ) {
       write('let _;');
     }
-    write(prologContent);
+
     writeLocalVariables(parentNames, argNames);
+    write(prologContent);
 
     write(bodyContent);
     if ( usesScratch ) {

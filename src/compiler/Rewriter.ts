@@ -84,9 +84,7 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(flipConditionals, visit.tags('conditional')),
     visit.matching(flipEquality, visit.tags('not')),
     visit.matching(promoteNot, visit.tags(['and', 'or'])),
-    visit.matching(rollUpForLoops, visit.tags('for')),
-
-    visit.statementGroups(mergeFunctions, visit.tags('function'))
+    visit.matching(rollUpForLoops, visit.tags('for'))
   ];
 
   // or, and, conditional Folding
@@ -254,84 +252,5 @@ export default function createTreeProcessors(visit: Visitor) {
       nested.loopStatements,
       node.elseStatements
     );
-  }
-
-  // we can merge consecutive non-recursive functions that are
-  // argument compatible and don't recurse
-  function mergeFunctions(functionDeclarations: Syntax.FunctionDeclaration[]) {
-    let group: Syntax.FunctionDeclaration[] = [];
-    let result: Syntax.Statement[] = [];
-    let lastName: string;
-
-    functionDeclarations.forEach(function (statement) {
-      let signature = statement.signature;
-      let name = signature.id.value;
-
-      if ( name !== lastName ||
-           hasAnnotation(statement, 'function/no_merge') ) {
-        processGroup();
-      }
-
-      if ( !signature.guard && group.length ) {
-        // if we see an unguarded, we can blow away the previous funcs
-        group = [];
-      }
-
-      lastName = name;
-      group.push(statement);
-    });
-    processGroup();
-
-    return result;
-
-    function processGroup() {
-      if ( group.length < 2 ) {
-        result = result.concat(group);
-        group = [];
-        return;
-      }
-
-      let firstDefinition = group[0];
-      let firstSignature = firstDefinition.signature;
-      let firstStatements = firstDefinition.statements;
-      let statements = firstStatements.statements.slice();
-      let guard = firstSignature.guard;
-
-      if ( guard ) {
-        statements = [
-          guard.template('if',
-            guard, firstStatements,
-            firstStatements.template('statements', [])
-          )
-        ];
-      }
-
-      let prevStatements = firstStatements;
-      for ( let i = 1, len = group.length; i < len; i++ ) {
-        let definition = group[i];
-        let signature = definition.signature;
-        let theseStatements = definition.statements;
-        let thisGuard = signature.guard;
-
-        statements = [
-          thisGuard.template('if', thisGuard, theseStatements,
-            prevStatements.template('statements', statements)
-          )
-        ];
-        guard = guard && guard.template('or', thisGuard, guard);
-        prevStatements = theseStatements;
-      }
-
-      result.push(
-        firstDefinition.template('function',
-          firstSignature.template('signature',
-            firstSignature.id, firstSignature.params, guard
-          ),
-          firstStatements.template('statements', statements)
-        )
-      );
-
-      group = [];
-    }
   }
 }
