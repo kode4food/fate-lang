@@ -4,12 +4,12 @@ type ArgTemplate = { [index: number]: any };
 
 let slice = Array.prototype.slice;
 
-function noOp() {
+function functionNotExhaustive() {
   throw new Error("Function invocation not exhaustive");
 }
 
 export function ensureFunction(func: Function): Function {
-  return typeof func === 'function' ? func : noOp;
+  return typeof func === 'function' ? func : functionNotExhaustive;
 }
 
 export function bindFunction(func: Function, args: ArgTemplate) {

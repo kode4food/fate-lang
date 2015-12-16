@@ -14,14 +14,16 @@ export function defineChannel(value: Channel) {
   return value;
 }
 
-let noOp = defineChannel(function(joinArgs: JoinArguments) {
+function channelNotExhaustive(joinArgs: JoinArguments) {
   if ( !joinArgs.provided ) {
     throw new Error("Channel invocation not exhaustive");
   }
-});
+}
+
+let notExhaustive = defineChannel(channelNotExhaustive);
 
 export function ensureChannel(value: Channel) {
-  return isFateChannel(value) ? value : noOp;
+  return isFateChannel(value) ? value : notExhaustive;
 }
 
 export function isFateChannel(channel: any) {
