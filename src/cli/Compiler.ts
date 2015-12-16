@@ -50,7 +50,7 @@ export function commandLine(inputArgs: string[], console: Console,
 
   if ( !inputArgs.length || badArg || args.help ) {
     displayUsage();
-    completedCallback(0);
+    completedCallback(badArg ? -1 : 0);
     return;
   }
 
@@ -76,7 +76,7 @@ export function commandLine(inputArgs: string[], console: Console,
     }
 
     // Done!
-    completedCallback(errors.length ? 1 : 0);
+    completedCallback(errors.length ? -2 : 0);
   }
   catch ( err ) {
     errorOut(err);

@@ -127,12 +127,20 @@ exports.cli = nodeunit.testCase({
       interpreter(["./test/hello"], cons, function (exitCode) {
         test.equal(exitCode, 0);
         test.ok(cons.contains("Hello, World!"));
-        failureTest();
+        noArgsTest();
       });
     }
 
-    function failureTest() {
+    function noArgsTest() {
       interpreter([], cons, function (exitCode) {
+        test.equal(exitCode, 0);
+        test.ok(cons.contains("Usage"));
+        badArgsTest();
+      });
+    }
+
+    function badArgsTest() {
+      interpreter(["--poop"], cons, function (exitCode) {
         test.equal(exitCode, -1);
         test.ok(cons.contains("Usage"));
         finish();
