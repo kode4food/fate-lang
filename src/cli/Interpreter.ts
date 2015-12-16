@@ -25,8 +25,6 @@ export function commandLine(inputArgs: string[], console: Console,
     }
   });
 
-  console.log(args);
-
   if ( !inputArgs.length || badArg || args.help ) {
     displayUsage();
     completedCallback(badArg ? -1 : 0);
