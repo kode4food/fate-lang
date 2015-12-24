@@ -3,20 +3,20 @@
 var nodeunit = require('nodeunit');
 var helpers = require('./helpers');
 
-var fate = require('../build/Fate');
+var fate = require('../dist/Fate');
 var compile = fate.compile;
 var evaluate = fate.evaluate;
 var globals = fate.globals;
 
-var types = require('../build/Types');
+var types = require('../dist/Types');
 var isObject = types.isObject;
 var createModule = types.createModule;
 
-var resolvers = require('../build/resolvers');
+var resolvers = require('../dist/resolvers');
 var createMemoryResolver = resolvers.createMemoryResolver;
 var createFileResolver = resolvers.createFileResolver;
 
-var Runtime = require('../build/Runtime');
+var Runtime = require('../dist/Runtime');
 
 exports.imports = nodeunit.testCase({
 

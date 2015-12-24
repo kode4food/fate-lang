@@ -3,14 +3,14 @@
 var fs = require('fs');
 var path = require('path');
 var nodeunit = require('nodeunit');
-var compiler = require('../build/cli/Compiler').commandLine;
-var interpreter = require('../build/cli/Interpreter').commandLine;
-var Global = require('../build/Global').default;
+var compiler = require('../dist/cli/Compiler').commandLine;
+var interpreter = require('../dist/cli/Interpreter').commandLine;
+var Global = require('../dist/Global').default;
 var helpers = require('./helpers');
 var createConsole = helpers.createConsole;
 
-var fate = require('../build/Fate');
-var isObject = require('../build/Types').isObject;
+var fate = require('../dist/Fate');
+var isObject = require('../dist/Types').isObject;
 
 exports.cli = nodeunit.testCase({
   "Command Line Help": function (test) {
@@ -38,7 +38,7 @@ exports.cli = nodeunit.testCase({
       test.ok(!cons.contains("Failures"));
 
       helpers.monkeyPatchRequires('./test', {
-        'fatejs': '../../build/Fate'
+        'fatejs': '../../dist/Fate'
       });
 
       var compiled = require('./cli_success/test1.fate.js');

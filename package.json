@@ -5,7 +5,7 @@
   "version": "0.3.0",
   "license": "MIT",
   "homepage": "http://www.fate-lang.org/",
-  "main": "build/Fate.js",
+  "main": "dist/Fate.js",
   "keywords": [],
   "contributors": [
     {

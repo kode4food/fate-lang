@@ -1,5 +1,5 @@
 *.fate.js
-build
+dist
 
 pids
 logs

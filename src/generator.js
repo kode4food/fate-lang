@@ -21,7 +21,7 @@ function isGenerator(value) {
 
 function* createRangeGenerator(start, end) {
   var current = start = Math.floor(start);
-  var end = Math.floor(end);
+  end = Math.floor(end);
   var increment = end > start ? 1 : -1;
 
   yield current;

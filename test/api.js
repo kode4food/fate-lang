@@ -1,8 +1,8 @@
 "use strict";
 
 var nodeunit = require('nodeunit');
-var types = require('../build/Types');
-var runtime = require('../build/Runtime');
+var types = require('../dist/Types');
+var runtime = require('../dist/Runtime');
 
 exports.api = nodeunit.testCase({
 

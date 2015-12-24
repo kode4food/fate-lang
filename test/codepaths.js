@@ -1,7 +1,7 @@
 "use strict";
 
 var nodeunit = require('nodeunit');
-var fate = require('../build/Fate');
+var fate = require('../dist/Fate');
 var evaluate = fate.evaluate;
 
 exports.codepaths = nodeunit.testCase({
@@ -236,7 +236,7 @@ exports.codepaths = nodeunit.testCase({
     test.equal(evaluate(script + ".self"), "isSelf");
     test.equal(evaluate(script + ".for"), "isFor");
     test.equal(evaluate(script + ".where"), "isWhere");
-    
+
     test.throws(function () {
       evaluate("let for = 'hello'");
     }, "Keyword used as an identifier");

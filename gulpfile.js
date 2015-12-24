@@ -17,8 +17,8 @@ var del = require('del');
 var jsFiles = ['src/**/*.js'];
 var tsFiles = ['src/**/*.ts'];
 var testFiles = ['./test/index.js'];
-var coverageFiles = ['./test/**/*.js', './build/**/*.js',
-                     '!./build/compiler/parser.js'];
+var coverageFiles = ['./test/**/*.js', './dist/**/*.js',
+                     '!./dist/compiler/parser.js'];
 var parserFile = ['./src/compiler/parser.pegjs'];
 var parserOutput = 'parser.js';
 
@@ -44,9 +44,9 @@ var enforcerConfig = {
 
 function buildDir(filename) {
   if ( filename ) {
-    return path.join('./build', filename);
+    return path.join('./dist', filename);
   }
-  return './build';
+  return './dist';
 }
 
 function createUnitTests() {
@@ -74,7 +74,7 @@ gulp.task('compile', ['parser'], function() {
   return gulp.src(tsFiles)
              .pipe(typescript(tsProject))
              .js
-             .pipe(gulp.dest('./build'));
+             .pipe(gulp.dest(buildDir()));
 });
 
 gulp.task('test', ['compile'], function () {
@@ -99,8 +99,7 @@ gulp.task('coverage', ['compile'], function (done) {
 });
 
 gulp.task('enforce', ['lint', 'coverage'], function () {
-  return gulp.src('.')
-             .pipe(enforcer(enforcerConfig));
+  return gulp.src('.').pipe(enforcer(enforcerConfig));
 });
 
 gulp.task('watch', ['compile'], function () {

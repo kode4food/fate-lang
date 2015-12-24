@@ -4,8 +4,8 @@ var fs = require('fs');
 var path = require('path');
 var glob = require('glob');
 
-var evaluate = require('../build/Fate').evaluate;
-var mixin = require('../build/Util').mixin;
+var evaluate = require('../dist/Fate').evaluate;
+var mixin = require('../dist/Util').mixin;
 
 /**
  * Creates a mock console, primarily for intercepting the results of the

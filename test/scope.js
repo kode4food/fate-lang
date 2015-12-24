@@ -1,7 +1,7 @@
 "use strict";
 
 var nodeunit = require('nodeunit');
-var fate = require('../build/Fate');
+var fate = require('../dist/Fate');
 var helpers = require('./helpers');
 var evaluate = fate.evaluate;
 var evaluateEmit = helpers.evaluateEmit;
