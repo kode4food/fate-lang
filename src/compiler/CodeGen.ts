@@ -14,8 +14,6 @@ let likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
   * Converts a parse tree into source code (initially JavaScript). Host
   * Language-specific constructs are avoided here and instead produced
   * by JavaScript code generation module.
-  *
-  * @param {Object} parseTree the parse tree to use
   */
 export function generateScriptBody(parseTree: Syntax.Statements) {
   let globals = new JavaScript.Globals();

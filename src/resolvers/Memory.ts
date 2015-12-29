@@ -34,8 +34,6 @@ export function createMemoryResolver() {
 
   /**
     * Removes a module from the resolver cache.
-    *
-    * @param {String} name the name of the module to remove
     */
   function unregister(name: ModuleName) {
     delete cache[name];
@@ -43,9 +41,6 @@ export function createMemoryResolver() {
 
   /**
     * Registers a module in the module cache.
-    *
-    * @param {String} name the name of the module to be registered
-    * @param {Function|String|Object} module the module to register
     */
   function register(name: ModuleName, module: string|AnyMap) {
     // A compiled Fate Module function

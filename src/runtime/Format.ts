@@ -27,8 +27,6 @@ export function isFormatter(value: string) {
  * interpolation operations.  The returned closure will attach flags
  * that identify any names or indexes that must be provided by Fate
  * to fulfill its formatting.
- *
- * @param {String} formatStr the String to be used for interpolation
  */
 export function buildFormatter(formatStr: string): FormatFunction {
   let components: Component[] = [];
