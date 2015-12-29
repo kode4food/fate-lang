@@ -13,9 +13,6 @@ const pathSuffixes = ['.fate.js', '.fate', '/index.fate.js', '/index.fate'];
 
 /**
   * Creates a new FileResolver.
-  *
-  * @param {Options} [options] Options for generating the FileResolver
-  * @param {String} [options.path] the base directory for resolving modules
   */
 export function createFileResolver(options: Options) {
   let cache: { [index: string]: Module } = {};

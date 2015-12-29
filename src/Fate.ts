@@ -35,8 +35,6 @@ export function globals(extensions?: Object) {
 /**
  * Fate compiler entry point.  Takes a script and returns a closure
  * for invoking it.  The script must be a String.
- *
- * @param {String} script the script to be compiled
  */
 export function compile(script: ScriptContent) {
   if ( typeof script !== 'string' ) {
