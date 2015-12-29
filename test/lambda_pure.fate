@@ -1,9 +1,9 @@
 import nodeunit
 
 def lambdas(test)
-  let lambda1 = (x, y) -> x + y
-  let lambda2 = x -> x * 2
-  let lambda3 = x -> [for y in x where y > 50 select y * 3]
+  let lambda1 = (x, y -> x + y)
+  let lambda2 = (x -> x * 2)
+  let lambda3 = (x -> [for y in x where y > 50 select y * 3])
 
   test.equals(lambda1(70, 80), 150)
   test.equals(lambda2(100), 200)
@@ -11,12 +11,27 @@ def lambdas(test)
   test.done()
 end
 
+def fatLambdas(test)
+  let lambda1 = (x, y ->
+    let r = x + y
+    r * x * y)
+
+  let lambda2 = (
+    x, y -> let r = x + y
+    r * x * y
+  )
+
+  test.equals(lambda1(70, 80), 840000)
+  test.equals(lambda2(40, 50), 180000)
+  test.done()
+end
+
 def curryTest(test)
-	let lambda1 = (x, y) -> x + y
+	let lambda1 = (x, y -> x + y)
 	let curry = lambda1(5, ?)
 	test.equals(curry(5), 10)
 
-	let lambda2 = (a, b, c) -> a + b + c
+	let lambda2 = (a, b, c -> a + b + c)
 
 	let curry1 = lambda2(1, ?, ?)
 	test.equals(curry1(2, 3), 6)
@@ -28,6 +43,7 @@ end
 
 let tests = nodeunit.testCase({
   "Lambdas Expressions": lambdas,
+  "Fat Lambda Expressions": fatLambdas,
   "Lambda currying": curryTest
 })
 

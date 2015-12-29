@@ -81,7 +81,7 @@ end
 
 if let a=getSomeValue(), b=getAnotherValue()
   # as they're not Nothing, do something with those values
-end  
+end
 
 # Branching Expressions
 let result = 'green' unless turnedOff else 'red'
@@ -149,7 +149,7 @@ You can also compile scripts manually by requiring the fatejs module, and callin
 var fate = require('fatejs');
 
 // compile a script that returns a lambda
-var script = fate.compile('(x) -> x * 100');
+var script = fate.compile('x -> x * 100');
 
 // execute the compiled script,
 // will return the lambda instance
@@ -163,7 +163,7 @@ Or, if you're lazy, you can skip the compile and execute steps, and just call `e
 
 ```javascript
 var fate = require('fatejs');
-var resultingLambda = fate.evaluate('(x) -> x * 100');
+var resultingLambda = fate.evaluate('x -> x * 100');
 console.log(resultingLambda(4));
 ```
 

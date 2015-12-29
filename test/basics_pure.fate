@@ -186,10 +186,10 @@ def nothingSomething(test)
 end
 
 def conditional(test)
-  let script = (data) -> 'cond1' if data.cond1 else
-                         'cond2' if data.cond2 else
-                         'cond4' unless data.cond3 else
-                         'cond3'
+  let script = (data -> 'cond1' if data.cond1 else
+                        'cond2' if data.cond2 else
+                        'cond4' unless data.cond3 else
+                        'cond3')
 
   {cond1: true} | script | test.equal(?, "cond1")
   {cond2: true} | script | test.equal(?, "cond2")
@@ -286,11 +286,11 @@ def deepPaths(test)
     }
   }]
 
-  root[0].colors[1]                   | test.equal(?, "green")
-  root[0].info.description            | test.equal(?, "this is a description")
-  root[0].info['description']         | test.equal(?, "this is a description")
-  root[0].info.notThere               | test.equal(?, undefined)
-  (() -> root[1].info['description']) | test.throws
+  root[0].colors[1]                | test.equal(?, "green")
+  root[0].info.description         | test.equal(?, "this is a description")
+  root[0].info['description']      | test.equal(?, "this is a description")
+  root[0].info.notThere            | test.equal(?, undefined)
+  (-> root[1].info['description']) | test.throws
   test.done()
 end
 

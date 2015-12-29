@@ -52,9 +52,18 @@ statements
     }
 
 statement
-  = s:conditionalStatement NL  {
+  = s:blockStatement NL  {
       return s;
     }
+
+blockStatements
+  = head:blockStatement
+    tail:(NL s:blockStatement { return s; })* __ {
+      return [head].concat(tail);
+    }
+
+blockStatement
+  = conditionalStatement
 
 conditionalStatement
   = trailingIfStatement
@@ -480,18 +489,14 @@ objectComprehension
     }
 
 lambda
-  = params:lambdaParams _ "->" __ expr:exprStatement  {
+  = params:idParamList? _ "->" __
+    stmts:blockStatements  {
       return node('lambda',
-        node('signature', null, params),
-        node('statements', [expr])
+        node('signature', null, params || []),
+        node('statements', stmts)
       );
     }
   / parens
-
-lambdaParams
-  = "(" __ params:idParamList __ ")"  { return params; }
-  / "(" __ ")"  { return []; }
-  / id:Identifier  { return [id.template('idParam', id)]; }
 
 idParamList
   = start:idParam
