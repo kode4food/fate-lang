@@ -80,7 +80,7 @@ You can also compile scripts on the fly by requiring the fatejs module, and call
 var fate = require('fatejs');
 
 // compile a script that returns a lambda
-var script = fate.compile('(x) -> x * 100');
+var script = fate.compile('x -> x * 100');
 
 // execute the compiled script, 
 // will return the lambda instance
@@ -95,7 +95,7 @@ Or, if you're lazy:
 ```javascript
 // require the Fate module
 var fate = require('fatejs');
-var resultingLambda = fate.evaluate('(x) -> x * 100');
+var resultingLambda = fate.evaluate('x -> x * 100');
 console.log(resultingLambda(4));
 ```
 
