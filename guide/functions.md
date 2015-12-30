@@ -45,7 +45,7 @@ This function can be extended to deal with specific type values:
 
 ```ruby
 def printItem('developer', name)
-  <b>"Developers rock! Especially %name"</b>
+  { name } | "Developers rock! Especially %name" | print
 end
 ```
 
