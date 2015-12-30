@@ -41,8 +41,8 @@ end
 This becomes especially important if you apply guards to your ranges:
 
 ```ruby
-for person in people when person.type = 'stooge',
-    brother in person.brothers when brother.living
+for person in people where person.type = 'stooge',
+    brother in person.brothers where brother.living
   renderItem(person, brother)
 else
   "I got nothin'!"
@@ -63,7 +63,7 @@ let colors = ['red', 'orange', 'yellow', 'green',
 What if we want only the colors consisting of six letters?  In a normal loop, we'd do something like this:
 
 ```ruby
-for c in colors when c.length = 6
+for c in colors where c.length = 6
   c
 end
 ```
@@ -71,7 +71,7 @@ end
 This will display the array, but not create a new one.  We can do that with an Array Comprehension as you see here:
 
 ```ruby
-let c6 = [for c in colors when c.length = 6]
+let c6 = [for c in colors where c.length = 6]
 c6  #-> orange yellow ingido violet
 ```
 
@@ -80,7 +80,7 @@ You can also transform the results.  Let's say you need to modify the color name
 
 ```ruby
 from string import title
-let c6 = [for c in colors when c.length = 6 select title(c)]
+let c6 = [for c in colors where c.length = 6 select title(c)]
 c6  #-> Orange Yellow Indigo Violet
 ```
 
@@ -90,7 +90,7 @@ Even better, you can create Objects from Arrays and vice-versa:
 ```ruby
 from string import title
 let c6 = {
-  for c in colors when c.length = 6
+  for c in colors where c.length = 6
   select c + '_key': title(c)
 }
 # c6 is now [orange_key='Orange', yellow_key='Yellow', ...

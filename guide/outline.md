@@ -81,7 +81,7 @@ Getting Started
             </ul>
           end
 
-          def renderList(people) when not people
+          def renderList(people) where not people
             <b>"There are no people to render!"</b>
           end
 
