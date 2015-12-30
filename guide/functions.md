@@ -74,7 +74,7 @@ arg_names? -> statement(s)
 Argument names are optional, meaning that a lambda can be kicked off just by using the arrow operator `->`.  Also, the parser will consume as many statements as it can, across multiple lines.  Meaning it's your responsibility to contain a lambda using parentheses, when appropriate.  For example:
 
 ```ruby
-# the parens will keep the parser from grabbing the second assignment
+# the parens keep the parser from grabbing the second assignment
 let my_lambda = (x, y -> x + y)
 let x = my_lambda(12, 10)
 ```
