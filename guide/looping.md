@@ -86,6 +86,7 @@ c6  #-> Orange Yellow Indigo Violet
 
 ### Object Comprehensions
 Even better, you can create Objects from Arrays and vice-versa:
+
 ```ruby
 from string import title
 let c6 = {for c in colors when c.length = 6 select c + '_key': title(c)}
