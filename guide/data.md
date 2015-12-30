@@ -10,9 +10,9 @@ Fate was specifically designed to consume JSON messages via Functions and Patter
 ### Reserved Words
 Fate reserves the following identifiers as keywords:
 
-    for, def, when, from, import, export, let, and, or,
-    like, mod, not, if, unless, true, false, as, in, 
-    return, self, else, end, where, select
+    for, def, when, from, import, export, let, and, or, like, mod,
+    not, if, unless, true, false, as, in, return, self, else, end,
+    where, select
 
 Attempting to assign or retrieve these keywords as local variables will result in parsing errors.
 
