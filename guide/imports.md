@@ -25,7 +25,7 @@ When you've imported an entire module, you have to address its functions or vari
 
 ```ruby
 import dir.subdir.module1 as myModule
-myModule.myPartial('Hello')
+myModule.myFunction('Hello')
 ```
 
 ### Cherry-Picking Items
@@ -36,7 +36,7 @@ from dir.subdir.module1 import myVariable
 
 from dir.subdir.module1 import myVariable as myVar
 
-from dir.subdir.module1 import myVariable, myPartial as function1
+from dir.subdir.module1 import myVariable, myFunction as function1
 function1('Hello')
 ```
 

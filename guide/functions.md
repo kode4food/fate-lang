@@ -64,13 +64,41 @@ let me = {name:'Thom', type:'developer', age:42}
 renderPerson(me)
 ```
 
-### Function and Partial Calls
-Like a function call in JavaScript.  A library function will either produce some script output or return a value, depending on its purpose.  A function will aways return `Nil`.
+### Lambdas
+A Lambda is a special type of function.  Specifically, it's one that can be included as part of an Expression.  Unlike normal Function declarations, a lambda only accepts named arguments and cannot include a guard.  A lambda is declared as follows:
 
 ```ruby
-for item in list
-  printItem(item)
+arg_names? -> statement(s)
+```
+
+Argument names are optional, meaning that a lambda can be kicked off just by using the arrow operator `->`.  Also, the parser will consume as many statements as it can, across multiple lines.  Meaning it's your responsibility to contain a lambda using parentheses, when appropriate.  For example:
+
+```ruby
+# the parens will keep the parser from grabbing the second assignment
+let my_lambda = (x, y -> x + y)
+let x = my_lambda(12, 10)
+```
+
+On the other hand, where one might normally include a lambda expression, this is not usually a problem.  For example:
+
+```ruby
+# the function call's parens will contain the lambda statement(s)
+timeout(100, ->
+  do_stuff()
+)
+```
+
+### Function and Lambda Calls
+Calling a Function or Lambda in Fate is like calling a function in JavaScript or similar languages.  This means that if you provide too few arguments to a Function, they will be assumed to match the `Nothing` Pattern.
+
+```ruby
+from pattern import Nothing
+
+def func(arg1, arg2, arg3)
+  print("arg3 not provided") if arg3 like Nothing
 end
+
+func(1, 2)  # third argument not provided
 ```
 
 ### Call Binding (?)

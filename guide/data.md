@@ -11,10 +11,10 @@ Fate was specifically designed to consume JSON messages via Functions and Patter
 Fate reserves the following identifiers as keywords:
 
     for, def, when, from, import, export, let, and, or,
-    like, mod, not, nil, if, unless, true, false, as,
-    in, return, self, else, end, where, select
+    like, mod, not, if, unless, true, false, as, in, 
+    return, self, else, end, where, select
 
-Attempting to assign values to these keywords, or to retrieve them as variables, will result in parsing errors.
+Attempting to assign or retrieve these keywords as local variables will result in parsing errors.
 
 ### Literals
 Literals are values expressed in terms of themselves, rather than by variable references.  So for example, if I talked about a variable `name` I would really be talking about whatever it is that name refers to.  In the case of Literals, they *are* the values.  Some might refer to literals as fixed, or atomic.  Examples of Literals might include: `3.14`, `'Hello, World'`, and `false`.
@@ -140,7 +140,6 @@ let a = 42,
 ```
 
 #### Static Single Assignment 
-
 Probably the single most important concept to understand about Fate is that it compiles down to something called Static Single Assignment Form.  What this means is that if you re-assign a variable that's in scope, the language will not simply overwrite the data the variable points to.  Instead, it will create an entirely new version of the variable, and leave the previous one intact.
 
 Normally, you wouldn't even notice this behavior, but it becomes particularly important when you create nested functions and joins. In JavaScript, re-assigning a variable from within a closure means that you overwrite the variable for everyone referring to it.  In Fate, this is not the case.  For Example:

@@ -94,7 +94,7 @@ Getting Started
 
         patterns
 
-          Fate supports pattern matching capability in Partial Definitions.  This facilitates what are essentially inline-guards.  For example:
+          Fate supports pattern matching capability in Function Definitions.  This facilitates what are essentially inline-guards.  For example:
 
           ```ruby
           def renderItem(type, name)
