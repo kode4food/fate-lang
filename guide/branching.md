@@ -82,7 +82,7 @@ In boolean logic, the `or` operator basically states that one or the other opera
 In boolean logic, the `and` operator basically states that both operands must be true.  In Fate, it's implemented by testing the left operand for 'truthiness'.  If it matches, then the right operand will be evaluated and returned.  Otherwise the left operand will be returned.
 
 ### Equality Operators (=, !=, like)
-The `==` and `!=` operators perform strict equality checking, identical to JavaScript's `===` and `!==` operators.
+The `=` and `!=` operators perform strict equality checking, identical to JavaScript's `===` and `!==` operators.
 
 ```ruby
 1 = '1'  # results in false
