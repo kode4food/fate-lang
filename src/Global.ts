@@ -17,17 +17,20 @@ function createMutable(value: any) {
   return new Mutable(value);
 }
 
+function timeout(delay: number, callback: Function) {
+  setTimeout(callback, delay);
+}
+
 export default {
   'node': {
     'null': null,
     'undefined': undefined,
     'console': console,
-    'setTimeout': setTimeout,
     'require': require
   },
   'mutable': createMutable,
   'print': console.log.bind(console.log),
-  'timeout': setTimeout,
+  'timeout': timeout,
   '__filename': undefined,
   '__dirname': undefined
 };
