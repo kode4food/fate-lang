@@ -56,12 +56,6 @@ statement
       return s;
     }
 
-blockStatements
-  = head:blockStatement
-    tail:(NL s:blockStatement { return s; })* __ {
-      return [head].concat(tail);
-    }
-
 blockStatement
   = conditionalStatement
 
@@ -490,13 +484,19 @@ objectComprehension
 
 lambda
   = params:idParamList? _ "->" __
-    stmts:blockStatements  {
+    stmts:lambdaStatements  {
       return node('lambda',
         node('signature', null, params || []),
         node('statements', stmts)
       );
     }
   / parens
+
+lambdaStatements
+  = head:blockStatement
+    tail:(NL s:blockStatement { return s; })* {
+      return [head].concat(tail);
+    }
 
 idParamList
   = start:idParam
