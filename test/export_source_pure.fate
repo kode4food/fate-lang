@@ -1,0 +1,16 @@
+let val_a = 1, val_b = 2
+export val_a as alias_val_a, val_b as alias_val_b
+export val_a, val_b
+
+export let val_c = 3, val_d = 4
+
+export import 'nodeunit' as nodeunit_nu
+export from 'nodeunit' import testCase as nodeunit_tc
+
+export def func_a(name)
+  {name} | "Hello, %name!"
+end
+
+export when join_a(x) & join_b(y)
+  print("done")
+end

@@ -1,0 +1,25 @@
+import nodeunit
+
+def imports(test)
+  import './export_source_pure.fate' as source
+
+  test.equal(source.val_a, 1)
+  test.equal(source.val_b, 2)
+  test.equal(source.alias_val_a, 1)
+  test.equal(source.alias_val_b, 2)
+  test.equal(source.val_c, 3)
+  test.equal(source.val_d, 4)
+
+  test.equal(source.nodeunit_nu, nodeunit)
+  test.equal(source.nodeunit_tc, nodeunit.testCase)
+
+  test.equal(source.func_a('Bob'), 'Hello, Bob!')
+  test.ok(source.join_a)
+  test.ok(source.join_b)
+
+  test.done()
+end
+
+export let tests = nodeunit.testCase({
+  "Importing Exported Items": imports
+})
