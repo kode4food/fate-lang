@@ -58,10 +58,8 @@ def recursiveCalls(test)
   test.done()
 end
 
-let tests = nodeunit.testCase({
+export let tests = nodeunit.testCase({
   "Left Function Calls": leftCalls,
   "Right Piped Calls": rightCalls,
   "Recursive Calls": recursiveCalls
 })
-
-export tests

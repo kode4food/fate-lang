@@ -182,6 +182,12 @@ export class ExpressionStatement extends Statement {
   constructor(public expression: Expression) { super(); }
 }
 
+export class ForStatement extends Statement {
+  constructor(public ranges: Ranges,
+              public loopStatements: Statements,
+              public elseStatements: Statements) { super(); }
+}
+
 export class IfStatement extends Statement {
   constructor(public condition: Expression,
               public thenStatements: Statements,
@@ -194,41 +200,80 @@ export class IfLetStatement extends Statement {
               public elseStatements: Statements) { super(); }
 }
 
-export class ForStatement extends Statement {
-  constructor(public ranges: Ranges,
-              public loopStatements: Statements,
-              public elseStatements: Statements) { super(); }
+export class ReturnStatement extends Statement {
+  constructor(public result: Expression) { super(); }
 }
 
-export class LetStatement extends Statement {
+export abstract class ExportableStatement extends Statement {
+  public abstract getModuleItems(): ModuleItems;
+}
+
+export class LetStatement extends ExportableStatement {
   constructor(public assignments: Assignments) { super(); }
+
+  public getModuleItems() {
+    return this.assignments.map(assignment => {
+      return node('moduleItem', assignment.id);
+    });
+  }
 }
 
-export class FromStatement extends Statement {
+export class FromStatement extends ExportableStatement {
   constructor(public path: ModulePath,
               public importList: ModuleItems) { super(); }
+
+  public getModuleItems() {
+    return this.importList.map(moduleItem => {
+      return node('moduleItem', moduleItem.alias);
+    });
+  }
 }
 
-export class ImportStatement extends Statement {
+export class ImportStatement extends ExportableStatement {
   constructor(public modules: ModuleSpecifiers) { super(); }
+
+  public getModuleItems() {
+    return this.modules.map(moduleSpecifier => {
+      return node('moduleItem', moduleSpecifier.alias);
+    });
+  }
+}
+
+export class ChannelDeclaration extends ExportableStatement {
+  constructor(public signatures: Signatures,
+              public statements: Statements) { super(); }
+
+  public getModuleItems() {
+    return this.signatures.map(signature => {
+      return node('moduleItem', signature.id);
+    });
+  }
+}
+
+export class FunctionDeclaration extends ExportableStatement {
+  constructor(public signature: Signature,
+              public statements: Statements) { super(); }
+
+  public getModuleItems() {
+    return [node('moduleItem', this.signature.id)];
+  }
 }
 
 export class ExportStatement extends Statement {
-  constructor(public exportList: ModuleItems) { super(); }
-}
+  public statement: ExportableStatement;
+  public exportItems: ModuleItems;
 
-export class ChannelDeclaration extends Statement {
-  constructor(public signatures: Signatures,
-              public statements: Statements) { super(); }
-}
+  constructor(public exportable: ExportableStatement|ModuleItems) {
+    super();
 
-export class FunctionDeclaration extends Statement {
-  constructor(public signature: Signature,
-              public statements: Statements) { super(); }
-}
-
-export class ReturnStatement extends Statement {
-  constructor(public result: Expression) { super(); }
+    if ( Array.isArray(exportable) ) {
+      this.exportItems = exportable;
+    }
+    else {
+      this.statement = exportable;
+      this.exportItems = exportable.getModuleItems();
+    }
+  }
 }
 
 // Symbol Nodes *************************************************************

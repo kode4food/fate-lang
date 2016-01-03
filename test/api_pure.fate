@@ -48,9 +48,7 @@ def somethingNothing(test)
   test.done()
 end
 
-let tests = nodeunit.testCase({
+export let tests = nodeunit.testCase({
   "True / False": trueFalse,
   "Something / Nothing": somethingNothing
 })
-
-export tests

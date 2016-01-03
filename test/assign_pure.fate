@@ -54,9 +54,7 @@ def testMutable(test)
   test.done()
 end
 
-let tests = nodeunit.testCase({
+export let tests = nodeunit.testCase({
   "Static Single Assignment": assignment,
   "Mutable Wrapper Assignment": testMutable
 })
-
-export tests

@@ -29,11 +29,9 @@ def parentFrom(test)
   test.done()
 end
 
-let tests = nodeunit.testCase({
+export let tests = nodeunit.testCase({
   "Explicit Single Import": explicit,
   "Multiple Duplicated Imports": multiple,
   "Importing from a Parent Dir": parent,
   "'from' Import from a Parent": parentFrom
 })
-
-export tests

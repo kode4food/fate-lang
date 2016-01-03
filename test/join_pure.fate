@@ -31,8 +31,6 @@ def joinPatternTest(test)
   )
 end
 
-let tests = nodeunit.testCase({
+export let tests = nodeunit.testCase({
   "Pattern-driven Join Evaluation": joinPatternTest
 })
-
-export tests

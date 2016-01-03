@@ -193,9 +193,16 @@ moduleSpecifier
     }
 
 exportStatement
-  = op:Export _ exports:moduleItems  {
-      return node(op, exports);
+  = op:Export _ exportable:exportable  {
+      return node(op, exportable);
     }
+
+exportable
+  = letStatement
+  / importStatement
+  / channelDeclaration
+  / funcDeclaration
+  / moduleItems
 
 forStatement
   = op:For _ ranges:ranges NL statements:statements tail:elseTail  {

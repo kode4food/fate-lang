@@ -25,11 +25,9 @@ def renderItem(name, brother)
   emit("%brother is the brother of %name")
 end
 
-def renderTest(name)
+export def renderTest(name)
   { name } | "Hello %name"
 end
-
-export renderTest as renderTest
 
 def nameAndAge(name, age)
   { name, age } | "%name is %age"

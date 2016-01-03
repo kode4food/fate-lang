@@ -361,7 +361,7 @@ def nestedMatchers(test)
   test.done()
 end
 
-let tests = nodeunit.testCase({
+export let tests = nodeunit.testCase({
   "Relational Evaluation": relational,
   "Equality Evaluation": equality,
   "'in' Evaluation": inEvaluation,
@@ -378,5 +378,3 @@ let tests = nodeunit.testCase({
   "Assignments": assignments,
   "Nested Matchers": nestedMatchers
 })
-
-export tests

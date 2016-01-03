@@ -39,10 +39,8 @@ def noArguments(test)
   test.done()
 end
 
-let tests = nodeunit.testCase({
+export let tests = nodeunit.testCase({
   "Functions with Guards Only": guardOnly,
   "Functions with Guard and Default": guardAndDefault,
   "Functions with No Arguments": noArguments
 })
-
-export tests

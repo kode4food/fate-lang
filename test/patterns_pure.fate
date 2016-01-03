@@ -113,12 +113,10 @@ def arrayPatterns(test)
   test.done()
 end
 
-let tests = nodeunit.testCase({
+export let tests = nodeunit.testCase({
 	"Numbers": numberPatterns,
   "Strings": stringPatterns,
   "Boolean": booleanPatterns,
   "Objects": objectPatterns,
   "Arrays": arrayPatterns
 })
-
-export tests

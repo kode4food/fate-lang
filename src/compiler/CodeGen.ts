@@ -187,7 +187,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createExportEvaluator(node: Syntax.ExportStatement) {
-    let exports = node.exportList.map(function (item: Syntax.ModuleItem) {
+    let exports = node.exportItems.map(function (item: Syntax.ModuleItem) {
       let name = item.name.value;
       let alias = item.alias.value;
       return <JavaScript.ModuleItem>[name, alias];

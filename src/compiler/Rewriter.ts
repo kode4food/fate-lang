@@ -84,7 +84,9 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(flipConditionals, visit.tags('conditional')),
     visit.matching(flipEquality, visit.tags('not')),
     visit.matching(promoteNot, visit.tags(['and', 'or'])),
-    visit.matching(rollUpForLoops, visit.tags('for'))
+    visit.matching(rollUpForLoops, visit.tags('for')),
+
+    visit.statementGroups(splitExportStatements, visit.tags('export'), 1)
   ];
 
   // or, and, conditional Folding
@@ -243,7 +245,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
     let nested = <Syntax.ForStatement>forStatements[0];
     if ( !node.elseStatements.isEmpty() ||
-          !nested.elseStatements.isEmpty() ) {
+         !nested.elseStatements.isEmpty() ) {
       return node;  // no else clauses
     }
 
@@ -252,5 +254,18 @@ export default function createTreeProcessors(visit: Visitor) {
       nested.loopStatements,
       node.elseStatements
     );
+  }
+
+  function splitExportStatements(statements: Syntax.ExportStatement[]) {
+    let result: Syntax.Statement[] = [];
+    statements.forEach(function (statement) {
+      let exportedStatement = statement.statement;
+      if ( exportedStatement ) {
+        result.push(exportedStatement);
+        statement.statement = null;
+      }
+      result.push(statement);
+    });
+    return result;
   }
 }
