@@ -19,10 +19,15 @@ export function definePattern(value: Pattern) {
 
 export function defineRegexPattern(regex: RegExp) {
   (<Pattern>pattern).__fatePattern = true;
+  pattern.valueOf = valueOf;
   return pattern;
 
   function pattern(value: any) {
     return regex.test(value);
+  }
+
+  function valueOf() {
+    return regex;
   }
 }
 
