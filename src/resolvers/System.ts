@@ -1,24 +1,33 @@
 "use strict";
 
-import * as ArrayModule from './system/Array';
-import * as MathModule from './system/Math';
-import * as ObjectModule from './system/Object';
-import * as PatternModule from './system/Pattern';
-import * as StringModule from './system/String';
+import { resolve as resolvePath } from 'path';
 
-import { createMemoryResolver } from './Memory';
+import { createModule, Module, ModuleName } from '../Types';
+
+const basePath = resolvePath(__dirname, './system');
 
 export function createSystemResolver() {
-  let resolver = createMemoryResolver();
+  let cache: { [index: string]: Module } = {};
+  return { resolve };
 
-  resolver.register('array', ArrayModule);
-  resolver.register('math', MathModule);
-  resolver.register('object', ObjectModule);
-  resolver.register('pattern', PatternModule);
-  resolver.register('string', StringModule);
+  function resolve(name: ModuleName): Module {
+    if ( name in cache ) {
+      return cache[name];
+    }
+    let module = tryRequire(name + '.fate');
+    if ( !module ) {
+      module = tryRequire(name);
+    }
+    cache[name] = module;
+    return module;
+  }
 
-  delete resolver.register;
-  delete resolver.unregister;
-
-  return resolver;
+  function tryRequire(filename: string) {
+    try {
+      return createModule(require(resolvePath(basePath, filename)));
+    }
+    catch ( err ) {
+      return undefined;
+    }
+  }
 }

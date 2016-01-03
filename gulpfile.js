@@ -14,7 +14,7 @@ var copy = require('gulp-copy');
 var tslint = require('gulp-tslint');
 var del = require('del');
 
-var jsFiles = ['src/**/*.js'];
+var supportFiles = ['src/**/*.js', 'src/**/*.fate'];
 var tsFiles = ['src/**/*.ts'];
 var testFiles = ['./test/index.js'];
 var coverageFiles = ['./test/**/*.js', './dist/**/*.js',
@@ -34,7 +34,7 @@ var nodeUnitConfig = {
 var enforcerConfig = {
   thresholds: {
     statements: 99.89,
-    branches: 97.08,
+    branches: 97.09,
     functions: 100,
     lines: 100
   },
@@ -59,7 +59,7 @@ gulp.task('clean', function () {
 });
 
 gulp.task('prepare', ['clean'], function () {
-  return gulp.src(jsFiles)
+  return gulp.src(supportFiles)
              .pipe(copy(buildDir(), { prefix: 1 }));
 });
 

@@ -17,10 +17,7 @@ const pathSuffixes = ['.fate.js', '.fate', '/index.fate.js', '/index.fate'];
 export function createFileResolver(options: Options) {
   let cache: { [index: string]: Module } = {};
   let defaultBasePath: DirPath = options.path || process.cwd();
-
-  return {
-    resolve: resolve
-  };
+  return { resolve };
 
   function resolve(name: ModuleName, basePath = defaultBasePath) {
     let cacheKey = `${basePath}//${name}`;

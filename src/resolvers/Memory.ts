@@ -17,12 +17,7 @@ type AnyMap = { [index: string]: any };
   */
 export function createMemoryResolver() {
   let cache: { [index: string]: Module } = {};
-
-  return {
-    resolve: resolve,
-    unregister: unregister,
-    register: register
-  };
+  return { resolve, unregister, register };
 
   function resolve(name: ModuleName) {
     let result = cache[name];

@@ -6,9 +6,7 @@ import { createModule, ModuleName, DirPath } from '../Types';
 const relativePathRegex = /^\.|\../;
 
 export function createNodeResolver() {
-  return {
-    resolve: resolve
-  };
+  return { resolve };
 
   function resolve(name: ModuleName, basePath?: DirPath) {
     try {
