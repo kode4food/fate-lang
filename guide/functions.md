@@ -67,7 +67,7 @@ renderPerson(me)
 ### Lambdas
 A Lambda is a special type of function.  Specifically, it's one that can be included as part of an Expression.  Unlike normal Function declarations, a lambda only accepts named arguments and cannot include a guard.  A lambda is declared as follows:
 
-```ruby
+```
 arg_names? -> statement(s)
 ```
 
@@ -84,7 +84,9 @@ On the other hand, where one might normally include a lambda expression, this is
 ```ruby
 # the function call's parens will contain the lambda statement(s)
 timeout(100, ->
+  # go until we hit the closing paren
   do_stuff()
+  do_more_stuff()
 )
 ```
 
