@@ -1,0 +1,29 @@
+from 'assert'
+import equal, notEqual, deepEqual, notDeepEqual, strictEqual,
+       notStrictEqual, throws, doesNotThrow
+
+export def equalTo(value)
+  x -> equal(value, x)
+end
+
+export def notEqualTo(value)
+  x -> notEqual(value, x)
+end
+
+export def deepEqualTo(value)
+  x -> deepEqual(value, x)
+end
+
+export def notDeepEqualTo(value)
+  x -> notDeepEqual(value, x)
+end
+
+export def strictEqualTo(value)
+  x -> strictEqual(value, x)
+end
+
+export def notStrictEqualTo(value)
+  x -> notStrictEqual(value, x)
+end
+
+export throws, doesNotThrow
