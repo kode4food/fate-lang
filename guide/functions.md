@@ -68,7 +68,10 @@ renderPerson(me)
 A Lambda is a special type of function.  Specifically, it's one that can be included as part of an Expression.  Unlike normal Function declarations, a lambda only accepts named arguments and cannot include a guard.  A lambda is declared as follows:
 
 ```
-arg_names? -> statement(s)
+lambda: lambda_args? "->" statement+
+
+lambda_args : "(" arg_names ")"
+            | arg_names
 ```
 
 Argument names are optional, meaning that a lambda can be kicked off just by using the arrow operator `->`.  Also, the parser will consume as many statements as it can, across multiple lines.  Meaning it's your responsibility to contain a lambda using parentheses, when appropriate.  For example:
