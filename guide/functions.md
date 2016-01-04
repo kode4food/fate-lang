@@ -70,8 +70,10 @@ A Lambda is a special type of function.  Specifically, it's one that can be incl
 ```
 lambda      : lambda_args? "->" statement+
 
-lambda_args : "(" arg_names ")"
+lambda_args : "(" arg_names? ")"
             | arg_names
+
+arg_names   : id ( "," id )*
 ```
 
 Argument names are optional, meaning that a lambda can be kicked off just by using the arrow operator `->`.  Also, the parser will consume as many statements as it can, across multiple lines.  Meaning it's your responsibility to contain a lambda using parentheses, when appropriate.  For example:
