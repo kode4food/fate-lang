@@ -1,4 +1,4 @@
-from 'assert'
+from assert
 import equal, notEqual, deepEqual, notDeepEqual, strictEqual,
        notStrictEqual, throws, doesNotThrow
 

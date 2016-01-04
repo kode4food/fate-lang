@@ -1,4 +1,5 @@
-from pattern import Nothing
+from pattern import Something
+
 export from '../../runtime/Format' import buildFormatter as build
 
 # Warning: this module assumes JavaScript-specific methods on Strings
@@ -14,15 +15,18 @@ export def lower(value)
   string(value).toLowerCase()
 end
 
-export def split(value, delim)
-  return string(value).split(whitespaceRegex) if delim like Nothing
+def split(value)
+  string(value).split(whitespaceRegex)
+end
+
+export def split(value, Something as delim)
   string(value).split(delim)
 end
 
 export def title(value)
-  string(value).replace(wordRegex, (word ->
+  string(value).replace(wordRegex, (word) ->
     word.charAt(0).toUpperCase() + word.substr(1).toLowerCase()
-  ))
+  )
 end
 
 export def upper(value)

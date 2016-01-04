@@ -1,21 +1,39 @@
+from pattern import Array
+
 from '../../Types' import isArray
 
 # Warning: this module assumes JavaScript-specific methods on Arrays
 
-export def first(value)
-  value[0] if isArray(value) else value
+def first(value)
+  value
 end
 
-export def join(value, delim)
-  (value if isArray(value) else [value]).join(delim or ' ')
+export def first(Array as value)
+  value[0]
 end
 
-export def last(value)
-  value[value.length - 1] if isArray(value) else value
+def join(value)
+  value
 end
 
-export def length(value)
-  value.length if isArray(value) else 0
+export def join(Array as value, delim)
+  value.join(delim or ' ')
+end
+
+def last(value)
+  value
+end
+
+export def last(Array as value)
+  value[value.length - 1]
+end
+
+def length(value)
+  0
+end
+
+export def length(Array as value)
+  value.length
 end
 
 export def empty(value)
