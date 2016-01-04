@@ -490,7 +490,7 @@ objectComprehension
     }
 
 lambda
-  = params:idParamList? _ "->" __
+  = params:lambdaParams? _ "->" __
     stmts:lambdaStatements  {
       return node('lambda',
         node('signature', null, params || []),
@@ -498,6 +498,10 @@ lambda
       );
     }
   / parens
+
+lambdaParams
+  = "(" _ params:idParamList? _ ")"  { return params; }
+  / idParamList
 
 lambdaStatements
   = head:blockStatement
