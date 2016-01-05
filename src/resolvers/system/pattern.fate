@@ -1,0 +1,67 @@
+from '../../Types' import isObject, isArray
+
+from '../../runtime/Pattern'
+import isPattern, definePattern, Pattern
+
+export from '../../runtime/Pattern'
+import isNothing as Nothing, isSomething as Something
+
+from './support' import getTypeOf
+
+# Warning: this module assumes JavaScript-specific properties on Arrays
+
+export let String = definePattern(value ->
+  getTypeOf(value) = 'string'
+)
+
+export let EmptyString = definePattern(value ->
+  value = ""
+)
+
+export let NonEmptyString = definePattern(value ->
+  getTypeOf(value) = 'string' and value.length > 0
+)
+
+export let Number = definePattern(value ->
+  getTypeOf(value) = 'number'
+)
+
+export let PositiveNumber = definePattern(value ->
+  getTypeOf(value) = 'number' and value > 0
+)
+
+export let NegativeNumber = definePattern(value ->
+  getTypeOf(value) = 'number' and value < 0
+)
+
+export let Integer = definePattern(value ->
+  getTypeOf(value) = 'number' and value mod 1 = 0
+)
+
+export let PositiveInteger = definePattern(value ->
+  getTypeOf(value) = 'number' and value > 0 and value mod 1 = 0
+)
+
+export let NegativeInteger = definePattern(value ->
+  getTypeOf(value) = 'number' and value < 0 and value mod 1 = 0
+)
+
+export let Boolean = definePattern(value ->
+  getTypeOf(value) = 'boolean'
+)
+
+export let Array = definePattern(isArray)
+export let Object = definePattern(isObject)
+
+export def ArrayOf(elementPattern)
+  return Array unless isPattern(elementPattern)
+
+  definePattern(value ->
+    return false unless isArray(value)
+
+    [
+      for item in value
+      where not elementPattern(item)
+    ].length = 0
+  )
+end

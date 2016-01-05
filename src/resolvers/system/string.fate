@@ -1,15 +1,13 @@
 from pattern import Something
 
+export from './support' import String as string
+
 export from '../../runtime/Format' import buildFormatter as build
 
 # Warning: this module assumes JavaScript-specific methods on Strings
 
 let whitespaceRegex = (/\s*/).valueOf()
 let wordRegex = (/\w\S*/g).valueOf()
-
-export def string(value)
-  '' + value
-end
 
 export def lower(value)
   string(value).toLowerCase()
