@@ -1,0 +1,21 @@
+from pattern import Nothing, Object
+
+from './support' import Object as JSObject
+
+# Warning: this module assumes JavaScript-specific Object prototype
+
+def keys
+  Nothing
+end
+
+export def keys(Object as value)
+  JSObject.keys(value)
+end
+
+def values
+  Nothing
+end
+
+export def values(Object as value)
+  [ for key in JSObject.keys(value) select value[key] ]
+end

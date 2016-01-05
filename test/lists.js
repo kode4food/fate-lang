@@ -1,8 +1,8 @@
 "use strict";
 
 var nodeunit = require('nodeunit');
-var fate = require('../dist/Fate');
-var evaluate = fate.evaluate;
+var evaluate = require('../dist/Fate').evaluate;
+var isNothing = require('../dist/Runtime').isNothing;
 
 exports.lists = nodeunit.testCase({
   "List comprehensions": function (test) {
@@ -117,10 +117,10 @@ exports.lists = nodeunit.testCase({
     test.equal(evaluate("import array\narray.empty({name:'Bill'})"), true);
 
     test.deepEqual(evaluate("import object\nobject.keys({name:'Thom',age:42})"), ['name','age']);
-    test.equal(evaluate("import object\nobject.keys(62)"), undefined);
+    test.ok(isNothing(evaluate("import object\nobject.keys(62)")));
 
     test.deepEqual(evaluate("import object\nobject.values({name:'Thom',age:42})"), ['Thom',42]);
-    test.equal(evaluate("import object\nobject.values(62)"), undefined);
+    test.ok(isNothing(evaluate("import object\nobject.values(62)")));
 
     test.done();
   }
