@@ -1,9 +1,12 @@
 from '../../Types' import isObject, isArray
-from '../../runtime/Pattern' import isPattern, definePattern, Pattern
-from './support' import getTypeOf
+
+from '../../runtime/Pattern'
+import isPattern, definePattern, Pattern
 
 export from '../../runtime/Pattern'
 import isNothing as Nothing, isSomething as Something
+
+from './support' import getTypeOf
 
 # Warning: this module assumes JavaScript-specific properties on Arrays
 
