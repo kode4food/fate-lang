@@ -10,6 +10,7 @@ type AnyMap = { [index: string]: any };
 export interface Pattern {
   (obj: any): boolean;
   __fatePattern?: boolean;
+  native?: RegExp;
 }
 
 export function definePattern(value: Pattern) {
@@ -19,15 +20,11 @@ export function definePattern(value: Pattern) {
 
 export function defineRegexPattern(regex: RegExp) {
   (<Pattern>pattern).__fatePattern = true;
-  pattern.valueOf = valueOf;
+  (<Pattern>pattern).native = regex;
   return pattern;
 
   function pattern(value: any) {
     return regex.test(value);
-  }
-
-  function valueOf() {
-    return regex;
   }
 }
 

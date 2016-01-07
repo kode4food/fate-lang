@@ -85,13 +85,13 @@ declStatement
   / channelDeclaration
 
 funcDeclaration
-  = op:Def _ signature:signature statements:statementsTail  {
+  = op:Def __ signature:signature statements:statementsTail  {
       return node(op, signature, statements);
     }
 
 channelDeclaration
-  = op:When _ signatures_start:signature
-    signatures_cont:( _ "&" __ s:signature  { return s; } )*
+  = op:When __ signatures_start:signature
+    signatures_cont:( __ "&" __ s:signature  { return s; } )*
     statements:statementsTail  {
       let signatures = [signatures_start].concat(signatures_cont);
       return node(op, signatures, statements);
@@ -103,7 +103,7 @@ signature
     }
 
 guard
-  = __ Where _ expr:expr  {
+  = __ Where __ expr:expr  {
       return expr;
     }
 
@@ -143,10 +143,11 @@ patternExpr
     }
 
 importStatement
-  = op:From _ path:(modulePath / stringPath) __ Import _ imports:moduleItems  {
+  = op:From __ path:(modulePath / stringPath)
+    __ Import __ imports:moduleItems  {
       return node(op, path, imports);
     }
-  / op:Import _ modules:moduleSpecifiers  {
+  / op:Import __ modules:moduleSpecifiers  {
       return node(op, modules);
     }
 
@@ -193,7 +194,7 @@ moduleSpecifier
     }
 
 exportStatement
-  = op:Export _ exportable:exportable  {
+  = op:Export __ exportable:exportable  {
       return node(op, exportable);
     }
 
@@ -205,7 +206,7 @@ exportable
   / moduleItems
 
 forStatement
-  = op:For _ ranges:ranges NL statements:statements tail:elseTail  {
+  = op:For __ ranges:ranges NL statements:statements tail:elseTail  {
       return node(op, ranges, statements, tail);
     }
 
@@ -268,7 +269,7 @@ elseTail
     }
 
 letStatement
-  = op:Let _ a:assignments  {
+  = op:Let __ a:assignments  {
       return node(op, a);
     }
 
@@ -278,7 +279,7 @@ assignments
     }
 
 assignment
-  = id:Identifier _ "=" __ expr:expr  {
+  = id:Identifier __ "=" __ expr:expr  {
       return node('assignment', id, expr);
     }
 
@@ -291,7 +292,7 @@ expr
   = rightCall
 
 rightCall
-  = args:conditional calls:( _ "|" __ c:conditional { return c; } )*  {
+  = args:conditional calls:( __ "|" __ c:conditional { return c; } )*  {
       if ( calls && calls.length ) {
         for ( let i = 0, len = calls.length; i < len; i++ ) {
           args = node('call', calls[i], [args]);
@@ -365,21 +366,21 @@ listInterpolation
 
 member
   = head:list
-    tail:( _ sel:memberSelector { return sel; } )*  {
+    tail:(sel:memberSelector { return sel; })*  {
       return buildBinaryChain(head, tail);
     }
 
 memberSelector
-  = "." _ elem:Name  {
+  = __ "." _ elem:Name  {
       return node('member', null, elem.template('literal', elem.value));
     }
-  / "[" __ elem:expr __ "]"  {
+  / _ "[" __ elem:expr __ "]"  {
       return node('member', null, elem);
     }
-  / args:callArgs  {
+  / _ args:callArgs  {
       return node('call', null, args);
     }
-  / args:bindArgs  {
+  / _ args:bindArgs  {
       return node('bind', null, args);
     }
 
@@ -437,10 +438,10 @@ arrayElements
     }
 
 arrayComprehension
-  = For _ ranges:ranges __ Select _ expr:expr  {
+  = For __ ranges:ranges __ Select __ expr:expr  {
       return node('arrayComp', ranges, expr);
     }
-  / For _ range:arrayRange  {
+  / For __ range:arrayRange  {
       return node('arrayComp', [range]);
     }
 
@@ -482,15 +483,15 @@ objectAssignment
     }
 
 objectComprehension
-  = For _ ranges:ranges __ Select __ assign:objectAssignment  {
+  = For __ ranges:ranges __ Select __ assign:objectAssignment  {
       return node('objectComp', ranges, assign);
     }
-  / For _ range:objectRange  {
+  / For __ range:objectRange  {
       return node('objectComp', [range]);
     }
 
 lambda
-  = params:lambdaParams? _ "->" __
+  = params:lambdaParams? __ "->" __
     stmts:lambdaStatements  {
       return node('lambda',
         node('signature', null, params || []),
@@ -500,7 +501,7 @@ lambda
   / parens
 
 lambdaParams
-  = "(" _ params:idParamList? _ ")"  { return params; }
+  = "(" __ params:idParamList? __ ")"  { return params; }
   / idParamList
 
 lambdaStatements
@@ -766,6 +767,6 @@ __ "whitespace with newline"
 _  "whitespace"
   = WS*
 
-AS_SEP = _ As __
-LIST_SEP = _ "," __
-PROP_SEP = _ ":" __
+AS_SEP = __ As __
+LIST_SEP = __ "," __
+PROP_SEP = __ ":" __
