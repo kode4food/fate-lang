@@ -7,10 +7,6 @@ class Mutable {
     this.value = value;
     return value;
   }
-
-  public get get() {
-    return this.value;
-  }
 }
 
 function createMutable(value: any) {

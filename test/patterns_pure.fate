@@ -103,7 +103,7 @@ def arrayPatterns(test)
   [1,2,3] like IntegerArray  | isTrue
   [1.2, 3] like IntegerArray | isFalse
   ['hi'] like IntegerArray   | isFalse
-  [] like IntegerArray       | isTrue
+  [] like IntegerArray       | isFalse
   'hi' like IntegerArray     | isFalse
 
   ['hi'] like BadArray       | isTrue

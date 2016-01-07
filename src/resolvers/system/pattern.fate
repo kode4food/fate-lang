@@ -54,11 +54,15 @@ export let Boolean = definePattern(value ->
 export let Array = definePattern(isArray)
 export let Object = definePattern(isObject)
 
+export def EmptyArray(value)
+  not isArray(value) or value.length = 0
+end
+
 export def ArrayOf(elementPattern)
   return Array unless isPattern(elementPattern)
 
   definePattern(value ->
-    return false unless isArray(value)
+    return false unless isArray(value) and value.length > 0
 
     [
       for item in value

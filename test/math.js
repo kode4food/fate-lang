@@ -51,30 +51,69 @@ exports.math = nodeunit.testCase({
 
   "Functions": function (test) {
     test.equal(evaluate("import math\nmath.avg([1,2,3])"), 2);
-    test.equal(evaluate("import math\nmath.avg([])"), 0);
-    test.ok(isNaN(evaluate("import math\nmath.avg(['non_num'])")));
-    test.ok(isNaN(evaluate("import math\nmath.avg('non_num')")));
-    test.equal(evaluate("import math\nmath.avg(1)"), 1);
+
+    test.throws(function () {
+      evaluate("import math\nmath.avg([])")
+    });
+
+    test.throws(function () {
+      evaluate("import math\nmath.avg(['non_num'])");
+    });
+
+    test.throws(function () {
+      evaluate("import math\nmath.avg('non_num')");
+    });
+
+    test.throws(function () {
+      evaluate("import math\nmath.avg(1)");
+    });
 
     test.equal(evaluate("import math\nmath.sum([1,2,3])"), 6);
-    test.equal(evaluate("import math\nmath.sum(5)"), 5);
-    test.ok(isNaN(evaluate("import math\nmath.sum('non_num')")));
+
+    test.throws(function () {
+      evaluate("import math\nmath.sum(5)");
+    });
+
+    test.throws(function () {
+      evaluate("import math\nmath.sum('non_num')");
+    });
 
     test.equal(evaluate("import math\nmath.max([1,9,7])"), 9);
-    test.equal(evaluate("import math\nmath.max(7)"), 7);
-    test.ok(isNaN(evaluate("import math\nmath.max('non_num')")));
+
+    test.throws(function () {
+      evaluate("import math\nmath.max(7)");
+    });
+
+    test.throws(function () {
+      evaluate("import math\nmath.max('non_num')");
+    });
 
     test.equal(evaluate("import math\nmath.median([1,9,7,50])"), 8);
     test.equal(evaluate("import math\nmath.median([1,9,7,50,6])"), 7);
     test.equal(evaluate("import math\nmath.median([9,1])"), 5);
     test.equal(evaluate("import math\nmath.median([9])"), 9);
-    test.equal(evaluate("import math\nmath.median(7)"), 7);
-    test.equal(evaluate("import math\nmath.median([])"), 0);
-    test.ok(isNaN(evaluate("import math\nmath.median('non_num')")));
+
+    test.throws(function () {
+      evaluate("import math\nmath.median(7)");
+    });
+
+    test.throws(function () {
+      evaluate("import math\nmath.median([])");
+    });
+
+    test.throws(function () {
+      evaluate("import math\nmath.median('non_num')");
+    });
 
     test.equal(evaluate("import math\nmath.min([1,9,7])"), 1);
-    test.equal(evaluate("import math\nmath.min(5)"), 5);
-    test.ok(isNaN(evaluate("import math\nmath.min('non_num')")));
+
+    test.throws(function () {
+      evaluate("import math\nmath.min(5)");
+    });
+
+    test.throws(function () {
+      evaluate("import math\nmath.min('non_num')");
+    });
 
     test.done();
   }

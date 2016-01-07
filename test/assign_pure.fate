@@ -48,9 +48,9 @@ end
 
 def testMutable(test)
   let a = mutable("there")
-  test.equal("hello " + a.get, "hello there")
+  test.equal("hello " + a.value, "hello there")
   a.set("you")
-  test.equal("hello " + a.get, "hello you")
+  test.equal("hello " + a.value, "hello you")
   test.done()
 end
 
