@@ -1,62 +1,41 @@
 from '../../Types' import isObject, isArray
 
 from '../../runtime/Pattern'
-import isPattern, definePattern, Pattern
+import isPattern, definePattern
 
 export from '../../runtime/Pattern'
 import isNothing as Nothing
      , isSomething as Something
 
-from './support' import getTypeOf
+from './support' import isA
 
-# Warning: this module assumes JavaScript-specific properties on Arrays
+# Warning: this module assumes JavaScript-specific methods
 
-export let String = definePattern(value ->
-  getTypeOf(value) = 'string'
+export let String = ~isA(self, 'string')
+export let EmptyString = ~(self = "")
+
+export let NonEmptyString = ~(
+  isA(self, 'string') and self.length > 0
 )
 
-export let EmptyString = definePattern(value ->
-  value = ""
+export let Number = ~isA(self, 'number')
+export let PositiveNumber = ~(isA(self, 'number') and self > 0)
+export let NegativeNumber = ~(isA(self, 'number') and self < 0)
+export let Integer = ~(isA(self, 'number') and self mod 1 = 0)
+
+export let PositiveInteger = ~(
+  isA(self, 'number') and self > 0 and self mod 1 = 0
 )
 
-export let NonEmptyString = definePattern(value ->
-  getTypeOf(value) = 'string' and value.length > 0
-)
-
-export let Number = definePattern(value ->
-  getTypeOf(value) = 'number'
-)
-
-export let PositiveNumber = definePattern(value ->
-  getTypeOf(value) = 'number' and value > 0
-)
-
-export let NegativeNumber = definePattern(value ->
-  getTypeOf(value) = 'number' and value < 0
-)
-
-export let Integer = definePattern(value ->
-  getTypeOf(value) = 'number' and value mod 1 = 0
-)
-
-export let PositiveInteger = definePattern(value ->
-  getTypeOf(value) = 'number' and value > 0 and value mod 1 = 0
-)
-
-export let NegativeInteger = definePattern(value ->
-  getTypeOf(value) = 'number' and value < 0 and value mod 1 = 0
-)
-
-export let Boolean = definePattern(value ->
-  getTypeOf(value) = 'boolean'
+export let NegativeInteger = ~(
+  isA(self, 'number') and self < 0 and self mod 1 = 0
 )
 
 export let Array = definePattern(isArray)
 export let Object = definePattern(isObject)
 
-export def EmptyArray(value)
-  not isArray(value) or value.length = 0
-end
+export let Boolean = ~isA(self, 'boolean')
+export let EmptyArray = ~(not isArray(self) or self.length = 0)
 
 export def ArrayOf(elementPattern)
   return Array unless isPattern(elementPattern)

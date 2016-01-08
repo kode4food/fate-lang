@@ -52,39 +52,39 @@ exports.math = nodeunit.testCase({
   "Functions": function (test) {
     test.equal(evaluate("import math\nmath.avg([1,2,3])"), 2);
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.avg([])")
     });
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.avg(['non_num'])");
     });
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.avg('non_num')");
     });
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.avg(1)");
     });
 
     test.equal(evaluate("import math\nmath.sum([1,2,3])"), 6);
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.sum(5)");
     });
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.sum('non_num')");
     });
 
     test.equal(evaluate("import math\nmath.max([1,9,7])"), 9);
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.max(7)");
     });
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.max('non_num')");
     });
 
@@ -93,25 +93,25 @@ exports.math = nodeunit.testCase({
     test.equal(evaluate("import math\nmath.median([9,1])"), 5);
     test.equal(evaluate("import math\nmath.median([9])"), 9);
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.median(7)");
     });
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.median([])");
     });
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.median('non_num')");
     });
 
     test.equal(evaluate("import math\nmath.min([1,9,7])"), 1);
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.min(5)");
     });
 
-    test.throws(function () {
+    test.throws(() => {
       evaluate("import math\nmath.min('non_num')");
     });
 

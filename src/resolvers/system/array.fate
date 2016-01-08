@@ -2,34 +2,18 @@ from pattern import Array
 
 from '../../Types' import isArray
 
-# Warning: this module assumes JavaScript-specific methods on Arrays
-
-def first(value)
-  value
-end
+# Warning: this module assumes JavaScript-specific methods
 
 export def first(Array as value)
   value[0]
-end
-
-def join(value)
-  value
 end
 
 export def join(Array as value, delim)
   value.join(delim or ' ')
 end
 
-def last(value)
-  value
-end
-
 export def last(Array as value)
   value[value.length - 1]
-end
-
-def length(value)
-  0
 end
 
 export def length(Array as value)

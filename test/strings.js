@@ -35,6 +35,15 @@ exports.strings = nodeunit.testCase({
     test.equal(evaluate(script3), "2");
     test.equal(evaluate(script4), "LC STRING");
     test.equal(evaluate(script5), "Thom is 43");
+
+    test.throws(() => {
+      evaluate("import string\nstring.upper(99)");
+    });
+
+    test.throws(() => {
+      evaluate("import string\nstring.split({obj:'boom'})");
+    });
+
     test.done();
   }
 

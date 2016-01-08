@@ -62,7 +62,7 @@ exports.imports = nodeunit.testCase({
       test.ok(isObject(exports2));
       test.equal(evaluate(script1), "arg1=1:arg2=2");
       test.equal(evaluate(script2), "arg1=5:arg2=6");
-      test.throws(function () {
+      test.throws(() => {
         Runtime.registerModule(99);
       }, "Registering nonsense should explode");
       test.done();
@@ -106,7 +106,7 @@ exports.imports = nodeunit.testCase({
       test.equal(evaluate(script2), "right!");
       test.equal(evaluate(script3), "wrong!");
 
-      test.throws(function () {
+      test.throws(() => {
         evaluate("import './bogus2.fate.js' as module");
       }, "should throw module not resolved");
 
@@ -126,10 +126,23 @@ exports.imports = nodeunit.testCase({
 
       test.equal(typeof array, 'object');
       test.equal(typeof array.join, 'function');
-      test.equal(array.first('hello'), 'hello');
-      test.equal(array.last('hello'), 'hello');
-      test.equal(array.length(37), 0);
-      test.equal(array.length({ name: 'fate', age: 1 }), 0);
+
+      test.throws(() => {
+        array.first('hello');
+      });
+
+      test.throws(() => {
+        array.last('hello');
+      });
+
+      test.throws(() => {
+        array.length(37)
+      });
+
+      test.throws(() => {
+        array.length({ name: 'fate', age: 1 })
+      });
+
       test.done();
     },
 
@@ -150,7 +163,7 @@ exports.imports = nodeunit.testCase({
     },
 
     "Missing Module Import": function (test) {
-      test.throws(function () {
+      test.throws(() => {
         evaluate("import bogus1");
       }, "should throw module not resolved");
       test.done();

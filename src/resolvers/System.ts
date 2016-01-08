@@ -14,12 +14,7 @@ export function createSystemResolver() {
     if ( name in cache ) {
       return cache[name];
     }
-    let module = tryRequire(name + '.fate');
-    if ( !module ) {
-      module = tryRequire(name);
-    }
-    cache[name] = module;
-    return module;
+    return cache[name] = tryRequire(name + '.fate');
   }
 
   function tryRequire(filename: string) {

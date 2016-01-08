@@ -2,6 +2,8 @@ from assert
 import equal, notEqual, deepEqual, notDeepEqual, strictEqual,
        notStrictEqual, throws, doesNotThrow
 
+# Warning: this module assumes JavaScript-specific methods
+
 export def equalTo(value)
   x -> equal(value, x)
 end
@@ -26,4 +28,5 @@ export def notStrictEqualTo(value)
   x -> notStrictEqual(value, x)
 end
 
+export let throws = throws(?)
 export throws, doesNotThrow

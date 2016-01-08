@@ -10,9 +10,9 @@ export {
   object as Object,
   string as String,
   number as Number,
-  getTypeOf
+  isA
 };
 
-function getTypeOf(value: any): string {
-  return typeof value;
+function isA(value: any, type: string): boolean {
+  return typeof value === type;
 }

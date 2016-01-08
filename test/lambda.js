@@ -16,7 +16,7 @@ exports.lambda = nodeunit.testCase({
                   'a(100)';
 
     test.equal(evaluate(script1), 150);
-    test.throws(function () {
+    test.throws(() => {
       evaluate(script2)
     });
     test.equal(evaluate(script3), 200);
