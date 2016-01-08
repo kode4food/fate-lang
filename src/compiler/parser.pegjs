@@ -555,36 +555,43 @@ wildcard = Wildcard
 
 /* Lexer *********************************************************************/
 
-For     = "for"     !NameContinue  { return 'for'; }
-Def     = "def"     !NameContinue  { return 'function'; }
-When    = "when"    !NameContinue  { return 'channel'; }
-From    = "from"    !NameContinue  { return 'from'; }
-Import  = "import"  !NameContinue  { return 'import'; }
-Export  = "export"  !NameContinue  { return 'export'; }
-Let     = "let"     !NameContinue  { return 'let'; }
-And     = "and"     !NameContinue  { return 'and'; }
-Or      = "or"      !NameContinue  { return 'or'; }
-Like    = "like"    !NameContinue  { return 'like'; }
-Mod     = "mod"     !NameContinue  { return 'mod'; }
-Not     = "not"     !NameContinue  { return 'not'; }
-In      = "in"      !NameContinue  { return 'in'; }
-NotIn   = Not _ In  !NameContinue  { return 'notIn'; }
-Return  = "return"  !NameContinue  { return 'return'; }
-Self    = "self"    !NameContinue  { return node('self'); }
-True    = "true"    !NameContinue  { return node('literal', true); }
-False   = "false"   !NameContinue  { return node('literal', false); }
-If      = "if"      !NameContinue  { return true; }
-Unless  = "unless"  !NameContinue  { return false; }
-As      = "as"      !NameContinue
-Else    = "else"    !NameContinue
-End     = "end"     !NameContinue
-Where   = "where"   !NameContinue
-Select  = "select"  !NameContinue
+For     = "for"      !NameContinue  { return 'for'; }
+Def     = "def"      !NameContinue  { return 'function'; }
+When    = "when"     !NameContinue  { return 'channel'; }
+From    = "from"     !NameContinue  { return 'from'; }
+Import  = "import"   !NameContinue  { return 'import'; }
+Export  = "export"   !NameContinue  { return 'export'; }
+Let     = "let"      !NameContinue  { return 'let'; }
+And     = "and"      !NameContinue  { return 'and'; }
+Or      = "or"       !NameContinue  { return 'or'; }
+Like    = "like"     !NameContinue  { return 'like'; }
+Mod     = "mod"      !NameContinue  { return 'mod'; }
+Not     = "not"      !NameContinue  { return 'not'; }
+In      = "in"       !NameContinue  { return 'in'; }
+NotIn   = Not _ In   !NameContinue  { return 'notIn'; }
+Return  = "return"   !NameContinue  { return 'return'; }
+Self    = "self"     !NameContinue  { return node('self'); }
+True    = "true"     !NameContinue  { return node('literal', true); }
+False   = "false"    !NameContinue  { return node('literal', false); }
+If      = "if"       !NameContinue  { return true; }
+Unless  = "unless"   !NameContinue  { return false; }
+As      = "as"       !NameContinue
+By      = "by"       !NameContinue
+Else    = "else"     !NameContinue
+End     = "end"      !NameContinue
+Where   = "where"    !NameContinue
+Select  = "select"   !NameContinue
+Reduce  = "reduce"   !NameContinue
+Order   = "order"    !NameContinue
+Group   = "group"    !NameContinue
+OrderBy = Order _ By !NameContinue
+GroupBy = Group _ By !NameContinue
 
 ReservedWord "reserved word"
   = ( For / Def / When / From / Import / Export / Let / And / Or /
-      Like / Mod / Not / If / Unless / True / False / As / In /
-      Return / Self / Else / End / Where / Select )
+      Like / Mod / Not / If / Unless / True / False / As / By /
+      In / Return / Self / Else / End / Where / Select / Reduce /
+      Order / Group )
 
 Identifier "identifier"
   = !ReservedWord name:Name  {
