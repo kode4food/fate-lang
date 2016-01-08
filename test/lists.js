@@ -54,7 +54,7 @@ exports.lists = nodeunit.testCase({
     test.equal(evaluate("[3 * 3, 2 * 4, 'Hel'+'lo', 14 / 2, 9 / 3][2]"), "Hello");
     test.equal(evaluate("import array\narray.length([1000])"), 1);
 
-    test.throws(() => {
+    test.throws(function () {
       evaluate("import array\narray.length(1000)");
     });
 
@@ -100,14 +100,14 @@ exports.lists = nodeunit.testCase({
     test.equal(evaluate("import array\narray.join(['this','is','fate'])"), "this is fate");
     test.equal(evaluate("import array\narray.join(['this','is','fate'], '-=-')"), "this-=-is-=-fate");
 
-    test.throws(() => {
+    test.throws(function () {
       evaluate("import array\narray.join('hello', '-=-')");
     });
 
     test.equal(evaluate("import array\narray.first([1,2,3])"), 1);
     test.equal(evaluate("import array\narray.first([9])"), 9);
 
-    test.throws(() => {
+    test.throws(function () {
       evaluate("import array\narray.first({name:'Bill',age:42})");
     });
 
@@ -115,7 +115,7 @@ exports.lists = nodeunit.testCase({
     test.equal(evaluate("import array\narray.last([])"), undefined);
     test.equal(evaluate("import array\narray.last([9])"), 9);
 
-    test.throws(() => {
+    test.throws(function () {
       evaluate("import array\narray.last({name:'Bill',age:42})");
     });
 
@@ -125,23 +125,23 @@ exports.lists = nodeunit.testCase({
     test.equal(evaluate("import array\narray.empty([1,2,3])"), false);
     test.equal(evaluate("import array\narray.empty([])"), true);
 
-    test.throws(() => {
+    test.throws(function () {
       evaluate("import array\narray.empty(9)");
     });
 
-    test.throws(() => {
+    test.throws(function () {
       evaluate("import array\narray.empty({name:'Bill'})");
     });
 
     test.deepEqual(evaluate("import object\nobject.keys({name:'Thom',age:42})"), ['name','age']);
 
-    test.throws(() => {
+    test.throws(function () {
       evaluate("import object\nobject.keys(62)");
     });
 
     test.deepEqual(evaluate("import object\nobject.values({name:'Thom',age:42})"), ['Thom',42]);
 
-    test.throws(() => {
+    test.throws(function () {
       evaluate("import object\nobject.values(62)");
     });
 

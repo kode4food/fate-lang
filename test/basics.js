@@ -184,7 +184,7 @@ exports.basics = nodeunit.testCase({
     test.equal(evaluate("root[0].info.description", data), "this is a description");
     test.equal(evaluate("root[0].info['description']", data), "this is a description");
     test.equal(evaluate("root[0].info.notThere", data), undefined);
-    test.throws(() => {
+    test.throws(function () {
       test.equal(evaluate("root[1].info['description']", data));
     });
     test.done();

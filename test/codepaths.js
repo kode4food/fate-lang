@@ -143,25 +143,25 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "'self' outside Function": function (test) {
-    test.throws(() => {
+    test.throws(function () {
       evaluate("self('hello')");
     }, "self called outside of a Function should explode");
     test.done();
   },
 
   "Wildcard outside Binding": function (test) {
-    test.throws(() => {
+    test.throws(function () {
       evaluate("? < 99");
     }, "Wildcard used outside of a binding");
     test.done();
   },
 
   "Duplicated Arg Names": function (test) {
-    test.throws(() => {
+    test.throws(function () {
       evaluate("def someFunction(arg1, arg2, arg1, arg3, arg2)\nend");
     }, "Duplicated arg names in a Function should explode");
 
-    test.throws(() => {
+    test.throws(function () {
       evaluate("when a(arg1, arg2) & b(arg3, arg2)\nend");
     }, "Arg names duplicated across channels should explode");
 
@@ -169,7 +169,7 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "Membership": function (test) {
-    test.throws(() => {
+    test.throws(function () {
       evaluate("null_value[null_value]", this.data);
     });
 
@@ -237,7 +237,7 @@ exports.codepaths = nodeunit.testCase({
     test.equal(evaluate(script + ".for"), "isFor");
     test.equal(evaluate(script + ".where"), "isWhere");
 
-    test.throws(() => {
+    test.throws(function () {
       evaluate("let for = 'hello'");
     }, "Keyword used as an identifier");
 
