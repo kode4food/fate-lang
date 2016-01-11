@@ -66,6 +66,7 @@ conditionalStatement
 
 unconditionalStatement
   = declStatement
+  / reduceStatement
   / forStatement
   / trailableStatement
 
@@ -204,6 +205,18 @@ exportable
   / channelDeclaration
   / funcDeclaration
   / moduleItems
+
+reduceStatement
+  = op:Reduce __ assign:reduceAssignment
+    __ For __ ranges:ranges NL statements:statements tail:elseTail  {
+      return node('reduce', assign, ranges, statements, tail);
+    }
+
+reduceAssignment
+  = assignment
+  / id:Identifier  {
+      return id.template('assignment', id, undefined);
+    }
 
 forStatement
   = op:For __ ranges:ranges NL statements:statements tail:elseTail  {
@@ -438,11 +451,23 @@ arrayElements
     }
 
 arrayComprehension
-  = For __ ranges:ranges __ Select __ expr:expr  {
-      return node('arrayComp', ranges, expr);
+  = For __ ranges:ranges orderBy:arrayComprehensionOrderBy?
+    expr:arrayComprehensionSelect  {
+      return node('arrayComp', ranges, expr, orderBy);
     }
-  / For __ range:arrayRange  {
-      return node('arrayComp', [range]);
+  / For __ range:arrayRange orderBy:arrayComprehensionOrderBy?  {
+      return node('arrayComp', [range], orderBy);
+    }
+
+arrayComprehensionSelect
+  = __ Select __ expr:expr  {
+      return expr;
+    }
+
+arrayComprehensionOrderBy
+  = __ OrderBy __
+    start:expr cont:( LIST_SEP expr:expr  { return expr; })*  {
+      return [start].concat(cont);
     }
 
 object
@@ -483,11 +508,26 @@ objectAssignment
     }
 
 objectComprehension
-  = For __ ranges:ranges __ Select __ assign:objectAssignment  {
+  = For __ ranges:ranges assign:objectComprehensionSelect  {
       return node('objectComp', ranges, assign);
+    }
+  / For __ ranges:ranges groupBy:objectComprehensionGroupBy
+    assign:objectComprehensionSelect?  {
+      return node('objectComp', ranges, assign, groupBy);
     }
   / For __ range:objectRange  {
       return node('objectComp', [range]);
+    }
+
+objectComprehensionSelect
+  = __ Select __ assign:objectAssignment  {
+      return assign;
+    }
+
+objectComprehensionGroupBy
+  = __ GroupBy __
+    start:expr cont:( LIST_SEP expr:expr  { return expr; })*  {
+      return [start].concat(cont);
     }
 
 lambda
