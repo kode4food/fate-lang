@@ -6,6 +6,6 @@
     "outDir": "../dist",
     "sourceMap": true,
     "noImplicitAny": true,
-    "noEmitOnError": true
+    "noEmitOnError": false
   }
 }

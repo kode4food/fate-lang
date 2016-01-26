@@ -3,9 +3,10 @@
 import * as JavaScript from './JavaScript';
 import * as Syntax from './Syntax';
 
-import { hasAnnotation, getAnnotation, Annotations } from './Annotations';
+import { hasAnnotation, getAnnotation } from './Annotations';
 
 type FunctionMap = { [index: string]: Function };
+type IdMapping = { id: string, anon: string };
 
 let slice = Array.prototype.slice;
 let likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
@@ -459,7 +460,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         });
       });
 
-      createLoop(node.ranges, createBody, node.annotations);
+      createLoop(node.ranges, createBody);
 
       generate.returnStatement(function () {
         generate.retrieveAnonymous(result);
@@ -485,15 +486,30 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createForEvaluator(node: Syntax.ForStatement) {
-    let elseStatements = node.elseStatements;
-    let successVar: string;
+    let generateLoop: Function, generateBody: Function;
+    let idMappings: IdMapping[];
+    let reduceAssignments = node.reduceAssignments;
 
-    if ( !elseStatements.isEmpty() ) {
-      successVar = generate.createAnonymous();
+    if ( reduceAssignments ) {
+      generateLoop = generateReduceLoop;
+      generateBody = generateReduceBody;
+    }
+    else {
+      generateLoop = generateForLoop;
+      generateBody = generateForBody;
+    }
+
+    generateStatements();
+
+    function generateStatements() {
+      let elseStatements = node.elseStatements;
+      if ( elseStatements.isEmpty() ) {
+        return generateLoop();
+      }
+
+      let successVar = generate.createAnonymous();
       generate.assignment(successVar, globals.literal(false));
-      generate.statement(function () {
-        createLoop(node.ranges, createBody, node.annotations, successVar);
-      });
+      generateLoop(successVar);
       generate.ifStatement(
         function () {
           generate.retrieveAnonymous(successVar);
@@ -502,19 +518,70 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         defer(createStatementsEvaluator, elseStatements)
       );
     }
-    else {
-      generate.statement(function () {
-        createLoop(node.ranges, createBody, node.annotations);
+
+    function generateReduceInitializers() {
+      let converted: JavaScript.AssignmentItems = [];
+
+      reduceAssignments.forEach(function(assignment) {
+        converted.push([assignment.id.value, defer(assignment.value)]);
+      });
+
+      generate.assignments(converted);
+    }
+
+    function generateResultAssignments() {
+      idMappings.forEach(function (mapping) {
+        generate.assignment(mapping.id, function () {
+          generate.retrieveAnonymous(mapping.anon);
+        });
       });
     }
 
-    function createBody() {
+    function generateAnonymousAssignments() {
+      idMappings.forEach(function (mapping) {
+        generate.statement(function () {
+          generate.assignAnonymous(mapping.anon, function () {
+            generate.getter(mapping.id);
+          });
+        });
+      });
+    }
+
+    function generateReduceLoop(successVar?: string) {
+      generateReduceInitializers();
+
+      // create the anonymous counters
+      idMappings = reduceAssignments.map(function (assignment) {
+        return {
+          id: assignment.id.value,
+          anon: generate.createAnonymous()
+        };
+      });
+
+      generateAnonymousAssignments();
+      generateForLoop(successVar);
+      generateResultAssignments();
+    }
+
+    function generateForLoop(successVar?: string) {
+      generate.statement(function () {
+        createLoop(node.ranges, generateBody, successVar);
+      });
+    }
+
+    function generateReduceBody() {
+      generateResultAssignments();
+      generateForBody();
+      generateAnonymousAssignments();
+    }
+
+    function generateForBody() {
       createStatementsEvaluator(node.loopStatements);
     }
   }
 
   function createLoop(ranges: Syntax.Ranges, createBody: Function,
-                      annotations: Annotations, successVar?: string) {
+                      successVar?: string) {
     processRange(0);
 
     function processRange(i: number) {
