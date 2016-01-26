@@ -529,6 +529,15 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       generate.assignments(converted);
     }
 
+    function createAnonymousCounters() {
+      idMappings = reduceAssignments.map(function (assignment) {
+        return {
+          id: assignment.id.value,
+          anon: generate.createAnonymous()
+        };
+      });
+    }
+
     function generateResultAssignments() {
       idMappings.forEach(function (mapping) {
         generate.assignment(mapping.id, function () {
@@ -549,15 +558,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
     function generateReduceLoop(successVar?: string) {
       generateReduceInitializers();
-
-      // create the anonymous counters
-      idMappings = reduceAssignments.map(function (assignment) {
-        return {
-          id: assignment.id.value,
-          anon: generate.createAnonymous()
-        };
-      });
-
+      createAnonymousCounters();
       generateAnonymousAssignments();
       generateForLoop(successVar);
       generateResultAssignments();
