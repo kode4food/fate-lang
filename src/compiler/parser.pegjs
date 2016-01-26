@@ -66,6 +66,7 @@ conditionalStatement
 
 unconditionalStatement
   = declStatement
+  / reduceStatement
   / forStatement
   / trailableStatement
 
@@ -204,6 +205,18 @@ exportable
   / channelDeclaration
   / funcDeclaration
   / moduleItems
+
+reduceStatement
+  = op:Reduce __ assign:reduceAssignment
+    __ For __ ranges:ranges NL statements:statements tail:elseTail  {
+      return node('reduce', assign, ranges, statements, tail);
+    }
+
+reduceAssignment
+  = assignment
+  / id:Identifier  {
+      return id.template('assignment', id, undefined);
+    }
 
 forStatement
   = op:For __ ranges:ranges NL statements:statements tail:elseTail  {
@@ -438,11 +451,23 @@ arrayElements
     }
 
 arrayComprehension
-  = For __ ranges:ranges __ Select __ expr:expr  {
-      return node('arrayComp', ranges, expr);
+  = For __ ranges:ranges orderBy:arrayComprehensionOrderBy?
+    expr:arrayComprehensionSelect  {
+      return node('arrayComp', ranges, expr, orderBy);
     }
-  / For __ range:arrayRange  {
-      return node('arrayComp', [range]);
+  / For __ range:arrayRange orderBy:arrayComprehensionOrderBy?  {
+      return node('arrayComp', [range], orderBy);
+    }
+
+arrayComprehensionSelect
+  = __ Select __ expr:expr  {
+      return expr;
+    }
+
+arrayComprehensionOrderBy
+  = __ OrderBy __
+    start:expr cont:( LIST_SEP expr:expr  { return expr; })*  {
+      return [start].concat(cont);
     }
 
 object
@@ -483,11 +508,26 @@ objectAssignment
     }
 
 objectComprehension
-  = For __ ranges:ranges __ Select __ assign:objectAssignment  {
+  = For __ ranges:ranges assign:objectComprehensionSelect  {
       return node('objectComp', ranges, assign);
+    }
+  / For __ ranges:ranges groupBy:objectComprehensionGroupBy
+    assign:objectComprehensionSelect?  {
+      return node('objectComp', ranges, assign, groupBy);
     }
   / For __ range:objectRange  {
       return node('objectComp', [range]);
+    }
+
+objectComprehensionSelect
+  = __ Select __ assign:objectAssignment  {
+      return assign;
+    }
+
+objectComprehensionGroupBy
+  = __ GroupBy __
+    start:expr cont:( LIST_SEP expr:expr  { return expr; })*  {
+      return [start].concat(cont);
     }
 
 lambda
@@ -555,36 +595,43 @@ wildcard = Wildcard
 
 /* Lexer *********************************************************************/
 
-For     = "for"     !NameContinue  { return 'for'; }
-Def     = "def"     !NameContinue  { return 'function'; }
-When    = "when"    !NameContinue  { return 'channel'; }
-From    = "from"    !NameContinue  { return 'from'; }
-Import  = "import"  !NameContinue  { return 'import'; }
-Export  = "export"  !NameContinue  { return 'export'; }
-Let     = "let"     !NameContinue  { return 'let'; }
-And     = "and"     !NameContinue  { return 'and'; }
-Or      = "or"      !NameContinue  { return 'or'; }
-Like    = "like"    !NameContinue  { return 'like'; }
-Mod     = "mod"     !NameContinue  { return 'mod'; }
-Not     = "not"     !NameContinue  { return 'not'; }
-In      = "in"      !NameContinue  { return 'in'; }
-NotIn   = Not _ In  !NameContinue  { return 'notIn'; }
-Return  = "return"  !NameContinue  { return 'return'; }
-Self    = "self"    !NameContinue  { return node('self'); }
-True    = "true"    !NameContinue  { return node('literal', true); }
-False   = "false"   !NameContinue  { return node('literal', false); }
-If      = "if"      !NameContinue  { return true; }
-Unless  = "unless"  !NameContinue  { return false; }
-As      = "as"      !NameContinue
-Else    = "else"    !NameContinue
-End     = "end"     !NameContinue
-Where   = "where"   !NameContinue
-Select  = "select"  !NameContinue
+For     = "for"      !NameContinue  { return 'for'; }
+Def     = "def"      !NameContinue  { return 'function'; }
+When    = "when"     !NameContinue  { return 'channel'; }
+From    = "from"     !NameContinue  { return 'from'; }
+Import  = "import"   !NameContinue  { return 'import'; }
+Export  = "export"   !NameContinue  { return 'export'; }
+Let     = "let"      !NameContinue  { return 'let'; }
+And     = "and"      !NameContinue  { return 'and'; }
+Or      = "or"       !NameContinue  { return 'or'; }
+Like    = "like"     !NameContinue  { return 'like'; }
+Mod     = "mod"      !NameContinue  { return 'mod'; }
+Not     = "not"      !NameContinue  { return 'not'; }
+In      = "in"       !NameContinue  { return 'in'; }
+NotIn   = Not _ In   !NameContinue  { return 'notIn'; }
+Return  = "return"   !NameContinue  { return 'return'; }
+Self    = "self"     !NameContinue  { return node('self'); }
+True    = "true"     !NameContinue  { return node('literal', true); }
+False   = "false"    !NameContinue  { return node('literal', false); }
+If      = "if"       !NameContinue  { return true; }
+Unless  = "unless"   !NameContinue  { return false; }
+As      = "as"       !NameContinue
+By      = "by"       !NameContinue
+Else    = "else"     !NameContinue
+End     = "end"      !NameContinue
+Where   = "where"    !NameContinue
+Select  = "select"   !NameContinue
+Reduce  = "reduce"   !NameContinue
+Order   = "order"    !NameContinue
+Group   = "group"    !NameContinue
+OrderBy = Order _ By !NameContinue
+GroupBy = Group _ By !NameContinue
 
 ReservedWord "reserved word"
   = ( For / Def / When / From / Import / Export / Let / And / Or /
-      Like / Mod / Not / If / Unless / True / False / As / In /
-      Return / Self / Else / End / Where / Select )
+      Like / Mod / Not / If / Unless / True / False / As / By /
+      In / Return / Self / Else / End / Where / Select / Reduce /
+      Order / Group )
 
 Identifier "identifier"
   = !ReservedWord name:Name  {
