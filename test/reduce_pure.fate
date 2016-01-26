@@ -1,0 +1,34 @@
+import nodeunit
+
+def reduceStatementImplicit(test)
+  let a = 50, b = 99
+
+  reduce a
+  for x in [1, 2, 3]
+    let a = a + x
+    let b = 20
+  end
+
+  test.equal(a, 56)
+  test.equal(b, 99)
+  test.done()
+end
+
+def reduceStatementExplcit(test)
+  let a = 50, b = 99
+
+  reduce a = 0
+  for x in [1, 2, 3]
+    let a = a + x
+    let b = 20
+  end
+
+  test.equal(a, 6)
+  test.equal(b, 99)
+  test.done()
+end
+
+export let tests = nodeunit.testCase({
+  "Implicit Reduce Statement": reduceStatementExplcit,
+  "Explicit Reduce Statement": reduceStatementExplcit
+})
