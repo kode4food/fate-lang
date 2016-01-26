@@ -209,9 +209,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     });
 
     let joinName = generate.createAnonymous();
-    generate.assignment(joinName, function() {
+    generate.assignment(joinName, function () {
       let joinArgs: any[] = [];
-      joinArgs.push(function() {
+      joinArgs.push(function () {
         generate.func({
           contextArgs: allParamNames,
           body: defer(createStatementsEvaluator, node.statements)
@@ -520,13 +520,12 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
 
     function generateReduceInitializers() {
-      let converted: JavaScript.AssignmentItems = [];
-
-      reduceAssignments.forEach(function(assignment) {
-        converted.push([assignment.id.value, defer(assignment.value)]);
-      });
-
-      generate.assignments(converted);
+      generate.assignments(reduceAssignments.map(function (assignment) {
+        return <JavaScript.AssignmentItem>[
+          assignment.id.value,
+          defer(assignment.value)
+        ];
+      }));
     }
 
     function createAnonymousCounters() {
