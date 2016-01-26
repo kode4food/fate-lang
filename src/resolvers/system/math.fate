@@ -10,11 +10,11 @@ let numberSort = (left, right -> left - right)
 let NumberArray = ArrayOf(Number)
 
 export def sum(NumberArray as values)
-  let res = mutable(0)
+  reduce result = 0
   for value in values
-    res.set(res.value + value)
+    let result = result + value
   end
-  res.value
+  return result
 end
 
 export def avg(values)

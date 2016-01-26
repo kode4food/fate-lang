@@ -66,7 +66,6 @@ conditionalStatement
 
 unconditionalStatement
   = declStatement
-  / reduceStatement
   / forStatement
   / trailableStatement
 
@@ -86,20 +85,20 @@ declStatement
   / channelDeclaration
 
 funcDeclaration
-  = op:Def __ signature:signature statements:statementsTail  {
+  = op:Def signature:signature statements:statementsTail  {
       return node(op, signature, statements);
     }
 
 channelDeclaration
-  = op:When __ signatures_start:signature
-    signatures_cont:( __ "&" __ s:signature  { return s; } )*
+  = op:When signatures_start:signature
+    signatures_cont:( __ "&" s:signature  { return s; } )*
     statements:statementsTail  {
       let signatures = [signatures_start].concat(signatures_cont);
       return node(op, signatures, statements);
     }
 
 signature
-  = id:Identifier _ params:params? guard:guard?  {
+  = __ id:Identifier _ params:params? guard:guard?  {
       return node('signature', id, params, guard);
     }
 
@@ -144,7 +143,7 @@ patternExpr
     }
 
 importStatement
-  = op:From __ path:(modulePath / stringPath)
+  = op:From path:(modulePath / stringPath)
     __ Import __ imports:moduleItems  {
       return node(op, path, imports);
     }
@@ -153,12 +152,12 @@ importStatement
     }
 
 stringPath
-  = path:SimpleString  {
+  = __ path:SimpleString  {
       return node('modulePath', path.value);
     }
 
 modulePath
-  = start:moduleComp cont:( "." item:moduleComp { return item; } )*  {
+  = __ start:moduleComp cont:( "." item:moduleComp { return item; } )*  {
       return node('modulePath', [start].concat(cont).join('/'));
     }
 
@@ -206,25 +205,29 @@ exportable
   / funcDeclaration
   / moduleItems
 
-reduceStatement
-  = op:Reduce __ assign:reduceAssignment
-    __ For __ ranges:ranges NL statements:statements tail:elseTail  {
-      return node('reduce', assign, ranges, statements, tail);
+forStatement
+  = Reduce reduceAssignments:reduceAssignments __
+    op:For ranges:ranges NL statements:statements tail:elseTail  {
+      return node(op, ranges, statements, tail, reduceAssignments);
+    }
+  / op:For ranges:ranges NL statements:statements tail:elseTail  {
+      return node(op, ranges, statements, tail);
+    }
+
+reduceAssignments
+  = __ start:reduceAssignment
+    cont:( LIST_SEP a:reduceAssignment { return a; } )*  {
+      return [start].concat(cont);
     }
 
 reduceAssignment
   = assignment
   / id:Identifier  {
-      return id.template('assignment', id, undefined);
-    }
-
-forStatement
-  = op:For __ ranges:ranges NL statements:statements tail:elseTail  {
-      return node(op, ranges, statements, tail);
+      return id.template('assignment', id, id);
     }
 
 ranges
-  = start:range cont:( LIST_SEP r:range { return r; } )*  {
+  = __ start:range cont:( LIST_SEP r:range { return r; } )*  {
       return [start].concat(cont);
     }
 
@@ -233,7 +236,7 @@ range
   / arrayRange
 
 objectRange
-  = rangeIds:objectRangeIdentifier __ In __ col:expr guard:guard?  {
+  = __ rangeIds:objectRangeIdentifier IN_SEP col:expr guard:guard?  {
       return node('range', rangeIds.value, rangeIds.name, col, guard);
     }
 
@@ -243,7 +246,7 @@ objectRangeIdentifier
     }
 
 arrayRange
-  = rangeIds:arrayRangeIdentifer __ In __ col:expr guard:guard?  {
+  = __ rangeIds:arrayRangeIdentifer IN_SEP col:expr guard:guard?  {
       return node('range', rangeIds.value, rangeIds.name, col, guard);
     }
 
@@ -451,23 +454,16 @@ arrayElements
     }
 
 arrayComprehension
-  = For __ ranges:ranges orderBy:arrayComprehensionOrderBy?
-    expr:arrayComprehensionSelect  {
-      return node('arrayComp', ranges, expr, orderBy);
+  = For ranges:ranges expr:arrayComprehensionSelect  {
+      return node('arrayComp', ranges, expr);
     }
-  / For __ range:arrayRange orderBy:arrayComprehensionOrderBy?  {
-      return node('arrayComp', [range], orderBy);
+  / For range:arrayRange  {
+      return node('arrayComp', [range]);
     }
 
 arrayComprehensionSelect
   = __ Select __ expr:expr  {
       return expr;
-    }
-
-arrayComprehensionOrderBy
-  = __ OrderBy __
-    start:expr cont:( LIST_SEP expr:expr  { return expr; })*  {
-      return [start].concat(cont);
     }
 
 object
@@ -508,26 +504,16 @@ objectAssignment
     }
 
 objectComprehension
-  = For __ ranges:ranges assign:objectComprehensionSelect  {
+  = For ranges:ranges assign:objectComprehensionSelect  {
       return node('objectComp', ranges, assign);
     }
-  / For __ ranges:ranges groupBy:objectComprehensionGroupBy
-    assign:objectComprehensionSelect?  {
-      return node('objectComp', ranges, assign, groupBy);
-    }
-  / For __ range:objectRange  {
+  / For range:objectRange  {
       return node('objectComp', [range]);
     }
 
 objectComprehensionSelect
   = __ Select __ assign:objectAssignment  {
       return assign;
-    }
-
-objectComprehensionGroupBy
-  = __ GroupBy __
-    start:expr cont:( LIST_SEP expr:expr  { return expr; })*  {
-      return [start].concat(cont);
     }
 
 lambda
@@ -622,16 +608,11 @@ End     = "end"      !NameContinue
 Where   = "where"    !NameContinue
 Select  = "select"   !NameContinue
 Reduce  = "reduce"   !NameContinue
-Order   = "order"    !NameContinue
-Group   = "group"    !NameContinue
-OrderBy = Order _ By !NameContinue
-GroupBy = Group _ By !NameContinue
 
 ReservedWord "reserved word"
   = ( For / Def / When / From / Import / Export / Let / And / Or /
-      Like / Mod / Not / If / Unless / True / False / As / By /
-      In / Return / Self / Else / End / Where / Select / Reduce /
-      Order / Group )
+      Like / Mod / Not / If / Unless / True / False / As / In /
+      Return / Self / Else / End / Where / Select / Reduce )
 
 Identifier "identifier"
   = !ReservedWord name:Name  {
@@ -815,5 +796,6 @@ _  "whitespace"
   = WS*
 
 AS_SEP = __ As __
+IN_SEP = __ In __
 LIST_SEP = __ "," __
 PROP_SEP = __ ":" __

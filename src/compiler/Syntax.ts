@@ -185,7 +185,8 @@ export class ExpressionStatement extends Statement {
 export class ForStatement extends Statement {
   constructor(public ranges: Ranges,
               public loopStatements: Statements,
-              public elseStatements: Statements) { super(); }
+              public elseStatements: Statements,
+              public reduceAssignments?: Assignments) { super(); }
 }
 
 export class IfStatement extends Statement {
