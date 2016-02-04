@@ -96,13 +96,18 @@ export function join(body: Function, ...argCount: number[]) {
     argumentIndexes.forEach(function (argumentIndex, setIndex) {
       let argumentSet = argumentSets[setIndex];
       let inputArgs = argumentSet[argumentIndex];
+
+      // build the arguments to be passed
       inputArgs.consumed = true;
       args = args.concat(inputArgs.argumentArray.slice(1));
       argsLength += argCount[setIndex];
       args.length = argsLength;
+
+      // cleanup
+      argumentSet[argumentIndex] = null;
+      argumentSet = argumentSet.filter(value => value !== null);
     });
 
-    // argumentSets = null;
     GlobalScheduler.queue(body, args);
   }
 }
