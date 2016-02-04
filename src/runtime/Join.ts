@@ -48,14 +48,10 @@ export function joinArguments(joinArgs?: JoinArguments) {
 }
 
 export function join(body: Function, ...argCount: number[]) {
-  let satisfied = false;
   let argumentSets: JoinArguments[][] = [];
   return provideArguments;
 
   function provideArguments(signatureIndex: number, args: JoinArguments) {
-    if ( satisfied ) {
-      return;
-    }
     args.provided = true;
 
     // This is not the most efficient implementation... don't care
@@ -106,8 +102,7 @@ export function join(body: Function, ...argCount: number[]) {
       args.length = argsLength;
     });
 
-    satisfied = true;
-    argumentSets = null;
+    // argumentSets = null;
     GlobalScheduler.queue(body, args);
   }
 }

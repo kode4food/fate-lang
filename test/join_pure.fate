@@ -1,14 +1,14 @@
 import nodeunit
 
 def joinPatternTest(test)
-  test.expect(11)
+  test.expect(16)
 
   when a({ value: 'another' } as x, y) & b(g, h)
-    x.type = 'Not'      | test.ok
-    x.value = 'another' | test.ok
-    y = 'goodbye'       | test.ok
-    g = 'you'           | test.ok
-    h = 40              | test.ok
+    x.type in ['Not', 'Yet']      | test.ok
+    x.value = 'another'           | test.ok
+    y in ['goodbye1', 'goodbye2'] | test.ok
+    g in ['you', 'there']         | test.ok
+    h in [40, 120]                | test.ok
   end
 
   when a({ type: 'Test' } as x, y) & b(g, self > 50 as h)
@@ -19,12 +19,13 @@ def joinPatternTest(test)
     h = 99             | test.ok
   end
 
-  (-> a({ non: 'exhaustive' })) | test.throws
-  timeout(10, -> a({ type: 'Test', value: 'aValue'}, 'hello'))
-  timeout(20, -> b('there', 99))
-  timeout(30, -> a({ type: 'Not', value: 'another' }, 'goodbye'))
-  timeout(40, -> b('you', 40))
-  timeout(60, -> b('there', 120))
+  (-> a({ non: 'exhaustive' })) | test.throws                      # none
+  timeout(10, -> a({ type: 'Test', value: 'aValue'}, 'hello'))     # 1
+  timeout(20, -> b('there', 99))                                   # 1, 2
+  timeout(30, -> a({ type: 'Not', value: 'another' }, 'goodbye1')) # 1, 2
+  timeout(40, -> b('you', 40))                                     # 1
+  timeout(60, -> b('there', 120))                                  # 1, 2
+  timeout(70, -> a({ type: 'Yet', value: 'another' }, 'goodbye2')) # 1
 
   timeout(100, -> # testing multi-line parse
     test.done()
