@@ -1,4 +1,4 @@
-"use strict";
+ "use strict";
 
 import Visitor from './Visitor';
 import * as Syntax from './Syntax';

@@ -74,6 +74,10 @@ export function isMatch(template: any, obj: any) {
   }
 
   for ( let key in template ) {
+    /* istanbul ignore next: don't know where this template's been */
+    if ( !template.hasOwnProperty(key) ) {
+      continue;
+    }
     if ( !isMatch(template[key], obj[key]) ) {
       return false;
     }

@@ -105,7 +105,7 @@ export function join(body: Function, ...argCount: number[]) {
 
       // cleanup
       argumentSet[argumentIndex] = null;
-      argumentSet = argumentSet.filter(value => value !== null);
+      argumentSets[setIndex] = argumentSet.filter(value => value !== null);
     });
 
     GlobalScheduler.queue(body, args);

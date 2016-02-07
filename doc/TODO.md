@@ -4,6 +4,8 @@
 
 * The compiler should perform a bit more validation.
 
+* The Code Generator needs to be modularized and cleaned up.  It's a mess right now.
+'
 * Source Maps
 
 * Documentation!

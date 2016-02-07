@@ -12,10 +12,10 @@ let slice = Array.prototype.slice;
 let likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
 
 /**
-  * Converts a parse tree into source code (initially JavaScript). Host
-  * Language-specific constructs are avoided here and instead produced
-  * by JavaScript code generation module.
-  */
+ * Converts a parse tree into source code (initially JavaScript). Host
+ * Language-specific constructs are avoided here and instead produced
+ * by JavaScript code generation module.
+ */
 export function generateScriptBody(parseTree: Syntax.Statements) {
   let globals = new JavaScript.Globals();
   let generate = JavaScript.createModule(globals);
@@ -316,7 +316,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function generateEnsured(signatureName: Syntax.Identifier,
-                            signatureType: string) {
+                           signatureType: string) {
     let ensure = globals.runtimeImport('ensure' + signatureType);
     let ensuredId = generate.createAnonymous();
 
