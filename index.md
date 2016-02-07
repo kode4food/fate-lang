@@ -97,14 +97,14 @@ else
 end
 
 # Reduce Statement (Multiple Components)
-reduce sum = 0, count = 0, average = 0
+reduce sum = 0, count = 0
 for value in [1, 2, 3, 4, 5, 6, 7]
 where value < 4
   let count = count + 1
   let sum = sum + value
-  let average = sum / count
 end
-
+let average = sum / count
+ 
 # Reduce Expression (in Lambda)
 let sum = (values ->
   reduce result = 0
