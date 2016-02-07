@@ -1,5 +1,8 @@
 # Change History
 
+## Version 0.4.0 - Reduce Statements and Expressions
+Because Fate uses static signle assignment form, there was no way to mutate values through a loop except using the `mutable()` hack, resulting in very unsafe code.  `reduce` statements and expressions address this limitation by introducing loop-safe managed values that continue to respect SSA Form.
+
 ## Version 0.3.0 - So Many Of Stuff!
 * Compiler modularized (Visitor, Checker, Patterns, Rewriter)
 * 'self' Keyword for recursive Function calling
