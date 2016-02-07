@@ -57,7 +57,7 @@ def reduceStatementsInLambda(test)
   )
 
   test.equal(sum([1,2,3]), 6)
-  test.equal(multi([1,2,3]), 12)
+  test.deepEqual(multi([1,2,3]), [6, 12])
   test.done()
 end
 
@@ -79,6 +79,7 @@ end
 export let tests = nodeunit.testCase({
   "Implicit Reduce Statement": reduceStatementImplicit,
   "Explicit Reduce Statement": reduceStatementExplicit,
+  "Reduce Statements In Lambda": reduceStatementsInLambda,
   "Explicit Multi-Reduce Statement": multiReduceStatementExplicit,
   "Implicit Reduce Expression": reduceExpressionImplicit,
   "Explicit Reduce Expression": reduceExpressionExplicit
