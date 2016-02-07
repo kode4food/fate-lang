@@ -454,14 +454,14 @@ arrayElements
     }
 
 arrayComprehension
-  = For ranges:ranges expr:arrayComprehensionSelect  {
+  = For ranges:ranges expr:expressionSelect  {
       return node('arrayComp', ranges, expr);
     }
   / For range:arrayRange  {
       return node('arrayComp', [range]);
     }
 
-arrayComprehensionSelect
+expressionSelect
   = __ Select __ expr:expr  {
       return expr;
     }
@@ -504,14 +504,14 @@ objectAssignment
     }
 
 objectComprehension
-  = For ranges:ranges assign:objectComprehensionSelect  {
+  = For ranges:ranges assign:objectAssignmentSelect  {
       return node('objectComp', ranges, assign);
     }
   / For range:objectRange  {
       return node('objectComp', [range]);
     }
 
-objectComprehensionSelect
+objectAssignmentSelect
   = __ Select __ assign:objectAssignment  {
       return assign;
     }
@@ -524,7 +524,7 @@ lambda
         node('statements', stmts)
       );
     }
-  / parens
+  / reduceExpression
 
 lambdaParams
   = "(" __ params:idParamList? __ ")"  { return params; }
@@ -544,6 +544,13 @@ idParamList
 
 idParam
   = id:Identifier  { return id.template('idParam', id); }
+
+reduceExpression
+  = op:Reduce __ reduceAssignment:reduceAssignment __
+    For ranges:ranges __ select:expressionSelect  {
+      return node(op, reduceAssignment, ranges, select);
+    }
+  / parens
 
 parens
   = "(" __ expr:expr __ ")"  {
@@ -581,6 +588,7 @@ wildcard = Wildcard
 
 /* Lexer *********************************************************************/
 
+Reduce  = "reduce"   !NameContinue  { return 'reduce'; }
 For     = "for"      !NameContinue  { return 'for'; }
 Def     = "def"      !NameContinue  { return 'function'; }
 When    = "when"     !NameContinue  { return 'channel'; }
@@ -607,7 +615,6 @@ Else    = "else"     !NameContinue
 End     = "end"      !NameContinue
 Where   = "where"    !NameContinue
 Select  = "select"   !NameContinue
-Reduce  = "reduce"   !NameContinue
 
 ReservedWord "reserved word"
   = ( For / Def / When / From / Import / Export / Let / And / Or /

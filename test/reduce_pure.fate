@@ -14,7 +14,7 @@ def reduceStatementImplicit(test)
   test.done()
 end
 
-def reduceStatementExplcit(test)
+def reduceStatementExplicit(test)
   let a = 50, b = 99
 
   reduce a = 0
@@ -28,7 +28,58 @@ def reduceStatementExplcit(test)
   test.done()
 end
 
+def multiReduceStatementExplicit(test)
+  reduce a = 0, b = 2
+  for x in [1, 2, 3]
+    let a = a + x
+    let b = b * x
+  end
+
+  test.equal(a, 6)
+  test.equal(b, 12)
+  test.done()
+end
+
+def reduceStatementsInLambda(test)
+  let sum = (values ->
+    reduce x = 0
+    for value in values
+      let x = x + value
+    end
+  )
+
+  let multi = (values ->
+    reduce a = 0, b = 2
+    for x in [1, 2, 3]
+      let a = a + x
+      let b = b * x
+    end
+  )
+
+  test.equal(sum([1,2,3]), 6)
+  test.equal(multi([1,2,3]), 12)
+  test.done()
+end
+
+def reduceExpressionImplicit(test)
+  let a = 5
+  let result = reduce a for x in [1,2,3] select a + x
+  test.equal(result, 11)
+  test.equal(a, 5)  # var shouldn't leak
+  test.done()
+end
+
+def reduceExpressionExplicit(test)
+  let result = reduce a = 0 for x in [1,2,3] select a + x
+  test.equal(result, 6)
+  test.equal(a, node.undefined)  # var shouldn't leak
+  test.done()
+end
+
 export let tests = nodeunit.testCase({
-  "Implicit Reduce Statement": reduceStatementExplcit,
-  "Explicit Reduce Statement": reduceStatementExplcit
+  "Implicit Reduce Statement": reduceStatementImplicit,
+  "Explicit Reduce Statement": reduceStatementExplicit,
+  "Explicit Multi-Reduce Statement": multiReduceStatementExplicit,
+  "Implicit Reduce Expression": reduceExpressionImplicit,
+  "Explicit Reduce Expression": reduceExpressionExplicit
 })

@@ -122,6 +122,12 @@ export class LambdaExpression extends Expression {
               public statements: Statements) { super(); }
 }
 
+export class ReduceExpression extends Expression {
+  constructor(public assignment: Assignment,
+              public ranges: Ranges,
+              public select: Expression) { super(); }
+}
+
 // Array/Object Construction and Comprehension ******************************
 
 export class ElementsConstructor extends Operator {
@@ -402,6 +408,7 @@ let tagToConstructor: FunctionMap = {
   'channel': ChannelDeclaration,
   'function': FunctionDeclaration,
   'lambda': LambdaExpression,
+  'reduce': ReduceExpression,
   'call': CallOperator,
   'bind': BindOperator,
   'let': LetStatement,

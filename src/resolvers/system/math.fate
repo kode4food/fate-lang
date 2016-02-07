@@ -12,9 +12,7 @@ let NumberArray = ArrayOf(Number)
 export def sum(NumberArray as values)
   reduce result = 0
   for value in values
-    let result = result + value
-  end
-  return result
+  select result + value
 end
 
 export def avg(values)

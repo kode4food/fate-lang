@@ -170,43 +170,14 @@ export function createModule(globals: Globals) {
   let exportsName = 'x';
 
   return {
-    registerAnonymous: registerAnonymous,
-    createAnonymous: createAnonymous,
-    assignAnonymous: assignAnonymous,
-    retrieveAnonymous: retrieveAnonymous,
-    assignResult: assignResult,
-    self: self,
-    selfName: selfName,
-    context: context,
-    contextName: contextName,
-    member: writeMember,
-    write: write,
-    writeAndGroup: writeAndGroup,
-    getter: getter,
-    assignment: assignment,
-    assignments: assignments,
-    assignFromArray: assignFromArray,
-    exports: exports,
-    exportsName: exportsName,
-    unaryOperator: unaryOperator,
-    binaryOperator: binaryOperator,
-    conditionalOperator: conditionalOperator,
-    statement: statement,
-    ifStatement: ifStatement,
-    loopExpression: loopExpression,
-    loopContinue: loopContinue,
-    funcDecl: funcDeclaration,
-    func: func,
-    compoundExpression: compoundExpression,
-    returnStatement: returnStatement,
-    call: call,
-    array: array,
-    arrayAppend: arrayAppend,
-    object: object,
-    objectAssign: objectAssign,
-    parens: parens,
-    code: code,
-    toString: toString
+    registerAnonymous, createAnonymous, assignAnonymous,
+    retrieveAnonymous, assignResult, self, selfName, context,
+    contextName, member, write, writeAndGroup, getter, assignment,
+    assignments, assignFromArray, exports, exportsName,
+    unaryOperator, binaryOperator, conditionalOperator, statement,
+    ifStatement, loopExpression, loopContinue, funcDeclaration,
+    iife, func, compoundExpression, returnStatement, call, array,
+    arrayAppend, object, objectAssign, parens, code, toString
   };
 
   function nextId(prefix: string) {
@@ -290,7 +261,7 @@ export function createModule(globals: Globals) {
     write(contextName);
   }
 
-  function writeMember(object: BodyEntry, property: BodyEntry) {
+  function member(object: BodyEntry, property: BodyEntry) {
     write(object, '[', property, ']');
   }
 
@@ -430,7 +401,7 @@ export function createModule(globals: Globals) {
       let alias = item[1];
 
       let localName = localForRead(name);
-      writeMember(exportsName, globals.literal(alias));
+      member(exportsName, globals.literal(alias));
       write('=', localName, ';');
     });
   }
@@ -600,6 +571,14 @@ export function createModule(globals: Globals) {
     write(';');
   }
 
+  function iife(funcBody: BodyEntry) {
+    parens(function () {
+      call(function () {
+        func({ body: funcBody });
+      }, []);
+    });
+  }
+
   function func(options: FunctionOptions) {
     let internalId = options.internalId;
     let internalArgs = options.internalArgs || [];
@@ -663,7 +642,7 @@ export function createModule(globals: Globals) {
 
       // pull the value from the global context
       write('let ', localNameId, '=');
-      writeMember(context, globals.literal(name));
+      member(context, globals.literal(name));
       write(';');
     });
 
@@ -732,7 +711,7 @@ export function createModule(globals: Globals) {
       expressions.forEach(function (item) {
         components.push(function () {
           let name = item[2] ? item[0] : globals.literal(item[0]);
-          writeMember(dictVar, name);
+          member(dictVar, name);
           write('=', item[1]);
         });
       });
@@ -760,7 +739,7 @@ export function createModule(globals: Globals) {
   }
 
   function objectAssign(dict: Id, name: BodyEntry, value: BodyEntry) {
-    writeMember(dict, name);
+    member(dict, name);
     write('=', value);
   }
 

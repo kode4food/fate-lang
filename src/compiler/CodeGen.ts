@@ -28,6 +28,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'channel': createChannelEvaluator,
     'function': createFunctionEvaluator,
     'lambda': createLambdaEvaluator,
+    'reduce': createReduceEvaluator,
     'call': createCallEvaluator,
     'bind': createBindEvaluator,
     'let': createLetEvaluator,
@@ -343,7 +344,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
     function createUnguarded() {
       let functionName = node.signature.id;
-      generate.funcDecl(functionName.value, {
+      generate.funcDeclaration(functionName.value, {
         internalId: getFuncOrLambdaInternalId(node),
         contextArgs: paramNames,
         body: defer(createStatementsEvaluator, node.statements)
@@ -354,7 +355,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       let functionName = node.signature.id;
       let ensuredId = generateEnsured(functionName, 'Function');
 
-      generate.funcDecl(functionName.value, {
+      generate.funcDeclaration(functionName.value, {
         internalId: getFuncOrLambdaInternalId(node),
         contextArgs: paramNames,
         prolog: createProlog,
@@ -389,6 +390,24 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         contextArgs: paramNames,
         body: defer(createStatementsEvaluator, node.statements)
       });
+    });
+  }
+
+  function createReduceEvaluator(node: Syntax.ReduceExpression) {
+    let statements = node.template('statements', [
+      node.template('let', [
+        node.template('assignment', node.assignment.id, node.select)
+      ])
+    ]);
+    let forNode = node.template('for',
+      node.ranges,
+      statements,
+      node.template('statements', []),
+      [node.assignment]
+    );
+
+    generate.iife(function () {
+      createForEvaluator(forNode);
     });
   }
 
@@ -440,13 +459,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createListCompEvaluator(node: Syntax.ListComprehension) {
-    generate.parens(function () {
-      generate.call(function () {
-        generate.func({
-          body: functionWrapperBody
-        });
-      }, []);
-    });
+    generate.iife(functionWrapperBody);
 
     function functionWrapperBody() {
       let isObject = node instanceof Syntax.ObjectComprehension;
@@ -500,6 +513,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
 
     generateStatements();
+    if ( reduceAssignments ) {
+      generateReduceResult();
+    }
 
     function generateStatements() {
       let elseStatements = node.elseStatements;
@@ -517,6 +533,22 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         null,
         defer(createStatementsEvaluator, elseStatements)
       );
+    }
+
+    function generateReduceResult() {
+      generate.statement(function () {
+        generate.assignResult(function () {
+          if ( reduceAssignments.length === 1 ) {
+            generate.getter(reduceAssignments[0].id.value);
+            return;
+          }
+          generate.array(reduceAssignments.map(function (assignment) {
+            return function () {
+              generate.getter(assignment.id.value);
+            };
+          }));
+        });
+      });
     }
 
     function generateReduceInitializers() {
