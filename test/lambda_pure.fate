@@ -11,6 +11,22 @@ def lambdas(test)
   test.done()
 end
 
+def rolledUpLoops(test)
+  let filtered = (values ->
+    [for value in values where value < 50]
+  )
+
+  let sum = (values ->
+    reduce result = 0
+    for value in values
+    select result + value
+  )
+
+  test.deepEqual(filtered([10, 20, 70, 30]), [10, 20, 30])
+  test.equals(sum([1, 2, 3]), 6)
+  test.done()
+end
+
 def fatLambdas(test)
   let lambda1 = (x, y ->
     let r = x + y
@@ -43,6 +59,7 @@ end
 
 let tests = nodeunit.testCase({
   "Lambdas Expressions": lambdas,
+  "Rolled Up Loops": rolledUpLoops,
   "Fat Lambda Expressions": fatLambdas,
   "Lambda currying": curryTest
 })

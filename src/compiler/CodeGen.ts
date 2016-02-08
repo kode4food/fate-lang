@@ -406,6 +406,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       [node.assignment]
     );
 
+    if ( hasAnnotation(node, 'function/single_expression') ) {
+      createForEvaluator(forNode);
+      return;
+    }
     generate.iife(function () {
       createForEvaluator(forNode);
     });
@@ -459,6 +463,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createListCompEvaluator(node: Syntax.ListComprehension) {
+    if ( hasAnnotation(node, 'function/single_expression') ) {
+      functionWrapperBody();
+      return;
+    }
     generate.iife(functionWrapperBody);
 
     function functionWrapperBody() {
@@ -474,9 +482,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       });
 
       createLoop(node.ranges, createBody);
-
-      generate.returnStatement(function () {
-        generate.retrieveAnonymous(result);
+      generate.statement(function () {
+        generate.assignResult(function () {
+          generate.retrieveAnonymous(result);
+        });
       });
 
       function createValueBody() {
