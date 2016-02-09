@@ -1,7 +1,5 @@
 "use strict";
 
-const isArray = Array.isArray;
-
 import Visitor from './Visitor';
 import * as Syntax from './Syntax';
 import { isTrue, isFalse, isIn } from '../Types';
@@ -260,13 +258,8 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function rollUpStandaloneLoops(statement: Syntax.ExpressionStatement) {
-    let parents = <Syntax.Nodes>visit.nodeStack.slice().reverse();
-    if ( Syntax.hasTag(parents[0], 'index') &&
-         isArray(parents[1]) && parents[1].length === 1 &&
-         Syntax.hasTag(parents[2], 'statements') &&
-         Syntax.hasTag(parents[3], ['function', 'lambda']) &&
-         Syntax.hasTag(statement.expression, ['arrayComp',
-           'objectComp', 'reduce']) ) {
+    if ( Syntax.hasTag(statement.expression,
+                       ['arrayComp', 'objectComp', 'reduce']) ) {
       annotate(statement.expression, 'function/single_expression');
       return statement.expression;
     }

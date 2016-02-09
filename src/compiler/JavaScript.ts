@@ -462,7 +462,7 @@ export function createModule(globals: Globals) {
     branches.forEach(function (branch, index) {
       names = extendNames(originalNames);
       branchContent[index] = branch ? code(branch) : "";
-      Object.keys(names).forEach(function (key) {
+       Object.keys(names).forEach(function (key) {
         let created = !originalNames[key];
         if ( created || names[key].length > 1 ) {
           let modificationSet = modificationSets[key];
@@ -501,7 +501,7 @@ export function createModule(globals: Globals) {
 
       let targetId = localForWrite(key);
       sourceIds.forEach(function (sourceId, index) {
-        if ( !sourceId ) {
+        if ( !sourceId || sourceId === targetId ) {
           return;
         }
         let content = [targetId, '=', sourceId, ';'].join('');

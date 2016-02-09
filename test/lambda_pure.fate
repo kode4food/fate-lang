@@ -12,9 +12,17 @@ def lambdas(test)
 end
 
 def rolledUpLoops(test)
-  let filtered = (values ->
-    [for value in values where value < 50]
+  let maybe_filtered = (filtered, values ->
+    if filtered
+      [for nothing in "ignored"]
+      [for value in values where value < 50]
+    else
+      [for value in values]
+    end
   )
+
+  let filtered = maybe_filtered(true, ?)
+  let unfiltered = maybe_filtered(false, ?)
 
   let sum = (values ->
     reduce result = 0
@@ -23,6 +31,7 @@ def rolledUpLoops(test)
   )
 
   test.deepEqual(filtered([10, 20, 70, 30]), [10, 20, 30])
+  test.deepEqual(unfiltered([1, 50, 100]), [1, 50, 100])
   test.equals(sum([1, 2, 3]), 6)
   test.done()
 end
