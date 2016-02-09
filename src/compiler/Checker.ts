@@ -1,7 +1,5 @@
 "use strict";
 
-const isArray = Array.isArray;
-
 import Visitor from './Visitor';
 import * as Syntax from './Syntax';
 import { annotate } from './Annotations';
@@ -19,7 +17,6 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(validateChannelArgs, visit.tags('channel')),
     visit.matching(annotateSelfFunctions, selfFunctions),
     visit.matching(annotateRecursiveFunctions, functionIdRetrieval),
-    visit.matching(annotateSingleExprFunctions, visit.tags('expression')),
     visit.statementGroups(validateAssignments, visit.tags('let'), 1),
     visit.statementGroups(warnFunctionShadowing, visit.tags('function'))
   ];
@@ -108,17 +105,6 @@ export default function createTreeProcessors(visit: Visitor) {
     }
     annotate(func, 'function/no_merge');
     return node;
-  }
-
-  function annotateSingleExprFunctions(statement: Syntax.ExpressionStatement) {
-    let parents = <Syntax.Nodes>visit.nodeStack.slice().reverse();
-    if ( Syntax.hasTag(parents[0], 'index') &&
-         isArray(parents[1]) && parents[1].length === 1 &&
-         Syntax.hasTag(parents[2], 'statements') &&
-         Syntax.hasTag(parents[3], ['function', 'lambda']) ) {
-      annotate(statement.expression, 'function/single_expression');
-    }
-    return statement;
   }
 
   function validateAssignments(statements: Syntax.LetStatement[]) {

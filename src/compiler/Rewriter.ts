@@ -1,9 +1,11 @@
 "use strict";
 
+const isArray = Array.isArray;
+
 import Visitor from './Visitor';
 import * as Syntax from './Syntax';
 import { isTrue, isFalse, isIn } from '../Types';
-import { hasAnnotation } from './Annotations';
+import { annotate, hasAnnotation } from './Annotations';
 
 let hasTag = Syntax.hasTag;
 let isLiteral = Syntax.isLiteral;
@@ -85,6 +87,7 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(flipEquality, visit.tags('not')),
     visit.matching(promoteNot, visit.tags(['and', 'or'])),
     visit.matching(rollUpForLoops, visit.tags('for')),
+    visit.matching(rollUpStandaloneLoops, visit.tags('expression')),
 
     visit.statementGroups(splitExportStatements, visit.tags('export'), 1)
   ];
@@ -254,6 +257,20 @@ export default function createTreeProcessors(visit: Visitor) {
       nested.loopStatements,
       node.elseStatements
     );
+  }
+
+  function rollUpStandaloneLoops(statement: Syntax.ExpressionStatement) {
+    let parents = <Syntax.Nodes>visit.nodeStack.slice().reverse();
+    if ( Syntax.hasTag(parents[0], 'index') &&
+         isArray(parents[1]) && parents[1].length === 1 &&
+         Syntax.hasTag(parents[2], 'statements') &&
+         Syntax.hasTag(parents[3], ['function', 'lambda']) &&
+         Syntax.hasTag(statement.expression, ['arrayComp',
+           'objectComp', 'reduce']) ) {
+      annotate(statement.expression, 'function/single_expression');
+      return statement.expression;
+    }
+    return statement;
   }
 
   function splitExportStatements(statements: Syntax.ExportStatement[]) {
