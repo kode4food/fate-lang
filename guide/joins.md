@@ -5,3 +5,4 @@ prev: functions
 next: imports
 ---
 ## Joins
+Joins in Fate are a way to handle multiple asynchronous callbacks.

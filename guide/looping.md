@@ -97,3 +97,32 @@ let c6 = {
 ```
 
 With the exception of `else` clauses and statement blocks, all aspects of `for` loops are supported, even nested ranges!
+
+### Reducing Results
+Because Fate doesn't support the kind of mutation that might find its way out of the scope of a single loop iteration, a structure mechanism is required to facilitate this behavior while still offering the same level of mutation safety.  Fate accomplishes this through the `reduce` statement and expression.  Reduce is a way to declare a `for` loop that is expected to mutate variables within its iterations.  This is accomplished by identifying the variables that will be mutated and then re-assigning their values inside of the loop.  For example:
+
+```ruby
+reduce sum = 0
+for value in values
+  let sum = sum + value
+end
+
+print(sum)
+```
+
+In this case, `sum` will initialize with a value of zero and be increment through each iteration of the loop.  After the statement completes, `sum` will contain the aggregated value.  Multiple variables can be mutated within a reduce statement.
+
+```ruby
+reduce sum = 0, count = 0
+for value in values where value < 100
+  let sum = sum + value
+  let count = count + 1
+end
+let avg = sum / count
+```
+
+The expression form of `reduce` is similar, but only allows for one variable to be tracked, and assigning it occurs implicitly via the `select` clause.  Also, it evaluates to the mutated value:
+
+```
+let sum = reduce x = 0 for value in values select x + value
+```
