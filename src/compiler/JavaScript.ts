@@ -176,8 +176,8 @@ export function createModule(globals: Globals) {
     assignments, assignFromArray, exports, exportsName,
     unaryOperator, binaryOperator, conditionalOperator, statement,
     ifStatement, loopExpression, loopContinue, funcDeclaration,
-    iife, func, compoundExpression, returnStatement, call, array,
-    arrayAppend, object, objectAssign, parens, code, toString
+    iife, scope, func, compoundExpression, returnStatement, call,
+    array, arrayAppend, object, objectAssign, parens, code, toString
   };
 
   function nextId(prefix: string) {
@@ -577,6 +577,19 @@ export function createModule(globals: Globals) {
         func({ body: funcBody });
       }, []);
     });
+  }
+
+  function scope(scopeBody: BodyEntry) {
+    let parentNames = names;
+    pushLocalScope();
+
+    let bodyContent = code(function () {
+      generate(scopeBody);
+    });
+
+    writeLocalVariables(parentNames, []);
+    write(bodyContent);
+    popLocalScopeWithScratch();
   }
 
   function func(options: FunctionOptions) {

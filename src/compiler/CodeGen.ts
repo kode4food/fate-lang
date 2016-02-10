@@ -406,11 +406,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       [node.assignment]
     );
 
-    if ( hasAnnotation(node, 'function/single_expression') ) {
-      createForEvaluator(forNode);
-      return;
-    }
-    generate.iife(function () {
+    let isSingle = hasAnnotation(node, 'function/single_expression');
+    let bodyGenerator = isSingle ? generate.scope : generate.iife;
+    bodyGenerator(function () {
       createForEvaluator(forNode);
     });
   }
@@ -463,11 +461,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createListCompEvaluator(node: Syntax.ListComprehension) {
-    if ( hasAnnotation(node, 'function/single_expression') ) {
-      functionWrapperBody();
-      return;
-    }
-    generate.iife(functionWrapperBody);
+    let isSingle = hasAnnotation(node, 'function/single_expression');
+    let bodyGenerator = isSingle ? generate.scope : generate.iife;
+    bodyGenerator(functionWrapperBody);
 
     function functionWrapperBody() {
       let isObject = node instanceof Syntax.ObjectComprehension;
