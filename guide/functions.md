@@ -130,7 +130,7 @@ mainLayout('A Title', printItems)
 Now, when mainLayout invokes `printItems()`, the bound list in `items` will be rendered.
 
 ### Piped Calls (|)
-A piped call is an operator where the left operand is passed as the sole argument to the right operand.  The right operand must evaluate to a callable function.  These calls can be chained from left to right, where the result of each call is passed into the next right-hand operand.
+A piped call is an operator where the evaluated value of the left operand is passed as the sole argument to the right operand.  The right operand must evaluate to a Callable.  These calls can be chained from left to right, where the result of each call is passed into the next right-hand operand.
 
 ```ruby
 from array import join

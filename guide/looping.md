@@ -126,3 +126,5 @@ The expression form of `reduce` is similar, but only allows for one variable to 
 ```
 let sum = reduce x = 0 for value in values select x + value
 ```
+
+The variable named `x` will not find its way out of this expression.

@@ -71,7 +71,16 @@ npm -g install fatejs
 
 **Note:** Depending on your operating system's permissions, you may have to use 'sudo' for this call to work.
 
-This will link the command line compiler (fatec) into your PATH, allowing you to convert Fate scripts into node.js modules.  Those modules can then be required like any other node module, but the `fatejs` module must be available to your application.
+
+This will link the command line interpreter (fate) into your PATH, allowing you to start Fate scripts directly from the command-line:
+
+```bash
+fate my_script.fate
+```
+
+It will also link the command line compiler (fatec) into your PATH, allowing you to convert Fate scripts into node.js modules.  Those modules can then be required like any other node module, but the `fatejs` module must be available to your project.
+
+Because the Fate module registers an extension with node, you can also `require()` Fate scripts directly.  Just be sure to require the `fatejs` module before attempting to do so.
 
 You can also compile scripts on the fly by requiring the fatejs module, and calling its compile function, like so:
 
