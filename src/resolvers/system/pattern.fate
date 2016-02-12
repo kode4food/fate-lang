@@ -18,10 +18,11 @@ export let NonEmptyString = ~(
   isA(self, 'string') and self.length > 0
 )
 
-export let Number = ~isA(self, 'number')
-export let PositiveNumber = ~(self > 0 and isA(self, 'number'))
-export let NegativeNumber = ~(self < 0 and isA(self, 'number'))
-export let Integer = ~(self mod 1 = 0 and isA(self, 'number'))
+export
+let Number = ~isA(self, 'number')
+  , PositiveNumber = ~(self > 0 and isA(self, 'number'))
+  , NegativeNumber = ~(self < 0 and isA(self, 'number'))
+  , Integer = ~(self mod 1 = 0 and isA(self, 'number'))
 
 export let PositiveInteger = ~(
   self > 0 and self mod 1 = 0 and isA(self, 'number')
@@ -31,11 +32,11 @@ export let NegativeInteger = ~(
   self < 0 and self mod 1 = 0 and isA(self, 'number')
 )
 
-export let Array = definePattern(isArray)
-export let Object = definePattern(isObject)
-
-export let Boolean = ~isA(self, 'boolean')
-export let EmptyArray = ~(isArray(self) and self.length = 0)
+export
+let Array = definePattern(isArray)
+  , Object = definePattern(isObject)
+  , Boolean = ~isA(self, 'boolean')
+  , EmptyArray = ~(isArray(self) and self.length = 0)
 
 export def ArrayOf(elementPattern)
   return Array unless isPattern(elementPattern)

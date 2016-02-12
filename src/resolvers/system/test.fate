@@ -5,15 +5,15 @@ import equal, notEqual, deepEqual, notDeepEqual, strictEqual,
 # Warning: this module assumes JavaScript-specific methods
 
 export
-let equalTo = (value -> x -> equal(value, x)),
-    notEqualTo = (value -> x -> notEqual(value, x)),
-    deepEqualTo = (value -> x -> deepEqual(value, x)),
-    notDeepEqualTo = (value -> x -> notDeepEqual(value, x)),
-    strictEqualTo = (value -> x -> strictEqual(value, x)),
-    notStrictEqualTo = (value -> x -> notStrictEqual(value, x)),
-    isFalse = equalTo(false),
-    isTrue = equalTo(true),
-    isOk = ok
+let equalTo = value -> x -> equal(value, x)
+  , notEqualTo = value -> x -> notEqual(value, x)
+  , deepEqualTo = value -> x -> deepEqual(value, x)
+  , notDeepEqualTo = value -> x -> notDeepEqual(value, x)
+  , strictEqualTo = value -> x -> strictEqual(value, x)
+  , notStrictEqualTo = value -> x -> notStrictEqual(value, x)
+  , isFalse = equalTo(false)
+  , isTrue = equalTo(true)
+  , isOk = ok
 
 export let throws = throws(?)
 export throws, doesNotThrow
