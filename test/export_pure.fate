@@ -1,21 +1,22 @@
 import nodeunit
+from test import equalTo, isOk
 
 def imports(test)
   import './export_source_pure.fate' as source
 
-  test.equal(source.val_a, 1)
-  test.equal(source.val_b, 2)
-  test.equal(source.alias_val_a, 1)
-  test.equal(source.alias_val_b, 2)
-  test.equal(source.val_c, 3)
-  test.equal(source.val_d, 4)
+  source.val_a       | equalTo(1)
+  source.val_b       | equalTo(2)
+  source.alias_val_a | equalTo(1)
+  source.alias_val_b | equalTo(2)
+  source.val_c       | equalTo(3)
+  source.val_d       | equalTo(4)
 
-  test.equal(source.nodeunit_nu, nodeunit)
-  test.equal(source.nodeunit_tc, nodeunit.testCase)
+  source.nodeunit_nu | equalTo(nodeunit)
+  source.nodeunit_tc | equalTo(nodeunit.testCase)
 
-  test.equal(source.func_a('Bob'), 'Hello, Bob!')
-  test.ok(source.join_a)
-  test.ok(source.join_b)
+  source.func_a('Bob') | equalTo('Hello, Bob!')
+  source.join_a        | isOk
+  source.join_b        | isOk
 
   test.done()
 end

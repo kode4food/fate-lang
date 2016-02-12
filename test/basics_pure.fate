@@ -3,6 +3,7 @@ from pattern import Nothing, Something
 let null = node.null, undefined = node.undefined
 
 import nodeunit
+from test import isFalse, isTrue, equalTo, throws
 
 let data1 = {
   "name": "World",
@@ -15,9 +16,6 @@ let data1 = {
 }
 
 def relational(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   10 * 99 > 900                  | isTrue
   100 / 5 >= 30                  | isFalse
   99 mod 6 >= 3                  | isTrue
@@ -30,9 +28,6 @@ def relational(test)
 end
 
 def equality(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   10 * 99 = 990                  | isTrue
   100 / 5 != 19                  | isTrue
   99 mod 6 = 3                   | isTrue
@@ -52,9 +47,6 @@ let data2 = {
 }
 
 def inEvaluation(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   10 in [1,10,30]                    | isTrue
   10 in data2.numbers                | isTrue
   'name' in {age:43, name:'Thom'}    | isTrue
@@ -75,9 +67,6 @@ let data3 = {
 }
 
 def notIn(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   10 not in [1,10,30]                    | isFalse
   10 not in data3.numbers                | isFalse
   'name' not in {age:43, name:'Thom'}    | isFalse
@@ -92,16 +81,13 @@ def notIn(test)
 end
 
 def bool(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   true and false                          | isFalse
   true or false                           | isTrue
-  data1.people[0].age * 2 = 100 and 'yep' | test.equal(?, "yep")
-  data1.people[0].age * 2 = 99 or 'nope'  | test.equal(?, "nope")
-  'yep' and data1.people[0].age * 2       | test.equal(?, 100)
-  'yep' or data1.people[0].age * 2        | test.equal(?, "yep")
-  false or data1.people[0].age * 2        | test.equal(?, 100)
+  data1.people[0].age * 2 = 100 and 'yep' | equalTo("yep")
+  data1.people[0].age * 2 = 99 or 'nope'  | equalTo("nope")
+  'yep' and data1.people[0].age * 2       | equalTo(100)
+  'yep' or data1.people[0].age * 2        | equalTo("yep")
+  false or data1.people[0].age * 2        | equalTo(100)
   not true and not false                  | isFalse
   not(true or false)                      | isFalse
   not true or not false                   | isTrue
@@ -110,27 +96,21 @@ def bool(test)
 end
 
 def unary(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   let a = "99"
 
-  +1                             | test.equal(?, 1)
-  +a                             | test.equal(?, 99)
-  -1                             | test.equal(?, -1)
+  +1                             | equalTo(1)
+  +a                             | equalTo(99)
+  -1                             | equalTo(-1)
   not false                      | isTrue
   not true                       | isFalse
   not (----10 - 10)              | isTrue
-  -data1.people[0].age           | test.equal(?, -50)
-  -data1.people[0].age + 10      | test.equal(?, -40)
+  -data1.people[0].age           | equalTo(-50)
+  -data1.people[0].age + 10      | equalTo(-40)
   not (data1.people[0].age = 25) | isTrue
   test.done()
 end
 
 def nothingSomething(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   true = Nothing            | isFalse
   Nothing != Nothing        | isFalse
   Nothing = Nothing         | isTrue
@@ -191,10 +171,10 @@ def conditional(test)
                         'cond4' unless data.cond3 else
                         'cond3')
 
-  {cond1: true} | script | test.equal(?, "cond1")
-  {cond2: true} | script | test.equal(?, "cond2")
-  {cond3: true} | script | test.equal(?, "cond3")
-  {} | script | test.equal(?, "cond4")
+  {cond1: true} | script | equalTo("cond1")
+  {cond2: true} | script | equalTo("cond2")
+  {cond3: true} | script | equalTo("cond3")
+  {} | script | equalTo("cond4")
   test.done()
 end
 
@@ -205,9 +185,10 @@ def trailingIfStatement(test)
     'cond 3'
   end
 
-  test.equal(test1(99), 'cond1')
-  test.equal(test1(0), 'cond3')
-  test.equal(test1(100), 'cond2')
+  test1(99)  | equalTo('cond1')
+  test1(0)   | equalTo('cond3')
+  test1(100) | equalTo('cond2')
+
   test.done()
 end
 
@@ -232,20 +213,18 @@ def ifLetStatement(test)
     end
   end
 
-  test.equal(test1("aVal", "bVal", "cVal"), "aVal-bVal-cVal")
-  test.equal(test1("aVal"), "b was Nothing")
-  test.equal(test1(Nothing, "bVal"), "a was Nothing")
-  test.equal(test1("aVal", "bVal"), "c was Nothing")
+  test1("aVal", "bVal", "cVal") | equalTo("aVal-bVal-cVal")
+  test1("aVal")                 | equalTo("b was Nothing")
+  test1(Nothing, "bVal")        | equalTo("a was Nothing")
+  test1("aVal", "bVal")         | equalTo("c was Nothing")
 
-  test.equal(test2("aVal"), "aVal returned")
-  test.equal(test2(), "a was Nothing")
+  test2("aVal") | equalTo("aVal returned")
+  test2()       | equalTo("a was Nothing")
+
   test.done()
 end
 
 def objectLike(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   let person = {
     name: "Thom",
     age: 42,
@@ -262,9 +241,6 @@ def objectLike(test)
 end
 
 def arrayLike(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   let a = 99, b = 'hello', c = [1, 2, 3]
 
   [1, 2, 3] like [1, 2]    | isTrue
@@ -286,18 +262,15 @@ def deepPaths(test)
     }
   }]
 
-  root[0].colors[1]                | test.equal(?, "green")
-  root[0].info.description         | test.equal(?, "this is a description")
-  root[0].info['description']      | test.equal(?, "this is a description")
-  root[0].info.notThere            | test.equal(?, undefined)
-  (-> root[1].info['description']) | test.throws
+  root[0].colors[1]                | equalTo("green")
+  root[0].info.description         | equalTo("this is a description")
+  root[0].info['description']      | equalTo("this is a description")
+  root[0].info.notThere            | equalTo(undefined)
+  (-> root[1].info['description']) | throws
   test.done()
 end
 
 def regularExpressions(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   let pattern1 = /dy$/
   let pattern2 = ~/dy$/
 
@@ -336,21 +309,18 @@ end
 
 def assignments(test)
   let a = 99
-  test.equal(a, 99)
+  a | equalTo(99)
 
   let a = 99, b = 1000
-  test.equal(a + b, 1099)
+  a + b | equalTo(1099)
 
   let a = 100, b = a + 20, c = b * 2
-  test.equal(c, 240)
+  c | equalTo(240)
 
   test.done()
 end
 
 def nestedMatchers(test)
-  let isTrue = test.equal(?, true)
-  let isFalse = test.equal(?, false)
-
   let n = Nothing, p = ~(42)
 
   39 like ~(p)      | isFalse

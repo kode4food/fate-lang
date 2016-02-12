@@ -1,5 +1,7 @@
 import nodeunit
 
+from test import equalTo
+
 let data = {
   "name": ["title", "case"],
   "people": [
@@ -15,7 +17,7 @@ def leftCalls(test)
   let formatted = title(join(data.name))
   let result = { formatted } | "Hello, %formatted!"
 
-  test.equal(result, "Hello, Title Case!")
+  result | equalTo("Hello, Title Case!")
   test.done()
 end
 
@@ -27,8 +29,8 @@ def rightCalls(test)
 
   let result2 = ['hello', 'there'] | '%1-%0'
 
-  test.equal(result1, "Hello, Title Case!")
-  test.equal(result2, "there-hello")
+  result1 | equalTo("Hello, Title Case!")
+  result2 | equalTo("there-hello")
   test.done()
 end
 
@@ -53,8 +55,8 @@ def recursiveCalls(test)
     end
   end
 
-  test.equal(callMe(10), '10, 9, 8, 7, 6, 5, 4, 3, 2, 1, liftoff')
-  test.equal(alsoMe(8), '8, 7, 6, 5, 4, 3, 2, 1, liftoff')
+  callMe(10) | equalTo('10, 9, 8, 7, 6, 5, 4, 3, 2, 1, liftoff')
+  alsoMe(8)  | equalTo('8, 7, 6, 5, 4, 3, 2, 1, liftoff')
   test.done()
 end
 

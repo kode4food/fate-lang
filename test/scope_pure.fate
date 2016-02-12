@@ -1,5 +1,7 @@
 import nodeunit
 
+from test import equalTo
+
 let a0 = "parent"
 let b0 = true
 
@@ -9,9 +11,12 @@ def scopeTest(test)
  		let greeting = "Local Hello"
  		return greeting
 	end
-	test.equals(greeting,"Not Hello")
-	test.equals(localGreeting(), "Local Hello")
-	test.equals(greeting + " " + localGreeting(), "Not Hello Local Hello")
+
+	greeting        | equalTo("Not Hello")
+	localGreeting() | equalTo("Local Hello")
+
+	greeting + " " + localGreeting() | equalTo("Not Hello Local Hello")
+
 	test.done()
 end
 
@@ -27,11 +32,13 @@ def nestedScopeTest(test)
 			return a * b
 		end
 		return a + b + second()
-	end	
-	test.equals(a, 3)
-	test.equals(b, 4)
-	test.equals(first(), 48)
-	test.done()	
+	end
+
+	a       | equalTo(3)
+	b       | equalTo(4)
+	first() | equalTo(48)
+
+	test.done()
 end
 
 def argumentsScopeTest(test)
@@ -40,15 +47,17 @@ def argumentsScopeTest(test)
 	def add(a, b)
 		return a + b
 	end
-	test.equals(add(2,3), 5)
+
+	add(2,3) | equalTo(5)
 	test.done()
-end	
+end
 
 def scopeOverrideTest(test)
 	let b = a0
 	let a0 = "child"
-	test.equals(a0, "child")
-	test.equals(b, "parent")
+
+	a0 | equalTo("child")
+	b  | equalTo("parent")
 	test.done()
 end
 
@@ -58,10 +67,11 @@ def conditionalScopeTest(test)
 		let a0 = "child"
 		let d0 = a0
 	end
-	test.equals(a0, "child")
-	test.equals(b0, true)
-	test.equals(c0, "parent")
-	test.equals(d0, "child")
+
+	a0 | equalTo("child")
+	b0 | equalTo(true)
+	c0 | equalTo("parent")
+	d0 | equalTo("child")
 	test.done()
 end
 

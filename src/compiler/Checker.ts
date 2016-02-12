@@ -62,7 +62,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function checkParamsForDuplication(node: Syntax.Node,
-                                      signatures: Syntax.Signatures) {
+                                     signatures: Syntax.Signatures) {
     let encounteredNames: { [index: string]: boolean } = { };
     let duplicatedNames: { [index: string]: boolean } = { };
     signatures.forEach(function (signature) {

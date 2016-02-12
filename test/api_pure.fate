@@ -3,14 +3,12 @@ from pattern import Nothing, Something
 let null = node.null, undefined = node.undefined
 
 import nodeunit
+from test import isFalse, isTrue
 
 import '../dist/Types' as types
 import '../dist/Runtime' as runtime
 
 def trueFalse(test)
-  let isFalse = test.equal(?, false),
-      isTrue = test.equal(?, true)
-
   types.isTrue(Nothing)           | isFalse
   types.isTrue(Something)         | isTrue
   types.isTrue(null)              | isFalse
@@ -32,9 +30,6 @@ def trueFalse(test)
 end
 
 def somethingNothing(test)
-  let isFalse = test.equal(?, false),
-      isTrue = test.equal(?, true)
-
   runtime.isSomething(null)      | isFalse
   runtime.isSomething(undefined) | isFalse
   runtime.isSomething(Something) | isTrue

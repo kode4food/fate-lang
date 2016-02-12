@@ -1,56 +1,66 @@
 import nodeunit
+from test import equalTo
 
 def assignment(test)
   let val1 = 100
-  test.equals(val1, 100)
+  val1 | equalTo(100)
+
   let val1 = 200
-  test.equals(val1, 200)
+  val1 | equalTo(200)
 
   def nested(x)
-    test.equals(val1, 200)
+    val1 | equalTo(200)
+
     let val1 = val1 + x
-    test.equals(val1 - x, 200)
+    val1 - x | equalTo(200)
+
     if x > 50
       let val1 = 1000
     end
     val1
   end
 
-  test.equals(nested(25), 225)
-  test.equals(nested(75), 1000)
-  test.equals(val1, 200)
+  nested(25) | equalTo(225)
+  nested(75) | equalTo(1000)
+  val1 	     | equalTo(200)
 
   let val2 = "hello"
-  test.equals(val2, "hello")
+  val2 | equalTo("hello")
+
   if val1 = 200
-    test.equals(val2, "hello")
+    val2 | equalTo("hello")
     let val2 = val2 + ", there"
   else
     let val2 = val2 + ", you"
   end
-  test.equals(val2, "hello, there")
+
+  val2 | equalTo("hello, there")
 
   if val2 = "nope"
     let val2 = "never set"
   else
-    test.equals(val2, "hello, there")
+    val2 | equalTo("hello, there")
     if val1 != 200
       let val2 = "not set either"
     end
-    test.equals(val2, "hello, there")
+    val2 | equalTo("hello, there")
+
     let val2 = "final value"
-    test.equals(val2, "final value")
+    val2 | equalTo("final value")
   end
-  test.equals(val2, "final value")
+
+  val2 | equalTo("final value")
 
   test.done()
 end
 
 def testMutable(test)
   let a = mutable("there")
-  test.equal("hello " + a.value, "hello there")
+  "hello " + a.value | equalTo("hello there")
+
   a.set("you")
-  test.equal("hello " + a.value, "hello you")
+  "hello " + a.value | equalTo("hello you")
+
   test.done()
 end
 

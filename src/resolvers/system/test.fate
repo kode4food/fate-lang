@@ -1,32 +1,19 @@
 from assert
 import equal, notEqual, deepEqual, notDeepEqual, strictEqual,
-       notStrictEqual, throws, doesNotThrow
+       notStrictEqual, throws, doesNotThrow, ok
 
 # Warning: this module assumes JavaScript-specific methods
 
-export def equalTo(value)
-  x -> equal(value, x)
-end
-
-export def notEqualTo(value)
-  x -> notEqual(value, x)
-end
-
-export def deepEqualTo(value)
-  x -> deepEqual(value, x)
-end
-
-export def notDeepEqualTo(value)
-  x -> notDeepEqual(value, x)
-end
-
-export def strictEqualTo(value)
-  x -> strictEqual(value, x)
-end
-
-export def notStrictEqualTo(value)
-  x -> notStrictEqual(value, x)
-end
+export
+let equalTo = (value -> x -> equal(value, x)),
+    notEqualTo = (value -> x -> notEqual(value, x)),
+    deepEqualTo = (value -> x -> deepEqual(value, x)),
+    notDeepEqualTo = (value -> x -> notDeepEqual(value, x)),
+    strictEqualTo = (value -> x -> strictEqual(value, x)),
+    notStrictEqualTo = (value -> x -> notStrictEqual(value, x)),
+    isFalse = equalTo(false),
+    isTrue = equalTo(true),
+    isOk = ok
 
 export let throws = throws(?)
 export throws, doesNotThrow

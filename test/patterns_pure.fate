@@ -1,12 +1,11 @@
 import pattern
 import nodeunit
 
+from test import isFalse, isTrue
+
 let null = node.null, undefined = node.undefined
 
 def numberPatterns(test)
-  let isTrue = test.equal(?, true),
-      isFalse = test.equal(?, false)
-
   "hello" like pattern.Number         | isFalse
   99.6 like pattern.Number            | isTrue
   {} like pattern.Number              | isFalse
@@ -35,9 +34,6 @@ def numberPatterns(test)
 end
 
 def stringPatterns(test)
-  let isTrue = test.equal(?, true),
-      isFalse = test.equal(?, false)
-
   "" like pattern.String              | isTrue
   "hello" like pattern.String         | isTrue
   "" like pattern.NonEmptyString      | isFalse
@@ -53,9 +49,6 @@ def stringPatterns(test)
 end
 
 def booleanPatterns(test)
-  let isTrue = test.equal(?, true),
-      isFalse = test.equal(?, false)
-
   true like pattern.Boolean    | isTrue
   false like pattern.Boolean   | isTrue
   "" like pattern.Boolean      | isFalse
@@ -69,9 +62,6 @@ def booleanPatterns(test)
 end
 
 def objectPatterns(test)
-  let isTrue = test.equal(?, true),
-      isFalse = test.equal(?, false)
-
   true like pattern.Object    | isFalse
   false like pattern.Object   | isFalse
   "" like pattern.Object      | isFalse
@@ -85,9 +75,6 @@ def objectPatterns(test)
 end
 
 def arrayPatterns(test)
-  let isTrue = test.equal(?, true),
-      isFalse = test.equal(?, false)
-
   true like pattern.Array    | isFalse
   false like pattern.Array   | isFalse
   "" like pattern.Array      | isFalse

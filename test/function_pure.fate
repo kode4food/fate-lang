@@ -1,12 +1,14 @@
 import nodeunit
 
+from test import equalTo, throws
+
 def guardOnly(test)
   def testFunc(x) where x > 10
     x * 10
   end
 
-  testFunc(12)     | test.equal(?, 120)
-  (-> testFunc(9)) | test.throws
+  testFunc(12)     | equalTo(120)
+  (-> testFunc(9)) | throws
   test.done()
 end
 
@@ -19,8 +21,8 @@ def guardAndDefault(test)
     x * 10
   end
 
-  testFunc(12) | test.equal(?, 120)
-  testFunc(9)  | test.equal(?, 45)
+  testFunc(12) | equalTo(120)
+  testFunc(9)  | equalTo(45)
   test.done()
 end
 
@@ -35,7 +37,7 @@ def noArguments(test)
     'guard worked'
   end
 
-  test.equal(testFunc(), 'guard worked')
+  testFunc() | equalTo('guard worked')
   test.done()
 end
 

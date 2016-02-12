@@ -1,13 +1,16 @@
 import nodeunit
 
+from test import equalTo, deepEqualTo
+
 def lambdas(test)
   let lambda1 = (x, y -> x + y)
   let lambda2 = (x -> x * 2)
   let lambda3 = (x -> [for y in x where y > 50 select y * 3])
 
-  test.equals(lambda1(70, 80), 150)
-  test.equals(lambda2(100), 200)
-  test.deepEqual(lambda3([5, 25, 70, 200]), [210, 600])
+  lambda1(70, 80)           | equalTo(150)
+  lambda2(100) 	            | equalTo(200)
+  lambda3([5, 25, 70, 200]) | deepEqualTo([210, 600])
+
   test.done()
 end
 
@@ -30,9 +33,10 @@ def rolledUpLoops(test)
     select result + value
   )
 
-  test.deepEqual(filtered([10, 20, 70, 30]), [10, 20, 30])
-  test.deepEqual(unfiltered([1, 50, 100]), [1, 50, 100])
-  test.equals(sum([1, 2, 3]), 6)
+  filtered([10, 20, 70, 30]) | deepEqualTo([10, 20, 30])
+  unfiltered([1, 50, 100])   | deepEqualTo([1, 50, 100])
+  sum([1, 2, 3])             | equalTo(6)
+
   test.done()
 end
 
@@ -46,23 +50,24 @@ def fatLambdas(test)
     r * x * y
   )
 
-  test.equals(lambda1(70, 80), 840000)
-  test.equals(lambda2(40, 50), 180000)
+  lambda1(70, 80) | equalTo(840000)
+  lambda2(40, 50) | equalTo(180000)
   test.done()
 end
 
 def curryTest(test)
 	let lambda1 = (x, y -> x + y)
 	let curry = lambda1(5, ?)
-	test.equals(curry(5), 10)
+	curry(5) | equalTo(10)
 
 	let lambda2 = (a, b, c -> a + b + c)
 
 	let curry1 = lambda2(1, ?, ?)
-	test.equals(curry1(2, 3), 6)
+	curry1(2, 3) | equalTo(6)
 
 	let  curry2 = curry1(2, ?)
-	test.equals(curry2(3), 6)
+	curry2(3) | equalTo(6)
+
 	test.done()
 end
 

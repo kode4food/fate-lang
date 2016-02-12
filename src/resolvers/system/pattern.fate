@@ -12,30 +12,30 @@ from './support' import isA
 # Warning: this module assumes JavaScript-specific methods
 
 export let String = ~isA(self, 'string')
-export let EmptyString = ~(self = "")
+export let EmptyString = ~''
 
 export let NonEmptyString = ~(
   isA(self, 'string') and self.length > 0
 )
 
 export let Number = ~isA(self, 'number')
-export let PositiveNumber = ~(isA(self, 'number') and self > 0)
-export let NegativeNumber = ~(isA(self, 'number') and self < 0)
-export let Integer = ~(isA(self, 'number') and self mod 1 = 0)
+export let PositiveNumber = ~(self > 0 and isA(self, 'number'))
+export let NegativeNumber = ~(self < 0 and isA(self, 'number'))
+export let Integer = ~(self mod 1 = 0 and isA(self, 'number'))
 
 export let PositiveInteger = ~(
-  isA(self, 'number') and self > 0 and self mod 1 = 0
+  self > 0 and self mod 1 = 0 and isA(self, 'number')
 )
 
 export let NegativeInteger = ~(
-  isA(self, 'number') and self < 0 and self mod 1 = 0
+  self < 0 and self mod 1 = 0 and isA(self, 'number')
 )
 
 export let Array = definePattern(isArray)
 export let Object = definePattern(isObject)
 
 export let Boolean = ~isA(self, 'boolean')
-export let EmptyArray = ~(not isArray(self) or self.length = 0)
+export let EmptyArray = ~(isArray(self) and self.length = 0)
 
 export def ArrayOf(elementPattern)
   return Array unless isPattern(elementPattern)
