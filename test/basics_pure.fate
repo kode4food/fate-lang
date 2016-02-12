@@ -1,9 +1,9 @@
+import nodeunit
+
 from pattern import Nothing, Something
+from test import isFalse, isTrue, equalTo, throws
 
 let null = node.null, undefined = node.undefined
-
-import nodeunit
-from test import isFalse, isTrue, equalTo, throws
 
 let data1 = {
   "name": "World",

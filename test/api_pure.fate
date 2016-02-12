@@ -1,9 +1,9 @@
+import nodeunit
+
 from pattern import Nothing, Something
+from test import isFalse, isTrue
 
 let null = node.null, undefined = node.undefined
-
-import nodeunit
-from test import isFalse, isTrue
 
 import '../dist/Types' as types
 import '../dist/Runtime' as runtime

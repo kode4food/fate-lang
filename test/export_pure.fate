@@ -1,4 +1,5 @@
 import nodeunit
+
 from test import equalTo, isOk
 
 def imports(test)
