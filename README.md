@@ -5,7 +5,7 @@ Fate is a programming language prototype that compiles into Node.js modules.  It
 
 For more information about Fate, you can visit the [Fate Language Site](http://www.fate-lang.org/).
 
-For more informationa bout the language itself, you can read the [Fate Programming Guide](https://kode4food.gitbooks.io/fate-lang/content/).
+For more information about the language itself, you can read the [Fate Programming Guide](https://kode4food.gitbooks.io/fate-lang/content/).
 
 For examples of real code, you can check out the scripts in the project's [Test Directory](https://github.com/kode4food/fate-lang/tree/master/test).
 
