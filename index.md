@@ -146,8 +146,7 @@ end
 export calculateVehicleEmissions as calculate
 ```
 
-If you'd like more examples, you can always check out the scripts in the project's [Test Directory](https://github.com/kode4food/fate-lang/tree/master/test).  You can also read the [Fate Programming Guide](https://kode4food.gitbooks.io/fate-lang/content/)
-
+If you'd like more information, you can read the [Fate Programming Guide](https://kode4food.gitbooks.io/fate-lang/content/).  For more examples of real code, you can check out the scripts in the project's [Test Directory](https://github.com/kode4food/fate-lang/tree/master/test).
 
 ## How to Install and Use
 Until the first stable release happens, you're really pressing your luck to use this thing in production.  But if you're insane, you can install the language globally like so:
