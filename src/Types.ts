@@ -15,14 +15,6 @@ export interface ModuleExports {
   [index: string]: any;
 }
 
-export interface Config {
-  [name: string]: any;
-}
-
-export interface Context {
-  [index: string]: any;
-}
-
 export let isArray = Array.isArray;
 
 export function isObject(obj: any) {

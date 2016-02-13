@@ -2,7 +2,6 @@
 
 var nodeunit = require('nodeunit');
 var evaluate = require('../dist/Fate').evaluate;
-var isNothing = require('../dist/Runtime').isNothing;
 
 exports.lists = nodeunit.testCase({
   "List comprehensions": function (test) {

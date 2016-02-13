@@ -2,7 +2,6 @@
 
 var nodeunit = require('nodeunit');
 var fate = require('../dist/Fate');
-var evaluate = fate.evaluate;
 var helpers = require('./helpers');
 var evaluateAsync = helpers.evaluateAsync;
 

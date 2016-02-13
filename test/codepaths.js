@@ -169,7 +169,7 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "Membership": function (test) {
-    test.throws(function () {
+    test.throws(() => {
       evaluate("null_value[null_value]", this.data);
     });
 
