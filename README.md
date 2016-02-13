@@ -144,7 +144,7 @@ end
 export calculateVehicleEmissions as calculate
 ```
 
-If you'd like more examples, you can always check out the scripts in the project's [Test Directory](./test).
+If you'd like more examples, you can always check out the scripts in the project's [Test Directory](./test).  You can also read the [Fate Programming Guide](https://kode4food.gitbooks.io/fate-lang/content/)
 
 ## How to Install and Use
 Until the first stable release happens, you're really pressing your luck to use this thing in production.  But if you're insane, you can install the language globally like so:
@@ -190,7 +190,7 @@ console.log(resultingLambda(4));
 ```
 
 ## Current Status
-The prototype functions, but not much more.  There's quite a bit left to do in the areas of validation, optimization, and runtime library support.  See the [TODO](doc/TODO.md) document to get an idea.
+The prototype functions, but not much more.  There's quite a bit left to do in the areas of validation, optimization, and runtime library support.  See the project's [GitHub Issues](https://github.com/kode4food/fate-lang/issues) page to get an idea.
 
 ## License (MIT License)
 Copyright (c) 2015 Thomas S. Bradford
