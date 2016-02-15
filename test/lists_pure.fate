@@ -29,7 +29,6 @@ def listBasics(test)
   })
   let keys = object.keys(selectedObjects)
   "10" in keys | isFalse 
-  
 
   test.done()
 end
