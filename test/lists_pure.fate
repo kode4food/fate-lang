@@ -1,0 +1,41 @@
+import nodeunit
+import object
+
+from test import equalTo, deepEqualTo, isFalse
+
+def listBasics(test)
+  let intList = [10, 20, 30, 50, 51, 75, 90, 100]
+  let objectList = {
+        "10": "that was ten",
+        "20": "that was twenty",
+        "30": "that was thirty"
+  }
+  
+  [for y in intList select y * 2] | deepEqualTo([20,40,60,100,102,150,180,200])
+  [for y in intList where y > 50] | deepEqualTo([51, 75, 90, 100])
+
+  [for y in intList where y > 50 select y * 2] | deepEqualTo([102, 150, 180, 200])
+
+  {for y in intList where y > 50 select y * 2: y * 4}[102] | equalTo(204)
+  {for y in intList select (y): y * 2}[51] | equalTo(102)
+  {for y in intList select val: y}['val'] | equalTo(100)
+
+  let selectedObjects = {for name:value in objectList where name >= 20}
+  selectedObjects["20"] | deepEqualTo("that was twenty")
+  selectedObjects["30"] | deepEqualTo("that was thirty")
+  selectedObjects | deepEqualTo({
+        "20": "that was twenty",
+        "30": "that was thirty"
+  })
+  let keys = object.keys(selectedObjects)
+  "10" in keys | isFalse 
+  
+
+  test.done()
+end
+
+let tests = nodeunit.testCase({
+  "Basic List Comprehensions": listBasics
+})
+
+export tests
