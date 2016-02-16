@@ -1,4 +1,4 @@
-from pattern import Nothing, Object
+from pattern import Object
 
 from './support' import Object as JSObject
 
