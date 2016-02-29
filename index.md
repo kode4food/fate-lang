@@ -131,17 +131,6 @@ if shape like LargeOrangeShape
   'bingo!'
 end
 
-# Join Processing
-when userData(user) & err()
-  # an error occurred fetching notifications
-  # deal with the issue
-end
- 
-when userData(user) & notificationData(notifications)
-  # the user data and notifications were retrieved
-  # do something about that
-end
-
 # Exporting from a module
 export calculateVehicleEmissions as calculate
 ```
