@@ -28,3 +28,7 @@ end
 export def upper(String as value)
   value.toUpperCase()
 end
+
+export def length(String as value)
+  value.length
+end

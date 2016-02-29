@@ -1,7 +1,8 @@
 import nodeunit
 import object
+import array
 
-from test import equalTo, deepEqualTo, isFalse
+from test import equalTo, deepEqualTo, isFalse, isTrue
 
 def listBasics(test)
   let intList = [10, 20, 30, 50, 51, 75, 90, 100]
@@ -19,6 +20,7 @@ def listBasics(test)
   {for y in intList where y > 50 select y * 2: y * 4}[102] | equalTo(204)
   {for y in intList select (y): y * 2}[51] | equalTo(102)
   {for y in intList select val: y}['val'] | equalTo(100)
+  
 
   let selectedObjects = {for name:value in objectList where name >= 20}
   selectedObjects["20"] | deepEqualTo("that was twenty")
@@ -28,13 +30,67 @@ def listBasics(test)
         "30": "that was thirty"
   })
   let keys = object.keys(selectedObjects)
-  "10" in keys | isFalse 
+  "10" in keys | isFalse
+
+  let generatedKeys = {for y in intList select 'val' + y : y}
+  generatedKeys['val20'] | equalTo(20)
+  generatedKeys['val51'] | equalTo(51)
+  generatedKeys['val100'] | equalTo(100)
 
   test.done()
 end
 
+def arrayBasics(test)
+  let arr = [9,8,'Hello',7,3]
+  arr[0] | equalTo(9)
+  arr[2] | equalTo('Hello')
+  arr[4] | equalTo(3)
+
+  arr | array.length | equalTo(5)
+
+  let arr2 = [3 * 3, 2 * 4, 'Hel'+'lo', 14 / 2, 9 / 3]
+  arr[0] | equalTo(9)
+  arr[1] | equalTo(8)
+  arr[2] | equalTo('Hello')
+  arr[3] | equalTo(7)
+  arr[4] | equalTo(3)
+  arr | array.length | equalTo(5)
+
+  test.done()
+end
+
+def arrayFunctions(test)
+  let thisIsFate = ['this','is','fate']
+  let oneTwoThree = [1,2,3]
+
+  thisIsFate | array.join | deepEqualTo('this is fate')
+  array.join(thisIsFate, '-=-') | deepEqualTo('this-=-is-=-fate')
+ 
+  oneTwoThree | array.last | equalTo(3)
+  oneTwoThree | array.first | equalTo(1)
+
+  [] | array.first | equalTo(undefined)
+  [] | array.last  | equalTo(undefined)
+
+  [] | array.empty | isTrue
+  oneTwoThree | array.empty | isFalse
+  thisIsFate  | array.empty | isFalse
+
+  test.done()
+end
+
+def objectFunctions(test)
+  let obj = {name:'Reinhard',age:28}
+  object.keys(obj) | deepEqualTo(['name', 'age'])
+  object.values(obj) | deepEqualTo(['Reinhard', 28])
+  test.done()
+end
+
 let tests = nodeunit.testCase({
-  "Basic List Comprehensions": listBasics
+  "Basic List Comprehensions": listBasics,
+  "Basic Array Handling": arrayBasics,
+  "Basic Array Functions": arrayFunctions,
+  "Basic Object Functions": objectFunctions
 })
 
 export tests
