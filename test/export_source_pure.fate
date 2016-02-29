@@ -10,7 +10,3 @@ export from 'nodeunit' import testCase as nodeunit_tc
 export def func_a(name)
   {name} | "Hello, %name!"
 end
-
-export when join_a(x) & join_b(y)
-  print("done")
-end

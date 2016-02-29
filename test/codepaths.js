@@ -149,6 +149,20 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
+  "'await' expressions": function (test) {
+    test.ok(evaluate("do await x"));
+
+    test.throws(function () {
+      evaluate("await x");
+    }, "await called outside of a 'do' block should explode");
+
+    test.throws(function () {
+      evaluate("do (-> await timeout(100))");
+    }, "await called nested in func should explode");
+
+    test.done();
+  },
+
   "Wildcard outside Binding": function (test) {
     test.throws(function () {
       evaluate("? < 99");

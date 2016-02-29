@@ -1,5 +1,7 @@
 "use strict";
 
+const Promise = require('welsh').Promise;
+
 class Mutable {
   constructor(public value: any) {}
 
@@ -13,8 +15,10 @@ function createMutable(value: any) {
   return new Mutable(value);
 }
 
-function timeout(delay: number, callback: Function) {
-  setTimeout(callback, delay);
+function timeout(delay: number) {
+  return new Promise(function (resolve: Function) {
+    setTimeout(resolve, delay);
+  });
 }
 
 export default {

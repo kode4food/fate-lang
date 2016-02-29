@@ -6,20 +6,43 @@ import { annotate } from './Annotations';
 
 type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
 
+const awaitBarriers = ['function', 'lambda', 'pattern'];
+
 export default function createTreeProcessors(visit: Visitor) {
   let selfFunctions = visit.ancestorTags('self', ['function', 'lambda']);
   let functionIdRetrieval = visit.ancestorTags('id', ['function']);
 
   return [
+    visit.matching(validateAwaits, visit.tags('await')),
     visit.matching(validateWildcards, visit.tags('wildcard')),
     visit.matching(validateSelfReferences, visit.tags('self')),
     visit.matching(validateFunctionArgs, visit.tags(['function', 'lambda'])),
-    visit.matching(validateChannelArgs, visit.tags('channel')),
     visit.matching(annotateSelfFunctions, selfFunctions),
     visit.matching(annotateRecursiveFunctions, functionIdRetrieval),
     visit.statementGroups(validateAssignments, visit.tags('let'), 1),
     visit.statementGroups(warnFunctionShadowing, visit.tags('function'))
   ];
+
+  // an 'await' can only exist inside of a 'do' expression
+  function validateAwaits(node: Syntax.AwaitOperator) {
+    let doAncestors = visit.hasAncestorTags('do');
+    let fnAncestors = visit.hasAncestorTags(awaitBarriers);
+
+    if ( !doAncestors ) {
+      visit.issueError(node, "'await' must appear in a 'do' block");
+    }
+
+    if ( !fnAncestors ) {
+      return node;
+    }
+
+    let doIndex = visit.nodeStack.indexOf(doAncestors[0]);
+    let fnIndex = visit.nodeStack.indexOf(fnAncestors[0]);
+    if ( fnIndex > doIndex ) {
+      visit.issueError(node, "'await' must not appear in a nested function");
+    }
+    return node;
+  }
 
   // a Wildcard can only exist in a call binder
   function validateWildcards(node: Syntax.Wildcard) {
@@ -53,11 +76,6 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function validateFunctionArgs(node: FunctionOrLambda) {
     checkParamsForDuplication(node, [node.signature]);
-    return node;
-  }
-
-  function validateChannelArgs(node: Syntax.ChannelDeclaration) {
-    checkParamsForDuplication(node, node.signatures);
     return node;
   }
 

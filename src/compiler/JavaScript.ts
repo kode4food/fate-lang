@@ -53,6 +53,7 @@ interface FunctionOptions {
   internalId?: string;
   internalArgs?: Name[];
   contextArgs?: Name[];
+  generator?: boolean;
   prolog?: BodyEntry;
   body: BodyEntry;
 }
@@ -173,11 +174,11 @@ export function createModule(globals: Globals) {
     registerAnonymous, createAnonymous, assignAnonymous,
     retrieveAnonymous, assignResult, self, selfName, context,
     contextName, member, write, writeAndGroup, getter, assignment,
-    assignments, assignFromArray, exports, exportsName,
-    unaryOperator, binaryOperator, conditionalOperator, statement,
-    ifStatement, loopExpression, loopContinue, funcDeclaration,
-    iife, scope, func, compoundExpression, returnStatement, call,
-    array, arrayAppend, object, objectAssign, parens, code, toString
+    assignments, exports, exportsName, unaryOperator, binaryOperator,
+    conditionalOperator, statement, ifStatement, loopExpression,
+    loopContinue, funcDeclaration, iife, scope, func, waitFor,
+    compoundExpression, returnStatement, call, array, arrayAppend,
+    object, objectAssign, parens, code, toString
   };
 
   function nextId(prefix: string) {
@@ -376,23 +377,6 @@ export function createModule(globals: Globals) {
       let localName = localForWrite(name);
       write(localName, '=', value, ";");
     });
-  }
-
-  function assignFromArray(varNames: Names, arr: BodyEntry) {
-    let anon = createAnonymous();
-
-    let elements: BodyEntries = [];
-    elements.push(function () {
-      assignAnonymous(anon, arr);
-    });
-
-    varNames.forEach(function (varName, arrIndex) {
-      elements.push(function () {
-        write(localForWrite(varName), '=', anon, '[', arrIndex, ']');
-      });
-    });
-
-    compoundExpression(elements);
   }
 
   function exports(items: ModuleItems) {
@@ -596,6 +580,7 @@ export function createModule(globals: Globals) {
     let internalId = options.internalId;
     let internalArgs = options.internalArgs || [];
     let contextArgs = options.contextArgs || [];
+    let isGenerator = options.generator;
     let funcProlog = options.prolog;
     let funcBody = options.body;
 
@@ -614,6 +599,9 @@ export function createModule(globals: Globals) {
 
     let argNames = internalArgs.concat(localNames);
     write('function');
+    if ( isGenerator ) {
+      write('*');
+    }
     if ( internalId ) {
       write(' ' + internalId);
     }
@@ -666,6 +654,10 @@ export function createModule(globals: Globals) {
     function isArgument(localName: Name) {
       return argNames.indexOf(localName) !== -1;
     }
+  }
+
+  function waitFor(expression: BodyEntry) {
+    write('(yield ', expression, ')');
   }
 
   function compoundExpression(expressions: BodyEntries) {

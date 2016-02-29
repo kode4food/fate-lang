@@ -70,6 +70,7 @@ export class UnaryOperator extends Operator {
   constructor(public left: Expression) { super(); }
 }
 
+export class AwaitOperator extends UnaryOperator {}
 export class FormatOperator extends UnaryOperator {}
 export class PositiveOperator extends UnaryOperator {}
 export class NegativeOperator extends UnaryOperator {}
@@ -126,6 +127,10 @@ export class ReduceExpression extends Expression {
   constructor(public assignment: Assignment,
               public ranges: Ranges,
               public select: Expression) { super(); }
+}
+
+export class DoExpression extends Expression {
+  constructor(public statements: Statements) { super(); }
 }
 
 // Array/Object Construction and Comprehension ******************************
@@ -242,17 +247,6 @@ export class ImportStatement extends ExportableStatement {
   public getModuleItems() {
     return this.modules.map(moduleSpecifier => {
       return node('moduleItem', moduleSpecifier.alias);
-    });
-  }
-}
-
-export class ChannelDeclaration extends ExportableStatement {
-  constructor(public signatures: Signatures,
-              public statements: Statements) { super(); }
-
-  public getModuleItems() {
-    return this.signatures.map(signature => {
-      return node('moduleItem', signature.id);
     });
   }
 }
@@ -405,10 +399,10 @@ let tagToConstructor: FunctionMap = {
   'from': FromStatement,
   'import': ImportStatement,
   'export': ExportStatement,
-  'channel': ChannelDeclaration,
   'function': FunctionDeclaration,
   'lambda': LambdaExpression,
   'reduce': ReduceExpression,
+  'do': DoExpression,
   'call': CallOperator,
   'bind': BindOperator,
   'let': LetStatement,
@@ -439,6 +433,7 @@ let tagToConstructor: FunctionMap = {
   'not': NotOperator,
   'neg': NegativeOperator,
   'pos': PositiveOperator,
+  'await': AwaitOperator,
   'format': FormatOperator,
   'member': MemberOperator,
   'array': ArrayConstructor,

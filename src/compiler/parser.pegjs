@@ -82,19 +82,10 @@ exprStatement
 
 declStatement
   = funcDeclaration
-  / channelDeclaration
 
 funcDeclaration
   = op:Def signature:signature statements:statementsTail  {
       return node(op, signature, statements);
-    }
-
-channelDeclaration
-  = op:When signatures_start:signature
-    signatures_cont:( __ "&" s:signature  { return s; } )*
-    statements:statementsTail  {
-      let signatures = [signatures_start].concat(signatures_cont);
-      return node(op, signatures, statements);
     }
 
 signature
@@ -201,7 +192,6 @@ exportStatement
 exportable
   = letStatement
   / importStatement
-  / channelDeclaration
   / funcDeclaration
   / moduleItems
 
@@ -222,7 +212,10 @@ reduceAssignments
 
 reduceAssignment
   = assignment
-  / id:Identifier  {
+  / idAssignment
+
+idAssignment
+  = id:Identifier  {
       return id.template('assignment', id, id);
     }
 
@@ -290,7 +283,8 @@ letStatement
     }
 
 assignments
-  = start:assignment cont:( LIST_SEP a:assignment { return a; } )*  {
+  = start:assignment
+    cont:( LIST_SEP a:assignment { return a; } )*  {
       return [start].concat(cont);
     }
 
@@ -524,7 +518,7 @@ lambda
         node('statements', stmts)
       );
     }
-  / reduceExpression
+  / doExpression
 
 lambdaParams
   = "(" __ params:idParamList? __ ")"  { return params; }
@@ -544,6 +538,12 @@ idParamList
 
 idParam
   = id:Identifier  { return id.template('idParam', id); }
+
+doExpression
+  = op:Do __ stmts:lambdaStatements  {
+      return node(op, node('statements', stmts));
+    }
+  / reduceExpression
 
 reduceExpression
   = op:Reduce __ reduceAssignment:reduceAssignment __
@@ -588,10 +588,11 @@ wildcard = Wildcard
 
 /* Lexer *********************************************************************/
 
+Await   = "await"    !NameContinue  { return 'await'; }
 Reduce  = "reduce"   !NameContinue  { return 'reduce'; }
+Do      = "do"       !NameContinue  { return 'do'; }
 For     = "for"      !NameContinue  { return 'for'; }
 Def     = "def"      !NameContinue  { return 'function'; }
-When    = "when"     !NameContinue  { return 'channel'; }
 From    = "from"     !NameContinue  { return 'from'; }
 Import  = "import"   !NameContinue  { return 'import'; }
 Export  = "export"   !NameContinue  { return 'export'; }
@@ -617,9 +618,9 @@ Where   = "where"    !NameContinue
 Select  = "select"   !NameContinue
 
 ReservedWord "reserved word"
-  = ( For / Def / When / From / Import / Export / Let / And / Or /
+  = ( For / Def / Do / From / Import / Export / Let / And / Or /
       Like / Mod / Not / If / Unless / True / False / As / In /
-      Return / Self / Else / End / Where / Select / Reduce )
+      Return / Self / Else / End / Where / Select / Reduce / Await )
 
 Identifier "identifier"
   = !ReservedWord name:Name  {
@@ -736,7 +737,7 @@ Equality = Like / NEQ / EQ
 Relational = GTE / LTE / LT / GT / In / NotIn
 Additive = Add / Sub
 Multiplicative = Mul / Div / Mod
-Unary = Neg / Pos / Not
+Unary = Await / Neg / Pos / Not
 
 Regex "regular expression"
   = "/" pattern:$RegexBody "/" flags:$RegexFlags  {

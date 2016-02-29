@@ -16,8 +16,6 @@ def imports(test)
   source.nodeunit_tc | equalTo(nodeunit.testCase)
 
   source.func_a('Bob') | equalTo('Hello, Bob!')
-  source.join_a        | isOk
-  source.join_b        | isOk
 
   test.done()
 end

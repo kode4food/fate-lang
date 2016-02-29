@@ -51,16 +51,6 @@ function evaluateEmit(script, data) {
   }
 }
 
-function evaluateAsync(script, callback) {
-  var result = [];
-  return evaluate(script, { emit: emit });
-
-  function emit(value) {
-    result.push(value);
-    callback(result);
-  }
-}
-
 function monkeyPatchRequires(root, remappedPaths) {
   var files = glob.sync('**/*.fate.js', { cwd: root });
   files.forEach(function (file) {
@@ -80,5 +70,4 @@ function monkeyPatchRequires(root, remappedPaths) {
 // Exported Functions
 exports.createConsole = createConsole;
 exports.evaluateEmit = evaluateEmit;
-exports.evaluateAsync = evaluateAsync;
 exports.monkeyPatchRequires = monkeyPatchRequires;

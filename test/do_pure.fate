@@ -1,0 +1,19 @@
+import nodeunit
+
+from test import equalTo
+
+def basics(test)
+  let x = (do
+    await timeout(200)
+    'hello'
+  )
+
+  (do
+    await x | equalTo("hello")
+    test.done()
+  )
+end
+
+export let tests = nodeunit.testCase({
+  "Basic Do Functionality": basics
+})

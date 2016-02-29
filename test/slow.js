@@ -14,4 +14,3 @@ exports.scheduler = require('./scheduler').scheduler;
 exports.scope = require('./scope').scope;
 exports.strings = require('./strings').strings;
 exports.math = require('./math').math;
-exports.when = require('./when').when;

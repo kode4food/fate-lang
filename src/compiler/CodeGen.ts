@@ -25,10 +25,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'import': createImportEvaluator,
     'from': createFromEvaluator,
     'export': createExportEvaluator,
-    'channel': createChannelEvaluator,
     'function': createFunctionEvaluator,
     'lambda': createLambdaEvaluator,
     'reduce': createReduceEvaluator,
+    'do': createDoEvaluator,
     'call': createCallEvaluator,
     'bind': createBindEvaluator,
     'let': createLetEvaluator,
@@ -59,6 +59,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'not': createNotEvaluator,
     'neg': createNegEvaluator,
     'pos': createPosEvaluator,
+    'await': createAwaitEvaluator,
     'format': createFormatEvaluator,
     'member': createMemberEvaluator,
     'array': createArrayEvaluator,
@@ -198,118 +199,6 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     generate.exports(exports);
   }
 
-  function createChannelEvaluator(node: Syntax.ChannelDeclaration) {
-    let signatures = node.signatures;
-    let allParamNames: string[] = [];
-    signatures.forEach(function (signature: Syntax.Signature) {
-      allParamNames = allParamNames.concat(
-        signature.params.map(function (param: Syntax.Parameter) {
-          return param.id.value;
-        })
-      );
-    });
-
-    let joinName = generate.createAnonymous();
-    generate.assignment(joinName, function () {
-      let joinArgs: any[] = [];
-      joinArgs.push(function () {
-        generate.func({
-          contextArgs: allParamNames,
-          body: defer(createStatementsEvaluator, node.statements)
-        });
-      });
-      signatures.forEach(function (signature) {
-        joinArgs.push(globals.literal(signature.params.length));
-      });
-      generate.call(globals.runtimeImport('join'), joinArgs);
-    });
-
-    signatures.forEach(createChannelSignature);
-
-    function createChannelSignature(signature: Syntax.Signature,
-                                    signatureIndex: number) {
-      let paramNames = signature.params.map(
-        function (param: Syntax.Parameter) { return param.id.value; }
-      );
-
-      let create = signature.guard ? createGuarded : createUnguarded;
-      create();
-
-      function createUnguarded() {
-        generate.assignment(signature.id.value, function () {
-          generate.call(globals.runtimeImport('defineChannel'), [
-            function () {
-              generate.func({
-                contextArgs: paramNames,
-                body: unguardedBody
-              });
-            }
-          ]);
-        });
-      }
-
-      function unguardedBody() {
-        let joinArgs = createArgumentsProlog();
-        joinDispatcher(joinArgs);
-      }
-
-      function createArgumentsProlog() {
-        let joinArgs = generate.createAnonymous();
-        let assignedNames = [joinArgs].concat(paramNames);
-        generate.statement(function () {
-          generate.assignFromArray(assignedNames, function () {
-            generate.call(globals.runtimeImport('joinArguments'));
-          });
-        });
-        return joinArgs;
-      }
-
-      function joinDispatcher(joinArgs: string) {
-        generate.statement(function () {
-          generate.call(joinName, [
-            globals.literal(signatureIndex),
-            function () {
-              generate.retrieveAnonymous(joinArgs);
-            }
-          ]);
-        });
-      }
-
-      function createGuarded() {
-        let functionName = signature.id;
-        let ensuredId = generateEnsured(functionName, 'Channel');
-
-        generate.assignment(signature.id.value, function () {
-          let defineFunction = globals.runtimeImport('defineChannel');
-          generate.call(defineFunction, [createFunction]);
-        });
-
-        function createFunction() {
-          generate.func({
-            body: createFunctionBody
-          });
-        }
-
-        function createFunctionBody() {
-          let joinArgs = createArgumentsProlog();
-          generate.ifStatement(
-            defer(signature.guard),
-            function () {
-              joinDispatcher(joinArgs);
-            },
-            null
-          );
-
-          generate.returnStatement(function () {
-            generate.call(ensuredId,
-              [function () { generate.retrieveAnonymous(joinArgs); }]
-            );
-          });
-        }
-      }
-    }
-  }
-
   function getFuncOrLambdaInternalId(node: Syntax.Node) {
     let hasSelf = hasAnnotation(node, 'function/self');
     return hasSelf ? generate.selfName : undefined;
@@ -411,6 +300,17 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     bodyGenerator(function () {
       createForEvaluator(forNode);
     });
+  }
+
+  function createDoEvaluator(node: Syntax.DoExpression) {
+    generate.call(globals.runtimeImport('createDoBlock'), [
+      function () {
+        generate.func({
+          generator: true,
+          body: defer(createStatementsEvaluator, node.statements)
+        });
+      }
+    ]);
   }
 
   function createCallEvaluator(node: Syntax.CallOperator) {
@@ -782,6 +682,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
   function createPosEvaluator(node: Syntax.PositiveOperator) {
     generate.unaryOperator('pos', defer(node.left));
+  }
+
+  function createAwaitEvaluator(node: Syntax.AwaitOperator) {
+    generate.waitFor(defer(node.left));
   }
 
   function createFormatEvaluator(node: Syntax.FormatOperator) {

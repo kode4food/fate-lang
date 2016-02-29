@@ -28,7 +28,8 @@
   "dependencies": {
     "glob": "^7.0.0",
     "minimist": "^1.2.0",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "welsh": "^4.0.0"
   },
   "devDependencies": {
     "del": "^2.2.0",
