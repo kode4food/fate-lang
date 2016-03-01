@@ -540,8 +540,8 @@ idParam
   = id:Identifier  { return id.template('idParam', id); }
 
 doExpression
-  = op:Do __ stmts:lambdaStatements  {
-      return node(op, node('statements', stmts));
+  = op:Do NL stmts:statements End {
+      return node(op, stmts);
     }
   / reduceExpression
 

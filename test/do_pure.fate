@@ -3,15 +3,15 @@ import nodeunit
 from test import equalTo
 
 def basics(test)
-  let x = (do
+  let x = do
     await timeout(200)
     'hello'
-  )
+  end
 
-  (do
+  do
     await x | equalTo("hello")
     test.done()
-  )
+  end
 end
 
 export let tests = nodeunit.testCase({

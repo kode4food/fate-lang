@@ -150,14 +150,14 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "'await' expressions": function (test) {
-    test.ok(evaluate("do await x"));
+    test.ok(evaluate("do\nawait x\nend"));
 
     test.throws(function () {
       evaluate("await x");
     }, "await called outside of a 'do' block should explode");
 
     test.throws(function () {
-      evaluate("do (-> await timeout(100))");
+      evaluate("do\n-> await timeout(100)\nend");
     }, "await called nested in func should explode");
 
     test.done();
