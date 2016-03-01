@@ -132,13 +132,13 @@ if shape like LargeOrangeShape
 end
 
 # Concurrency
-let name = (do
+let name = do
   'World'
-)
+end
 
-(do
+do
   {name: await name} | "Hello, %name!" | print
-)
+end
 
 # Exporting from a module
 export calculateVehicleEmissions as calculate
