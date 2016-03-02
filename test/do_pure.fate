@@ -1,6 +1,8 @@
 import nodeunit
+import http
 
-from test import equalTo, deepEqualTo
+from pattern import NonEmptyString
+from test import equalTo, deepEqualTo, isOk
 
 def basics(test)
   let x = do
@@ -38,8 +40,18 @@ def awaitAll(test)
   end
 end
 
+def awaitHttp(test)
+  do
+    let content = await http.get('http://www.fate-lang.org/')
+    content like NonEmptyString | isOk
+    test.done()
+  end
+end
+
+
 export let tests = nodeunit.testCase({
   "Basic Do Functionality": basics,
   "Await Any Functionality": awaitAny,
-  "Await All Functionality": awaitAll
+  "Await All Functionality": awaitAll,
+  "Await HTTP Functionality": awaitHttp
 })

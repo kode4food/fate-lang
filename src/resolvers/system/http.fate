@@ -1,20 +1,18 @@
-import http
-
 from url import parse as parseURL
 from pattern import NonEmptyString as URL
 
-from './support' import createPromise
+from './support' import createPromise, http
 
 export def get(URL as url)
   createPromise(resolve ->
     let content = mutable('')
 
-    http.get(url | parseURL, res ->
+    http.get(url | parseURL, (res) ->
       res.on('data', data ->
-        content.get() + data | content.set
+        content.value + data | content.set
       )
       res.on('end', ->
-        content.get() | resolve
+        content.value | resolve
       )
     )
   )

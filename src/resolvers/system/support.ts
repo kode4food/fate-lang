@@ -1,5 +1,7 @@
 "use strict";
 
+import * as http from 'http';
+
 const Promise = require('welsh').Promise;
 
 const math = Math;
@@ -13,6 +15,7 @@ export {
   string as String,
   number as Number,
   createPromise,
+  http,
   isA
 };
 
