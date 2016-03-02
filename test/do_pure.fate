@@ -1,6 +1,6 @@
 import nodeunit
 
-from test import equalTo, deepEqualTo, isOk
+from test import equalTo, deepEqualTo
 
 def basics(test)
   let x = do
@@ -15,7 +15,10 @@ def basics(test)
 end
 
 def awaitAny(test)
-  let arr = [timeout(100), timeout(10), timeout(50)]
+  let arr = [
+    for x in [100, 10, 50]
+    select x | timeout
+  ]
 
   do
     await any arr | equalTo(10)
@@ -24,7 +27,10 @@ def awaitAny(test)
 end
 
 def awaitAll(test)
-  let arr = [timeout(100), timeout(10), timeout(50)]
+  let arr = [
+    for x in [100, 10, 50]
+    select x | timeout
+  ]
 
   do
     await all arr | deepEqualTo([100, 10, 50])
