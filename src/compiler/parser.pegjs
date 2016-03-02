@@ -351,10 +351,19 @@ additive
     }
 
 multiplicative
-  = head:pattern
-    tail:( _ op:Multiplicative __ r:pattern { return node(op, null, r); } )*  {
+  = head:await
+    tail:( _ op:Multiplicative __ r:await { return node(op, null, r); } )*  {
       return buildBinaryChain(head, tail);
     }
+
+await
+  = op:Await mod:awaitModifier? _ expr:pattern  {
+      return node(op, expr, mod);
+    }
+  / pattern
+
+awaitModifier
+  = _ mod:(Any / All) { return mod; }
 
 pattern
   = "~" _ expr:unary  {
@@ -610,6 +619,8 @@ True    = "true"     !NameContinue  { return node('literal', true); }
 False   = "false"    !NameContinue  { return node('literal', false); }
 If      = "if"       !NameContinue  { return true; }
 Unless  = "unless"   !NameContinue  { return false; }
+Any     = "any"      !NameContinue  { return 'any'; }
+All     = "all"      !NameContinue  { return 'all'; }
 As      = "as"       !NameContinue
 By      = "by"       !NameContinue
 Else    = "else"     !NameContinue
@@ -620,7 +631,8 @@ Select  = "select"   !NameContinue
 ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or /
       Like / Mod / Not / If / Unless / True / False / As / In /
-      Return / Self / Else / End / Where / Select / Reduce / Await )
+      Return / Self / Else / End / Where / Select / Reduce / Await /
+      Any / All )
 
 Identifier "identifier"
   = !ReservedWord name:Name  {
@@ -737,7 +749,7 @@ Equality = Like / NEQ / EQ
 Relational = GTE / LTE / LT / GT / In / NotIn
 Additive = Add / Sub
 Multiplicative = Mul / Div / Mod
-Unary = Await / Neg / Pos / Not
+Unary = Neg / Pos / Not
 
 Regex "regular expression"
   = "/" pattern:$RegexBody "/" flags:$RegexFlags  {

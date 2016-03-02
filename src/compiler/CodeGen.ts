@@ -6,10 +6,17 @@ import * as Syntax from './Syntax';
 import { hasAnnotation, getAnnotation } from './Annotations';
 
 type FunctionMap = { [index: string]: Function };
+type FunctionNameMap = { [index: string]: string };
 type IdMapping = { id: string, anon: string };
 
-let slice = Array.prototype.slice;
-let likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
+const slice = Array.prototype.slice;
+const likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
+
+const waiterMap: FunctionNameMap = {
+  'value': 'awaitValue',
+  'any': 'awaitAny',
+  'all': 'awaitAll'
+};
 
 /**
  * Converts a parse tree into source code (initially JavaScript). Host
@@ -685,7 +692,8 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createAwaitEvaluator(node: Syntax.AwaitOperator) {
-    generate.waitFor(defer(node.left));
+    let waiter = waiterMap[node.resolver || 'value'];
+    generate.waitFor(defer(node.left), waiter);
   }
 
   function createFormatEvaluator(node: Syntax.FormatOperator) {

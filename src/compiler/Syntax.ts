@@ -70,12 +70,17 @@ export class UnaryOperator extends Operator {
   constructor(public left: Expression) { super(); }
 }
 
-export class AwaitOperator extends UnaryOperator {}
 export class FormatOperator extends UnaryOperator {}
 export class PositiveOperator extends UnaryOperator {}
 export class NegativeOperator extends UnaryOperator {}
 export class NotOperator extends UnaryOperator {}
 export class Pattern extends UnaryOperator { }
+
+export class AwaitOperator extends UnaryOperator {
+  constructor(left: Expression, public resolver: string) {
+    super(left);
+  }
+}
 
 export class BinaryOperator extends Operator {
   constructor(public left: Expression,

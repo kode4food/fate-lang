@@ -656,8 +656,9 @@ export function createModule(globals: Globals) {
     }
   }
 
-  function waitFor(expression: BodyEntry) {
-    write('(yield ', expression, ')');
+  function waitFor(expression: BodyEntry, resolver: string) {
+    let resolverFunc = globals.runtimeImport(resolver);
+    write('(yield [', resolverFunc, ',', expression, '])');
   }
 
   function compoundExpression(expressions: BodyEntries) {

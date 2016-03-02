@@ -1,6 +1,6 @@
 import nodeunit
 
-from test import equalTo
+from test import equalTo, deepEqualTo, isOk
 
 def basics(test)
   let x = do
@@ -14,6 +14,26 @@ def basics(test)
   end
 end
 
+def awaitAny(test)
+  let arr = [timeout(100), timeout(10), timeout(50)]
+
+  do
+    await any arr | equalTo(10)
+    test.done()
+  end
+end
+
+def awaitAll(test)
+  let arr = [timeout(100), timeout(10), timeout(50)]
+
+  do
+    await all arr | deepEqualTo([100, 10, 50])
+    test.done()
+  end
+end
+
 export let tests = nodeunit.testCase({
-  "Basic Do Functionality": basics
+  "Basic Do Functionality": basics,
+  "Await Any Functionality": awaitAny,
+  "Await All Functionality": awaitAll
 })

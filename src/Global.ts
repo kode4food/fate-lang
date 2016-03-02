@@ -17,7 +17,9 @@ function createMutable(value: any) {
 
 function timeout(delay: number) {
   return new Promise(function (resolve: Function) {
-    setTimeout(resolve, delay);
+    setTimeout(function () {
+      resolve(delay);
+    }, delay);
   });
 }
 

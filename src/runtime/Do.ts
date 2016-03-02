@@ -22,7 +22,20 @@ export function createDoBlock(generator: Function) {
         return;
       }
 
-      Promise.resolve(result.value).then(fulfilled);
+      let [resolver, arg] = result.value;
+      resolver(arg).then(fulfilled);
     }
   });
+}
+
+export function awaitValue(value: any) {
+  return Promise.resolve(value);
+}
+
+export function awaitAny(array: any[]) {
+  return Promise.race(array);
+}
+
+export function awaitAll(array: any[]) {
+  return Promise.all(array);
 }
