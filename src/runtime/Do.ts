@@ -1,6 +1,8 @@
 "use strict";
 
-const Promise = require('welsh').Promise;
+const welsh = require('welsh');
+const Promise = welsh.Promise;
+const Deferred = welsh.Deferred;
 
 interface GeneratorResult {
   done: boolean;
@@ -29,13 +31,13 @@ export function createDoBlock(generator: Function) {
 }
 
 export function awaitValue(value: any) {
-  return Promise.resolve(value);
+  return Deferred.resolve(value);
 }
 
 export function awaitAny(array: any[]) {
-  return Promise.race(array);
+  return Deferred.race(array);
 }
 
 export function awaitAll(array: any[]) {
-  return Promise.all(array);
+  return Deferred.all(array);
 }
