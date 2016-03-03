@@ -1,4 +1,5 @@
 import nodeunit
+
 import pattern
 
 from test import isFalse, isTrue

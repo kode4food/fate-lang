@@ -1,8 +1,8 @@
 import nodeunit
-import http
 
 from pattern import NonEmptyString
 from test import equalTo, deepEqualTo, isOk
+import http
 
 def basics(test)
   let x = do

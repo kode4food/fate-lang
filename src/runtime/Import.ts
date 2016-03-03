@@ -11,7 +11,7 @@ let systemResolver = Resolvers.createSystemResolver();
 let memoryResolver = Resolvers.createMemoryResolver();
 
 let _resolvers: Resolvers.Resolver[] = [
-  nodeResolver, fileResolver, systemResolver, memoryResolver
+  fileResolver, nodeResolver, systemResolver, memoryResolver
 ];
 
 export let registerModule = memoryResolver.register;

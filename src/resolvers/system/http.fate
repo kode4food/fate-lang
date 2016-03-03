@@ -1,13 +1,14 @@
 from url import parse as parseURL
 from pattern import NonEmptyString as URL
 
-from './support' import createPromise, http
+import 'node:http' as http
+from './support' import createPromise
 
 export def get(URL as url)
   createPromise(resolve ->
     let content = mutable('')
 
-    http.get(url | parseURL, (res) ->
+    let req = http.get(url | parseURL, (res) ->
       res.on('data', data ->
         content.value + data | content.set
       )

@@ -27,7 +27,7 @@ export def median(NumberArray as values)
   let temp = values.slice(0).sort(numberSort)
   let len = temp.length
   return temp[((len + 1) / 2) - 1] if len mod 2 != 0
-  
+
   let mid = len / 2
   (temp[mid - 1] + temp[mid]) / 2
 end

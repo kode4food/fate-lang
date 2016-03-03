@@ -3,6 +3,7 @@
 import { resolve as resolvePath } from 'path';
 import { createModule, ModuleName, DirPath } from '../Types';
 
+const nodeModuleRegex = /^node:(.*)$/;
 const relativePathRegex = /^\.|\../;
 
 export function createNodeResolver() {
@@ -10,7 +11,11 @@ export function createNodeResolver() {
 
   function resolve(name: ModuleName, basePath?: DirPath) {
     try {
-      if ( basePath && relativePathRegex.test(name) ) {
+      let explicit = nodeModuleRegex.exec(name);
+      if ( explicit ) {
+        name = explicit[1];
+      }
+      else if ( basePath && relativePathRegex.test(name) ) {
         name = resolvePath(basePath, name);
       }
       return createModule(require(name));

@@ -1,4 +1,5 @@
 import nodeunit
+
 import object
 import array
 
@@ -11,7 +12,7 @@ def listBasics(test)
         "20": "that was twenty",
         "30": "that was thirty"
   }
-  
+
   [for y in intList select y * 2] | deepEqualTo([20,40,60,100,102,150,180,200])
   [for y in intList where y > 50] | deepEqualTo([51, 75, 90, 100])
 
@@ -20,7 +21,7 @@ def listBasics(test)
   {for y in intList where y > 50 select y * 2: y * 4}[102] | equalTo(204)
   {for y in intList select (y): y * 2}[51] | equalTo(102)
   {for y in intList select val: y}['val'] | equalTo(100)
-  
+
 
   let selectedObjects = {for name:value in objectList where name >= 20}
   selectedObjects["20"] | deepEqualTo("that was twenty")
@@ -65,7 +66,7 @@ def arrayFunctions(test)
 
   thisIsFate | array.join | deepEqualTo('this is fate')
   array.join(thisIsFate, '-=-') | deepEqualTo('this-=-is-=-fate')
- 
+
   oneTwoThree | array.last | equalTo(3)
   oneTwoThree | array.first | equalTo(1)
 
