@@ -1,7 +1,5 @@
 "use strict";
 
-const Promise = require('welsh').Promise;
-
 const math = Math;
 const object = Object;
 const string = String;
@@ -12,12 +10,13 @@ export {
   object as Object,
   string as String,
   number as Number,
-  createPromise,
+  make,
   isA
 };
 
-function createPromise(executor: Function) {
-  return new Promise(executor);
+function make(constructor: Function, ...args: any[]) {
+  let instance = Object.create(constructor.prototype);
+  return constructor.apply(instance, args) || instance;
 }
 
 function isA(value: any, type: string): boolean {

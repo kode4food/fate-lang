@@ -40,6 +40,7 @@ def awaitAll(test)
   end
 end
 
+# TODO: this test needs to be mocked
 def awaitHttp(test)
   do
     let content = await http.get('http://www.fate-lang.org/')
@@ -47,7 +48,6 @@ def awaitHttp(test)
     test.done()
   end
 end
-
 
 export let tests = nodeunit.testCase({
   "Basic Do Functionality": basics,

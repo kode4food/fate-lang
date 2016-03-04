@@ -1,20 +1,17 @@
+from welsh import Promise
 from url import parse as parseURL
 from pattern import NonEmptyString as URL
 
 import 'node:http' as http
-from './support' import createPromise
+from './support' import make
 
 export def get(URL as url)
-  createPromise(resolve ->
+  make(Promise, (resolve) ->
     let content = mutable('')
 
     let req = http.get(url | parseURL, (res) ->
-      res.on('data', data ->
-        content.value + data | content.set
-      )
-      res.on('end', ->
-        content.value | resolve
-      )
+      res.on('data', data -> content.value + data | content.set)
+      res.on('end', -> content.value | resolve)
     )
   )
 end
