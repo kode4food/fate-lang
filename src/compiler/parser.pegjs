@@ -278,19 +278,34 @@ elseTail
     }
 
 letStatement
-  = op:Let __ a:assignments  {
+  = op:Let __ a:letAssignments  {
       return node(op, a);
     }
 
-assignments
-  = start:assignment
-    cont:( LIST_SEP a:assignment { return a; } )*  {
+letAssignments
+  = start:letAssignment
+    cont:( LIST_SEP a:letAssignment { return a; } )*  {
       return [start].concat(cont);
     }
+
+letAssignment
+  = assignment
+  / arrayDestructure
 
 assignment
   = id:Identifier __ "=" __ expr:expr  {
       return node('assignment', id, expr);
+    }
+
+arrayDestructure
+  = "[" __ ids:idList __ "]" __ "=" __ expr:expr  {
+      return node('arrayDestructure', ids, expr);
+    }
+
+idList
+  = start:Identifier
+    cont:( LIST_SEP id:Identifier { return id; })*  {
+      return [start].concat(cont);
     }
 
 returnStatement

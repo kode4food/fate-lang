@@ -65,7 +65,16 @@ def testMutable(test)
   test.done()
 end
 
+def testDestructuring(test)
+  let [a, b] = [1, 2]
+  a | equalTo(1)
+  b | equalTo(2)
+
+  test.done()
+end
+
 export let tests = nodeunit.testCase({
   "Static Single Assignment": assignment,
-  "Mutable Wrapper Assignment": testMutable
+  "Mutable Wrapper Assignment": testMutable,
+  "Destructuring Assignment": testDestructuring
 })
