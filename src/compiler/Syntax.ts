@@ -202,7 +202,17 @@ export class ForStatement extends Statement {
   constructor(public ranges: Ranges,
               public loopStatements: Statements,
               public elseStatements: Statements,
-              public reduceAssignments?: DirectAssignment[]) { super(); }
+              public reduceAssignments?: Assignment[]) { super(); }
+
+  public getReduceIdentifiers() {
+    let result: Identifier[] = [];
+    this.reduceAssignments.forEach(assignment => {
+      assignment.getIdentifiers().forEach(function (id) {
+        result.push(id);
+      });
+    });
+    return result;
+  }
 }
 
 export class IfStatement extends Statement {

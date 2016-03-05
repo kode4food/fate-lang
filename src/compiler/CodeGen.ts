@@ -483,13 +483,14 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     function generateReduceResult() {
       generate.statement(function () {
         generate.assignResult(function () {
-          if ( reduceAssignments.length === 1 ) {
-            generate.getter(reduceAssignments[0].id.value);
+          let ids = node.getReduceIdentifiers();
+          if ( ids.length === 1 ) {
+            generate.getter(ids[0].value);
             return;
           }
-          generate.array(reduceAssignments.map(function (assignment) {
+          generate.array(ids.map(function (id) {
             return function () {
-              generate.getter(assignment.id.value);
+              generate.getter(id.value);
             };
           }));
         });
@@ -497,18 +498,13 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
 
     function generateReduceInitializers() {
-      generate.assignments(reduceAssignments.map(function (assignment) {
-        return <JavaScript.AssignmentItem>[
-          assignment.id.value,
-          defer(assignment.value)
-        ];
-      }));
+      reduceAssignments.forEach(createEvaluator);
     }
 
     function createAnonymousCounters() {
-      idMappings = reduceAssignments.map(function (assignment) {
+      idMappings = node.getReduceIdentifiers().map(function (id) {
         return {
-          id: assignment.id.value,
+          id: id.value,
           anon: generate.createAnonymous()
         };
       });

@@ -217,6 +217,8 @@ reduceAssignments
 reduceAssignment
   = assignment
   / idAssignment
+  / arrayDestructure
+  / objectDestructure
 
 idAssignment
   = id:Identifier  {
