@@ -315,10 +315,17 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       function () {
         generate.func({
           generator: true,
-          body: defer(createStatementsEvaluator, node.statements)
+          body: doBody
         });
       }
     ]);
+
+    function doBody() {
+      if ( node.whenAssignments ) {
+        node.whenAssignments.forEach(createEvaluator);
+      }
+      createStatementsEvaluator(node.statements);
+    }
   }
 
   function createCallEvaluator(node: Syntax.CallOperator) {

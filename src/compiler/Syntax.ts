@@ -135,7 +135,8 @@ export class ReduceExpression extends Expression {
 }
 
 export class DoExpression extends Expression {
-  constructor(public statements: Statements) { super(); }
+  constructor(public statements: Statements,
+              public whenAssignments?: Assignments) { super(); }
 }
 
 // Array/Object Construction and Comprehension ******************************
@@ -403,12 +404,13 @@ export class ModuleSpecifier extends Node {
 export class ModulePath extends Identifier {}
 
 export abstract class Assignment extends Node {
+  constructor(public value: Expression) { super(); }
   public abstract getIdentifiers(): Identifier[];
 }
 
 export class DirectAssignment extends Assignment {
-  constructor(public id: Identifier, public value: Expression) {
-    super();
+  constructor(public id: Identifier, value: Expression) {
+    super(value);
   }
 
   public getIdentifiers() {
@@ -417,8 +419,8 @@ export class DirectAssignment extends Assignment {
 }
 
 export class ArrayDestructure extends Assignment {
-  constructor(public ids: Identifier[], public value: Expression) {
-    super();
+  constructor(public ids: Identifier[], value: Expression) {
+    super(value);
   }
 
   public getIdentifiers() {

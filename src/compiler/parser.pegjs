@@ -217,8 +217,6 @@ reduceAssignments
 reduceAssignment
   = assignment
   / idAssignment
-  / arrayDestructure
-  / objectDestructure
 
 idAssignment
   = id:Identifier  {
@@ -284,22 +282,22 @@ elseTail
     }
 
 letStatement
-  = op:Let __ a:letAssignments  {
+  = op:Let __ a:assignments  {
       return node(op, a);
     }
 
-letAssignments
-  = start:letAssignment
-    cont:( LIST_SEP a:letAssignment { return a; } )*  {
+assignments
+  = start:assignment
+    cont:( LIST_SEP a:assignment { return a; } )*  {
       return [start].concat(cont);
     }
 
-letAssignment
-  = assignment
+assignment
+  = directAssignment
   / arrayDestructure
   / objectDestructure
 
-assignment
+directAssignment
   = id:Identifier __ "=" __ expr:expr  {
       return node('assignment', id, expr);
     }
@@ -592,17 +590,24 @@ idParam
   = id:Identifier  { return id.template('idParam', id); }
 
 doExpression
-  = op:Do NL stmts:statements End {
-      return node(op, stmts);
+  = op:Do when:whenAssignments? NL stmts:statements End {
+      return node(op, stmts, when);
     }
   / reduceExpression
 
+whenAssignments
+  = __ When __ assignments:reduceAssignments  { return assignments; }
+
 reduceExpression
-  = op:Reduce __ reduceAssignment:reduceAssignment __
+  = op:Reduce __ reduceAssignment:reduceExpressionAssignment __
     For ranges:ranges __ select:expressionSelect  {
       return node(op, reduceAssignment, ranges, select);
     }
   / parens
+
+reduceExpressionAssignment
+  = directAssignment
+  / idAssignment
 
 parens
   = "(" __ expr:expr __ ")"  {
@@ -670,12 +675,13 @@ Else    = "else"     !NameContinue
 End     = "end"      !NameContinue
 Where   = "where"    !NameContinue
 Select  = "select"   !NameContinue
+When    = "when"     !NameContinue
 
 ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or /
       Like / Mod / Not / If / Unless / True / False / As / In /
       Return / Self / Else / End / Where / Select / Reduce / Await /
-      Any / All )
+      Any / All / When )
 
 Identifier "identifier"
   = !ReservedWord name:Name  {

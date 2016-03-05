@@ -16,6 +16,16 @@ def basics(test)
   end
 end
 
+def doWith(test)
+  do when a = timeout(10), b = timeout(200), [c, d] = [90, 80]
+    a | equalTo(10)
+    b | equalTo(200)
+    c | equalTo(90)
+    d | equalTo(80)
+    test.done()
+  end
+end
+
 def awaitAny(test)
   let arr = [
     for x in [100, 10, 50]
@@ -51,6 +61,7 @@ end
 
 export let tests = nodeunit.testCase({
   "Basic Do Functionality": basics,
+  "'Do With' Functionality": doWith,
   "Await Any Functionality": awaitAny,
   "Await All Functionality": awaitAll,
   "Await HTTP Functionality": awaitHttp
