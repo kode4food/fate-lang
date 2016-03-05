@@ -416,6 +416,20 @@ export class ArrayDestructure extends Assignment {
   }
 }
 
+export class ObjectDestructure extends Assignment {
+  constructor(public items: ObjectDestructureItem[],
+              public value: Expression) { super(); }
+
+  public getIdentifiers() {
+    return this.items.map(item => item.id);
+  }
+}
+
+export class ObjectDestructureItem extends Node {
+  constructor(public id: Identifier,
+              public value: Expression) { super(); }
+}
+
 export class ObjectAssignment extends Node {
   constructor(public id: Expression,
               public value: Expression) { super(); }
@@ -482,6 +496,8 @@ let tagToConstructor: FunctionMap = {
   'modulePath': ModulePath,
   'assignment': DirectAssignment,
   'arrayDestructure': ArrayDestructure,
+  'objectDestructure': ObjectDestructure,
+  'objectDestructureItem': ObjectDestructureItem,
   'objectAssignment': ObjectAssignment
 };
 

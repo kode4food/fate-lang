@@ -65,7 +65,7 @@ def testMutable(test)
   test.done()
 end
 
-def testDestructuring(test)
+def testArrayDestructuring(test)
   let [a, b] = [1, 2]
   a | equalTo(1)
   b | equalTo(2)
@@ -73,8 +73,30 @@ def testDestructuring(test)
   test.done()
 end
 
+def testObjectDestructuring(test)
+  let myObject = { name: 'Fate', age: 1 }
+  myObject.name | equalTo('Fate')
+  myObject.age  | equalTo(1)
+
+  let {age, name} = myObject
+  age  | equalTo(1)
+  name | equalTo('Fate')
+
+  let {age as a1, name as n1} = myObject
+  a1 | equalTo(1)
+  n1 | equalTo('Fate')
+
+  let ge = 'ge', na = 'na'
+  let { 'a' + ge as a2, na + 'me' as n2 } = myObject
+  a2 | equalTo(1)
+  n2 | equalTo('Fate')
+
+  test.done()
+end
+
 export let tests = nodeunit.testCase({
   "Static Single Assignment": assignment,
   "Mutable Wrapper Assignment": testMutable,
-  "Destructuring Assignment": testDestructuring
+  "Destructuring Array Assignment": testArrayDestructuring,
+  "Destructuring Object Assignment": testObjectDestructuring
 })

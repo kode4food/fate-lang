@@ -41,6 +41,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'let': createLetEvaluator,
     'assignment': createAssignmentEvaluator,
     'arrayDestructure': createArrayDestructureEvaluator,
+    'objectDestructure': createObjectDestructureEvaluator,
     'return': createReturnEvaluator,
     'expression': createExpressionEvaluator,
     'arrayComp': createListCompEvaluator,
@@ -365,6 +366,23 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         generate.member(
           function () { generate.retrieveAnonymous(result); },
           '' + index
+        );
+      });
+    });
+  }
+
+  function createObjectDestructureEvaluator(node: Syntax.ObjectDestructure) {
+    let result = generate.createAnonymous();
+
+    generate.statement(function () {
+      generate.assignAnonymous(result, defer(node.value));
+    });
+
+    node.items.forEach(function (item) {
+      generate.assignment(item.id.value, function () {
+        generate.member(
+          function () { generate.retrieveAnonymous(result); },
+          defer(item.value)
         );
       });
     });
