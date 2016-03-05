@@ -31,6 +31,10 @@
       return value !== null;
     }));
   }
+
+  function literalName(node) {
+    return node.template('literal', node.value);
+  }
 }
 
 start = module
@@ -213,6 +217,8 @@ reduceAssignments
 reduceAssignment
   = assignment
   / idAssignment
+  / arrayDestructure
+  / objectDestructure
 
 idAssignment
   = id:Identifier  {
@@ -278,19 +284,57 @@ elseTail
     }
 
 letStatement
-  = op:Let __ a:assignments  {
+  = op:Let __ a:letAssignments  {
       return node(op, a);
     }
 
-assignments
-  = start:assignment
-    cont:( LIST_SEP a:assignment { return a; } )*  {
+letAssignments
+  = start:letAssignment
+    cont:( LIST_SEP a:letAssignment { return a; } )*  {
       return [start].concat(cont);
     }
+
+letAssignment
+  = assignment
+  / arrayDestructure
+  / objectDestructure
 
 assignment
   = id:Identifier __ "=" __ expr:expr  {
       return node('assignment', id, expr);
+    }
+
+arrayDestructure
+  = "[" __ ids:idList __ "]" __ "=" __ expr:expr  {
+      return node('arrayDestructure', ids, expr);
+    }
+
+objectDestructure
+  = "{" __ items:objectDestructureItems __ "}" __ "=" __ expr:expr  {
+      return node('objectDestructure', items, expr);
+    }
+
+objectDestructureItems
+  = start:objectDestructureItem
+    cont:( LIST_SEP item:objectDestructureItem { return item; } )*  {
+      return [start].concat(cont);
+    }
+
+objectDestructureItem
+  = name:Name AS_SEP id:Identifier  {
+      return node('objectDestructureItem', id, literalName(name));
+    }
+  / name:expr AS_SEP id:Identifier  {
+      return node('objectDestructureItem', id, name);
+    }
+  / id:Identifier  {
+      return node('objectDestructureItem', id, literalName(id));
+    }
+
+idList
+  = start:Identifier
+    cont:( LIST_SEP id:Identifier { return id; } )*  {
+      return [start].concat(cont);
     }
 
 returnStatement
@@ -391,7 +435,7 @@ member
 
 memberSelector
   = __ "." _ elem:Name  {
-      return node('member', null, elem.template('literal', elem.value));
+      return node('member', null, literalName(elem));
     }
   / _ "[" __ elem:expr __ "]"  {
       return node('member', null, elem);
@@ -488,14 +532,13 @@ objectAssignments
 
 objectAssignment
   = name:Name PROP_SEP value:expr  {
-      return node('objectAssignment',
-                  name.template('literal', name.value), value);
+      return node('objectAssignment', literalName(name), value);
     }
   / name:expr PROP_SEP value:expr  {
       return node('objectAssignment', name, value);
     }
   / name:Name  {
-      var nameValue = name.template('literal', name.value)
+      var nameValue = literalName(name);
       if ( name.value === 'self' ) {
         return node('objectAssignment', nameValue, name.template('self'));
       }
@@ -541,7 +584,7 @@ lambdaStatements
 
 idParamList
   = start:idParam
-    cont:( LIST_SEP id:idParam { return id; })*  {
+    cont:( LIST_SEP id:idParam { return id; } )*  {
       return [start].concat(cont);
     }
 

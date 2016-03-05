@@ -31,7 +31,7 @@ def reduceStatementExplicit(test)
 end
 
 def multiReduceStatementExplicit(test)
-  reduce a = 0, b = 2
+  reduce [a, b] = [0, 2]
   for x in [1, 2, 3]
     let a = a + x
     let b = b * x

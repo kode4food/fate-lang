@@ -129,7 +129,7 @@ export class LambdaExpression extends Expression {
 }
 
 export class ReduceExpression extends Expression {
-  constructor(public assignment: Assignment,
+  constructor(public assignment: DirectAssignment,
               public ranges: Ranges,
               public select: Expression) { super(); }
 }
@@ -202,7 +202,17 @@ export class ForStatement extends Statement {
   constructor(public ranges: Ranges,
               public loopStatements: Statements,
               public elseStatements: Statements,
-              public reduceAssignments?: Assignments) { super(); }
+              public reduceAssignments?: Assignment[]) { super(); }
+
+  public getReduceIdentifiers() {
+    let result: Identifier[] = [];
+    this.reduceAssignments.forEach(assignment => {
+      assignment.getIdentifiers().forEach(function (id) {
+        result.push(id);
+      });
+    });
+    return result;
+  }
 }
 
 export class IfStatement extends Statement {
@@ -229,9 +239,13 @@ export class LetStatement extends ExportableStatement {
   constructor(public assignments: Assignments) { super(); }
 
   public getModuleItems() {
-    return this.assignments.map(assignment => {
-      return node('moduleItem', assignment.id);
+    let result: ModuleItems = [];
+    this.assignments.forEach(assignment => {
+      assignment.getIdentifiers().forEach(id => {
+        result.push(id.template('moduleItem', id));
+      });
     });
+    return result;
   }
 }
 
@@ -388,7 +402,40 @@ export class ModuleSpecifier extends Node {
 
 export class ModulePath extends Identifier {}
 
-export class Assignment extends Node {
+export abstract class Assignment extends Node {
+  public abstract getIdentifiers(): Identifier[];
+}
+
+export class DirectAssignment extends Assignment {
+  constructor(public id: Identifier, public value: Expression) {
+    super();
+  }
+
+  public getIdentifiers() {
+    return [this.id];
+  }
+}
+
+export class ArrayDestructure extends Assignment {
+  constructor(public ids: Identifier[], public value: Expression) {
+    super();
+  }
+
+  public getIdentifiers() {
+    return this.ids;
+  }
+}
+
+export class ObjectDestructure extends Assignment {
+  constructor(public items: ObjectDestructureItem[],
+              public value: Expression) { super(); }
+
+  public getIdentifiers() {
+    return this.items.map(item => item.id);
+  }
+}
+
+export class ObjectDestructureItem extends Node {
   constructor(public id: Identifier,
               public value: Expression) { super(); }
 }
@@ -457,7 +504,10 @@ let tagToConstructor: FunctionMap = {
   'moduleItem': ModuleItem,
   'moduleSpecifier': ModuleSpecifier,
   'modulePath': ModulePath,
-  'assignment': Assignment,
+  'assignment': DirectAssignment,
+  'arrayDestructure': ArrayDestructure,
+  'objectDestructure': ObjectDestructure,
+  'objectDestructureItem': ObjectDestructureItem,
   'objectAssignment': ObjectAssignment
 };
 

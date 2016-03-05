@@ -129,13 +129,15 @@ export default function createTreeProcessors(visit: Visitor) {
     let namesSeen: { [index: string]: boolean } = {};
     statements.forEach(function (statement) {
       statement.assignments.forEach(function (assignment) {
-        let name = assignment.id.value;
-        if ( namesSeen[name] ) {
-          visit.issueWarning(assignment,
-            `Are you sure you wanted to immediately reassign '${name}'?`
-          );
-        }
-        namesSeen[name] = true;
+        assignment.getIdentifiers().forEach(function (id) {
+          let name = id.value;
+          if ( namesSeen[name] ) {
+            visit.issueWarning(id,
+              `Are you sure you wanted to immediately reassign '${name}'?`
+            );
+          }
+          namesSeen[name] = true;
+        });
       });
     });
     return statements;
