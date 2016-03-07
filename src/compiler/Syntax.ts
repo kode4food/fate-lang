@@ -429,8 +429,9 @@ export class ArrayDestructure extends Assignment {
 }
 
 export class ObjectDestructure extends Assignment {
-  constructor(public items: ObjectDestructureItem[],
-              public value: Expression) { super(); }
+  constructor(public items: ObjectDestructureItem[], value: Expression) {
+    super(value);
+  }
 
   public getIdentifiers() {
     return this.items.map(item => item.id);
