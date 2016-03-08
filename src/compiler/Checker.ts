@@ -136,17 +136,17 @@ export default function createTreeProcessors(visit: Visitor) {
       return node;
     }
 
-    let parent = visit.hasAncestorTags(assignmentTypes)[0];
-    let parentIndex = visit.nodeStack.indexOf(parent);
-    let doContainer = <Syntax.Node>visit.nodeStack[parentIndex - 4];
-    if ( doContainer.tag === 'do' ) {
-      addDoReference(<Syntax.DoExpression>doContainer, node);
-    }
+    visit.nodeStack.forEach(function (parent) {
+      if ( parent instanceof Syntax.Node &&
+           Syntax.hasTag(parent, assignmentTypes) ) {
+        addDoReference(<Syntax.Assignment>parent, node);
+      }
+    });
 
     return node;
   }
 
-  function addDoReference(node: Syntax.DoExpression, id: Syntax.Identifier) {
+  function addDoReference(node: Syntax.Assignment, id: Syntax.Identifier) {
     let ids: NameSet = getAnnotation(node, 'do/references') || {};
     ids[id.value] = true;
     annotate(node, 'do/references', ids);
@@ -159,10 +159,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
     let encountered: AssignmentMap = {};
     node.whenClause.assignments.forEach(function (assignment) {
-      let getters: NameSet = getAnnotation(node, 'do/references');
-      if ( !getters ) {
-        return;
-      }
+      let getters: NameSet = getAnnotation(assignment, 'do/references') || {};
 
       Object.keys(getters).forEach(function (getter) {
         let prevAssignment = encountered[getter];
