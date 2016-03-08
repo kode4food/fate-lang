@@ -87,8 +87,6 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(rollUpForLoops, visit.tags('for')),
     visit.matching(rollUpStandaloneLoops, visit.tags('expression')),
 
-    visit.matching(wrapWhenAssignments, visit.tags('do')),
-
     visit.statementGroups(splitExportStatements, visit.tags('export'), 1)
   ];
 
@@ -266,18 +264,6 @@ export default function createTreeProcessors(visit: Visitor) {
       return statement.expression;
     }
     return statement;
-  }
-
-  function wrapWhenAssignments(node: Syntax.DoExpression) {
-    if ( !node.whenAssignments ) {
-      return node;
-    }
-
-    node.whenAssignments.forEach(function (assignment) {
-      let value = assignment.value;
-      assignment.value = value.template('await', value);
-    });
-    return node;
   }
 
   function splitExportStatements(statements: Syntax.ExportStatement[]) {

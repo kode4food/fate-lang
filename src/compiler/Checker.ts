@@ -2,23 +2,29 @@
 
 import Visitor from './Visitor';
 import * as Syntax from './Syntax';
-import { annotate } from './Annotations';
+import { annotate, hasAnnotation, getAnnotation } from './Annotations';
 
 type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
+type AssignmentMap = { [index: string]: Syntax.Assignment };
+type NameSet = { [index: string]: boolean };
 
 const awaitBarriers = ['function', 'lambda', 'pattern'];
+const assignmentTypes = ['assignment', 'arrayDestructure', 'objectDestructure'];
 
 export default function createTreeProcessors(visit: Visitor) {
-  let selfFunctions = visit.ancestorTags('self', ['function', 'lambda']);
+  let selfFunction = visit.ancestorTags('self', ['function', 'lambda']);
   let functionIdRetrieval = visit.ancestorTags('id', ['function']);
+  let whenReference = visit.ancestorTags('id', assignmentTypes, 'let', 'do');
 
   return [
     visit.matching(validateAwaits, visit.tags('await')),
     visit.matching(validateWildcards, visit.tags('wildcard')),
     visit.matching(validateSelfReferences, visit.tags('self')),
     visit.matching(validateFunctionArgs, visit.tags(['function', 'lambda'])),
-    visit.matching(annotateSelfFunctions, selfFunctions),
+    visit.matching(annotateSelfFunctions, selfFunction),
     visit.matching(annotateRecursiveFunctions, functionIdRetrieval),
+    visit.matching(annotateWhenReferences, whenReference),
+    visit.matching(groupWhenAssignments, visit.tags('do')),
     visit.statementGroups(validateAssignments, visit.tags('let'), 1),
     visit.statementGroups(warnFunctionShadowing, visit.tags('function'))
   ];
@@ -81,8 +87,8 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function checkParamsForDuplication(node: Syntax.Node,
                                      signatures: Syntax.Signatures) {
-    let encounteredNames: { [index: string]: boolean } = { };
-    let duplicatedNames: { [index: string]: boolean } = { };
+    let encounteredNames: NameSet = { };
+    let duplicatedNames: NameSet = { };
     signatures.forEach(function (signature) {
       signature.params.forEach(function (param) {
         let name = param.id.value;
@@ -125,8 +131,62 @@ export default function createTreeProcessors(visit: Visitor) {
     return node;
   }
 
+  function annotateWhenReferences(node: Syntax.Identifier) {
+    if ( !hasAnnotation(node, 'id/reference') ) {
+      return node;
+    }
+
+    let parent = visit.hasAncestorTags(assignmentTypes)[0];
+    let parentIndex = visit.nodeStack.indexOf(parent);
+    let doContainer = <Syntax.Node>visit.nodeStack[parentIndex - 4];
+    if ( doContainer.tag === 'do' ) {
+      addDoReference(<Syntax.DoExpression>doContainer, node);
+    }
+
+    return node;
+  }
+
+  function addDoReference(node: Syntax.DoExpression, id: Syntax.Identifier) {
+    let ids: NameSet = getAnnotation(node, 'do/references') || {};
+    ids[id.value] = true;
+    annotate(node, 'do/references', ids);
+  }
+
+  function groupWhenAssignments(node: Syntax.DoExpression) {
+    if ( !node.whenClause ) {
+      return node;
+    }
+
+    let encountered: AssignmentMap = {};
+    node.whenClause.assignments.forEach(function (assignment) {
+      let getters: NameSet = getAnnotation(node, 'do/references');
+      if ( !getters ) {
+        return;
+      }
+
+      Object.keys(getters).forEach(function (getter) {
+        let prevAssignment = encountered[getter];
+        if ( !prevAssignment ) {
+          return;
+        }
+
+        let thisGroup = getAnnotation(assignment, 'when/group') || 0;
+        let prevGroup = getAnnotation(prevAssignment, 'when/group') || 0;
+
+        if ( thisGroup <= prevGroup ) {
+          annotate(assignment, 'when/group', thisGroup = prevGroup + 1);
+        }
+      });
+
+      assignment.getIdentifiers().forEach(function (id) {
+        encountered[id.value] = assignment;
+      });
+    });
+    return node;
+  }
+
   function validateAssignments(statements: Syntax.LetStatement[]) {
-    let namesSeen: { [index: string]: boolean } = {};
+    let namesSeen: NameSet = {};
     statements.forEach(function (statement) {
       statement.assignments.forEach(function (assignment) {
         assignment.getIdentifiers().forEach(function (id) {
@@ -144,7 +204,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function warnFunctionShadowing(statements: Syntax.FunctionDeclaration[]) {
-    let namesSeen: { [index: string]: boolean } = {};
+    let namesSeen: NameSet = {};
     let lastName: string;
 
     statements.forEach(function (statement) {

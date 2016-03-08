@@ -1,5 +1,6 @@
 {
   let isFormatter = require('../runtime/Format').isFormatter;
+  let annotate = require('./Annotations').annotate;
   let Syntax = require('./Syntax');
 
   function node() {
@@ -34,6 +35,11 @@
 
   function literalName(node) {
     return node.template('literal', node.value);
+  }
+
+  function reference(id) {
+    annotate(id, 'id/reference');
+    return id;
   }
 }
 
@@ -220,7 +226,7 @@ reduceAssignment
 
 idAssignment
   = id:Identifier  {
-      return id.template('assignment', id, id);
+      return id.template('assignment', id, reference(id));
     }
 
 ranges
@@ -590,13 +596,15 @@ idParam
   = id:Identifier  { return id.template('idParam', id); }
 
 doExpression
-  = op:Do when:whenAssignments? NL stmts:statements End {
+  = op:Do when:whenClause? NL stmts:statements End {
       return node(op, stmts, when);
     }
   / reduceExpression
 
-whenAssignments
-  = __ When __ assignments:reduceAssignments  { return assignments; }
+whenClause
+  = __ When __ assignments:reduceAssignments  {
+      return node('let', assignments);
+    }
 
 reduceExpression
   = op:Reduce __ reduceAssignment:reduceExpressionAssignment __
@@ -621,7 +629,7 @@ literal
   / regex
   / boolean
   / self
-  / identifier
+  / reference
   / wildcard
 
 string
@@ -635,6 +643,11 @@ string
 regex
   = re:Regex  {
       return node('regex', re.pattern, re.flags);
+    }
+
+reference
+  = id:Identifier  {
+      return reference(id);
     }
 
 boolean = True / False

@@ -16,12 +16,32 @@ def basics(test)
   end
 end
 
-def doWith(test)
+def doWhenSimple(test)
+  do when t = 100
+    t | equalTo(100)
+    test.done()
+  end
+end
+
+def doWhenNoDependencies(test)
   do when a = timeout(10), b = timeout(200), [c, d] = [90, 80]
     a | equalTo(10)
     b | equalTo(200)
     c | equalTo(90)
     d | equalTo(80)
+    test.done()
+  end
+end
+
+def doWhenDependencies(test)
+  do when a = timeout(10), b = timeout(a * 20), [c, d] = [90, 80],
+          e = timeout(30 * a), [f] = [c]
+    a | equalTo(10)
+    b | equalTo(200)
+    c | equalTo(90)
+    d | equalTo(80)
+    e | equalTo(300)
+    f | equalTo(90)
     test.done()
   end
 end
@@ -61,7 +81,9 @@ end
 
 export let tests = nodeunit.testCase({
   "Basic Do Functionality": basics,
-  "'Do With' Functionality": doWith,
+  "'Do When' (Simple)": doWhenSimple,
+  "'Do When' (No Dependencies)": doWhenNoDependencies,
+  "'Do When' (Dependencies)": doWhenDependencies,
   "Await Any Functionality": awaitAny,
   "Await All Functionality": awaitAll,
   "Await HTTP Functionality": awaitHttp

@@ -40,8 +40,8 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'bind': createBindEvaluator,
     'let': createLetEvaluator,
     'assignment': createAssignmentEvaluator,
-    'arrayDestructure': createArrayDestructureEvaluator,
-    'objectDestructure': createObjectDestructureEvaluator,
+    'arrayDestructure': createAssignmentEvaluator,
+    'objectDestructure': createAssignmentEvaluator,
     'return': createReturnEvaluator,
     'expression': createExpressionEvaluator,
     'arrayComp': createListCompEvaluator,
@@ -74,11 +74,17 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'member': createMemberEvaluator,
     'array': createArrayEvaluator,
     'object': createObjectEvaluator,
-    'id':  createIdEvaluator,
+    'id': createIdEvaluator,
     'literal': createLiteral,
     'regex': createRegex,
     'self': createSelfEvaluator,
     'pattern': createPatternEvaluator
+  };
+
+  let AssignmentEvaluators: FunctionMap = {
+    'assignment': createDirectAssignmentEvaluator,
+    'arrayDestructure': createArrayDestructureEvaluator,
+    'objectDestructure': createObjectDestructureEvaluator
   };
 
   // generate the module function and return the source code
@@ -321,10 +327,49 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     ]);
 
     function doBody() {
-      if ( node.whenAssignments ) {
-        node.whenAssignments.forEach(createEvaluator);
+      if ( node.whenClause ) {
+        let groups = getWhenGroups(node.whenClause.assignments);
+        groups.forEach(generateGroup);
       }
       createStatementsEvaluator(node.statements);
+    }
+
+    function generateGroup(group: Syntax.Assignments) {
+      let anon = generate.createAnonymous();
+      generate.statement(function () {
+        generate.assignAnonymous(anon, function () {
+          generate.waitFor(function () {
+            generate.array(
+              group.map(function (assignment) {
+                return defer(assignment.value);
+              })
+            );
+          }, 'awaitAll');
+        });
+      });
+
+      group.forEach(function (assignment, idx) {
+        createAssignmentEvaluator(assignment, function () {
+          return function () {
+            generate.member(
+              function () { generate.retrieveAnonymous(anon); },
+              '' + idx
+            );
+          };
+        });
+      });
+    }
+
+    function getWhenGroups(assignments: Syntax.Assignments) {
+      let groups: Syntax.Assignments[] = [];
+
+      assignments.forEach(function (assignment) {
+        let groupNum = getAnnotation(assignment, 'when/group') || 0;
+        let group = groups[groupNum] || (groups[groupNum] = []);
+        group.push(assignment);
+      });
+
+      return groups;
     }
   }
 
@@ -357,15 +402,27 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     node.assignments.forEach(createEvaluator);
   }
 
-  function createAssignmentEvaluator(node: Syntax.DirectAssignment) {
-    generate.assignment(node.id.value, defer(node.value));
+  function getAssignmentValue(node: Syntax.Assignment) {
+    return defer(node.value);
   }
 
-  function createArrayDestructureEvaluator(node: Syntax.ArrayDestructure) {
+  function createAssignmentEvaluator(node: Syntax.Assignment,
+                                     getValue = getAssignmentValue) {
+    let assignmentEvaluator = AssignmentEvaluators[node.tag];
+    return assignmentEvaluator(node, getValue);
+  }
+
+  function createDirectAssignmentEvaluator(node: Syntax.DirectAssignment,
+                                           getValue: Function) {
+    generate.assignment(node.id.value, getValue(node));
+  }
+
+  function createArrayDestructureEvaluator(node: Syntax.ArrayDestructure,
+                                           getValue: Function) {
     let result = generate.createAnonymous();
 
     generate.statement(function () {
-      generate.assignAnonymous(result, defer(node.value));
+      generate.assignAnonymous(result, getValue(node));
     });
 
     node.getIdentifiers().forEach(function (id, index) {
@@ -378,11 +435,12 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     });
   }
 
-  function createObjectDestructureEvaluator(node: Syntax.ObjectDestructure) {
+  function createObjectDestructureEvaluator(node: Syntax.ObjectDestructure,
+                                            getValue: Function) {
     let result = generate.createAnonymous();
 
     generate.statement(function () {
-      generate.assignAnonymous(result, defer(node.value));
+      generate.assignAnonymous(result, getValue(node));
     });
 
     node.items.forEach(function (item) {

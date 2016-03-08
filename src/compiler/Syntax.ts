@@ -10,6 +10,7 @@ export type NodeOrNodes = Node|Nodes;
 export type Ranges = Range[];
 export type Signatures = Signature[];
 export type Parameters = Parameter[];
+export type Identifiers = Identifier[];
 export type Expressions = Expression[];
 export type Assignments = Assignment[];
 export type ModuleItems = ModuleItem[];
@@ -136,7 +137,7 @@ export class ReduceExpression extends Expression {
 
 export class DoExpression extends Expression {
   constructor(public statements: Statements,
-              public whenAssignments?: Assignments) { super(); }
+              public whenClause?: LetStatement) { super(); }
 }
 
 // Array/Object Construction and Comprehension ******************************
@@ -206,7 +207,7 @@ export class ForStatement extends Statement {
               public reduceAssignments?: Assignment[]) { super(); }
 
   public getReduceIdentifiers() {
-    let result: Identifier[] = [];
+    let result: Identifiers = [];
     this.reduceAssignments.forEach(assignment => {
       assignment.getIdentifiers().forEach(function (id) {
         result.push(id);
@@ -308,7 +309,6 @@ export class Identifier extends Symbol {
 
 export class Self extends Identifier {}
 
-
 export class Literal extends Symbol {
   constructor(public value: any) { super(); }
 }
@@ -405,7 +405,7 @@ export class ModulePath extends Identifier {}
 
 export abstract class Assignment extends Node {
   constructor(public value: Expression) { super(); }
-  public abstract getIdentifiers(): Identifier[];
+  public abstract getIdentifiers(): Identifiers;
 }
 
 export class DirectAssignment extends Assignment {
@@ -419,7 +419,7 @@ export class DirectAssignment extends Assignment {
 }
 
 export class ArrayDestructure extends Assignment {
-  constructor(public ids: Identifier[], value: Expression) {
+  constructor(public ids: Identifiers, value: Expression) {
     super(value);
   }
 
@@ -493,7 +493,7 @@ let tagToConstructor: FunctionMap = {
   'member': MemberOperator,
   'array': ArrayConstructor,
   'object': ObjectConstructor,
-  'id':  Identifier,
+  'id': Identifier,
   'self': Self,
   'literal': Literal,
   'pattern': Pattern,
