@@ -537,9 +537,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       generate.assignment(successVar, globals.literal(false));
       generateLoop(successVar);
       generate.ifStatement(
-        function () {
-          generate.retrieveAnonymous(successVar);
-        },
+        function () { generate.retrieveAnonymous(successVar); },
         null,
         defer(createStatementsEvaluator, elseStatements)
       );
