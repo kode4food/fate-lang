@@ -46,6 +46,17 @@ def doWhenDependencies(test)
   end
 end
 
+def doWhenNested(test)
+  do when a = timeout(10),
+          b = do
+            a * 20
+          end
+    a | equalTo(10)
+    b | equalTo(200)
+    test.done()
+  end
+end
+
 def awaitAny(test)
   let arr = [
     for x in [100, 10, 50]
@@ -84,6 +95,7 @@ export let tests = nodeunit.testCase({
   "'Do When' (Simple)": doWhenSimple,
   "'Do When' (No Dependencies)": doWhenNoDependencies,
   "'Do When' (Dependencies)": doWhenDependencies,
+  "'Do When' (Nested)": doWhenNested,
   "Await Any Functionality": awaitAny,
   "Await All Functionality": awaitAll,
   "Await HTTP Functionality": awaitHttp
