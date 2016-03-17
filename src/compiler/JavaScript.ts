@@ -178,7 +178,7 @@ export function createModule(globals: Globals) {
     conditionalOperator, statement, ifStatement, loopExpression,
     loopContinue, funcDeclaration, iife, scope, func, waitFor,
     compoundExpression, returnStatement, call, array, arrayAppend,
-    object, objectAssign, parens, code, toString
+    object, objectAssign, parens, code, toString, args
   };
 
   function nextId(prefix: string) {
@@ -256,6 +256,11 @@ export function createModule(globals: Globals) {
 
   function self() {
     write(selfName);
+  }
+
+  function args(startAt = 0) {
+    let slice = globals.runtimeImport('sliceArray');
+    write(slice, '(arguments,', '' + startAt, ')');
   }
 
   function context() {

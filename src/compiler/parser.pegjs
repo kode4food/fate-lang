@@ -45,7 +45,7 @@
 
 start = module
 
-/** Parser *******************************************************************/
+/* Parser *******************************************************************/
 
 module
   = __ statements:moduleStatement*  {
@@ -128,15 +128,20 @@ paramList
     }
 
 paramDef
-  = pattern:patternExpr alias:( AS_SEP id:Identifier { return id; } )  {
-      return node('patternParam', alias, pattern);
+  = pattern:patternExpr
+    alias:( AS_SEP id:Identifier { return id; } )
+    cardinality:paramCardinality?  {
+      return node('patternParam', alias, pattern, cardinality);
     }
-  / id:Identifier  {
-      return node('idParam', id);
+  / id:Identifier cardinality:paramCardinality?  {
+      return node('idParam', id, cardinality);
     }
-  / pattern:patternExpr  {
-      return node('patternParam', null, pattern);
+  / pattern:patternExpr cardinality:paramCardinality?  {
+      return node('patternParam', null, pattern, cardinality);
     }
+
+paramCardinality
+  = _ '*'  { return Syntax.Cardinality.ZeroToMany; }
 
 patternExpr
   = expr:expr  {
@@ -593,7 +598,9 @@ idParamList
     }
 
 idParam
-  = id:Identifier  { return id.template('idParam', id); }
+  = id:Identifier cardinality:paramCardinality?  {
+      return id.template('idParam', id, cardinality);
+    }
 
 doExpression
   = op:Do when:whenClause? NL stmts:statements End {

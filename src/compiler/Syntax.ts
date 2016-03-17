@@ -353,7 +353,7 @@ export class Signature extends Node {
       }
 
       let ident = paramDef.id || <Identifier>node('id', idx);
-      this.params.push(node('idParam', ident));
+      this.params.push(node('idParam', ident, paramDef.cardinality));
       guards.push(node('like', ident, (<PatternParameter>paramDef).pattern));
     });
 
@@ -371,13 +371,24 @@ export class Signature extends Node {
   }
 }
 
+export enum Cardinality {
+  Required, ZeroToMany
+}
+
 export class Parameter extends Node {
-  constructor(public id: Identifier) { super(); }
+  constructor(public id: Identifier,
+              public cardinality: Cardinality) {
+    super();
+    if ( !cardinality ) {
+      this.cardinality = Cardinality.Required;
+    }
+  }
 }
 
 export class PatternParameter extends Parameter {
-  constructor(id: Identifier, public pattern: Expression) {
-    super(id);
+  constructor(id: Identifier, public pattern: Expression,
+              cardinality: Cardinality) {
+    super(id, cardinality);
   }
 }
 

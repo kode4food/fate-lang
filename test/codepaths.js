@@ -256,5 +256,17 @@ exports.codepaths = nodeunit.testCase({
     }, "Keyword used as an identifier");
 
     test.done();
+  },
+
+  "Parameter Ordering": function (test) {
+    test.throws(function () {
+      evaluate("def test(a*, b)\nb\nend");
+    }, "Parameters are out of order");
+
+    test.throws(function () {
+      evaluate("def test(b*, c*, d*)\nb\nend");
+    }, "Parameters are out of order");
+
+    test.done();
   }
 });

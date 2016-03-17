@@ -7,7 +7,7 @@ const glob = require('glob');
 const evaluate = require('../dist/Fate').evaluate;
 const mixin = require('../dist/Util').mixin;
 
-/**
+/*
  * Creates a mock console, primarily for intercepting the results of the
  * Fate command-line tool
  */

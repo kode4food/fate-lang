@@ -30,7 +30,7 @@ interface CompilerOutput {
   err?: Error;
 }
 
-/**
+/*
  * Executes Fate command-line parsing.  This function is normally
  * invoked automatically when the cli.js script is called directly.
  *

@@ -22,7 +22,7 @@ export function isFormatter(value: string) {
   return buildFormatter(value).__fateIndexes.length > 0;
 }
 
-/**
+/*
  * Builds a closure that will be used internally to support Fate's
  * interpolation operations.  The returned closure will attach flags
  * that identify any names or indexes that must be provided by Fate

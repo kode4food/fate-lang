@@ -18,7 +18,7 @@ const waiterMap: FunctionNameMap = {
   'all': 'awaitAll'
 };
 
-/**
+/*
  * Converts a parse tree into source code (initially JavaScript). Host
  * Language-specific constructs are avoided here and instead produced
  * by JavaScript code generation module.
@@ -120,9 +120,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     };
   }
 
-  /**
-    * Called recursively, this is the busiest function in the code generator
-    */
+  /*
+   * Called recursively, this is the busiest function in the code generator
+   */
   function createEvaluator(node: Syntax.Node) {
     /* istanbul ignore if: untestable */
     if ( !(node instanceof Syntax.Node) ) {
@@ -239,10 +239,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   function createFunctionEvaluator(node: Syntax.FunctionDeclaration) {
     let signature = node.signature;
     let params = signature.params;
-
-    let paramNames = params.map(function (param: Syntax.Parameter) {
-      return param.id.value;
-    });
+    let paramNames = getFixedParamNames(params);
 
     let create = signature.guard ? createGuarded : createUnguarded;
     create();
@@ -252,8 +249,13 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       generate.funcDeclaration(functionName.value, {
         internalId: getFuncOrLambdaInternalId(node),
         contextArgs: paramNames,
-        body: defer(createStatementsEvaluator, node.statements)
+        body: createBody
       });
+    }
+
+    function createBody() {
+      generateParamProcessor(params);
+      createStatementsEvaluator(node.statements);
     }
 
     function createGuarded() {
@@ -264,7 +266,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         internalId: getFuncOrLambdaInternalId(node),
         contextArgs: paramNames,
         prolog: createProlog,
-        body: defer(createStatementsEvaluator, node.statements)
+        body: createBody
       });
 
       function createProlog() {
@@ -284,17 +286,45 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   function createLambdaEvaluator(node: Syntax.LambdaExpression) {
     let signature = node.signature;
     let params = signature.params;
-
-    let paramNames = params.map(function (param: Syntax.Parameter) {
-      return param.id.value;
-    });
+    let paramNames = getFixedParamNames(params);
 
     generate.parens(function () {
       generate.func({
         internalId: getFuncOrLambdaInternalId(node),
         contextArgs: paramNames,
-        body: defer(createStatementsEvaluator, node.statements)
+        body: function () {
+          generateParamProcessor(params);
+          createStatementsEvaluator(node.statements);
+        }
       });
+    });
+  }
+
+  function getFixedParamNames(params: Syntax.Parameters) {
+    return params.filter(function (param: Syntax.Parameter) {
+      return param.cardinality === Syntax.Cardinality.Required;
+    }).map(function (param: Syntax.Parameter) {
+      return param.id.value;
+    });
+  }
+
+  function generateParamProcessor(params: Syntax.Parameters) {
+    let fixedCount = getFixedParamNames(params).length;
+    if ( fixedCount === params.length ) {
+      return;
+    }
+
+    let nonFixed = params.slice(fixedCount);
+    nonFixed.forEach(function (param: Syntax.Parameter, idx: number) {
+      /* istanbul ignore if: untestable */
+      if ( param.cardinality !== Syntax.Cardinality.ZeroToMany ) {
+        throw new Error("Stupid Coder: Unexpected cardinality");
+      }
+
+      generate.assignment(
+        param.id.value,
+        function () { generate.args(fixedCount); }
+      );
     });
   }
 

@@ -4,6 +4,7 @@
 require('../dist/Fate');
 
 exports["Pure Fate API"] = require('./api_pure').tests;
+exports["Pure Fate Arguments"] = require('./args_pure').tests;
 exports["Pure Fate Basics"] = require('./basics_pure').tests;
 exports["Pure Fate Calls"] = require('./calls_pure').tests;
 exports["Pure Fate 'Do' Blocks"] = require('./do_pure').tests;
