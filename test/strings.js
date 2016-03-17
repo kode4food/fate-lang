@@ -1,14 +1,14 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var fate = require('../dist/Fate');
-var evaluate = fate.evaluate;
+const nodeunit = require('nodeunit');
+const fate = require('../dist/Fate');
+const evaluate = fate.evaluate;
 
 exports.strings = nodeunit.testCase({
   "Escape Sequences": function (test) {
-    var script1 = '"\\\\ \\" \\\' \\b \\f \\n \\r \\t"';
-    var script2 = "'\\\\ \\\" \\' \\b \\f \\n \\r \\t'";
-    var script3 = "{name:'hello', age:9} | '%% %name %% %%%% %age'";
+    let script1 = '"\\\\ \\" \\\' \\b \\f \\n \\r \\t"';
+    let script2 = "'\\\\ \\\" \\' \\b \\f \\n \\r \\t'";
+    let script3 = "{name:'hello', age:9} | '%% %name %% %%%% %age'";
     test.equal(evaluate(script1), "\\ \" \' \b \f \n \r \t");
     test.equal(evaluate(script2), "\\ \" \' \b \f \n \r \t");
     test.equal(evaluate(script3), "% hello % %% 9");
@@ -16,17 +16,17 @@ exports.strings = nodeunit.testCase({
   },
 
   "Multi-Line, Single Quote": function (test) {
-    var script1 = "'''hello\nthere'''";
+    let script1 = "'''hello\nthere'''";
     test.equal(evaluate(script1), "hello\nthere");
     test.done();
   },
 
   "Functions": function (test) {
-    var script1 = "from string import lower\nlower('CAP STRING')";
-    var script2 = "from string import split\nsplit('1\\n2\\n3')[2]";
-    var script3 = "from string import split\nsplit('1-2-3', '-')[1]";
-    var script4 = "from string import upper\nupper('lc string')";
-    var script5 = "from string import build\n" +
+    let script1 = "from string import lower\nlower('CAP STRING')";
+    let script2 = "from string import split\nsplit('1\\n2\\n3')[2]";
+    let script3 = "from string import split\nsplit('1-2-3', '-')[1]";
+    let script4 = "from string import upper\nupper('lc string')";
+    let script5 = "from string import build\n" +
                   "let b=build('%name is %age')\n" +
                   "{ name: 'Thom', age: 43 } | b";
 

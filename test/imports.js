@@ -1,33 +1,33 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var helpers = require('./helpers');
+const nodeunit = require('nodeunit');
+const helpers = require('./helpers');
 
-var fate = require('../dist/Fate');
-var compile = fate.compile;
-var evaluate = fate.evaluate;
-var globals = fate.globals;
+const fate = require('../dist/Fate');
+const compile = fate.compile;
+const evaluate = fate.evaluate;
+const globals = fate.globals;
 
-var types = require('../dist/Types');
-var isObject = types.isObject;
-var createModule = types.createModule;
+const types = require('../dist/Types');
+const isObject = types.isObject;
+const createModule = types.createModule;
 
-var resolvers = require('../dist/resolvers');
-var createMemoryResolver = resolvers.createMemoryResolver;
-var createFileResolver = resolvers.createFileResolver;
+const resolvers = require('../dist/resolvers');
+const createMemoryResolver = resolvers.createMemoryResolver;
+const createFileResolver = resolvers.createFileResolver;
 
-var Runtime = require('../dist/Runtime');
+const Runtime = require('../dist/Runtime');
 
 exports.imports = nodeunit.testCase({
 
   "helper imports": nodeunit.testCase({
     setUp: function (callback) {
-      var resolver = createMemoryResolver();
+      let resolver = createMemoryResolver();
       this.memoryResolver = resolver;
       Runtime.resolvers().push(resolver);
 
-      var compiled = compile("'hello compiled!'");
-      var generatedModule = createModule();
+      let compiled = compile("'hello compiled!'");
+      let generatedModule = createModule();
       compiled(globals(), generatedModule.exports);
       resolver.register('compiled', generatedModule);
 
@@ -49,14 +49,14 @@ exports.imports = nodeunit.testCase({
     },
 
     "Helper Import": function (test) {
-      var script1 = "import helpers\n" +
+      let script1 = "import helpers\n" +
                     "helpers.testHelper(1,2)";
 
-      var script2 = "from helpers import testHelper as test\n" +
+      let script2 = "from helpers import testHelper as test\n" +
                     "test(5,6)";
 
-      var exports1 = Runtime.resolve('hello');
-      var exports2 = Runtime.resolve('helpers');
+      let exports1 = Runtime.resolve('hello');
+      let exports2 = Runtime.resolve('helpers');
 
       test.ok(isObject(exports1));
       test.ok(isObject(exports2));
@@ -81,15 +81,15 @@ exports.imports = nodeunit.testCase({
     },
 
     "Module Retrieval": function (test) {
-      var found = Runtime.resolve('test');
-      var notFound = Runtime.resolve('unknown');
+      let found = Runtime.resolve('test');
+      let notFound = Runtime.resolve('unknown');
       test.ok(isObject(found));
       test.equal(notFound, undefined);
       test.done();
     },
 
     "File Import": function (test) {
-      var script = "import test as t\n" +
+      let script = "import test as t\n" +
                    "t.renderTest('Curly')";
 
       test.equal(evaluate(script), "Hello Curly");
@@ -97,9 +97,9 @@ exports.imports = nodeunit.testCase({
     },
 
     "File Submodule Import": function (test) {
-      var script1 = "import module1\nmodule1.test_value";
-      var script2 = "import module2\nmodule2.test_value";
-      var script3 = "import module1.index\nindex.test_value";
+      let script1 = "import module1\nmodule1.test_value";
+      let script2 = "import module2\nmodule2.test_value";
+      let script3 = "import module1.index\nindex.test_value";
 
       test.equal(evaluate(script1), "right!");
       test.equal(evaluate(script1), "right!"); // still works!
@@ -122,7 +122,7 @@ exports.imports = nodeunit.testCase({
     "System Import": function (test) {
       test.equal(evaluate("import math\nmath.round(9.5)"), 10);
 
-      var array = Runtime.resolve('array');
+      let array = Runtime.resolve('array');
 
       test.equal(typeof array, 'object');
       test.equal(typeof array.join, 'function');
@@ -147,7 +147,7 @@ exports.imports = nodeunit.testCase({
     },
 
     "Bound System Import": function (test) {
-      var script = "from array import join\n" +
+      let script = "from array import join\n" +
                    "let a = ['this', 'is', 'an', 'array']\n" +
                    "let j = join(?, '///')\n" +
                    "a | j";

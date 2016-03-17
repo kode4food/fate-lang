@@ -81,15 +81,6 @@ def awaitAll(test)
   end
 end
 
-# TODO: this test needs to be mocked
-def awaitHttp(test)
-  do
-    let content = await http.get('http://www.fate-lang.org/')
-    content like NonEmptyString | isOk
-    test.done()
-  end
-end
-
 export let tests = nodeunit.testCase({
   "Basic Do Functionality": basics,
   "'Do When' (Simple)": doWhenSimple,
@@ -97,6 +88,5 @@ export let tests = nodeunit.testCase({
   "'Do When' (Dependencies)": doWhenDependencies,
   "'Do When' (Nested)": doWhenNested,
   "Await Any Functionality": awaitAny,
-  "Await All Functionality": awaitAll,
-  "Await HTTP Functionality": awaitHttp
+  "Await All Functionality": awaitAll
 })

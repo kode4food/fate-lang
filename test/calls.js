@@ -1,8 +1,8 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var fate = require('../dist/Fate');
-var evaluate = fate.evaluate;
+const nodeunit = require('nodeunit');
+const fate = require('../dist/Fate');
+const evaluate = fate.evaluate;
 
 exports.calls = nodeunit.testCase({
   setUp: function (callback) {
@@ -19,7 +19,7 @@ exports.calls = nodeunit.testCase({
   },
 
   "Left Calls": function (test) {
-    var script1 = 'from string import title\n' +
+    let script1 = 'from string import title\n' +
                   'from array import join\n' +
                   'let formatted = title(join(name))\n' +
                   '{ formatted } | "Hello, %formatted!"';
@@ -30,12 +30,12 @@ exports.calls = nodeunit.testCase({
   },
 
   "Right Calls": function (test) {
-    var script1 = 'from string import title\n' +
+    let script1 = 'from string import title\n' +
                   'from array import join\n' +
                   'let formatted = name | join | title\n' +
                   '{ formatted } | "Hello, %formatted!"';
 
-    var script2 = "['hello', 'there'] | '%1-%0'";
+    let script2 = "['hello', 'there'] | '%1-%0'";
 
     test.equal(evaluate(script1, this.data), "Hello, Title Case!");
     test.equal(evaluate(script2), "there-hello");

@@ -1,15 +1,15 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var GlobalScheduler = require('../dist/Scheduler').GlobalScheduler;
+const nodeunit = require('nodeunit');
+const GlobalScheduler = require('../dist/Scheduler').GlobalScheduler;
 
 exports.scheduler = nodeunit.testCase({
 
   "Scheduler": function (test) {
-    var count = 200;
-    var remaining = count;
+    let count = 200;
+    let remaining = count;
     test.expect(count);
-    for ( var i = 0; i < count; i++ ) {
+    for ( let i = 0; i < count; i++ ) {
       setTimeout(scheduleTest(i), Math.random() * 50);
     }
 

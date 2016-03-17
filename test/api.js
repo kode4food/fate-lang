@@ -1,8 +1,9 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var types = require('../dist/Types');
-var runtime = require('../dist/Runtime');
+const nodeunit = require('nodeunit');
+const types = require('../dist/Types');
+const runtime = require('../dist/Runtime');
+const support = require('../dist/resolvers/system/support');
 
 exports.api = nodeunit.testCase({
 
@@ -25,6 +26,19 @@ exports.api = nodeunit.testCase({
     test.equal(types.isFalse("hello"), false);
     test.equal(types.isFalse([1]), false);
     test.done();
-  }
+  },
 
+  "Support Library Calls": function (test) {
+    let Promise = require('welsh').Promise;
+
+    let p = support.make(Promise, function (resolve) {
+      resolve('hello');
+    });
+
+    test.ok(p instanceof Promise);
+    p.then(function (value) {
+      test.equal(value, 'hello');
+      test.done();
+    });
+  }
 });

@@ -1,10 +1,10 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var fate = require('../dist/Fate');
-var evaluate = fate.evaluate;
-var helpers = require('./helpers');
-var evaluateEmit = helpers.evaluateEmit;
+const nodeunit = require('nodeunit');
+const fate = require('../dist/Fate');
+const evaluate = fate.evaluate;
+const helpers = require('./helpers');
+const evaluateEmit = helpers.evaluateEmit;
 
 exports.loops = nodeunit.testCase({
   setUp: function (callback) {
@@ -22,31 +22,31 @@ exports.loops = nodeunit.testCase({
   },
 
   "Basic Loops": function (test) {
-    var script1 = 'for color in ["red", "green", "blue"]\n' +
+    let script1 = 'for color in ["red", "green", "blue"]\n' +
                   'where color != "red"\n' +
                   '  emit(color + " is a color")\n' +
                   'end';
 
-    var script2 = 'for color in []\n' +
+    let script2 = 'for color in []\n' +
                   '  emit(color + " is a color")\n' +
                   'else\n' +
                   '  emit("No Colors")\n' +
                   'end';
 
-    var script3 = 'for color in 97\n' +
+    let script3 = 'for color in 97\n' +
                   '  emit(color + " is a color")\n' +
                   'end';
 
-    var script4 = 'for name:value in {name:"Thom", age:42}\n' +
+    let script4 = 'for name:value in {name:"Thom", age:42}\n' +
                   '  emit({ name, value } | "%name=%value")\n' +
                   'end';
 
-    var script5 = 'for person in people, brother in person.brothers\n' +
+    let script5 = 'for person in people, brother in person.brothers\n' +
                   '  let name = person.name\n' +
                   '  emit({ name, brother } | "%name-%brother")\n' +
                   'end';
 
-    var script6 = 'for person in people\n' +
+    let script6 = 'for person in people\n' +
                   '  for brother in person.brothers\n' +
                   '    emit(person.name + "-" + brother)\n' +
                   '  else\n' +
@@ -54,7 +54,7 @@ exports.loops = nodeunit.testCase({
                   '  end\n' +
                   'end';
 
-    var script7 = 'for person in people\n' +
+    let script7 = 'for person in people\n' +
                   '  for brother in person.brothers\n' +
                   '    let name = person.name\n' +
                   '    emit({ name, brother } | "%name-%brother")\n' +
@@ -75,7 +75,7 @@ exports.loops = nodeunit.testCase({
   },
 
   "Shadowing Loops": function (test) {
-    var script5 = 'let name = "Bobby"\n' +
+    let script5 = 'let name = "Bobby"\n' +
                   'for person in people, brother in person.brothers\n' +
                   '  let name = person.name\n' +
                   '  emit({ name, brother } | "%name-%brother")\n' +
@@ -89,13 +89,13 @@ exports.loops = nodeunit.testCase({
   },
 
   "Generator Loops": function (test) {
-    var script1 = "from math import range\nfor i in range(1, 10)\nemit(i)\nend";
-    var script2 = "from math import range\nfor i in range(10, 2)\nemit(i)\nend";
-    var script3 = "from math import range\nfor i in range(5, -5)\nemit(i)\nend";
-    var script4 = "from math import range\nfor i in range(0, 0)\nemit(i)\nend";
-    var script5 = "from math import range\nfor i in range(0.5, 10.1)\nemit(i)\nend";
-    var script6 = "from math import range\n[for i in range(1,10) select i * 2]";
-    var script7 = "from math import range\n[for i in range(1,10) where i < 5]";
+    let script1 = "from math import range\nfor i in range(1, 10)\nemit(i)\nend";
+    let script2 = "from math import range\nfor i in range(10, 2)\nemit(i)\nend";
+    let script3 = "from math import range\nfor i in range(5, -5)\nemit(i)\nend";
+    let script4 = "from math import range\nfor i in range(0, 0)\nemit(i)\nend";
+    let script5 = "from math import range\nfor i in range(0.5, 10.1)\nemit(i)\nend";
+    let script6 = "from math import range\n[for i in range(1,10) select i * 2]";
+    let script7 = "from math import range\n[for i in range(1,10) where i < 5]";
 
     test.deepEqual(evaluateEmit(script1), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     test.deepEqual(evaluateEmit(script2), [10, 9, 8, 7, 6, 5, 4, 3, 2]);
@@ -114,13 +114,13 @@ exports.loops = nodeunit.testCase({
       yield "blue";
     }
 
-    var script1 = '[for idx:brother in people[2].brothers ' +
+    let script1 = '[for idx:brother in people[2].brothers ' +
                   'select brother + ":" + idx]';
 
-    var script2 = '[for idx:color in colors() select color + ":" + idx]';
+    let script2 = '[for idx:color in colors() select color + ":" + idx]';
 
-    var script3 = '[for color in 97]';
-    var script4 = '{for x:y in 100}';
+    let script3 = '[for color in 97]';
+    let script4 = '{for x:y in 100}';
 
     test.deepEqual(evaluate(script1, this.data), ['Curly:0', 'Shemp:1']);
     test.deepEqual(evaluate(script2, {colors}), ['red:0', 'green:1', 'blue:2']);

@@ -1,10 +1,10 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var fate = require('../dist/Fate');
-var helpers = require('./helpers');
-var evaluate = fate.evaluate;
-var evaluateEmit = helpers.evaluateEmit;
+const nodeunit = require('nodeunit');
+const fate = require('../dist/Fate');
+const helpers = require('./helpers');
+const evaluate = fate.evaluate;
+const evaluateEmit = helpers.evaluateEmit;
 
 exports.scope = nodeunit.testCase({
   setUp: function (callback) {
@@ -14,14 +14,14 @@ exports.scope = nodeunit.testCase({
   },
 
   "Shadow Local Scope": function (test) {
-    var script1 = "let greeting = 'Not Hello'\n" +
+    let script1 = "let greeting = 'Not Hello'\n" +
                   "def localGreeting()\n" +
                   "  let greeting = 'Local Hello'\n" +
                   "  return greeting\n" +
                   "end\n" +
                   "localGreeting() + ' ' + greeting";
 
-    var script2 = "let greeting = 'Not Hello'\n" +
+    let script2 = "let greeting = 'Not Hello'\n" +
                   "def localGreeting()\n" +
                   "  let greeting = 'Local Hello'\n" +
                   "  def evenMoreLocalGreeting()\n" +
@@ -40,7 +40,7 @@ exports.scope = nodeunit.testCase({
   },
 
   "Inherit Local Scope": function (test) {
-    var script1 = "let greeting = 'Outer Hello'\n" +
+    let script1 = "let greeting = 'Outer Hello'\n" +
                   "def localGreeting()\n" +
                   "  emit(greeting)\n" +
                   "  let greeting = 'Inner Hello'\n" +
@@ -60,7 +60,7 @@ exports.scope = nodeunit.testCase({
   },
 
   "Scope Override": function (test) {
-    var script = "let b = a\n" +
+    let script = "let b = a\n" +
                  "let a = 'child'\n" +
                  "b + ' ' + a";
 
@@ -69,7 +69,7 @@ exports.scope = nodeunit.testCase({
   },
 
   "Conditional Scope": function (test) {
-    var script = "let c = a\n" +
+    let script = "let c = a\n" +
                  "if b\n" +
                  "  let a = 'child'\n" +
                  "  let d = a\n" +

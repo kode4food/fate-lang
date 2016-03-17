@@ -1,8 +1,8 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var fate = require('../dist/Fate');
-var evaluate = fate.evaluate;
+const nodeunit = require('nodeunit');
+const fate = require('../dist/Fate');
+const evaluate = fate.evaluate;
 
 exports.basics = nodeunit.testCase({
   setUp: function (callback) {
@@ -52,7 +52,7 @@ exports.basics = nodeunit.testCase({
   },
 
   "In Evaluation": function (test) {
-    var data = {
+    let data = {
       numbers: [1,10,30],
       names: ['bill', 'ted'],
       person: {age:43, name:'Thom'},
@@ -72,7 +72,7 @@ exports.basics = nodeunit.testCase({
   },
 
   "Not In Evaluation": function (test) {
-    var data = {
+    let data = {
       numbers: [1,10,30],
       names: ['bill', 'ted'],
       person: {age:43, name:'Thom'}
@@ -117,7 +117,7 @@ exports.basics = nodeunit.testCase({
   },
 
   "'Nothing' Evaluation": function (test ) {
-    var importNothing = "from pattern import Nothing\n";
+    let importNothing = "from pattern import Nothing\n";
 
     test.equal(evaluate(importNothing + "true = Nothing"), false);
     test.equal(evaluate(importNothing + "Nothing != Nothing"), false);
@@ -129,7 +129,7 @@ exports.basics = nodeunit.testCase({
   },
 
   "Conditional Evaluation": function (test) {
-    var script = "'cond1' if cond1 else " +
+    let script = "'cond1' if cond1 else " +
                  "'cond2' if cond2 else " +
                  "'cond4' unless cond3 else 'cond3'";
 
@@ -141,7 +141,7 @@ exports.basics = nodeunit.testCase({
   },
 
   "Object Like": function (test) {
-    var data = {
+    let data = {
       person: {
         name: "Thom",
         age: 42,
@@ -149,7 +149,7 @@ exports.basics = nodeunit.testCase({
       }
     };
 
-    var script1 = 'if person like {name: "Thom", age: 42}\n' +
+    let script1 = 'if person like {name: "Thom", age: 42}\n' +
                   '  true\n' +
                   'end';
 
@@ -158,10 +158,10 @@ exports.basics = nodeunit.testCase({
   },
 
   "Array Like": function (test) {
-    var script1 = '[1, 2, 3] like [1, 2]';
-    var script2 = '[1, 2, 3] like [1, 2, 3]';
-    var script3 = '[1, 2] like [1, 2, 3]';
-    var script4 = '[] like []';
+    let script1 = '[1, 2, 3] like [1, 2]';
+    let script2 = '[1, 2, 3] like [1, 2, 3]';
+    let script3 = '[1, 2] like [1, 2, 3]';
+    let script4 = '[] like []';
 
     test.equal(evaluate(script1), true);
     test.equal(evaluate(script2), true);
@@ -171,7 +171,7 @@ exports.basics = nodeunit.testCase({
   },
 
   "Deep Paths": function (test) {
-    var data = {
+    let data = {
       root: [{
         colors: ['red', 'green', 'blue'],
         info: {
@@ -198,7 +198,7 @@ exports.basics = nodeunit.testCase({
   },
 
   "Context": function (test) {
-    var person = { name: 'thom', age: 43, colors: ['red', 'green', 'blue'] };
+    let person = { name: 'thom', age: 43, colors: ['red', 'green', 'blue'] };
     test.equal(evaluate("name", person), 'thom');
     test.deepEqual(evaluate("colors", person), person.colors);
     test.equal(evaluate("age", person), 43);
