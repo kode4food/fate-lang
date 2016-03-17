@@ -1,9 +1,9 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var types = require('../dist/Types');
-var runtime = require('../dist/Runtime');
-var support = require('../dist/resolvers/system/support');
+const nodeunit = require('nodeunit');
+const types = require('../dist/Types');
+const runtime = require('../dist/Runtime');
+const support = require('../dist/resolvers/system/support');
 
 exports.api = nodeunit.testCase({
 

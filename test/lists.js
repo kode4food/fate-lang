@@ -1,11 +1,11 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var evaluate = require('../dist/Fate').evaluate;
+const nodeunit = require('nodeunit');
+const evaluate = require('../dist/Fate').evaluate;
 
 exports.lists = nodeunit.testCase({
   "List comprehensions": function (test) {
-    var data = {
+    let data = {
       yl: [10, 20, 30, 50, 51, 75, 90, 100],
       xl: [
         { val: 5, friend: 51 },
@@ -20,14 +20,14 @@ exports.lists = nodeunit.testCase({
       }
     };
 
-    var script1 = "[for y in yl select y * 2]";
-    var script2 = "[for y in yl where y > 50 select y * 2]";
-    var script3 = "[for y in yl, x in xl where x.friend = y select x.val * y]";
-    var script4 = "{for y in yl where y > 50 select y * 2: y * 4}[102]";
-    var script5 = "{for y in yl select (y): y * 2}[51]";
-    var script6 = "{for y in yl select val: y}['val']";
-    var script7 = "[for y in yl where y > 50]";
-    var script8 = "{for name:value in zl where name >= 20}";
+    let script1 = "[for y in yl select y * 2]";
+    let script2 = "[for y in yl where y > 50 select y * 2]";
+    let script3 = "[for y in yl, x in xl where x.friend = y select x.val * y]";
+    let script4 = "{for y in yl where y > 50 select y * 2: y * 4}[102]";
+    let script5 = "{for y in yl select (y): y * 2}[51]";
+    let script6 = "{for y in yl select val: y}['val']";
+    let script7 = "[for y in yl where y > 50]";
+    let script8 = "{for name:value in zl where name >= 20}";
 
     test.deepEqual(evaluate(script1, data), [20,40,60,100,102,150,180,200]);
     test.deepEqual(evaluate(script2, data), [102,150,180,200]);
@@ -37,7 +37,7 @@ exports.lists = nodeunit.testCase({
     test.equal(evaluate(script6, data), 100);
     test.deepEqual(evaluate(script7, data), [51,75,90,100]);
 
-    var result = evaluate(script8, data);
+    let result = evaluate(script8, data);
     test.deepEqual(result, {
       "20": "that was twenty",
       "30": "that was thirty"
@@ -61,7 +61,7 @@ exports.lists = nodeunit.testCase({
   },
 
   "Object Construction": function (test) {
-    var data = {
+    let data = {
       name: 'hello',
       value: 9
     };
@@ -79,7 +79,7 @@ exports.lists = nodeunit.testCase({
   },
 
   "Nested lists": function (test) {
-    var base = "{" +
+    let base = "{" +
                "  name   : 'World'," +
                "  title  : 'Famous People', " +
                "  people : [" +

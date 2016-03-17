@@ -1,19 +1,19 @@
 "use strict";
 
-var fs = require('fs');
-var path = require('path');
-var glob = require('glob');
+const fs = require('fs');
+const path = require('path');
+const glob = require('glob');
 
-var evaluate = require('../dist/Fate').evaluate;
-var mixin = require('../dist/Util').mixin;
+const evaluate = require('../dist/Fate').evaluate;
+const mixin = require('../dist/Util').mixin;
 
 /**
  * Creates a mock console, primarily for intercepting the results of the
  * Fate command-line tool
  */
 function createConsole() {
-  var buffer = [];
-  var str;
+  let buffer = [];
+  let str;
 
   return {
     log: append,
@@ -42,7 +42,7 @@ function createConsole() {
 }
 
 function evaluateEmit(script, data) {
-  var result = [];
+  let result = [];
   evaluate(script, mixin({ emit: emit }, data));
   return result;
 
@@ -52,11 +52,11 @@ function evaluateEmit(script, data) {
 }
 
 function monkeyPatchRequires(root, remappedPaths) {
-  var files = glob.sync('**/*.fate.js', { cwd: root });
+  let files = glob.sync('**/*.fate.js', { cwd: root });
   files.forEach(function (file) {
     // Rewrite the file to point to the local Fate instance
-    var filePath = path.join(root, file);
-    var content = fs.readFileSync(filePath).toString();
+    let filePath = path.join(root, file);
+    let content = fs.readFileSync(filePath).toString();
     Object.keys(remappedPaths).forEach(function (originalPackage) {
       content = content.replace(
         "require('" + originalPackage + "')",

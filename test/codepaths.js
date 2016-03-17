@@ -1,8 +1,8 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var fate = require('../dist/Fate');
-var evaluate = fate.evaluate;
+const nodeunit = require('nodeunit');
+const fate = require('../dist/Fate');
+const evaluate = fate.evaluate;
 
 exports.codepaths = nodeunit.testCase({
   setUp: function (callback) {
@@ -129,10 +129,10 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "'if' with literals": function (test) {
-    var script1 = "if true\n'was true'\nelse\n'was false'\nend";
-    var script2 = "if false\n'was true'\nelse\n'was false'\nend";
-    var script3 = "if true\n'was true'\nend";
-    var script4 = "if false\n'was true'\nend";
+    let script1 = "if true\n'was true'\nelse\n'was false'\nend";
+    let script2 = "if false\n'was true'\nelse\n'was false'\nend";
+    let script3 = "if true\n'was true'\nend";
+    let script4 = "if false\n'was true'\nend";
 
     test.equal(evaluate(script1), 'was true');
     test.equal(evaluate(script2), 'was false');
@@ -203,22 +203,22 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "Rewrite": function (test) {
-    var script1 = "let a = 'hello'\n" +
+    let script1 = "let a = 'hello'\n" +
                   "let b = 'goodbye'\n" +
                   "a + b";
 
-    var script2 = "let a = 5\n" +
+    let script2 = "let a = 5\n" +
                   "if not (a like 10)\n" +
                   "  'hello!'\n" +
                   "end";
 
-    var script3 = "if not (a like 10) and not (b like 8)\n" +
+    let script3 = "if not (a like 10) and not (b like 8)\n" +
                   "  'yes'\n" +
                   "else\n" +
                   "  'no'\n" +
                   "end";
 
-    var script4 = "if not (a like 10) or not (b like 8)\n" +
+    let script4 = "if not (a like 10) or not (b like 8)\n" +
                   "  'yes'\n" +
                   "else\n" +
                   "  'no'\n" +
@@ -235,8 +235,8 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "Formatting": function (test) {
-    var script1 = "'World' | 'Hello, %0!'";
-    var script2 = "'World' | 'Hello, %!'";
+    let script1 = "'World' | 'Hello, %0!'";
+    let script2 = "'World' | 'Hello, %!'";
 
     test.equal(evaluate(script1), "Hello, World!");
     test.equal(evaluate(script2), "Hello, World!");
@@ -245,7 +245,7 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "Keywords": function (test) {
-    var script = "{self: 'isSelf', for: 'isFor', where: 'isWhere'}";
+    let script = "{self: 'isSelf', for: 'isFor', where: 'isWhere'}";
 
     test.equal(evaluate(script + ".self"), "isSelf");
     test.equal(evaluate(script + ".for"), "isFor");

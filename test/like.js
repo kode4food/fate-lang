@@ -1,12 +1,12 @@
 "use strict";
 
-var nodeunit = require('nodeunit');
-var fate = require('../dist/Fate');
-var evaluate = fate.evaluate;
+const nodeunit = require('nodeunit');
+const fate = require('../dist/Fate');
+const evaluate = fate.evaluate;
 
 exports.like = nodeunit.testCase({
   "Guard Patterns": function (test) {
-    var script1 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
+    let script1 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
                   "def func(person)\n" +
                   "  'normal person: ' + person.name\n" +
                   "end\n" +
@@ -20,16 +20,16 @@ exports.like = nodeunit.testCase({
   },
 
   "Object Patterns": function (test) {
-    var script1 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
+    let script1 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
                   "{ name: 'Bill', age: 27 } like p";
 
-    var script2 = "let p = ~[self, { name: 'Thom', age: self > 20 }, 99]\n" +
+    let script2 = "let p = ~[self, { name: 'Thom', age: self > 20 }, 99]\n" +
                   "['crap', { name: 'Thom', age: 30 }, 99] like p";
 
-    var script3 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
+    let script3 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
                   "{ name: 'Thom', age: 27 } like p";
 
-    var script4 = "let p = ~{name: 'Thom', address: ~{ city: 'Boston' }}\n" +
+    let script4 = "let p = ~{name: 'Thom', address: ~{ city: 'Boston' }}\n" +
                   "{name: 'Thom', address: { street: '123 Main', city: 'Boston' }} like p";
 
     test.equal(evaluate(script1), true);
@@ -40,22 +40,22 @@ exports.like = nodeunit.testCase({
   },
 
   "Array Patterns": function (test) {
-    var script1 = "let p = ~(self > 50 and self < 100)\n" +
+    let script1 = "let p = ~(self > 50 and self < 100)\n" +
                   "p(75)";
 
-    var script2 = "let p = ~(self > 50 and self < 100)\n" +
+    let script2 = "let p = ~(self > 50 and self < 100)\n" +
                   "75 like p";
 
-    var script3 = "let p = ~[12, self, 99]\n" +
+    let script3 = "let p = ~[12, self, 99]\n" +
                   "[12, 88, 99] like p";
 
-    var script4 = "let p = ~([12, self, 99] and self[1]=88)\n" +
+    let script4 = "let p = ~([12, self, 99] and self[1]=88)\n" +
                   "[12, 88, 99] like p";
 
-    var script5 = "let p = ~[12, [1, self, 3]]\n" +
+    let script5 = "let p = ~[12, [1, self, 3]]\n" +
                   "[12, [1, 5, 3], 24] like p";
 
-    var script6 = "'hello' like ~(self)";
+    let script6 = "'hello' like ~(self)";
 
     test.equal(evaluate(script1), true);
     test.equal(evaluate(script2), true);
@@ -67,7 +67,7 @@ exports.like = nodeunit.testCase({
   },
 
   "Invalid 'self' Patterns": function (test) {
-    var script1 = "{ self: 'hello', age: 90 } | ~{ self: 'hello' }";
+    let script1 = "{ self: 'hello', age: 90 } | ~{ self: 'hello' }";
 
     test.throws(function () {
       evaluate("self > 99");
@@ -88,33 +88,33 @@ exports.like = nodeunit.testCase({
   },
 
   "Like Matching": function (test) {
-    var person1 = {
+    let person1 = {
       "name": "Thom",
       "age": 42,
       "job": "Developer",
       "colors": ["red", "green", "blue"]
     };
 
-    var person2 = {
+    let person2 = {
       "name": "Thom",
       "age": 42,
       "colors": ["red", "green", "blue"]
     };
 
-    var person3 = {
+    let person3 = {
       "name": "Thom",
       "age": 42,
       "colors": ["red", "green", "yellow"]
     };
 
-    var person4 = {
+    let person4 = {
       "name": "Thom",
       "colors": ["red", "blue"]
     };
 
-    var array = ["red", "green", "blue"];
+    let array = ["red", "green", "blue"];
 
-    var data = {
+    let data = {
       person1: person1,
       person2: person2,
       person3: person3,
@@ -123,32 +123,32 @@ exports.like = nodeunit.testCase({
       null_value: null
     };
 
-    var script1 = 'if person1 like person2\n' +
+    let script1 = 'if person1 like person2\n' +
                   '  "They match!"\n' +
                   'end';
 
-    var script2 = 'unless person1 like person3\n' +
+    let script2 = 'unless person1 like person3\n' +
                   '  "They don\'t match!"\n' +
                   'end';
 
-    var script3 = 'unless person1 like person4\n' +
+    let script3 = 'unless person1 like person4\n' +
                   '  "They don\'t match!"\n' +
                   'end';
 
-    var script4 = 'if array like ["red", "green", "blue"]\n' +
+    let script4 = 'if array like ["red", "green", "blue"]\n' +
                   '  "They match!"\n' +
                   'else\n' +
                   '  "They don\'t match!"\n' +
                   'end';
 
-    var script5 = 'unless person1 like {name: "Thom", age: 56}\n' +
+    let script5 = 'unless person1 like {name: "Thom", age: 56}\n' +
                   '  "They don\'t match!"\n' +
                   'end';
 
-    var script6 = "import pattern\n" +
+    let script6 = "import pattern\n" +
                   "pattern.Nothing like null_value";
 
-    var script7 = "import pattern\n" +
+    let script7 = "import pattern\n" +
                   "null_value like pattern.Nothing";
 
     test.equal(evaluate(script1, data), "They match!");
