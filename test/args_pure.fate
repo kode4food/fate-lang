@@ -1,0 +1,18 @@
+import nodeunit
+
+from test import equalTo, deepEqualTo
+
+def zeroOrMore(test)
+  def func(x, y, z*)
+    x | equalTo('hello')
+    y | equalTo('world')
+    z | deepEqualTo(['this', 'is', 'a', 'test'])
+    test.done()
+  end
+
+  func('hello', 'world', 'this', 'is', 'a', 'test')
+end
+
+export let tests = nodeunit.testCase({
+  "Zero Or More": zeroOrMore
+})

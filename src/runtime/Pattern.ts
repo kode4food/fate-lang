@@ -40,7 +40,7 @@ export let isSomething: Pattern = definePattern(function (value: any) {
   return value !== null && value !== undefined && value !== isNothing;
 });
 
-/**
+/*
  * Basic dynamic matcher to support the `like` operator.
  */
 export function isMatch(template: any, obj: any) {
@@ -85,7 +85,7 @@ export function isMatch(template: any, obj: any) {
   return true;
 }
 
-/**
+/*
  * Compiled matcher, for when the template has been defined as a literal.
  */
 export function buildMatcher(template: any) {

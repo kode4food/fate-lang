@@ -82,6 +82,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function validateFunctionArgs(node: FunctionOrLambda) {
     checkParamsForDuplication(node, [node.signature]);
+    checkParamCardinality(node.signature);
     return node;
   }
 
@@ -107,6 +108,31 @@ export default function createTreeProcessors(visit: Visitor) {
         duplicatedItems.join(', ')
       );
     }
+  }
+
+  function checkParamCardinality(node: Syntax.Signature) {
+    // the rules, for now: required* -> zeroToMany?
+    let state = 0;
+    node.params.forEach(function (parameter) {
+      switch ( parameter.cardinality ) {
+        case Syntax.Cardinality.Required:
+          if ( state !== 0 ) {
+            visit.issueError(parameter, "Yeah, you can't do that");
+          }
+          break;
+
+        case Syntax.Cardinality.ZeroToMany:
+          if ( state !== 0 ) {
+            visit.issueError(parameter, "You can't do that either");
+          }
+          state = 1;
+          break;
+
+        default:
+          console.log(parameter);
+          throw new Error("Stupid Coder: Bad Cardinality Value");
+      }
+    });
   }
 
   function annotateSelfFunctions(node: Syntax.Self) {

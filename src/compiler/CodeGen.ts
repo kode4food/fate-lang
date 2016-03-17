@@ -18,7 +18,7 @@ const waiterMap: FunctionNameMap = {
   'all': 'awaitAll'
 };
 
-/**
+/*
  * Converts a parse tree into source code (initially JavaScript). Host
  * Language-specific constructs are avoided here and instead produced
  * by JavaScript code generation module.
@@ -120,9 +120,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     };
   }
 
-  /**
-    * Called recursively, this is the busiest function in the code generator
-    */
+  /*
+   * Called recursively, this is the busiest function in the code generator
+   */
   function createEvaluator(node: Syntax.Node) {
     /* istanbul ignore if: untestable */
     if ( !(node instanceof Syntax.Node) ) {

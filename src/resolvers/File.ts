@@ -11,9 +11,9 @@ interface Options {
 const explicitPathRegex = /(\.fate)(\.js)?$/;
 const pathSuffixes = ['.fate.js', '.fate', '/index.fate.js', '/index.fate'];
 
-/**
-  * Creates a new FileResolver.
-  */
+/*
+ * Creates a new FileResolver.
+ */
 export function createFileResolver(options: Options) {
   let cache: { [index: string]: Module } = {};
   let defaultBasePath: DirPath = options.path || process.cwd();
