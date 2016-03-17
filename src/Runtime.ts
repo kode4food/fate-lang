@@ -11,6 +11,6 @@ export * from './runtime/Import';
 export * from './runtime/Loop';
 export * from './runtime/Pattern';
 
-export function sliceArray(array: any[], startAt = 0) {
+export function sliceArray(array: any[], startAt: number) {
   return slice.call(array, startAt);
 }

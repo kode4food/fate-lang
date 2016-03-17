@@ -117,17 +117,22 @@ export default function createTreeProcessors(visit: Visitor) {
       switch ( parameter.cardinality ) {
         case Syntax.Cardinality.Required:
           if ( state !== 0 ) {
-            visit.issueError(parameter, "Yeah, you can't do that");
+            visit.issueError(parameter,
+              "A required argument can't follow a wildcard argument"
+            );
           }
           break;
 
         case Syntax.Cardinality.ZeroToMany:
           if ( state !== 0 ) {
-            visit.issueError(parameter, "You can't do that either");
+            visit.issueError(parameter,
+              "A wildcard argument can't follow a wildcard argument"
+            );
           }
           state = 1;
           break;
 
+        /* istanbul ignore next */
         default:
           console.log(parameter);
           throw new Error("Stupid Coder: Bad Cardinality Value");
