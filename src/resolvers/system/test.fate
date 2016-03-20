@@ -15,5 +15,4 @@ let equalTo = value -> x -> equal(value, x)
   , isTrue = equalTo(true)
   , isOk = ok
 
-export let throws = throws(?)
 export throws, doesNotThrow

@@ -1,6 +1,7 @@
 import nodeunit
 
-from test import equalTo, deepEqualTo
+from test import equalTo, deepEqualTo, throws
+from pattern import ArrayOf, NonEmptyString
 
 def zeroOrMore(test)
   def func(x, y, z*)
@@ -13,6 +14,18 @@ def zeroOrMore(test)
   func('hello', 'world', 'this', 'is', 'a', 'test')
 end
 
+def withPattern(test)
+  def func(x, ArrayOf(NonEmptyString) as y*)
+    x | equalTo('hello')
+    y | deepEqualTo(['this', 'is', 'a', 'test'])
+    test.done()
+  end
+
+  (-> func('hello', 'this', '', 'a', 'test')) | throws
+  func('hello', 'this', 'is', 'a', 'test')
+end
+
 export let tests = nodeunit.testCase({
-  "Zero Or More": zeroOrMore
+  "Zero Or More": zeroOrMore,
+  "With Pattern": withPattern
 })
