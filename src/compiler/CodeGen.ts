@@ -251,11 +251,11 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         contextArgs: paramNames,
         body: createBody
       });
-    }
 
-    function createBody() {
-      generateParamProcessor(params);
-      createStatementsEvaluator(node.statements);
+      function createBody() {
+        generateParamProcessor(params);
+        createStatementsEvaluator(node.statements);
+      }
     }
 
     function createGuarded() {
@@ -265,11 +265,11 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       generate.funcDeclaration(functionName.value, {
         internalId: getFuncOrLambdaInternalId(node),
         contextArgs: paramNames,
-        prolog: createProlog,
         body: createBody
       });
 
-      function createProlog() {
+      function createBody() {
+        generateParamProcessor(params);
         generate.ifStatement(
           defer(signature.guard),
           null,  // this is an 'else' case
@@ -279,6 +279,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
             });
           }
         );
+        createStatementsEvaluator(node.statements);
       }
     }
   }
@@ -292,12 +293,14 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       generate.func({
         internalId: getFuncOrLambdaInternalId(node),
         contextArgs: paramNames,
-        body: function () {
-          generateParamProcessor(params);
-          createStatementsEvaluator(node.statements);
-        }
+        body: createBody
       });
     });
+
+    function createBody() {
+      generateParamProcessor(params);
+      createStatementsEvaluator(node.statements);
+    }
   }
 
   function getFixedParamNames(params: Syntax.Parameters) {
@@ -664,11 +667,11 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       let range = ranges[i];
       let valueId = range.valueId.value;
       let nameId = range.nameId ? range.nameId.value : null;
-      let prolog: Function;
+      let guardFunc: Function;
 
       if ( range.guard ) {
         // we have a guard
-        prolog = function () {
+        guardFunc = function () {
           generate.ifStatement(
             defer(range.guard),
             null,
@@ -691,7 +694,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
           value: valueId,
           name: nameId,
           collection: defer(range.collection),
-          guard: prolog,
+          guard: guardFunc,
           body: function () {
             processRange(i + 1);
           }

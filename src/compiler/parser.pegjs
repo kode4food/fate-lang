@@ -129,15 +129,14 @@ paramList
 
 paramDef
   = pattern:patternExpr
-    alias:( AS_SEP id:Identifier { return id; } )
-    cardinality:paramCardinality?  {
-      return node('patternParam', alias, pattern, cardinality);
+    alias:( AS_SEP id:Identifier { return id; } )  {
+      return node('patternParam', alias, pattern);
     }
   / id:Identifier cardinality:paramCardinality?  {
       return node('idParam', id, cardinality);
     }
-  / pattern:patternExpr cardinality:paramCardinality?  {
-      return node('patternParam', null, pattern, cardinality);
+  / pattern:patternExpr  {
+      return node('patternParam', null, pattern, null);
     }
 
 paramCardinality

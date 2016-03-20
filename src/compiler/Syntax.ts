@@ -338,35 +338,12 @@ export class Range extends Node {
 }
 
 export class Signature extends Node {
-  public params: Parameters = [];
-
-  constructor(public id: Identifier, paramDefs: Parameters,
+  constructor(public id: Identifier,
+              public params: Parameters,
               public guard: Expression) {
     super();
-    let guards: Expressions = [];
-
-    // Generate Guards from the Parameters
-    (paramDefs || []).forEach((paramDef, idx) => {
-      if ( !(paramDef instanceof PatternParameter) ) {
-        this.params.push(paramDef);
-        return;
-      }
-
-      let ident = paramDef.id || <Identifier>node('id', idx);
-      this.params.push(node('idParam', ident, paramDef.cardinality));
-      guards.push(node('like', ident, (<PatternParameter>paramDef).pattern));
-    });
-
-    // Combine the Guards
-    if ( guards.length ) {
-      if ( this.guard ) {
-        // Push it to the end of the list
-        guards.push(this.guard);
-      }
-      this.guard = guards.shift();
-      guards.forEach((g) => {
-        this.guard = node('and', this.guard, g);
-      });
+    if ( !params ) {
+      this.params = [];
     }
   }
 }

@@ -54,7 +54,6 @@ interface FunctionOptions {
   internalArgs?: Name[];
   contextArgs?: Name[];
   generator?: boolean;
-  prolog?: BodyEntry;
   body: BodyEntry;
 }
 
@@ -586,7 +585,6 @@ export function createModule(globals: Globals) {
     let internalArgs = options.internalArgs || [];
     let contextArgs = options.contextArgs || [];
     let isGenerator = options.generator;
-    let funcProlog = options.prolog;
     let funcBody = options.body;
 
     let parentNames = names;
@@ -596,10 +594,6 @@ export function createModule(globals: Globals) {
 
     let bodyContent = code(function () {
       generate(funcBody);
-    });
-
-    let prologContent = code(function () {
-      generate(funcProlog);
     });
 
     let argNames = internalArgs.concat(localNames);
@@ -616,9 +610,8 @@ export function createModule(globals: Globals) {
     }
 
     writeLocalVariables(parentNames, argNames);
-    write(prologContent);
-
     write(bodyContent);
+
     if ( usesScratch ) {
       write('return _;');
     }

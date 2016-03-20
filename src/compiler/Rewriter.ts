@@ -74,6 +74,8 @@ export default function createTreeProcessors(visit: Visitor) {
   let collection = visit.tags(['object', 'array']);
 
   return [
+    visit.matching(buildPatternGuards, visit.tags('signature')),
+
     visit.matching(foldShortCircuits, foldableShortCircuit),
     visit.matching(foldUnaryConstants, foldableUnaryConstant),
     visit.matching(foldBinaryConstants, foldableBinaryConstant),
@@ -89,6 +91,34 @@ export default function createTreeProcessors(visit: Visitor) {
 
     visit.statementGroups(splitExportStatements, visit.tags('export'), 1)
   ];
+
+  function buildPatternGuards(node: Syntax.Signature) {
+    let newGuards: Syntax.Expressions = [];
+
+    // Generate Guards from the Parameters
+    let params = node.params;
+    params.forEach((param, idx) => {
+      if ( param instanceof Syntax.PatternParameter ) {
+        let ident = param.id || param.template('id', idx);
+        params[idx] = ident.template('idParam', ident, param.cardinality);
+        newGuards.push(ident.template('like', ident, param.pattern));
+      }
+    });
+
+    // Combine the Guards
+    if ( newGuards.length ) {
+      if ( node.guard ) {
+        // Push it to the end of the list
+        newGuards.push(node.guard);
+      }
+      node.guard = newGuards.shift();
+      newGuards.forEach((newGuard) => {
+        node.guard = node.guard.template('and', node.guard, newGuard);
+      });
+    }
+
+    return node;
+  }
 
   // or, and, conditional Folding
   function foldShortCircuits(node: Syntax.Node) {
