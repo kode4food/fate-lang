@@ -7,7 +7,7 @@ from pattern import Array, Number, ArrayOf
 export from '../../generator' import createRangeGenerator as range
 
 let numberSort = (left, right -> left - right)
-let NumberArray = ArrayOf(Number)
+let NumberArray = ArrayOf(Number).MinLength(1)
 
 export def sum(NumberArray as values)
   reduce result = 0

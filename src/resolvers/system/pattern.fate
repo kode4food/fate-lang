@@ -7,7 +7,7 @@ export from '../../runtime/Pattern'
 import isNothing as Nothing
      , isSomething as Something
 
-from './support' import isA
+from './support' import isA, setProperty
 
 # Warning: this module assumes JavaScript-specific methods
 
@@ -39,14 +39,29 @@ let Array = definePattern(isArray)
   , EmptyArray = ~(isArray(self) and self.length = 0)
 
 export def ArrayOf(elementPattern)
-  return Array unless isPattern(elementPattern)
-
-  definePattern(value ->
-    return false unless isArray(value) and value.length > 0
-
+  let checker = definePattern(value ->
+    return false unless isArray(value)
     [
       for item in value
       where not elementPattern(item)
     ].length = 0
   )
+
+  def decorate(pattern)
+    # should become 'export' calls
+    setProperty(pattern, 'MinLength', minLength -> (value ->
+      return false unless isArray(value) and value.length >= minLength
+      pattern(value)
+    ) | definePattern | decorate)
+
+    setProperty(pattern, 'MaxLength', maxLength -> (value ->
+      return false unless isArray(value) and value.length <= maxLength
+      pattern(value)
+    ) | definePattern | decorate)
+
+    pattern
+  end
+
+  return decorate(Array) unless isPattern(elementPattern)
+  decorate(checker)
 end

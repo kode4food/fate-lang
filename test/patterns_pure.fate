@@ -1,92 +1,95 @@
 import nodeunit
 
-import pattern
+from pattern
+import Array, Object, String, NonEmptyString, EmptyString,
+       Boolean, Number, Integer, PositiveInteger, PositiveNumber,
+       NegativeInteger, NegativeNumber, ArrayOf
 
 from test import isFalse, isTrue
 
 let null = node.null, undefined = node.undefined
 
 def numberPatterns(test)
-  "hello" like pattern.Number         | isFalse
-  99.6 like pattern.Number            | isTrue
-  {} like pattern.Number              | isFalse
-  pattern.Nothing like pattern.Number | isFalse
+  "hello" like Number         | isFalse
+  99.6 like Number            | isTrue
+  {} like Number              | isFalse
+  Nothing like Number         | isFalse
 
-  99.6 like pattern.Integer           | isFalse
-  99 like pattern.Integer             | isTrue
+  99.6 like Integer           | isFalse
+  99 like Integer             | isTrue
 
-  -99 like pattern.PositiveInteger    | isFalse
-  99.6 like pattern.PositiveInteger   | isFalse
-  0 like pattern.PositiveInteger      | isFalse
-  -99 like pattern.NegativeInteger    | isTrue
-  -99.6 like pattern.NegativeInteger  | isFalse
-  0 like pattern.NegativeInteger      | isFalse
+  -99 like PositiveInteger    | isFalse
+  99.6 like PositiveInteger   | isFalse
+  0 like PositiveInteger      | isFalse
+  -99 like NegativeInteger    | isTrue
+  -99.6 like NegativeInteger  | isFalse
+  0 like NegativeInteger      | isFalse
 
-  99.6 like pattern.PositiveNumber    | isTrue
-  99 like pattern.PositiveNumber      | isTrue
-  -99 like pattern.PositiveNumber     | isFalse
-  0 like pattern.PositiveNumber       | isFalse
-  -99.6 like pattern.NegativeNumber   | isTrue
-  -99 like pattern.NegativeNumber     | isTrue
-  99 like pattern.NegativeNumber      | isFalse
-  0 like pattern.NegativeNumber       | isFalse
+  99.6 like PositiveNumber    | isTrue
+  99 like PositiveNumber      | isTrue
+  -99 like PositiveNumber     | isFalse
+  0 like PositiveNumber       | isFalse
+  -99.6 like NegativeNumber   | isTrue
+  -99 like NegativeNumber     | isTrue
+  99 like NegativeNumber      | isFalse
+  0 like NegativeNumber       | isFalse
 
 	test.done()
 end
 
 def stringPatterns(test)
-  "" like pattern.String              | isTrue
-  "hello" like pattern.String         | isTrue
-  "" like pattern.NonEmptyString      | isFalse
-  "" like pattern.EmptyString         | isTrue
-  "hello" like pattern.EmptyString    | isFalse
-  "hello" like pattern.NonEmptyString | isTrue
-  99 like pattern.String              | isFalse
-  {} like pattern.String              | isFalse
-  [] like pattern.EmptyString         | isFalse
-  null like pattern.String            | isFalse
+  "" like String              | isTrue
+  "hello" like String         | isTrue
+  "" like NonEmptyString      | isFalse
+  "" like EmptyString         | isTrue
+  "hello" like EmptyString    | isFalse
+  "hello" like NonEmptyString | isTrue
+  99 like String              | isFalse
+  {} like String              | isFalse
+  [] like EmptyString         | isFalse
+  null like String            | isFalse
 
   test.done()
 end
 
 def booleanPatterns(test)
-  true like pattern.Boolean    | isTrue
-  false like pattern.Boolean   | isTrue
-  "" like pattern.Boolean      | isFalse
-  "hello" like pattern.Boolean | isFalse
-  99 like pattern.Boolean      | isFalse
-  {} like pattern.Boolean      | isFalse
-  [] like pattern.Boolean      | isFalse
-  null like pattern.Boolean    | isFalse
+  true like Boolean    | isTrue
+  false like Boolean   | isTrue
+  "" like Boolean      | isFalse
+  "hello" like Boolean | isFalse
+  99 like Boolean      | isFalse
+  {} like Boolean      | isFalse
+  [] like Boolean      | isFalse
+  null like Boolean    | isFalse
 
   test.done()
 end
 
 def objectPatterns(test)
-  true like pattern.Object    | isFalse
-  false like pattern.Object   | isFalse
-  "" like pattern.Object      | isFalse
-  "hello" like pattern.Object | isFalse
-  99 like pattern.Object      | isFalse
-  {} like pattern.Object      | isTrue
-  [] like pattern.Object      | isFalse
-  null like pattern.Object    | isFalse
+  true like Object    | isFalse
+  false like Object   | isFalse
+  "" like Object      | isFalse
+  "hello" like Object | isFalse
+  99 like Object      | isFalse
+  {} like Object      | isTrue
+  [] like Object      | isFalse
+  null like Object    | isFalse
 
   test.done()
 end
 
 def arrayPatterns(test)
-  true like pattern.Array    | isFalse
-  false like pattern.Array   | isFalse
-  "" like pattern.Array      | isFalse
-  "hello" like pattern.Array | isFalse
-  99 like pattern.Array      | isFalse
-  {} like pattern.Array      | isFalse
-  [] like pattern.Array      | isTrue
-  null like pattern.Array    | isFalse
+  true like Array    | isFalse
+  false like Array   | isFalse
+  "" like Array      | isFalse
+  "hello" like Array | isFalse
+  99 like Array      | isFalse
+  {} like Array      | isFalse
+  [] like Array      | isTrue
+  null like Array    | isFalse
 
-  let IntegerArray = pattern.ArrayOf(pattern.Integer)
-  let BadArray = pattern.ArrayOf("hello")
+  let IntegerArray = ArrayOf(Integer).MinLength(1)
+  let BadArray = ArrayOf("hello")
 
   [1,2,3] like IntegerArray  | isTrue
   [1.2, 3] like IntegerArray | isFalse

@@ -11,7 +11,8 @@ export {
   string as String,
   number as Number,
   make,
-  isA
+  isA,
+  setProperty
 };
 
 function make(constructor: Function, ...args: any[]) {
@@ -21,4 +22,10 @@ function make(constructor: Function, ...args: any[]) {
 
 function isA(value: any, type: string): boolean {
   return typeof value === type;
+}
+
+type Target = { [index: string]: any };
+
+function setProperty(target: Target, key: string, value: any) {
+  target[key] = value;
 }
