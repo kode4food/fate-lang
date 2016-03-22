@@ -304,8 +304,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function getFixedParamNames(params: Syntax.Parameters) {
+    let isFixed = true;
     return params.filter(function (param: Syntax.Parameter) {
-      return param.cardinality === Syntax.Cardinality.Required;
+      isFixed = isFixed && param.cardinality === Syntax.Cardinality.Required;
+      return isFixed;
     }).map(function (param: Syntax.Parameter) {
       return param.id.value;
     });
