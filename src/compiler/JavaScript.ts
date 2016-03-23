@@ -84,78 +84,20 @@ function lastItem(arr: any[]) {
   return arr[arr.length - 1];
 }
 
-export class Globals {
-  private globals: { [index: string]: number } = {}; // name -> nextId
-  private generatedLiterals: { [index: string]: GlobalId } = {};
-  private generatedImports: { [index: string]: GlobalId } = {};
-  private generatedBuilders: { [index: string]: GlobalId } = {};
-  private globalVars: string[] = [];
+// various names
+const selfName = 's';
+const contextName = 'c';
+const exportsName = 'x';
 
-  public nextId(prefix: string) {
-    let next = this.globals[prefix];
-    if ( typeof next !== 'number' ) {
-      next = 0;  // seed it
-    }
-    let id = prefix + next.toString(36);
-    this.globals[prefix] = next + 1;
-    return id;
-  }
+export function createModule() {
+  let idCounters: { [index: string]: number } = {}; // prefix -> nextId
 
-  public literal(literalValue: any) {
-    let canonical: string;
-    if ( literalValue instanceof RegExp ) {
-      canonical = literalValue.toString();
-    }
-    else {
-      canonical = jsonStringify(literalValue);
-    }
-    let id = this.generatedLiterals[canonical];
-    if ( id ) {
-      return id;
-    }
-    id = this.generatedLiterals[canonical] = this.nextId('l');
+  let generatedLiterals: { [index: string]: GlobalId } = {};
+  let generatedImports: { [index: string]: GlobalId } = {};
+  let generatedBuilders: { [index: string]: GlobalId } = {};
+  let globalVars: string[] = [];
 
-    this.globalVars.push(`${id}=${canonical}`);
-    return id;
-  }
-
-  public runtimeImport(funcName: string) {
-    let id = this.generatedImports[funcName];
-    if ( id ) {
-      return id;
-    }
-    id = this.generatedImports[funcName] = this.nextId('r');
-    this.globalVars.push(
-      [id, "=r.", funcName].join('')
-    );
-    return id;
-  }
-
-  public builder(funcName: string, ...literalIds: Ids) {
-    let funcId = this.runtimeImport(funcName);
-    let key = `${funcId}/${literalIds.join('/')}`;
-    let id = this.generatedBuilders[key];
-    if ( id ) {
-      return id;
-    }
-    id = this.generatedBuilders[key] = this.nextId('b');
-    this.globalVars.push(
-      `${ id }=${ funcId }(${ literalIds.join(',') })`
-    );
-    return id;
-  }
-
-  public toString() {
-    if ( this.globalVars.length ) {
-      return `const ${ this.globalVars.join(',') };`;
-    }
-    return '';
-  }
-}
-
-export function createModule(globals: Globals) {
   // keeps track of name -> local mappings throughout the nesting
-  let locals: { [index: string]: number } = {}; // prefix -> nextId
   let names: NameIdsMap = {};  // name -> localId[]
   let scopeInfo = createScopeInfo();
   let nameStack: NameInfo[] = [];
@@ -164,29 +106,68 @@ export function createModule(globals: Globals) {
   let writerStack: BodyEntries[] = [];
   let body: BodyEntries = [];
 
-  // various names
-  let selfName = 's';
-  let contextName = 'c';
-  let exportsName = 'x';
-
   return {
-    registerAnonymous, createAnonymous, assignAnonymous,
-    retrieveAnonymous, assignResult, self, selfName, context,
-    contextName, member, write, writeAndGroup, getter, assignment,
-    assignments, exports, exportsName, unaryOperator, binaryOperator,
-    conditionalOperator, statement, ifStatement, loopExpression,
-    loopContinue, funcDeclaration, iife, scope, func, waitFor,
-    compoundExpression, returnStatement, call, array, arrayAppend,
-    object, objectAssign, parens, code, toString, args
+    literal, runtimeImport, builder, registerAnonymous, createAnonymous,
+    assignAnonymous, retrieveAnonymous, assignResult, self, selfName,
+    args, context, contextName, member, write, writeAndGroup, getter,
+    assignment, assignments, exports, exportsName, unaryOperator,
+    binaryOperator, conditionalOperator, statement, ifStatement,
+    loopExpression, loopContinue, funcDeclaration, iife, scope, func,
+    waitFor, compoundExpression, returnStatement, call, array,
+    arrayAppend, object, objectAssign, parens, code, toString
   };
 
   function nextId(prefix: string) {
-    let next = locals[prefix];
+    let next = idCounters[prefix];
     if ( typeof next !== 'number' ) {
       next = 0;  // seed it
     }
-    let id = prefix + next;
-    locals[prefix] = next + 1;
+    let id = prefix + next.toString(36);
+    idCounters[prefix] = next + 1;
+    return id;
+  }
+
+  function literal(literalValue: any) {
+    let canonical: string;
+    if ( literalValue instanceof RegExp ) {
+      canonical = literalValue.toString();
+    }
+    else {
+      canonical = jsonStringify(literalValue);
+    }
+    let id = generatedLiterals[canonical];
+    if ( id ) {
+      return id;
+    }
+    id = generatedLiterals[canonical] = nextId('l');
+
+    globalVars.push(`${id}=${canonical}`);
+    return id;
+  }
+
+  function runtimeImport(funcName: string) {
+    let id = generatedImports[funcName];
+    if ( id ) {
+      return id;
+    }
+    id = generatedImports[funcName] = nextId('r');
+    globalVars.push(
+      [id, "=r.", funcName].join('')
+    );
+    return id;
+  }
+
+  function builder(funcName: string, ...literalIds: Ids) {
+    let funcId = runtimeImport(funcName);
+    let key = `${funcId}/${literalIds.join('/')}`;
+    let id = generatedBuilders[key];
+    if ( id ) {
+      return id;
+    }
+    id = generatedBuilders[key] = nextId('b');
+    globalVars.push(
+      `${ id }=${ funcId }(${ literalIds.join(',') })`
+    );
     return id;
   }
 
@@ -258,7 +239,7 @@ export function createModule(globals: Globals) {
   }
 
   function args(startAt = 0) {
-    let slice = globals.runtimeImport('sliceArray');
+    let slice = runtimeImport('sliceArray');
     write(slice, '(arguments,', '' + startAt, ')');
   }
 
@@ -389,7 +370,7 @@ export function createModule(globals: Globals) {
       let alias = item[1];
 
       let localName = localForRead(name);
-      member(exportsName, globals.literal(alias));
+      member(exportsName, literal(alias));
       write('=', localName, ';');
     });
   }
@@ -405,7 +386,7 @@ export function createModule(globals: Globals) {
 
   function conditionalOperator(condition: BodyEntry, trueVal: BodyEntry,
                                 falseVal: BodyEntry) {
-    let isTrue = globals.runtimeImport('isTrue');
+    let isTrue = runtimeImport('isTrue');
     let condCode = code(condition);
     let trueCode = code(trueVal);
     let falseCode = code(falseVal);
@@ -425,7 +406,7 @@ export function createModule(globals: Globals) {
       elseBranch = undefined;
     }
 
-    let condWrapper = globals.runtimeImport(condWrapperName);
+    let condWrapper = runtimeImport(condWrapperName);
     let condCode = code(condition);
     let [thenCode, elseCode] = codeBranches(thenBranch, elseBranch);
 
@@ -508,7 +489,7 @@ export function createModule(globals: Globals) {
     let loopBody = options.body;
 
     let iteratorName = itemName ? 'createNamedIterator' : 'createIterator';
-    let iterator = globals.runtimeImport(iteratorName);
+    let iterator = runtimeImport(iteratorName);
     let iteratorContent = code(function () {
       write(iterator, '(', collection, ')');
     });
@@ -531,7 +512,7 @@ export function createModule(globals: Globals) {
     });
 
     if ( itemName ) {
-      let wrapper = globals.nextId('i');
+      let wrapper = nextId('i');
       write('for(let ', wrapper, ' of ', iteratorContent, '){');
       write('let ', argNames[0], '=', wrapper, '[0],');
       write(argNames[1], '=', wrapper, '[1];');
@@ -641,7 +622,7 @@ export function createModule(globals: Globals) {
 
       // pull the value from the global context
       write('let ', localNameId, '=');
-      member(context, globals.literal(name));
+      member(context, literal(name));
       write(';');
     });
 
@@ -655,7 +636,7 @@ export function createModule(globals: Globals) {
   }
 
   function waitFor(expression: BodyEntry, resolver: string) {
-    let resolverFunc = globals.runtimeImport(resolver);
+    let resolverFunc = runtimeImport(resolver);
     write('(yield [', resolverFunc, ',', expression, '])');
   }
 
@@ -714,7 +695,7 @@ export function createModule(globals: Globals) {
 
       expressions.forEach(function (item) {
         components.push(function () {
-          let name = item[2] ? item[0] : globals.literal(item[0]);
+          let name = item[2] ? item[0] : literal(item[0]);
           member(dictVar, name);
           write('=', item[1]);
         });
@@ -770,6 +751,16 @@ export function createModule(globals: Globals) {
   }
 
   function toString() {
-    return code();
+    let buffer: string[] = [];
+
+    // can't know all globals until body content is generated
+    let bodyContent = code();
+
+    if ( globalVars.length ) {
+      buffer.push(`const ${ globalVars.join(',') };`);
+    }
+
+    buffer.push(bodyContent);
+    return buffer.join('');
   }
 }

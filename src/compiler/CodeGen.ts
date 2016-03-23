@@ -24,8 +24,7 @@ const waiterMap: FunctionNameMap = {
  * by JavaScript code generation module.
  */
 export function generateScriptBody(parseTree: Syntax.Statements) {
-  let globals = new JavaScript.Globals();
-  let generate = JavaScript.createModule(globals);
+  let generate = JavaScript.createModule();
 
   // a lookup table of code generators
   let Evaluators: FunctionMap = {
@@ -88,12 +87,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   };
 
   // generate the module function and return the source code
-  createScriptFunction(parseTree);
-  let body = generate.toString();
-  let buffer: string[] = [];
-  buffer.push(globals.toString());
-  buffer.push(body);
-  return buffer.join('');
+  return createScriptFunction(parseTree);
 
   function createScriptFunction(statements: Syntax.Statements) {
     generate.func({
@@ -103,6 +97,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         createStatementsEvaluator(statements);
       }
     });
+    return generate.toString();
   }
 
   function defer(...args: any[]) {
@@ -154,8 +149,8 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       let moduleName = module.path.value;
       let moduleAlias = module.alias.value;
 
-      let moduleNameId = globals.literal(moduleName);
-      let importer = globals.builder('importer', moduleNameId);
+      let moduleNameId = generate.literal(moduleName);
+      let importer = generate.builder('importer', moduleNameId);
 
       assigns.push([
         moduleAlias,
@@ -171,14 +166,14 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     generate.member(function () {
       generate.context();
     },
-    globals.literal('__dirname'));
+    generate.literal('__dirname'));
   }
 
   function createFromEvaluator(node: Syntax.FromStatement) {
     let assigns: any[] = [];
     let modulePath = node.path.value;
-    let modulePathId = globals.literal(modulePath);
-    let importer = globals.builder('importer', modulePathId);
+    let modulePathId = generate.literal(modulePath);
+    let importer = generate.builder('importer', modulePathId);
 
     let anon = generate.createAnonymous();
     assigns.push([
@@ -196,7 +191,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
             function () {
               generate.retrieveAnonymous(anon);
             },
-            globals.literal(item.name.value)
+            generate.literal(item.name.value)
           );
         }
       ]);
@@ -222,7 +217,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
   function generateEnsured(signatureName: Syntax.Identifier,
                            signatureType: string) {
-    let ensure = globals.runtimeImport('ensure' + signatureType);
+    let ensure = generate.runtimeImport('ensure' + signatureType);
     let ensuredId = generate.createAnonymous();
 
     generate.statement(function () {
@@ -352,7 +347,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createDoEvaluator(node: Syntax.DoExpression) {
-    generate.call(globals.runtimeImport('createDoBlock'), [
+    generate.call(generate.runtimeImport('createDoBlock'), [
       function () {
         generate.func({
           generator: true,
@@ -418,7 +413,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createBindEvaluator(node: Syntax.BindOperator) {
-    generate.call(globals.runtimeImport('bindFunction'), [
+    generate.call(generate.runtimeImport('bindFunction'), [
       defer(node.left),
       function () {
         let elems: JavaScript.ObjectAssignmentItems = [];
@@ -569,7 +564,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       }
 
       let successVar = generate.createAnonymous();
-      generate.assignment(successVar, globals.literal(false));
+      generate.assignment(successVar, generate.literal(false));
       generateLoop(successVar);
       generate.ifStatement(
         function () { generate.retrieveAnonymous(successVar); },
@@ -659,7 +654,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       if ( i === ranges.length ) {
         if ( successVar ) {
           generate.statement(function () {
-            generate.assignAnonymous(successVar, globals.literal(true));
+            generate.assignAnonymous(successVar, generate.literal(true));
           });
         }
         createBody();
@@ -722,7 +717,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createIfLetEvaluator(node: Syntax.IfLetStatement) {
-    let some = globals.runtimeImport('isSomething');
+    let some = generate.runtimeImport('isSomething');
     let letStatement = node.condition;
     createLetEvaluator(letStatement);
 
@@ -795,20 +790,20 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createInEvaluator(node: Syntax.InOperator) {
-    let isIn = globals.runtimeImport('isIn');
+    let isIn = generate.runtimeImport('isIn');
     generate.call(isIn, [defer(node.left), defer(node.right)]);
   }
 
   function createNotInEvaluator(node: Syntax.NotInOperator) {
     generate.unaryOperator('not', function () {
-      let isIn = globals.runtimeImport('isIn');
+      let isIn = generate.runtimeImport('isIn');
       generate.call(isIn, [defer(node.left), defer(node.right)]);
     });
   }
 
   function createNotEvaluator(node: Syntax.NotOperator) {
     generate.unaryOperator('not', function () {
-      let isTrue = globals.runtimeImport('isTrue');
+      let isTrue = generate.runtimeImport('isTrue');
       generate.call(isTrue, [defer(node.left)]);
     });
   }
@@ -827,8 +822,8 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createFormatEvaluator(node: Syntax.FormatOperator) {
-    let formatStr = globals.literal((<Syntax.Literal>node.left).value);
-    let formatter = globals.builder('buildFormatter', formatStr);
+    let formatStr = generate.literal((<Syntax.Literal>node.left).value);
+    let formatter = generate.builder('buildFormatter', formatStr);
     generate.write(formatter);
   }
 
@@ -867,13 +862,13 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createLiteral(node: Syntax.Literal) {
-    let literal = globals.literal(node.value);
+    let literal = generate.literal(node.value);
     generate.write(literal);
   }
 
   function createRegex(node: Syntax.Regex) {
-    let regex = globals.builder('defineRegexPattern',
-                                globals.literal(node.value));
+    let regex = generate.builder('defineRegexPattern',
+                                generate.literal(node.value));
     generate.write(regex);
   }
 
@@ -888,7 +883,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createPatternEvaluator(node: Syntax.Pattern) {
-    let definePattern = globals.runtimeImport('definePattern');
+    let definePattern = generate.runtimeImport('definePattern');
     generate.call(definePattern, [
       function () {
         generate.func({
@@ -919,7 +914,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         createPatternElements(<Syntax.ElementsConstructor>node);
         break;
       case 'self':
-        generate.write(globals.literal(true));
+        generate.write(generate.literal(true));
         break;
       default:
         if ( canGenerateEquality(node) ) {
@@ -952,7 +947,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
     let expressions: Function[] = [];
     expressions.push(function () {
-      let checker = globals.runtimeImport(containerCheckName);
+      let checker = generate.runtimeImport(containerCheckName);
       generate.call(checker, [function () {
         generate.retrieveAnonymous(parentLocal);
       }]);
@@ -965,7 +960,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
     else {
       node.elements.forEach(function (expr: Syntax.Expression, idx: number) {
-        pushElement(expr, expr, globals.literal(idx));
+        pushElement(expr, expr, generate.literal(idx));
       });
     }
     generate.writeAndGroup(expressions);
@@ -1035,7 +1030,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     let right = deferIfNotAlready(rightNode);
 
     if ( !(rightNode instanceof Syntax.Literal) ) {
-      let isMatch = globals.runtimeImport('isMatch');
+      let isMatch = generate.runtimeImport('isMatch');
       generate.call(isMatch, [right, left]);
       return;
     }
@@ -1045,7 +1040,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       return;
     }
 
-    let matcher = globals.builder('buildMatcher', generate.code(right));
+    let matcher = generate.builder('buildMatcher', generate.code(right));
     generate.call(matcher, [left]);
   }
 
