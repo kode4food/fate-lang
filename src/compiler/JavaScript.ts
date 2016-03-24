@@ -398,7 +398,7 @@ export function createModule() {
   }
 
   function ifStatement(condition: BodyEntry, thenBranch: BodyEntry,
-                        elseBranch: BodyEntry) {
+                       elseBranch: BodyEntry) {
     let condWrapperName = 'isTrue';
     if ( !thenBranch ) {
       condWrapperName = 'isFalse';
@@ -646,7 +646,7 @@ export function createModule() {
     write(')');
   }
 
-  function returnStatement(bodyCallback: Function) {
+  function returnStatement(bodyCallback?: Function) {
     write('return ', bodyCallback, ';');
   }
 

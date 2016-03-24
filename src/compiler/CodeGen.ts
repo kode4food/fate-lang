@@ -35,6 +35,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'lambda': createLambdaEvaluator,
     'reduce': createReduceEvaluator,
     'do': createDoEvaluator,
+    'case': createCaseEvaluator,
     'call': createCallEvaluator,
     'bind': createBindEvaluator,
     'let': createLetEvaluator,
@@ -346,7 +347,8 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     });
   }
 
-  function createDoEvaluator(node: Syntax.DoExpression) {
+  function createDoEvaluator(node: Syntax.DoExpression,
+                             caseGuard?: Function) {
     generate.call(generate.runtimeImport('createDoBlock'), [
       function () {
         generate.func({
@@ -360,6 +362,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       if ( node.whenClause ) {
         let groups = getWhenGroups(node.whenClause.assignments);
         groups.forEach(generateGroup);
+      }
+      if ( caseGuard ) {
+        caseGuard();
       }
       createStatementsEvaluator(node.statements);
     }
@@ -400,6 +405,39 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       });
 
       return groups;
+    }
+  }
+
+  function createCaseEvaluator(node: Syntax.CaseExpression) {
+    generate.call(generate.runtimeImport('createDoBlock'), [
+      function () {
+        generate.func({
+          generator: true,
+          body: doBody
+        });
+      }
+    ]);
+
+    function doBody() {
+      let triggered = generate.createAnonymous();
+
+      generate.waitFor(function () {
+        generate.array(node.cases.map(function (doCase) {
+          return function () {
+            createDoEvaluator(doCase, function () {
+              generate.ifStatement(
+                function () { generate.retrieveAnonymous(triggered); },
+                function () { generate.returnStatement(); },
+                null
+              );
+
+              generate.statement(function () {
+                generate.assignAnonymous(triggered, generate.literal(true));
+              });
+            });
+          };
+        }));
+      }, 'awaitAny');
     }
   }
 
@@ -672,9 +710,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
           generate.ifStatement(
             defer(range.guard),
             null,
-            function () {
-              generate.loopContinue();
-            }
+            function () { generate.loopContinue(); }
           );
         };
       }

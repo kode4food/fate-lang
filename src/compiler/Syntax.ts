@@ -141,7 +141,7 @@ export class DoExpression extends Expression {
 }
 
 export class CaseExpression extends Expression {
-  constructor(public whenClauses: LetStatement[]) { super(); }
+  constructor(public cases: DoExpression[]) { super(); }
 }
 
 // Array/Object Construction and Comprehension ******************************

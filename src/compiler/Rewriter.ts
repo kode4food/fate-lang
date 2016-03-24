@@ -75,7 +75,6 @@ export default function createTreeProcessors(visit: Visitor) {
 
   return [
     visit.matching(buildPatternGuards, visit.tags('signature')),
-    visit.matching(expandCaseExpressions, visit.tags('case')),
 
     visit.matching(foldShortCircuits, foldableShortCircuit),
     visit.matching(foldUnaryConstants, foldableUnaryConstant),
@@ -119,19 +118,6 @@ export default function createTreeProcessors(visit: Visitor) {
     }
 
     return node;
-  }
-
-  function expandCaseExpressions(node: Syntax.CaseExpression) {
-    return node.template('do',
-      node.template('statements', [
-        node.template('expression',
-          node.template('await',
-            node.template('array', node.whenClauses),
-            'any'
-          )
-        )
-      ])
-    );
   }
 
   // or, and, conditional Folding
