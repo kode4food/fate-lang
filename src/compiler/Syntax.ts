@@ -135,9 +135,11 @@ export class ReduceExpression extends Expression {
               public select: Expression) { super(); }
 }
 
+type WhenClause = LetStatement|Expression;
+
 export class DoExpression extends Expression {
   constructor(public statements: Statements,
-              public whenClause?: LetStatement) { super(); }
+              public whenClause?: WhenClause) { super(); }
 }
 
 export class CaseExpression extends Expression {

@@ -90,16 +90,38 @@ def caseExpression(test)
       test.ok(false)
     end
 
-    case y = timeout(20)
+    case timeout(20)
       print("should not happen")
       test.ok(false)
     end
 
-    case z
+    case z = timeout(5)
       test.ok(true)
       z | equalTo(5)
       test.done()
     end
+  end
+end
+
+def casePropagate(test)
+  let notHello = do
+    await timeout(20)
+    "not hello"
+  end
+
+  let caseTest = do
+    case timeout(10)
+      "hello"
+    end
+
+    case notHello
+      "should not be here"
+    end
+  end
+
+  do
+    await caseTest | equalTo("hello")
+    test.done()
   end
 end
 
@@ -111,5 +133,6 @@ export let tests = nodeunit.testCase({
   "'Do When' (Nested)": doWhenNested,
   "Await Any Functionality": awaitAny,
   "Await All Functionality": awaitAll,
-  "Case Expression": caseExpression
+  "Case Expression": caseExpression,
+  "Case Propagation": casePropagate
 })

@@ -359,17 +359,32 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     ]);
 
     function doBody() {
-      if ( node.whenClause ) {
-        let groups = getWhenGroups(node.whenClause.assignments);
-        groups.forEach(generateGroup);
+      if ( node.whenClause instanceof Syntax.LetStatement ) {
+        let whenClause = <Syntax.LetStatement>node.whenClause;
+        let groups = getAssignmentGroups(whenClause.assignments);
+        groups.forEach(generateAssignment);
       }
+      else if ( node.whenClause ) {
+        generateExpression(node.whenClause);
+      }
+
       if ( caseGuard ) {
         caseGuard();
       }
       createStatementsEvaluator(node.statements);
     }
 
-    function generateGroup(group: Syntax.Assignments) {
+    function generateExpression(expression: Syntax.Expression) {
+      generate.statement(function () {
+        generate.assignResult(function () {
+          generate.waitFor(function () {
+            createEvaluator(expression);
+          }, 'awaitValue');
+        });
+      });
+    }
+
+    function generateAssignment(group: Syntax.Assignments) {
       let anon = generate.createAnonymous();
       generate.statement(function () {
         generate.assignAnonymous(anon, function () {
@@ -395,7 +410,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       });
     }
 
-    function getWhenGroups(assignments: Syntax.Assignments) {
+    function getAssignmentGroups(assignments: Syntax.Assignments) {
       let groups: Syntax.Assignments[] = [];
 
       assignments.forEach(function (assignment) {
@@ -421,23 +436,27 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     function doBody() {
       let triggered = generate.createAnonymous();
 
-      generate.waitFor(function () {
-        generate.array(node.cases.map(function (doCase) {
-          return function () {
-            createDoEvaluator(doCase, function () {
-              generate.ifStatement(
-                function () { generate.retrieveAnonymous(triggered); },
-                function () { generate.returnStatement(); },
-                null
-              );
+      generate.returnStatement(function () {
+        generate.waitFor(function () {
+          generate.array(node.cases.map(function (doCase) {
+            return function () {
+              createDoEvaluator(doCase, function () {
+                generate.ifStatement(
+                  function () { generate.retrieveAnonymous(triggered); },
+                  function () { generate.returnStatement(); },
+                  null
+                );
 
-              generate.statement(function () {
-                generate.assignAnonymous(triggered, generate.literal(true));
+                generate.statement(function () {
+                  generate.assignAnonymous(
+                    triggered, generate.literal(true)
+                  );
+                });
               });
-            });
-          };
-        }));
-      }, 'awaitAny');
+            };
+          }));
+        }, 'awaitAny');
+      });
     }
   }
 

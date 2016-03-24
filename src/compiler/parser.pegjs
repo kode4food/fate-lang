@@ -621,8 +621,11 @@ caseClauses
     }
 
 caseClause
-  = Case __ assignments:reduceAssignments NL stmts:statements End {
+  = Case __ assignments:reduceAssignments NL stmts:statements End  {
       return node('do', stmts, node('let', assignments));
+    }
+  / Case __ expr:expr NL stmts:statements End  {
+      return node('do', stmts, expr);
     }
 
 reduceExpression

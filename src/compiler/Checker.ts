@@ -184,12 +184,13 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function groupWhenAssignments(node: Syntax.DoExpression) {
-    if ( !node.whenClause ) {
+    if ( !(node.whenClause instanceof Syntax.LetStatement) ) {
       return node;
     }
 
+    let whenClause = <Syntax.LetStatement>node.whenClause;
     let encountered: AssignmentMap = {};
-    node.whenClause.assignments.forEach(function (assignment) {
+    whenClause.assignments.forEach(function (assignment) {
       let getters: NameSet = getAnnotation(assignment, 'do/references') || {};
 
       Object.keys(getters).forEach(function (getter) {
