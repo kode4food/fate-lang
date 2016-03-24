@@ -125,6 +125,27 @@ def casePropagate(test)
   end
 end
 
+def caseOrdering(test)
+  let result = do
+    case 1
+      "first"
+    end
+
+    case 2
+      "second"
+    end
+
+    case 3
+      "third"
+    end
+  end
+
+  do
+    await result | equalTo("first")
+    test.done()
+  end
+end
+
 export let tests = nodeunit.testCase({
   "Basic Do Functionality": basics,
   "'Do When' (Simple)": doWhenSimple,
@@ -134,5 +155,6 @@ export let tests = nodeunit.testCase({
   "Await Any Functionality": awaitAny,
   "Await All Functionality": awaitAll,
   "Case Expression": caseExpression,
-  "Case Propagation": casePropagate
+  "Case Propagation": casePropagate,
+  "Case Proper Ordering": caseOrdering
 })
