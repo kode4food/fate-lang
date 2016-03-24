@@ -603,14 +603,26 @@ idParam
     }
 
 doExpression
-  = op:Do when:whenClause? NL stmts:statements End {
-      return node(op, stmts, when);
+  = op:Do NL stmts:statements End {
+      return node(op, stmts);
+    }
+  / op:Do __ When __ assignments:reduceAssignments NL stmts:statements End {
+      return node(op, stmts, node('let', assignments));
+    }
+  / Do __ cases:caseClauses NL End  {
+      return node('case', cases);
     }
   / reduceExpression
 
-whenClause
-  = __ When __ assignments:reduceAssignments  {
-      return node('let', assignments);
+caseClauses
+  = start:caseClause
+    cont:(CASE_SEP w:caseClause { return w; })*  {
+      return [start].concat(cont);
+    }
+
+caseClause
+  = Case __ assignments:reduceAssignments NL stmts:statements End {
+      return node('do', stmts, node('let', assignments));
     }
 
 reduceExpression
@@ -668,6 +680,7 @@ wildcard = Wildcard
 Await   = "await"    !NameContinue  { return 'await'; }
 Reduce  = "reduce"   !NameContinue  { return 'reduce'; }
 Do      = "do"       !NameContinue  { return 'do'; }
+Case    = "case"     !NameContinue  { return 'case'; }
 For     = "for"      !NameContinue  { return 'for'; }
 Def     = "def"      !NameContinue  { return 'function'; }
 From    = "from"     !NameContinue  { return 'from'; }
@@ -701,7 +714,7 @@ ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or /
       Like / Mod / Not / If / Unless / True / False / As / In /
       Return / Self / Else / End / Where / Select / Reduce / Await /
-      Any / All / When )
+      Any / All / When / Case )
 
 Identifier "identifier"
   = !ReservedWord name:Name  {
@@ -888,3 +901,4 @@ AS_SEP = __ As __
 IN_SEP = __ In __
 LIST_SEP = __ "," __
 PROP_SEP = __ ":" __
+CASE_SEP = NL

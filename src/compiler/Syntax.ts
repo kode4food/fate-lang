@@ -140,6 +140,10 @@ export class DoExpression extends Expression {
               public whenClause?: LetStatement) { super(); }
 }
 
+export class CaseExpression extends Expression {
+  constructor(public whenClauses: LetStatement[]) { super(); }
+}
+
 // Array/Object Construction and Comprehension ******************************
 
 export class ElementsConstructor extends Operator {
@@ -446,6 +450,7 @@ let tagToConstructor: FunctionMap = {
   'lambda': LambdaExpression,
   'reduce': ReduceExpression,
   'do': DoExpression,
+  'case': CaseExpression,
   'call': CallOperator,
   'bind': BindOperator,
   'let': LetStatement,

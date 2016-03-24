@@ -49,8 +49,8 @@ end
 def doWhenNested(test)
   do when a = timeout(10),
           b = do
-            a * 20
-          end
+                a * 20
+              end
     a | equalTo(10)
     b | equalTo(200)
     test.done()
@@ -81,6 +81,26 @@ def awaitAll(test)
   end
 end
 
+def caseExpression(test)
+  let z = timeout(5)
+
+  do
+    case x = timeout(10)
+      test.ok(false)
+    end
+
+    case y = timeout(20)
+      test.ok(false)
+    end
+
+    case z
+      test.ok(true)
+      z | equalTo(5)
+      test.done()
+    end
+  end
+end
+
 export let tests = nodeunit.testCase({
   "Basic Do Functionality": basics,
   "'Do When' (Simple)": doWhenSimple,
@@ -88,5 +108,6 @@ export let tests = nodeunit.testCase({
   "'Do When' (Dependencies)": doWhenDependencies,
   "'Do When' (Nested)": doWhenNested,
   "Await Any Functionality": awaitAny,
-  "Await All Functionality": awaitAll
+  "Await All Functionality": awaitAll,
+  "Case Expression": caseExpression
 })
