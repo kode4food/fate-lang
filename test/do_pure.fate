@@ -86,10 +86,12 @@ def caseExpression(test)
 
   do
     case x = timeout(10)
+      print("should not happen")
       test.ok(false)
     end
 
     case y = timeout(20)
+      print("should not happen")
       test.ok(false)
     end
 

@@ -1,7 +1,7 @@
 # Fate (Patterns & Guards & Joins, Oh My!)
 [![Build Status](https://travis-ci.org/kode4food/fate-lang.svg?branch=master)](https://travis-ci.org/kode4food/fate-lang)
 
-Fate is a programming language prototype that compiles into Node.js modules.  It is a mostly functional language, providing first-class patterns, invocation guards, list comprehensions, and flexible function application.
+Fate is a programming language that targets the V8 JavaScript JVM.  It is a mostly functional language that provides first-class patterns, invocation guards, list comprehensions, flexible function application, and awesome concurrency.
 
 For more information about Fate, you can visit the [Fate Language Site](http://www.fate-lang.org/).
 
