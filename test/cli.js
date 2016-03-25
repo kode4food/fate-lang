@@ -3,9 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 const nodeunit = require('nodeunit');
-const compiler = require('../dist/cli/Compiler').commandLine;
-const interpreter = require('../dist/cli/Interpreter').commandLine;
-const Global = require('../dist/Global').default;
+const compiler = require('../dist/cli/Compiler')['commandLine'];
+const interpreter = require('../dist/cli/Interpreter')['commandLine'];
+const Global = require('../dist/Global')['default'];
 const helpers = require('./helpers');
 const createConsole = helpers.createConsole;
 
