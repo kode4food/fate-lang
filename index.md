@@ -71,12 +71,15 @@ else
   'good to go'
 end
 
-greetWith('hello') if person like Friend
-
+# Syntactic sugar for 'if not'
 unless processFinished
   'process some request'
 end
 
+# Suffix 'if' (can also do unless)
+greetWith('hello') if person like Friend
+
+# The 'if let' statement
 if let a=getSomeValue(), b=getAnotherValue()
   # as they're not Nothing, do something with those values
 end  
@@ -105,7 +108,7 @@ where value < 4
 end
 let average = sum / count
  
-# Reduce Expression (in Lambda)
+# Reduce Expression (in a multi-line Lambda)
 let sum = (values ->
   reduce result = 0
   for value in values
