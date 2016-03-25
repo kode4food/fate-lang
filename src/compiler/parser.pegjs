@@ -603,11 +603,11 @@ idParam
     }
 
 doExpression
-  = op:Do NL stmts:statements End {
-      return node(op, stmts);
+  = Do NL stmts:statements End {
+      return node('do', stmts);
     }
-  / op:Do __ When __ assignments:reduceAssignments NL stmts:statements End {
-      return node(op, stmts, node('let', assignments));
+  / Do __ When __ when:whenTail  {
+      return when;
     }
   / Do __ cases:caseClauses NL End  {
       return node('case', cases);
@@ -621,10 +621,15 @@ caseClauses
     }
 
 caseClause
-  = Case __ assignments:reduceAssignments NL stmts:statements End  {
+  = Case __ when:whenTail  {
+      return when;
+    }
+
+whenTail
+  = assignments:reduceAssignments NL stmts:statements End  {
       return node('do', stmts, node('let', assignments));
     }
-  / Case __ expr:expr NL stmts:statements End  {
+  / expr:expr NL stmts:statements End  {
       return node('do', stmts, expr);
     }
 
