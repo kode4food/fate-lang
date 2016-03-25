@@ -64,7 +64,7 @@ You've seen Functions and Patterns, but there's more to Fate than that.  Let's t
 ### Branching Statements and Expressions
 
 ```ruby
-# Ye Olde 'If' Statement
+# Ye Ole 'If' Statement
 if myAge > 50
   'should probably retire'
 else
