@@ -10,7 +10,7 @@ import { sync as glob } from 'glob';
 import { sync as mkdirp } from 'mkdirp';
 
 import {
-  compileModule, generateNodeModule, wrapCompileError
+  compileModule, wrapCompileError, GeneratedCode
 } from "../compiler/Compiler";
 
 import { VERSION } from '../Fate';
@@ -168,6 +168,19 @@ export function commandLine(inputArgs: string[], console: Console,
   function writeNodeModule(jsContent: string, outputPath: string) {
     mkdirp(dirname(outputPath));
     writeFileSync(outputPath, generateNodeModule(jsContent));
+  }
+
+  function generateNodeModule(generatedCode: GeneratedCode) {
+    let buffer: string[] = [];
+    buffer.push('"use strict";');
+    buffer.push("const fate=require('fatejs');");
+    buffer.push("const r=fate.Runtime;");
+    buffer.push(generatedCode);
+    buffer.push("module.__fateModule=true;");
+    buffer.push("module.result=s(");
+    buffer.push("fate.globals({__filename}),");
+    buffer.push("module.exports);");
+    return buffer.join('');
   }
 
   // Support Functions

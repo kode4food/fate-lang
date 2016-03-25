@@ -55,27 +55,6 @@ export function compileModule(script: ScriptContent) {
   };
 }
 
-export function generateNodeModule(generatedCode: GeneratedCode) {
-  let buffer: string[] = [];
-  buffer.push('"use strict";');
-  buffer.push("const fate=require('fatejs');");
-  buffer.push("const r=fate.Runtime;");
-  buffer.push(generatedCode);
-  buffer.push("module.__fateModule=true;");
-  buffer.push("module.result=s(");
-  buffer.push("fate.globals({__filename}),");
-  buffer.push("module.exports);");
-  return buffer.join('');
-}
-
-export function generateFunctionCode(generatedCode: GeneratedCode) {
-  let buffer: string[] = [];
-  buffer.push('"use strict";');
-  buffer.push(generatedCode);
-  buffer.push("module.exports=s;");
-  return buffer.join('');
-}
-
 export function generateFunction(generatedCode: GeneratedCode) {
   interface FateContext {
     g: any;
@@ -91,6 +70,14 @@ export function generateFunction(generatedCode: GeneratedCode) {
 
   runInContext(generateFunctionCode(generatedCode), context);
   return context.module.exports;
+}
+
+function generateFunctionCode(generatedCode: GeneratedCode) {
+  let buffer: string[] = [];
+  buffer.push('"use strict";');
+  buffer.push(generatedCode);
+  buffer.push("module.exports=s;");
+  return buffer.join('');
 }
 
 export function wrapCompileError(err: Error, filePath?: FilePath): Error {
