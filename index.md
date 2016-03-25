@@ -3,7 +3,7 @@ layout: fate_title
 title: Fate Programming
 ---
 ## Patterns & Guards & Joins, Oh My!
-Fate is a programming language prototype that compiles into Node.js modules.  It is a mostly functional language, providing first-class patterns, invocation guards, list comprehensions, and flexible function application.
+Fate is a programming language that targets the V8 JavaScript JVM.  It is a mostly functional language that provides first-class patterns, invocation guards, list comprehensions, flexible function application, and awesome concurrency.
 
 That's a lot to take in, so maybe it's better to just demonstrate.  Let's say you needed to calculate the NOx emissions for an OBD II reporting module.  You could do it the obvious way:
 
@@ -138,6 +138,20 @@ end
 
 do
   {name: await name} | "Hello, %name!" | print
+end
+
+let result = do
+  case name
+    print("name resolved first")
+  end
+
+  case [content, _] = http.get("www.example.org/")
+    print(content)
+  end
+
+  case timeout(100)
+    print("couldn't get name or http content in 100ms")
+  end
 end
 
 # Exporting from a module
