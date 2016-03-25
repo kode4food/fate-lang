@@ -120,6 +120,13 @@ let result = [for color in colors
 let deidentified = {for name:value in person
                     where name not in ['name', 'address', 'ssn']}
 
+# Destructuring Assignment
+let person = { name: 'Bill', age: 43 }
+let { name, age as yearsOnEarth } = person
+
+let numbers = [1, 2, 3]
+let [ first, second, third ] = numbers
+
 # More Advanced Patterns
 let LargeOrangeShape = ~{
   type: self in ['square', 'circle', 'triangle'],
@@ -140,13 +147,15 @@ do
   {name: await name} | "Hello, %name!" | print
 end
 
-let result = do
+let eventualResult = do
   case name
     print("name resolved first")
+    name
   end
 
-  case [content, _] = http.get("www.example.org/")
-    print(content)
+  case [content, _] = http.get("http://www.example.org/")
+    print("http content resolved first")
+    content
   end
 
   case timeout(100)
