@@ -1,5 +1,8 @@
 # Change History
 
+## Version 0.5.5 - Concurrency Enhanced
+`do` has been enhanced with the ability to await multiple parallel resolutions.  If the `when` clause is used, these results are joined into a single block.  If `case` clauses are used, the first to be resolved wins and that block is executed.
+
 ## Version 0.5.0 - Concurrency Simplified
 The Join Syntax (`when`) has been removed, replaced with a much more capable model based somewhat on Haskell's IO Monad.  Keywords added to support this are: `do`, `await`, `any`, and `all`.
 
