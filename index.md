@@ -61,14 +61,9 @@ Done!  The problem of vehicle emissions testing is now solved!
 ## A Quick Tour
 You've seen Functions and Patterns, but there's more to Fate than that.  Let's take a very quick look at some of those language features.
 
+### Branching Statements and Expressions
+
 ```ruby
-# Imports
-from SomeModule import displayString as display
-
-import SomeModule as aModule
-let display = aModule.displayString
-
-# Branching Statements
 if myAge > 50
   'should probably retire'
 else
@@ -87,7 +82,11 @@ end
 
 # Branching Expressions
 let result = 'green' unless turnedOff else 'red'
+```
 
+### Iteration And Reducing
+
+```ruby
 # For Loops, with Guards, Else Clauses, and Multiple Ranges
 for color in colors where color != 'orange',
     shape in shapes where shape != 'square'
@@ -119,14 +118,11 @@ let result = [for color in colors
 
 let deidentified = {for name:value in person
                     where name not in ['name', 'address', 'ssn']}
+```
 
-# Destructuring Assignment
-let person = { name: 'Bill', age: 43 }
-let { name, age as yearsOnEarth } = person
+### Patterns and Destructuring
 
-let numbers = [1, 2, 3]
-let [ first, second, third ] = numbers
-
+```ruby
 # More Advanced Patterns
 let LargeOrangeShape = ~{
   type: self in ['square', 'circle', 'triangle'],
@@ -138,7 +134,18 @@ if shape like LargeOrangeShape
   'bingo!'
 end
 
-# Concurrency
+# Destructuring Assignment
+let person = { name: 'Bill', age: 43 }
+let { name, age as yearsOnEarth } = person
+
+let numbers = [1, 2, 3]
+let [ first, second, third ] = numbers
+```
+
+### Concurrency Expressions
+
+```ruby
+# A basic 'do' expression
 let name = do
   'World'
 end
@@ -162,6 +169,16 @@ let eventualResult = do
     print("couldn't get name or http content in 100ms")
   end
 end
+```
+
+### Importing Symbols To/From A Module
+
+```ruby
+# Importing into a module
+from SomeModule import displayString as display
+
+import SomeModule as aModule
+let display = aModule.displayString
 
 # Exporting from a module
 export calculateVehicleEmissions as calculate
