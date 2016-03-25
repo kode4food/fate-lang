@@ -175,7 +175,7 @@ let eventualResult = do
 end
 ```
 
-### Importing Symbols To/From A Module
+### Importing From/Exporting To A Module
 
 ```ruby
 # Importing into a module
