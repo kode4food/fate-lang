@@ -128,8 +128,10 @@ let deidentified = {for name:value in person
 
 ```ruby
 # More Advanced Patterns
+let Shape = ~(self in ['square', 'circle', 'triangle'])
+
 let LargeOrangeShape = ~{
-  type: self in ['square', 'circle', 'triangle'],
+  type: Shape,
   colors: 'orange' in self,
   size: self > 50
 }
