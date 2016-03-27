@@ -11,7 +11,8 @@ export def get(URL as url)
 
     let req = http.get(url | parseURL, (res) ->
       res.on('data', data -> content.value + data | content.set)
-      res.on('end', -> content.value | resolve)
+      res.on('end', -> [content.value] | resolve)
+      res.on('error', err -> [content.value, err] | resolve)
     )
   )
 end

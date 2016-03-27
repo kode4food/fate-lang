@@ -6,17 +6,10 @@ import * as Syntax from './Syntax';
 import { hasAnnotation, getAnnotation } from './Annotations';
 
 type FunctionMap = { [index: string]: Function };
-type FunctionNameMap = { [index: string]: string };
 type IdMapping = { id: string, anon: string };
 
 const slice = Array.prototype.slice;
 const likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
-
-const waiterMap: FunctionNameMap = {
-  'value': 'awaitValue',
-  'any': 'awaitAny',
-  'all': 'awaitAll'
-};
 
 /*
  * Converts a parse tree into source code (initially JavaScript). Host
@@ -164,10 +157,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createImporterArguments() {
-    generate.member(function () {
-      generate.context();
-    },
-    generate.literal('__dirname'));
+    generate.member(
+      function () { generate.context(); },
+      generate.currentDirectory()
+    );
   }
 
   function createFromEvaluator(node: Syntax.FromStatement) {
@@ -377,9 +370,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     function generateExpression(expression: Syntax.Expression) {
       generate.statement(function () {
         generate.assignResult(function () {
-          generate.waitFor(function () {
+          generate.waitFor(Syntax.Resolver.Value, function () {
             createEvaluator(expression);
-          }, 'awaitValue');
+          });
         });
       });
     }
@@ -388,13 +381,13 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       let anon = generate.createAnonymous();
       generate.statement(function () {
         generate.assignAnonymous(anon, function () {
-          generate.waitFor(function () {
+          generate.waitFor(Syntax.Resolver.All, function () {
             generate.array(
               group.map(function (assignment) {
                 return defer(assignment.value);
               })
             );
-          }, 'awaitAll');
+          });
         });
       });
 
@@ -437,7 +430,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       let triggered = generate.createAnonymous();
 
       generate.returnStatement(function () {
-        generate.waitFor(function () {
+        generate.waitFor(Syntax.Resolver.Any, function () {
           generate.array(node.cases.map(function (doCase) {
             return function () {
               createDoEvaluator(doCase, function () {
@@ -455,7 +448,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
               });
             };
           }));
-        }, 'awaitAny');
+        });
       });
     }
   }
@@ -872,8 +865,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createAwaitEvaluator(node: Syntax.AwaitOperator) {
-    let waiter = waiterMap[node.resolver || 'value'];
-    generate.waitFor(defer(node.left), waiter);
+    generate.waitFor(node.resolver, defer(node.left));
   }
 
   function createFormatEvaluator(node: Syntax.FormatOperator) {

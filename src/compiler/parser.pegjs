@@ -416,7 +416,8 @@ await
   / pattern
 
 awaitModifier
-  = _ mod:(Any / All) { return mod; }
+  = _ Any  { return Syntax.Resolver.Any; }
+  / _ All  { return Syntax.Resolver.All; }
 
 pattern
   = "~" _ expr:unary  {

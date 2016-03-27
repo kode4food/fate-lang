@@ -77,8 +77,12 @@ export class NegativeOperator extends UnaryOperator {}
 export class NotOperator extends UnaryOperator {}
 export class Pattern extends UnaryOperator { }
 
+export enum Resolver {
+  Value, Any, All
+}
+
 export class AwaitOperator extends UnaryOperator {
-  constructor(left: Expression, public resolver: string) {
+  constructor(left: Expression, public resolver: Resolver) {
     super(left);
   }
 }

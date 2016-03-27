@@ -2,6 +2,7 @@
 
 import { mixin } from '../Util';
 import { GeneratedCode } from './Compiler';
+import { Resolver } from './Syntax';
 
 let jsonStringify = JSON.stringify;
 
@@ -18,6 +19,7 @@ type BodyEntries = BodyEntry[];
 type NameIdsMap = { [index: string]: Ids };
 type Modifications = Modification[];
 type NameModificationsMap = { [index: string]: Modifications };
+type FunctionNameMap = { [index: string]: string };
 
 export type AssignmentItem = [Name, BodyEntry];
 export type AssignmentItems = AssignmentItem[];
@@ -80,14 +82,19 @@ let operatorMap: StringMap = {
   'pos': '+'
 };
 
-function lastItem(arr: any[]) {
-  return arr[arr.length - 1];
-}
+const waiterMap: FunctionNameMap = {};
+waiterMap[Resolver.Value] = 'awaitValue';
+waiterMap[Resolver.Any] = 'awaitAny';
+waiterMap[Resolver.All] = 'awaitAll';
 
 // various names
 const selfName = 's';
 const contextName = 'c';
 const exportsName = 'x';
+
+function lastItem(arr: any[]) {
+  return arr[arr.length - 1];
+}
 
 export function createModule() {
   let idCounters: { [index: string]: number } = {}; // prefix -> nextId
@@ -109,12 +116,12 @@ export function createModule() {
   return {
     literal, runtimeImport, builder, registerAnonymous, createAnonymous,
     assignAnonymous, retrieveAnonymous, assignResult, self, selfName,
-    args, context, contextName, member, write, writeAndGroup, getter,
-    assignment, assignments, exports, exportsName, unaryOperator,
-    binaryOperator, conditionalOperator, statement, ifStatement,
-    loopExpression, loopContinue, funcDeclaration, iife, scope, func,
-    waitFor, compoundExpression, returnStatement, call, array,
-    arrayAppend, object, objectAssign, parens, code, toString
+    currentDirectory, args, context, contextName, member, write,
+    writeAndGroup, getter, assignment, assignments, exports, exportsName,
+    unaryOperator, binaryOperator, conditionalOperator, statement,
+    ifStatement, loopExpression, loopContinue, funcDeclaration, iife,
+    scope, func, waitFor, compoundExpression, returnStatement, call,
+    array, arrayAppend, object, objectAssign, parens, code, toString
   };
 
   function nextId(prefix: string) {
@@ -236,6 +243,10 @@ export function createModule() {
 
   function self() {
     write(selfName);
+  }
+
+  function currentDirectory() {
+    return literal('__dirname');
   }
 
   function args(startAt = 0) {
@@ -635,8 +646,9 @@ export function createModule() {
     }
   }
 
-  function waitFor(expression: BodyEntry, resolver: string) {
-    let resolverFunc = runtimeImport(resolver);
+  function waitFor(resolver: Resolver, expression: BodyEntry) {
+    let resolverFuncName = waiterMap[resolver || Resolver.Value];
+    let resolverFunc = runtimeImport(resolverFuncName);
     write('(yield [', resolverFunc, ',', expression, '])');
   }
 
