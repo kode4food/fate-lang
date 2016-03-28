@@ -607,17 +607,17 @@ doExpression
   = Do NL stmts:statements End {
       return node('do', stmts);
     }
-  / Do __ When __ when:whenTail  {
+  / Do __ When __ when:whenTail End {
       return when;
     }
-  / Do __ cases:caseClauses NL End  {
+  / Do __ cases:caseClauses End  {
       return node('case', cases);
     }
   / reduceExpression
 
 caseClauses
   = start:caseClause
-    cont:(CASE_SEP w:caseClause { return w; })*  {
+    cont:(w:caseClause { return w; })*  {
       return [start].concat(cont);
     }
 
@@ -627,10 +627,10 @@ caseClause
     }
 
 whenTail
-  = assignments:reduceAssignments NL stmts:statements End  {
+  = assignments:reduceAssignments NL stmts:statements  {
       return node('do', stmts, node('let', assignments));
     }
-  / expr:expr NL stmts:statements End  {
+  / expr:expr NL stmts:statements  {
       return node('do', stmts, expr);
     }
 

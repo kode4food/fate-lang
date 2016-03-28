@@ -94,18 +94,15 @@ def caseExpression(test)
     case x = timeout(10)
       print("should not happen")
       test.ok(false)
-    end
 
     case timeout(20)
       print("should not happen")
       test.ok(false)
-    end
 
     case z = timeout(5)
       test.ok(true)
       z | equalTo(5)
       test.done()
-    end
   end
 end
 
@@ -118,11 +115,9 @@ def casePropagate(test)
   let caseTest = do
     case timeout(10)
       "hello"
-    end
 
     case notHello
       "should not be here"
-    end
   end
 
   do
@@ -135,15 +130,12 @@ def caseOrdering(test)
   let result = do
     case 1
       "first"
-    end
 
     case 2
       "second"
-    end
 
     case 3
       "third"
-    end
   end
 
   do
