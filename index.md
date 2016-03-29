@@ -136,9 +136,9 @@ let LargeOrangeShape = ~{
   size: self > 50
 }
 
-if shape like LargeOrangeShape
-  'bingo!'
-end
+# Instead of multiple statements with an 'end', you
+# can just use a colon to evaluate a single statement
+if shape like LargeOrangeShape: print('bingo!')
 
 # Destructuring Assignment
 let person = { name: 'Bill', age: 43 }
