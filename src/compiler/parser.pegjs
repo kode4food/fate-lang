@@ -48,8 +48,8 @@ start = module
 /* Parser *******************************************************************/
 
 module
-  = __ statements:moduleStatement*  {
-      return statementsNode(statements);
+  = __ stmts:moduleStatement*  {
+      return statementsNode(stmts);
     }
 
 moduleStatement
@@ -57,8 +57,8 @@ moduleStatement
   / statement
 
 statements
-  = statements:statement*  {
-      return statementsNode(statements);
+  = stmts:statement*  {
+      return statementsNode(stmts);
     }
 
 statement
@@ -94,8 +94,8 @@ declStatement
   = funcDeclaration
 
 funcDeclaration
-  = op:Def signature:signature statements:statementsTail  {
-      return node(op, signature, statements);
+  = op:Def signature:signature stmts:statementsTail  {
+      return node(op, signature, stmts);
     }
 
 signature
@@ -109,8 +109,11 @@ guard
     }
 
 statementsTail
-  = NL statements:statements End  {
-      return statements;
+  = NL stmts:statements End  {
+      return stmts;
+    }
+  / __ ":" __ stmt:blockStatement  {
+      return statementsNode([stmt]);
     }
 
 params
@@ -212,11 +215,11 @@ exportable
 
 forStatement
   = Reduce reduceAssignments:reduceAssignments __
-    op:For ranges:ranges NL statements:statements tail:elseTail  {
-      return node(op, ranges, statements, tail, reduceAssignments);
+    op:For ranges:ranges elsable:elsableStatements  {
+      return node(op, ranges, elsable[0], elsable[1], reduceAssignments);
     }
-  / op:For ranges:ranges NL statements:statements tail:elseTail  {
-      return node(op, ranges, statements, tail);
+  / op:For ranges:ranges elsable:elsableStatements  {
+      return node(op, ranges, elsable[0], elsable[1]);
     }
 
 reduceAssignments
@@ -272,24 +275,35 @@ trailingIfStatement
     }
 
 ifStatement
-  = op:IfUnless __ condition:(letStatement / expr) NL
-    statements:statements tail:elseTail  {
+  = op:IfUnless __ condition:(letStatement / expr)
+    elsable:elsableStatements  {
       var tag = condition.tag === 'let' ? 'ifLet' : 'if';
       if ( !op ) {
-        return node(tag, condition, tail, statements);
+        return node(tag, condition, elsable[1], elsable[0]);
       }
-      return node(tag, condition, statements, tail);
+      return node(tag, condition, elsable[0], elsable[1]);
+    }
+
+elsableStatements
+  = NL stmts:statements elseTail:blockElseTail  {
+      return [stmts, elseTail];
+    }
+  / __ ":" __ stmt:statement elseTail:elseTail?  {
+      return [statementsNode([stmt]), elseTail || node('statements', [])];
+    }
+
+blockElseTail
+  = elseTail
+  / End  {
+      return node('statements', []);
     }
 
 elseTail
   = Else _ ifStatement:ifStatement  {
       return node('statements', [ifStatement]);
     }
-  / Else NL statements:statements End  {
-      return statements;
-    }
-  / End  {
-      return node('statements', []);
+  / Else stmts:statementsTail  {
+      return stmts;
     }
 
 letStatement
@@ -604,34 +618,45 @@ idParam
     }
 
 doExpression
-  = Do NL stmts:statements End {
+  = Do stmts:statementsTail  {
       return node('do', stmts);
     }
   / Do __ When __ when:whenTail  {
       return when;
     }
-  / Do __ cases:caseClauses NL End  {
+  / Do __ cases:caseClauses End  {
       return node('case', cases);
     }
   / reduceExpression
 
+whenTail
+  = assignments:reduceAssignments stmts:statementsTail  {
+      return node('do', stmts, node('let', assignments));
+    }
+  / expr:expr stmts:statementsTail  {
+      return node('do', stmts, expr);
+    }
+
 caseClauses
   = start:caseClause
-    cont:(CASE_SEP w:caseClause { return w; })*  {
+    cont:(w:caseClause { return w; })*  {
       return [start].concat(cont);
     }
 
 caseClause
-  = Case __ when:whenTail  {
-      return when;
-    }
-
-whenTail
-  = assignments:reduceAssignments NL stmts:statements End  {
+  = Case __ assignments:reduceAssignments stmts:caseClauseTail  {
       return node('do', stmts, node('let', assignments));
     }
-  / expr:expr NL stmts:statements End  {
+  / Case __ expr:expr stmts:caseClauseTail  {
       return node('do', stmts, expr);
+    }
+
+caseClauseTail
+  = NL stmts:statements  {
+      return stmts;
+    }
+  / __ ":" __ stmt:statement  {
+      return statementsNode([stmt]);
     }
 
 reduceExpression
