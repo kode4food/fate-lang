@@ -23,9 +23,7 @@ exports.loops = nodeunit.testCase({
 
   "Basic Loops": function (test) {
     let script1 = 'for color in ["red", "green", "blue"]\n' +
-                  'where color != "red"\n' +
-                  '  emit(color + " is a color")\n' +
-                  'end';
+                  'where color != "red": emit(color + " is a color")';
 
     let script2 = 'for color in []\n' +
                   '  emit(color + " is a color")\n' +
@@ -49,9 +47,7 @@ exports.loops = nodeunit.testCase({
     let script6 = 'for person in people\n' +
                   '  for brother in person.brothers\n' +
                   '    emit(person.name + "-" + brother)\n' +
-                  '  else\n' +
-                  '    emit("-")\n' +
-                  '  end\n' +
+                  '  else: emit("-")\n' +
                   'end';
 
     let script7 = 'for person in people\n' +
