@@ -164,16 +164,13 @@ let eventualResult = do
   case name
     print("name resolved first")
     name
-  end
 
   case [content, _] = http.get("http://www.example.org/")
     print("http content resolved first")
     content
-  end
 
   case timeout(100)
     print("couldn't get name or http content in 100ms")
-  end
 end
 ```
 
