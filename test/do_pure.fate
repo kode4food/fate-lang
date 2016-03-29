@@ -59,9 +59,7 @@ end
 
 def doWhenNested(test)
   do when a = timeout(10),
-          b = do
-                a * 20
-              end
+          b = do: a * 20
     a | equalTo(10)
     b | equalTo(200)
     test.done()
