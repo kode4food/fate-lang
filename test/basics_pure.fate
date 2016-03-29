@@ -196,13 +196,9 @@ def ifLetStatement(test)
   def test1(val1, val2, val3)
     if let a = val1, b = val2, c = val3
       {a, b, c} | "%a-%b-%c"
-    else if a like Nothing
-      "a was Nothing"
-    else if b like Nothing
-      "b was Nothing"
-    else
-      "c was Nothing"
-    end
+    else if a like Nothing: "a was Nothing"
+    else if b like Nothing: "b was Nothing"
+    else: "c was Nothing"
   end
 
   def test2(val)

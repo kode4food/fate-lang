@@ -149,9 +149,7 @@ exports.basics = nodeunit.testCase({
       }
     };
 
-    let script1 = 'if person like {name: "Thom", age: 42}\n' +
-                  '  true\n' +
-                  'end';
+    let script1 = 'if person like {name: "Thom", age: 42}: true';
 
     test.equal(evaluate(script1, data), true);
     test.done();

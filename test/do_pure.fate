@@ -47,7 +47,12 @@ def doWhenDependencies(test)
 end
 
 def doWhenExpression(test)
-  do when timeout(10)
+  do when timeout(10): test.done()
+end
+
+def awaitDoWhenExpression(test)
+  do
+    await (do when timeout(10): 'hello') | equalTo('hello')
     test.done()
   end
 end
@@ -128,14 +133,9 @@ end
 
 def caseOrdering(test)
   let result = do
-    case 1
-      "first"
-
-    case 2
-      "second"
-
-    case 3
-      "third"
+    case 1: "first"
+    case 2: "second"
+    case 3: "third"
   end
 
   do
@@ -150,6 +150,7 @@ export let tests = nodeunit.testCase({
   "'Do When' (No Dependencies)": doWhenNoDependencies,
   "'Do When' (Dependencies)": doWhenDependencies,
   "'Do When' (Expression)": doWhenExpression,
+  "'Do When' (Await)": awaitDoWhenExpression,
   "'Do When' (Nested)": doWhenNested,
   "Await Any Functionality": awaitAny,
   "Await All Functionality": awaitAll,
