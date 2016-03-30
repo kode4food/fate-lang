@@ -467,18 +467,15 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     function generateFunction() {
       generate.parens(function () {
         generate.func({
-          internalId: getFuncOrLambdaInternalId(node),
-          contextArgs: ['self'],
+          internalArgs: [generate.valueName],
           body: function () {
-            generateBody(function () {
-              generate.getter('self');
-            });
+            generateBody(generate.valueName);
           }
         });
       });
     }
 
-    function generateBody(valueGenerator: Function) {
+    function generateBody(valueGenerator: JavaScript.BodyEntry) {
       let value = generate.createAnonymous();
       generate.statement(function () {
         generate.assignAnonymous(value, valueGenerator);

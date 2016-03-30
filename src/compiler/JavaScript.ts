@@ -14,13 +14,13 @@ type Alias = Name;
 type Id = string;
 type Ids = Id[];
 type GlobalId = Id;
-type BodyEntry = string|Function;
 type BodyEntries = BodyEntry[];
 type NameIdsMap = { [index: string]: Ids };
 type Modifications = Modification[];
 type NameModificationsMap = { [index: string]: Modifications };
 type FunctionNameMap = { [index: string]: string };
 
+export type BodyEntry = string|Function;
 export type AssignmentItem = [Name, BodyEntry];
 export type AssignmentItems = AssignmentItem[];
 export type ModuleItem = [Name, Alias];
@@ -91,6 +91,7 @@ waiterMap[Resolver.All] = 'awaitAll';
 const selfName = 's';
 const contextName = 'c';
 const exportsName = 'x';
+const valueName = 'v';
 
 function lastItem(arr: any[]) {
   return arr[arr.length - 1];
@@ -114,14 +115,17 @@ export function createModule() {
   let body: BodyEntries = [];
 
   return {
-    literal, runtimeImport, builder, registerAnonymous, createAnonymous,
-    assignAnonymous, retrieveAnonymous, assignResult, self, selfName,
-    currentDirectory, args, context, contextName, member, write,
-    writeAndGroup, getter, assignment, assignments, exports, exportsName,
-    unaryOperator, binaryOperator, conditionalOperator, statement,
-    ifStatement, loopExpression, loopContinue, funcDeclaration, iife,
-    scope, func, waitFor, compoundExpression, returnStatement, call,
-    array, arrayAppend, object, objectAssign, parens, code, toString
+    selfName, contextName, exportsName, valueName,
+    literal, runtimeImport, builder, registerAnonymous,
+    createAnonymous, assignAnonymous, retrieveAnonymous,
+    assignResult, self, currentDirectory, args, context,
+    member, write, writeAndGroup, getter, assignment,
+    assignments, exports, unaryOperator, binaryOperator,
+    conditionalOperator, statement, ifStatement,
+    loopExpression, loopContinue, funcDeclaration, iife,
+    scope, func, waitFor, compoundExpression, returnStatement,
+    call, array, arrayAppend, object, objectAssign, parens,
+    code, toString
   };
 
   function nextId(prefix: string) {
