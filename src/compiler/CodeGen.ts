@@ -477,9 +477,15 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         );
       });
 
-      if ( !node.elseStatements.isEmpty() ) {
-        createStatementsEvaluator(node.elseStatements);
+      if ( node.elseStatements.isEmpty() ) {
+        let exploder = generate.runtimeImport('matchNotExhaustive');
+        generate.statement(function () {
+          generate.call(exploder, []);
+        });
+        return;
       }
+
+      createStatementsEvaluator(node.elseStatements);
     });
   }
 

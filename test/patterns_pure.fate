@@ -5,7 +5,7 @@ import Array, Object, String, NonEmptyString, EmptyString,
        Boolean, Number, Integer, PositiveInteger, PositiveNumber,
        NegativeInteger, NegativeNumber, ArrayOf
 
-from test import isFalse, isTrue, equalTo
+from test import isFalse, isTrue, equalTo, throws
 
 let null = node.null, undefined = node.undefined
 
@@ -119,6 +119,11 @@ def matchExpression(test)
     43: "forty three"
     else: "nope"
   end | equalTo("nope")
+
+  (-> match 42
+    41: "won't happen"
+    43: "won't happen"
+  end) | throws
 
   test.done()
 end

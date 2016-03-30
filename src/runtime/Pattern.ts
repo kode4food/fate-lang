@@ -13,6 +13,10 @@ export interface Pattern {
   native?: RegExp;
 }
 
+export function matchNotExhaustive() {
+  throw new Error("Match invocation not exhaustive");
+}
+
 export function definePattern(value: Pattern) {
   value.__fatePattern = true;
   return value;
