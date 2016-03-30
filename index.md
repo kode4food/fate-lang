@@ -144,6 +144,14 @@ let LargeOrangeShape = ~{
 # can just use a colon to evaluate a single statement
 if shape like LargeOrangeShape: print('bingo!')
 
+# Match against multiple possible Patterns
+let matchResult = match shape
+  LargeOrangeShape: "Was large and orange"
+  Shape: "Was just a shape"
+  Person: "Was some person... probably Bill"
+  else: "No idea"
+end
+
 # Destructuring Assignment
 let person = { name: 'Bill', age: 43 }
 let { name, age as yearsOnEarth } = person
