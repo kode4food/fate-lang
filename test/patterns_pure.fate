@@ -125,6 +125,11 @@ def matchExpression(test)
     43: "won't happen"
   end) | throws
 
+  42 | match
+    41: "forty one"
+    42: "forty two"
+  end | equalTo("forty two")
+
   test.done()
 end
 

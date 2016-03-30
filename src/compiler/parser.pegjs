@@ -440,16 +440,26 @@ pattern
   / match
 
 match
-  = op:Match __ expr:expr NL matches:matchClauses
-    elseTail:matchElseTail? End  {
-      return node(op, expr, matches, elseTail || node('statements', []));
+  = op:Match value:matchValue matches:matchClauses
+    elseTail:matchElseTail  {
+      return node(op, value, matches, elseTail);
     }
   / unary
 
+matchValue
+  = __ expr:expr NL {
+      return expr;
+    }
+  / NL  {
+      return null;
+    }
 
 matchElseTail
-  = Else stmts:clauseTail {
+  = Else stmts:clauseTail End  {
       return stmts;
+    }
+  / End  {
+      return node('statements', []);
     }
 
 matchClauses

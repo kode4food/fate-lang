@@ -455,17 +455,40 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createMatchEvaluator(node: Syntax.MatchExpression) {
-    generate.iife(function () {
-      let exprResult = generate.createAnonymous();
+    let generator = node.value ? generateExpression : generateFunction;
+    generator();
+
+    function generateExpression() {
+      generate.iife(function () {
+        generateBody(defer(node.value));
+      });
+    }
+
+    function generateFunction() {
+      generate.parens(function () {
+        generate.func({
+          internalId: getFuncOrLambdaInternalId(node),
+          contextArgs: ['self'],
+          body: function () {
+            generateBody(function () {
+              generate.getter('self');
+            });
+          }
+        });
+      });
+    }
+
+    function generateBody(valueGenerator: Function) {
+      let value = generate.createAnonymous();
       generate.statement(function () {
-        generate.assignAnonymous(exprResult, defer(node.value));
+        generate.assignAnonymous(value, valueGenerator);
       });
 
       node.matches.forEach(function (match) {
         generate.ifStatement(
           function () {
             createLikeComparison(
-              function () { generate.retrieveAnonymous(exprResult); },
+              function () { generate.retrieveAnonymous(value); },
               defer(match.pattern)
             );
           },
@@ -486,7 +509,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       }
 
       createStatementsEvaluator(node.elseStatements);
-    });
+    }
   }
 
   function createCallEvaluator(node: Syntax.CallOperator) {
