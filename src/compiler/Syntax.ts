@@ -150,6 +150,17 @@ export class CaseExpression extends Expression {
   constructor(public cases: DoExpression[]) { super(); }
 }
 
+export class MatchExpression extends Expression {
+  constructor(public value: Expression,
+              public matches: MatchClause[],
+              public elseStatements: Statements) { super(); }
+}
+
+export class MatchClause extends Node {
+  constructor(public pattern: Pattern,
+              public statements: Statements) { super(); }
+}
+
 // Array/Object Construction and Comprehension ******************************
 
 export class ElementsConstructor extends Operator {
@@ -457,6 +468,8 @@ let tagToConstructor: FunctionMap = {
   'reduce': ReduceExpression,
   'do': DoExpression,
   'case': CaseExpression,
+  'match': MatchExpression,
+  'matchClause': MatchClause,
   'call': CallOperator,
   'bind': BindOperator,
   'let': LetStatement,

@@ -29,6 +29,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'reduce': createReduceEvaluator,
     'do': createDoEvaluator,
     'case': createCaseEvaluator,
+    'match': createMatchEvaluator,
     'call': createCallEvaluator,
     'bind': createBindEvaluator,
     'let': createLetEvaluator,
@@ -451,6 +452,35 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         });
       });
     }
+  }
+
+  function createMatchEvaluator(node: Syntax.MatchExpression) {
+    generate.iife(function () {
+      let exprResult = generate.createAnonymous();
+      generate.statement(function () {
+        generate.assignAnonymous(exprResult, defer(node.value));
+      });
+
+      node.matches.forEach(function (match) {
+        generate.ifStatement(
+          function () {
+            createLikeComparison(
+              function () { generate.retrieveAnonymous(exprResult); },
+              defer(match.pattern)
+            );
+          },
+          function () {
+            createStatementsEvaluator(match.statements);
+            generate.returnStatement();
+          },
+          null
+        );
+      });
+
+      if ( !node.elseStatements.isEmpty() ) {
+        createStatementsEvaluator(node.elseStatements);
+      }
+    });
   }
 
   function createCallEvaluator(node: Syntax.CallOperator) {

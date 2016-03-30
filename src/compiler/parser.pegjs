@@ -125,9 +125,9 @@ params
     }
 
 paramList
-  = start:paramDef
-    cont:( LIST_SEP param:paramDef  { return param; } )*  {
-      return [start].concat(cont);
+  = head:paramDef
+    tail:( LIST_SEP param:paramDef  { return param; } )*  {
+      return [head].concat(tail);
     }
 
 paramDef
@@ -166,8 +166,8 @@ stringPath
     }
 
 modulePath
-  = __ start:moduleComp cont:( "." item:moduleComp { return item; } )*  {
-      return node('modulePath', [start].concat(cont).join('/'));
+  = __ head:moduleComp tail:( "." item:moduleComp { return item; } )*  {
+      return node('modulePath', [head].concat(tail).join('/'));
     }
 
 moduleComp
@@ -176,8 +176,8 @@ moduleComp
     }
 
 moduleItems
-  = start:moduleItem cont:( LIST_SEP item:moduleItem { return item; } )*  {
-      return [start].concat(cont);
+  = head:moduleItem tail:( LIST_SEP item:moduleItem { return item; } )*  {
+      return [head].concat(tail);
     }
 
 moduleItem
@@ -189,9 +189,9 @@ moduleItem
     }
 
 moduleSpecifiers
-  = start:moduleSpecifier
-    cont:( LIST_SEP spec:moduleSpecifier { return spec; } )*  {
-      return [start].concat(cont);
+  = head:moduleSpecifier
+    tail:( LIST_SEP spec:moduleSpecifier { return spec; } )*  {
+      return [head].concat(tail);
     }
 
 moduleSpecifier
@@ -223,9 +223,9 @@ forStatement
     }
 
 reduceAssignments
-  = __ start:reduceAssignment
-    cont:( LIST_SEP a:reduceAssignment { return a; } )*  {
-      return [start].concat(cont);
+  = __ head:reduceAssignment
+    tail:( LIST_SEP a:reduceAssignment { return a; } )*  {
+      return [head].concat(tail);
     }
 
 reduceAssignment
@@ -238,8 +238,8 @@ idAssignment
     }
 
 ranges
-  = __ start:range cont:( LIST_SEP r:range { return r; } )*  {
-      return [start].concat(cont);
+  = __ head:range tail:( LIST_SEP r:range { return r; } )*  {
+      return [head].concat(tail);
     }
 
 range
@@ -312,9 +312,9 @@ letStatement
     }
 
 assignments
-  = start:assignment
-    cont:( LIST_SEP a:assignment { return a; } )*  {
-      return [start].concat(cont);
+  = head:assignment
+    tail:( LIST_SEP a:assignment { return a; } )*  {
+      return [head].concat(tail);
     }
 
 assignment
@@ -338,9 +338,9 @@ objectDestructure
     }
 
 objectDestructureItems
-  = start:objectDestructureItem
-    cont:( LIST_SEP item:objectDestructureItem { return item; } )*  {
-      return [start].concat(cont);
+  = head:objectDestructureItem
+    tail:( LIST_SEP item:objectDestructureItem { return item; } )*  {
+      return [head].concat(tail);
     }
 
 objectDestructureItem
@@ -355,9 +355,9 @@ objectDestructureItem
     }
 
 idList
-  = start:Identifier
-    cont:( LIST_SEP id:Identifier { return id; } )*  {
-      return [start].concat(cont);
+  = head:Identifier
+    tail:( LIST_SEP id:Identifier { return id; } )*  {
+      return [head].concat(tail);
     }
 
 returnStatement
@@ -437,7 +437,39 @@ pattern
   = "~" _ expr:unary  {
       return expr.template('pattern', expr);
     }
+  / match
+
+match
+  = op:Match __ expr:expr NL matches:matchClauses
+    elseTail:matchElseTail? End  {
+      return node(op, expr, matches, elseTail || node('statements', []));
+    }
   / unary
+
+
+matchElseTail
+  = Else stmts:clauseTail {
+      return stmts;
+    }
+
+matchClauses
+  = head:matchClause
+    tail:(m:matchClause { return m; })*  {
+      return [head].concat(tail);
+    }
+
+matchClause
+  = pattern:patternExpr stmts:clauseTail  {
+      return node('matchClause', pattern, stmts);
+    }
+
+clauseTail
+  = NL stmts:statements  {
+      return stmts;
+    }
+  / __ ":" __ stmt:statement  {
+      return statementsNode([stmt]);
+    }
 
 unary
   = op:Unary _ expr:unary  {
@@ -480,9 +512,9 @@ callArgs
     }
 
 callElements
-  = start:callElement
-    cont:( LIST_SEP e:callElement  { return e; } )*  {
-      return [start].concat(cont);
+  = head:callElement
+    tail:( LIST_SEP e:callElement  { return e; } )*  {
+      return [head].concat(tail);
     }
 
 callElement
@@ -494,9 +526,9 @@ bindArgs
     }
 
 bindElements
-  = start:expr
-    cont:( LIST_SEP e:expr  { return e; } )*  {
-      return [start].concat(cont);
+  = head:expr
+    tail:( LIST_SEP e:expr  { return e; } )*  {
+      return [head].concat(tail);
     }
 
 list
@@ -519,9 +551,9 @@ array
     }
 
 arrayElements
-  = start:expr
-    cont:( LIST_SEP e:expr  { return e; } )*  {
-      return [start].concat(cont);
+  = head:expr
+    tail:( LIST_SEP e:expr  { return e; } )*  {
+      return [head].concat(tail);
     }
 
 arrayComprehension
@@ -549,9 +581,9 @@ object
     }
 
 objectAssignments
-  = start:objectAssignment
-    cont:( LIST_SEP a:objectAssignment { return a; } )*  {
-      return [start].concat(cont);
+  = head:objectAssignment
+    tail:( LIST_SEP a:objectAssignment { return a; } )*  {
+      return [head].concat(tail);
     }
 
 objectAssignment
@@ -602,14 +634,14 @@ lambdaParams
 
 lambdaStatements
   = head:blockStatement
-    tail:(NL s:blockStatement { return s; })* {
+    tail:( NL s:blockStatement { return s; } )* {
       return [head].concat(tail);
     }
 
 idParamList
-  = start:idParam
-    cont:( LIST_SEP id:idParam { return id; } )*  {
-      return [start].concat(cont);
+  = head:idParam
+    tail:( LIST_SEP id:idParam { return id; } )*  {
+      return [head].concat(tail);
     }
 
 idParam
@@ -638,25 +670,17 @@ whenTail
     }
 
 caseClauses
-  = start:caseClause
-    cont:(w:caseClause { return w; })*  {
-      return [start].concat(cont);
+  = head:caseClause
+    tail:( w:caseClause { return w; } )*  {
+      return [head].concat(tail);
     }
 
 caseClause
-  = Case __ assignments:reduceAssignments stmts:caseClauseTail  {
+  = Case __ assignments:reduceAssignments stmts:clauseTail  {
       return node('do', stmts, node('let', assignments));
     }
-  / Case __ expr:expr stmts:caseClauseTail  {
+  / Case __ expr:expr stmts:clauseTail  {
       return node('do', stmts, expr);
-    }
-
-caseClauseTail
-  = NL stmts:statements  {
-      return stmts;
-    }
-  / __ ":" __ stmt:statement  {
-      return statementsNode([stmt]);
     }
 
 reduceExpression
@@ -715,6 +739,7 @@ Await   = "await"    !NameContinue  { return 'await'; }
 Reduce  = "reduce"   !NameContinue  { return 'reduce'; }
 Do      = "do"       !NameContinue  { return 'do'; }
 Case    = "case"     !NameContinue  { return 'case'; }
+Match   = "match"    !NameContinue  { return 'match'; }
 For     = "for"      !NameContinue  { return 'for'; }
 Def     = "def"      !NameContinue  { return 'function'; }
 From    = "from"     !NameContinue  { return 'from'; }
@@ -748,7 +773,7 @@ ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or /
       Like / Mod / Not / If / Unless / True / False / As / In /
       Return / Self / Else / End / Where / Select / Reduce / Await /
-      Any / All / When / Case )
+      Any / All / When / Case / Match )
 
 Identifier "identifier"
   = !ReservedWord name:Name  {
@@ -935,4 +960,3 @@ AS_SEP = __ As __
 IN_SEP = __ In __
 LIST_SEP = __ "," __
 PROP_SEP = __ ":" __
-CASE_SEP = NL

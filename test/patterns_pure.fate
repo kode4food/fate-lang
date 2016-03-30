@@ -5,7 +5,7 @@ import Array, Object, String, NonEmptyString, EmptyString,
        Boolean, Number, Integer, PositiveInteger, PositiveNumber,
        NegativeInteger, NegativeNumber, ArrayOf
 
-from test import isFalse, isTrue
+from test import isFalse, isTrue, equalTo
 
 let null = node.null, undefined = node.undefined
 
@@ -104,10 +104,30 @@ def arrayPatterns(test)
   test.done()
 end
 
+def matchExpression(test)
+  let result = match 42
+    self > 50: "over 50"
+    self < 40: "under 40"
+    42: "42 exactly"
+    self >= 40: "over 40"
+  end
+
+  result | equalTo("42 exactly")
+
+  match 42
+    41: "forty one"
+    43: "forty three"
+    else: "nope"
+  end | equalTo("nope")
+
+  test.done()
+end
+
 export let tests = nodeunit.testCase({
 	"Numbers": numberPatterns,
   "Strings": stringPatterns,
   "Boolean": booleanPatterns,
   "Objects": objectPatterns,
-  "Arrays": arrayPatterns
+  "Arrays": arrayPatterns,
+  "Match": matchExpression
 })

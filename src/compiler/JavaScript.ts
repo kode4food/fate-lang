@@ -659,7 +659,11 @@ export function createModule() {
   }
 
   function returnStatement(bodyCallback?: Function) {
-    write('return ', bodyCallback, ';');
+    if ( bodyCallback ) {
+      write('return ', bodyCallback, ';');
+      return;
+    }
+    write('return ', (usesScratch ? '_' : ''), ';');
   }
 
   function call(funcId: Id|BodyEntry, args?: BodyEntries) {
