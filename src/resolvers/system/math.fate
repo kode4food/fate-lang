@@ -38,46 +38,52 @@ end
 
 # Math functions
 
-def NumberWrapped(func)
-  def Wrapper(Number as value)
+def NumberFunc(func)
+  def wrapper(Number as value)
     func(value)
+  end
+end
+
+def NumberFunc2(func)
+  def wrapper(Number as x, Number as y)
+    func(x, y)
   end
 end
 
 # `number(value)` convert value to a Number
 export let number = Number
 # `abs(value)` returns the absolute value
-export let abs = Math.abs | NumberWrapped
+export let abs = Math.abs | NumberFunc
 # `acos(value)` returns the arc-cosine of value (in radians)
-export let acos = Math.acos | NumberWrapped
+export let acos = Math.acos | NumberFunc
 # `asin(value)` returns the arc-sine of value (in radians)
-export let asin = Math.asin | NumberWrapped
+export let asin = Math.asin | NumberFunc
 # `atan(value)` returns the arc-tangent of value (in radians)
-export let atan = Math.atan | NumberWrapped
+export let atan = Math.atan | NumberFunc
 # `atan2(x,y)` returns the arc-tangent of the coords
-export let atan2 = Math.atan2 | NumberWrapped
+export let atan2 = Math.atan2 | NumberFunc2
 # `ceil(value)` rounds to the next highest integer
-export let ceil = Math.ceil | NumberWrapped
+export let ceil = Math.ceil | NumberFunc
 # `cos(value)` returns the cosine of value (in radians)
-export let cos = Math.cos | NumberWrapped
+export let cos = Math.cos | NumberFunc
 # `exp(x)` returns E to the power of x
-export let exp = Math.exp | NumberWrapped
+export let exp = Math.exp | NumberFunc
 # `floor(value)` rounds to the next lowest integer
-export let floor = Math.floor | NumberWrapped
+export let floor = Math.floor | NumberFunc
 # `log(value)` returns the natural logarithm
-export let log = Math.log | NumberWrapped
+export let log = Math.log | NumberFunc
 # `pow(x,y)` returns x raised to the power of y
-export let pow = Math.pow | NumberWrapped
+export let pow = Math.pow | NumberFunc2
 # `random()` returns a random number (0 <= x < 1)
-export let random = Math.random | NumberWrapped
+export let random = Math.random | NumberFunc
 # `round(value)` rounds up or down to the closest integer
-export let round = Math.round | NumberWrapped
+export let round = Math.round | NumberFunc
 # `sin(value)` returns the sine of value (in radians)
-export let sin = Math.sin | NumberWrapped
+export let sin = Math.sin | NumberFunc
 # `sqrt(value)` returns the square root
-export let sqrt = Math.sqrt | NumberWrapped
+export let sqrt = Math.sqrt | NumberFunc
 # `tan(value)` returns the tangent of value (in radians)
-export let tan = Math.tan | NumberWrapped
+export let tan = Math.tan | NumberFunc
 
 # ### Constants
 
