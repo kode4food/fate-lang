@@ -21,11 +21,16 @@ export let NonEmptyString = ~(
 export
 let Number = ~isA(self, 'number')
   , PositiveNumber = ~(self > 0 and isA(self, 'number'))
+  , NonNegativeNumber = ~(self >= 0 and isA(self, 'number'))
   , NegativeNumber = ~(self < 0 and isA(self, 'number'))
   , Integer = ~(self mod 1 = 0 and isA(self, 'number'))
 
 export let PositiveInteger = ~(
   self > 0 and self mod 1 = 0 and isA(self, 'number')
+)
+
+export let NonNegativeInteger = ~(
+  self >= 0 and self mod 1 = 0 and isA(self, 'number')
 )
 
 export let NegativeInteger = ~(
@@ -34,9 +39,10 @@ export let NegativeInteger = ~(
 
 export
 let Array = definePattern(isArray)
+  , EmptyArray = ~(isArray(self) and self.length = 0)
+  , NonEmptyArray = ~(isArray(self) and self.length > 0)
   , Object = definePattern(isObject)
   , Boolean = ~isA(self, 'boolean')
-  , EmptyArray = ~(isArray(self) and self.length = 0)
 
 export def ArrayOf(elementPattern)
   let checker = definePattern(value ->
