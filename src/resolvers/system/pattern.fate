@@ -54,7 +54,6 @@ export def ArrayOf(elementPattern)
   )
 
   def decorate(pattern)
-    # should become 'export' calls
     setProperty(pattern, 'MinLength', minLength -> (value ->
       return false unless isArray(value) and value.length >= minLength
       pattern(value)
