@@ -549,10 +549,13 @@ export function createModule() {
   }
 
   function funcDeclaration(name: Name, options: FunctionOptions) {
-    let functionId = localForWrite(name);
-    write(functionId, '=');
-    func(options);
-    write(';');
+    statement(function () {
+      assignResult(function () {
+        let functionId = localForWrite(name);
+        write(functionId, '=');
+        func(options);
+      });
+    });
   }
 
   function iife(funcBody: BodyEntry) {

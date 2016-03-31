@@ -38,40 +38,46 @@ end
 
 # Math functions
 
+def NumberWrapped(func)
+  def Wrapper(Number as value)
+    func(value)
+  end
+end
+
 # `number(value)` convert value to a Number
 export let number = Number
 # `abs(value)` returns the absolute value
-export let abs = Math.abs
+export let abs = Math.abs | NumberWrapped
 # `acos(value)` returns the arc-cosine of value (in radians)
-export let acos = Math.acos
+export let acos = Math.acos | NumberWrapped
 # `asin(value)` returns the arc-sine of value (in radians)
-export let asin = Math.asin
+export let asin = Math.asin | NumberWrapped
 # `atan(value)` returns the arc-tangent of value (in radians)
-export let atan = Math.atan
+export let atan = Math.atan | NumberWrapped
 # `atan2(x,y)` returns the arc-tangent of the coords
-export let atan2 = Math.atan2
+export let atan2 = Math.atan2 | NumberWrapped
 # `ceil(value)` rounds to the next highest integer
-export let ceil = Math.ceil
+export let ceil = Math.ceil | NumberWrapped
 # `cos(value)` returns the cosine of value (in radians)
-export let cos = Math.cos
+export let cos = Math.cos | NumberWrapped
 # `exp(x)` returns E to the power of x
-export let exp = Math.exp
+export let exp = Math.exp | NumberWrapped
 # `floor(value)` rounds to the next lowest integer
-export let floor = Math.floor
+export let floor = Math.floor | NumberWrapped
 # `log(value)` returns the natural logarithm
-export let log = Math.log
+export let log = Math.log | NumberWrapped
 # `pow(x,y)` returns x raised to the power of y
-export let pow = Math.pow
+export let pow = Math.pow | NumberWrapped
 # `random()` returns a random number (0 <= x < 1)
-export let random = Math.random
+export let random = Math.random | NumberWrapped
 # `round(value)` rounds up or down to the closest integer
-export let round = Math.round
+export let round = Math.round | NumberWrapped
 # `sin(value)` returns the sine of value (in radians)
-export let sin = Math.sin
+export let sin = Math.sin | NumberWrapped
 # `sqrt(value)` returns the square root
-export let sqrt = Math.sqrt
+export let sqrt = Math.sqrt | NumberWrapped
 # `tan(value)` returns the tangent of value (in radians)
-export let tan = Math.tan
+export let tan = Math.tan | NumberWrapped
 
 # ### Constants
 
