@@ -106,18 +106,18 @@ end
 
 def matchExpression(test)
   let result = match 42
-    self > 50: "over 50"
-    self < 40: "under 40"
-    42: "42 exactly"
-    self >= 40: "over 40"
+    self > 50  : "over 50"
+    self < 40  : "under 40"
+    42         : "42 exactly"
+    self >= 40 : "over 40"
   end
 
   result | equalTo("42 exactly")
 
   match 42
-    41: "forty one"
-    43: "forty three"
-    else: "nope"
+    41   : "forty one"
+    43   : "forty three"
+    else : "nope"
   end | equalTo("nope")
 
   (-> match 42
