@@ -55,7 +55,7 @@ function createUnitTests() {
 }
 
 gulp.task('clean', function () {
-  return del([buildDir('**/*')]);
+  return del([buildDir('**/*'), './**/*.fate.js']);
 });
 
 gulp.task('prepare', ['clean'], function () {
