@@ -10,7 +10,6 @@ exports.lambda = require('./lambda').lambda;
 exports.like = require('./like').like;
 exports.lists = require('./lists').lists;
 exports.loops = require('./loops').loops;
-exports.scheduler = require('./scheduler').scheduler;
 exports.scope = require('./scope').scope;
 exports.strings = require('./strings').strings;
 exports.math = require('./math').math;
