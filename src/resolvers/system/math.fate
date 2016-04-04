@@ -3,6 +3,8 @@ from './support' import Math, Number
 from pattern import Array, Number, ArrayOf
 
 # Warning: this module assumes JavaScript-specific methods
+#
+#   Basically everything from JavaScript's Math module
 
 export from '../../generator' import createRangeGenerator as range
 

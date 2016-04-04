@@ -1,9 +1,16 @@
-from welsh import Promise
-from url import parse as parseURL
+from 'node:welsh' import Promise
+from 'node:url' import parse as parseURL
+
 from pattern import NonEmptyString as URL
+from './support' import make
 
 import 'node:http' as http
-from './support' import make
+
+# Warning: this module assumes JavaScript-specific methods
+#
+#   The Welsh promise module
+#   Node's 'url' module
+#   Node's 'http' module
 
 export def get(URL as url)
   make(Promise, (resolve) ->

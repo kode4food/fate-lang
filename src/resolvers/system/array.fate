@@ -3,6 +3,9 @@ from pattern import Array
 from '../../Types' import isArray
 
 # Warning: this module assumes JavaScript-specific methods
+#
+#   Array.prototype.length
+#   Array.prototype.join
 
 export def first(Array as value)
   value[0]

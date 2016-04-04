@@ -3,6 +3,12 @@ from pattern import Something, String
 export from '../../runtime/Format' import buildFormatter as build
 
 # Warning: this module assumes JavaScript-specific methods
+#
+#   String.prototype.toLowerCase
+#   String.prototype.toUppercase
+#   String.prototype.split
+#   String.prototype.replace
+#   Array.prototype.length
 
 let whitespaceRegex = (/\s*/).native
 let wordRegex = (/\w\S*/g).native

@@ -1,8 +1,10 @@
-from assert
+from 'node:assert'
 import equal, notEqual, deepEqual, notDeepEqual, strictEqual,
        notStrictEqual, throws, doesNotThrow, ok
 
 # Warning: this module assumes JavaScript-specific methods
+#
+#   Basically everything from Node.js' assert module
 
 export
 let equalTo = value -> x -> equal(value, x)

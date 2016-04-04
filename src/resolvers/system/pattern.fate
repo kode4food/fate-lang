@@ -10,6 +10,8 @@ import isNothing as Nothing
 from './support' import isA, setProperty
 
 # Warning: this module assumes JavaScript-specific methods
+#
+#   Array.prototype.length
 
 export let String = ~isA(self, 'string')
 export let EmptyString = ~''
