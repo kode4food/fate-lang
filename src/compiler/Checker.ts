@@ -91,7 +91,8 @@ export default function createTreeProcessors(visit: Visitor) {
     let encounteredNames: NameSet = { };
     let duplicatedNames: NameSet = { };
     signatures.forEach(function (signature) {
-      signature.params.forEach(function (param) {
+      let namedParams = signature.params.filter(param => !!param.id);
+      namedParams.forEach(function (param) {
         let name = param.id.value;
         if ( encounteredNames[name] ) {
           duplicatedNames[name] = true;
