@@ -26,6 +26,20 @@ def guardAndDefault(test)
   test.done()
 end
 
+def anonymousPatternArgument(test)
+  def testFunc(x)
+    x * 5
+  end
+
+  def testFunc(self > 5)
+    "hello"
+  end
+
+  testFunc(5) | equalTo(25)
+  testFunc(6) | equalTo('hello')
+  test.done()
+end
+
 def noArguments(test)
   let a = 99
 
@@ -44,5 +58,6 @@ end
 export let tests = nodeunit.testCase({
   "Functions with Guards Only": guardOnly,
   "Functions with Guard and Default": guardAndDefault,
+  "Functions with Anonymous Patterns": anonymousPatternArgument,
   "Functions with No Arguments": noArguments
 })
