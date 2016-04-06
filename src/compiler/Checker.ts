@@ -233,6 +233,16 @@ export default function createTreeProcessors(visit: Visitor) {
     return statements;
   }
 
+  function isGuarded(signature: Syntax.Signature) {
+    if ( signature.guard ) {
+      return true;
+    }
+
+    return signature.params.filter(function (param) {
+      return param instanceof Syntax.PatternParameter;
+    }).length !== 0;
+  }
+
   function warnFunctionShadowing(statements: Syntax.FunctionDeclaration[]) {
     let namesSeen: NameSet = {};
     let lastName: string;
@@ -241,7 +251,7 @@ export default function createTreeProcessors(visit: Visitor) {
       let signature = statement.signature;
       let name = signature.id.value;
 
-      if ( !signature.guard && namesSeen[name] ) {
+      if ( !isGuarded(signature) && namesSeen[name] ) {
         visit.issueWarning(statement,
           `The unguarded Function '${name}' will replace ` +
           `the previous definition(s)`
