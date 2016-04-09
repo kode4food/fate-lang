@@ -709,7 +709,7 @@ reduceExpressionAssignment
 
 parens
   = "(" __ expr:expr __ ")"  {
-      return expr;
+      return node('parens', expr);
     }
   / literal
 

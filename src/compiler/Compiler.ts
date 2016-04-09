@@ -3,9 +3,9 @@
 "use strict";
 
 import Visitor from './Visitor';
-import Checker from './Checker';
+import Prepare from './Prepare';
 import Patterns from './Patterns';
-import Rewriter from './Rewriter';
+import Rewrite from './Rewrite';
 
 import * as Runtime from '../Runtime';
 
@@ -33,7 +33,7 @@ export class CompileError implements Error {
 
 export type CompileErrors = CompileError[];
 
-const compilerPipeline = [Checker, Patterns, Rewriter];
+const compilerPipeline = [Prepare, Patterns, Rewrite];
 
 export function compileModule(script: ScriptContent) {
   let syntaxTree = generatedParser.parse(script);

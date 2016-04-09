@@ -17,6 +17,7 @@ export default function createTreeProcessors(visit: Visitor) {
   let whenReference = visit.ancestorTags('id', assignmentTypes, 'let', 'do');
 
   return [
+    visit.matching(rollUpParens, visit.tags('parens')),
     visit.matching(validateAwaits, visit.tags('await')),
     visit.matching(validateWildcards, visit.tags('wildcard')),
     visit.matching(validateSelfReferences, visit.tags('self')),
@@ -28,6 +29,10 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.statementGroups(validateAssignments, visit.tags('let'), 1),
     visit.statementGroups(warnFunctionShadowing, visit.tags('function'))
   ];
+
+  function rollUpParens(node: Syntax.Parens) {
+    return node.left;
+  }
 
   // an 'await' can only exist inside of a 'do' expression
   function validateAwaits(node: Syntax.AwaitOperator) {

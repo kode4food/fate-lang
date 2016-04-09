@@ -22,7 +22,8 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(namePatterns, visit.tags('pattern')),
     visit.matching(nameSelfPatternAnchors, patternCollection),
     visit.matching(nameAndAnnotateSelfPatterns, selfPattern),
-    visit.matching(annotatePatternNode, patternNode)
+    visit.matching(annotatePatternNode, patternNode),
+    visit.matching(buildPatternGuards, visit.tags('signature'))
   ];
 
   // patterns don't have to exist within Patterns
@@ -92,6 +93,34 @@ export default function createTreeProcessors(visit: Visitor) {
   // so that the Code Generator can branch appropriately
   function annotatePatternNode(node: Syntax.Node) {
     annotate(node, 'pattern/node');
+    return node;
+  }
+
+  function buildPatternGuards(node: Syntax.Signature) {
+    let newGuards: Syntax.Expressions = [];
+
+    // Generate Guards from the Parameters
+    let params = node.params;
+    params.forEach((param, idx) => {
+      if ( param instanceof Syntax.PatternParameter ) {
+        let ident = param.id || param.template('id', idx);
+        params[idx] = ident.template('idParam', ident, param.cardinality);
+        newGuards.push(ident.template('like', ident, param.pattern));
+      }
+    });
+
+    // Combine the Guards
+    if ( newGuards.length ) {
+      if ( node.guard ) {
+        // Push it to the end of the list
+        newGuards.push(node.guard);
+      }
+      node.guard = newGuards.shift();
+      newGuards.forEach((newGuard) => {
+        node.guard = node.guard.template('and', node.guard, newGuard);
+      });
+    }
+
     return node;
   }
 }

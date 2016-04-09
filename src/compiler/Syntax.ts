@@ -67,6 +67,10 @@ export function hasTag(node: Node, tags?: TagOrTags): any {
 export class Expression extends Node {}
 export class Operator extends Expression {}
 
+export class Parens extends Expression {
+  constructor(public left: Expression) { super(); }
+}
+
 export class UnaryOperator extends Operator {
   constructor(public left: Expression) { super(); }
 }
@@ -501,6 +505,7 @@ let tagToConstructor: FunctionMap = {
   'neg': NegativeOperator,
   'pos': PositiveOperator,
   'await': AwaitOperator,
+  'parens': Parens,
   'format': FormatOperator,
   'member': MemberOperator,
   'array': ArrayConstructor,
