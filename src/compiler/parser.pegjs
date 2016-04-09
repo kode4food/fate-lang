@@ -131,16 +131,19 @@ paramList
     }
 
 paramDef
-  = pattern:patternExpr
-    alias:( AS_SEP id:Identifier { return id; } )
-    cardinality:paramCardinality?  {
+  = pattern:patternExpr alias:alias cardinality:paramCardinality?  {
       return node('patternParam', alias, pattern, cardinality);
     }
-  / id:Identifier cardinality:paramCardinality?  {
-      return node('idParam', id, cardinality);
-    }
   / pattern:patternExpr cardinality:paramCardinality?  {
+      if ( pattern.left.tag === 'id' ) {
+        return node('idParam', pattern.left, cardinality);
+      }
       return node('patternParam', null, pattern, cardinality);
+    }
+
+alias
+  = AS_SEP id:Identifier  {
+      return id;
     }
 
 paramCardinality
@@ -181,7 +184,7 @@ moduleItems
     }
 
 moduleItem
-  = name:Name AS_SEP alias:Identifier  {
+  = name:Name alias:alias  {
       return node('moduleItem', name, alias);
     }
   / name:Identifier  {
@@ -195,10 +198,10 @@ moduleSpecifiers
     }
 
 moduleSpecifier
-  = path:stringPath AS_SEP alias:Identifier  {
+  = path:stringPath alias:alias  {
       return node('moduleSpecifier', path, alias);
     }
-  / path:modulePath alias:( AS_SEP id:Identifier  { return id; } )?  {
+  / path:modulePath alias:alias?  {
       return node('moduleSpecifier', path, alias);
     }
 
@@ -344,10 +347,10 @@ objectDestructureItems
     }
 
 objectDestructureItem
-  = name:Name AS_SEP id:Identifier  {
+  = name:Name id:alias  {
       return node('objectDestructureItem', id, literalName(name));
     }
-  / name:expr AS_SEP id:Identifier  {
+  / name:expr id:alias  {
       return node('objectDestructureItem', id, name);
     }
   / id:Identifier  {

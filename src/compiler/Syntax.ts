@@ -384,7 +384,7 @@ export class Parameter extends Node {
 }
 
 export class PatternParameter extends Parameter {
-  constructor(id: Identifier, public pattern: Expression,
+  constructor(id: Identifier, public pattern: Pattern,
               cardinality: Cardinality) {
     super(id, cardinality);
   }
