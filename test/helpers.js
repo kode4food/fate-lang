@@ -7,6 +7,8 @@ const glob = require('glob');
 const evaluate = require('../dist/Fate')['evaluate'];
 const mixin = require('../dist/Util')['mixin'];
 
+const usesFate = /^(['"])use fate\1$/g;
+
 /*
  * Creates a mock console, primarily for intercepting the results of the
  * Fate command-line tool
@@ -51,9 +53,13 @@ function evaluateEmit(script, data) {
   }
 }
 
+function isFateCompilation(filename) {
+  return usesFate.test(fs.readFileSync(filename).toString());
+}
+
 function monkeyPatchRequires(root, remappedPaths) {
-  let files = glob.sync('**/*.fate.js', { cwd: root });
-  files.forEach(function (file) {
+  let files = glob.sync('**/*.js', { cwd: root });
+  files.filter(isFateCompilation).forEach(function (file) {
     // Rewrite the file to point to the local Fate instance
     let filePath = path.join(root, file);
     let content = fs.readFileSync(filePath).toString();

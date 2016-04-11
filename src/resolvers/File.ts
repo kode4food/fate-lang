@@ -9,7 +9,7 @@ interface Options {
 }
 
 const explicitPathRegex = /(\.fate)(\.js)?$/;
-const pathSuffixes = ['.fate.js', '.fate', '/index.fate.js', '/index.fate'];
+const pathSuffixes = ['.js', '.fate', '/index.js', '/index.fate'];
 
 /*
  * Creates a new FileResolver.

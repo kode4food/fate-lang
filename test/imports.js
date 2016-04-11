@@ -107,7 +107,7 @@ exports.imports = nodeunit.testCase({
       test.equal(evaluate(script3), "wrong!");
 
       test.throws(function () {
-        evaluate("import './bogus2.fate.js' as module");
+        evaluate("import './bogus2' as module");
       }, "should throw module not resolved");
 
       test.done();

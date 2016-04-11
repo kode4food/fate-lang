@@ -34,7 +34,7 @@ var nodeUnitConfig = {
 var enforcerConfig = {
   thresholds: {
     statements: 99.87,
-    branches: 96.93,
+    branches: 96.77,
     functions: 100,
     lines: 100
   },
@@ -55,7 +55,9 @@ function createUnitTests() {
 }
 
 gulp.task('clean', function () {
-  return del([buildDir('**/*'), './**/*.fate.js']);
+  return del([
+    buildDir('**/*')
+  ]);
 });
 
 gulp.task('prepare', ['clean'], function () {

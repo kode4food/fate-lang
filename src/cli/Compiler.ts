@@ -15,14 +15,14 @@ import {
 
 import { VERSION } from '../Fate';
 
-const ext = '.js';
+const defaultPattern = '*.fate';
 
 interface ParsedArguments {
   'help'?: boolean;
   'parse'?: boolean;
-  'in'?: string|string[];
+  'in'?: string;
   'out'?: string;
-  'files'?: string;
+  '_'?: string[];
 }
 
 interface CompilerOutput {
@@ -36,7 +36,7 @@ interface CompilerOutput {
  *
  * Example:
  *
- *     commandLine("-in", "./scripts", "-out", "./output");
+ *     commandLine("--in", "./scripts", "--out", "./output");
  */
 export function commandLine(inputArgs: string[], console: Console,
                             completedCallback: Function) {
@@ -44,8 +44,12 @@ export function commandLine(inputArgs: string[], console: Console,
 
   let args = <ParsedArguments>minimist(inputArgs, {
     boolean: ['parse', 'help'],
-    string: ['in', 'out', 'files'],
-    unknown: () => { badArg = true; return false; }
+    string: ['in', 'out'],
+    unknown: (value) => {
+      let invalidFlag = /^--.+/.test(value);
+      badArg = badArg || invalidFlag;
+      return !invalidFlag;
+    }
   });
 
   if ( !inputArgs.length || badArg || args.help ) {
@@ -54,16 +58,15 @@ export function commandLine(inputArgs: string[], console: Console,
     return;
   }
 
-  let inDirs = makeArray(args.in);
   let skipWrite = args.parse;
-  let pattern = args.files || '**/*.fate';
+  let patterns = args._.length ? args._ : [defaultPattern];
   let errors: CompilerOutput[] = [];
   let warnings: CompilerOutput[] = [];
   let success = 0;
 
   try {
-    // Iterate over the `-in` directories
-    processDirectories();
+    // Process each pattern
+    patterns.forEach(processPattern);
     // Display the results
     processResults();
     if ( warnings.length ) {
@@ -82,16 +85,13 @@ export function commandLine(inputArgs: string[], console: Console,
     errorOut(err);
   }
 
-  function processDirectories() {
-    inDirs.forEach(processDirectory);
-  }
-
-  function processDirectory(inDir: string) {
+  function processPattern(pattern: string) {
+    let inDir = args.in || process.cwd();
     let outDir = args.out || inDir;
     let files = glob(pattern, { cwd: inDir });
 
     if ( !files.length ) {
-      throw `No files found matching '${pattern}' in ${inDir}`;
+      throw `No files found matching '${pattern}'`;
     }
 
     files.forEach(function (file: string) {
@@ -107,7 +107,8 @@ export function commandLine(inputArgs: string[], console: Console,
 
         let scriptBody = compileResult.scriptBody;
         if ( !skipWrite ) {
-          writeNodeModule(scriptBody, join(outDir, file + ext));
+          let outFile = file.replace(/\.fate$/, '.js');
+          writeNodeModule(scriptBody, join(outDir, outFile));
         }
 
         success += 1;
@@ -149,13 +150,6 @@ export function commandLine(inputArgs: string[], console: Console,
     let wrapped = wrapCompileError(error.err, error.filePath);
     console.warn(wrapped.toString());
     console.warn("");
-  }
-
-  function makeArray(value: string|string[]): string[] {
-    if ( !Array.isArray(value) ) {
-      return [value];
-    }
-    return <string[]>value;
   }
 
   // Processing Functions
@@ -205,17 +199,18 @@ export function commandLine(inputArgs: string[], console: Console,
 `
   Usage:
 
-    fatec (options)
+    fatec (options) <patterns>
 
   Where:
 
     Options:
 
     --help         - You're looking at me right now
-    --in <path>    - Location of scripts to parse
-    --out <path>   - Location of compiled output (or --in path)
-    --files <glob> - Filename pattern to parse (**/*.fate)
     --parse        - Parse only! Don't generate any output
+    --in <path>    - Location of source files to compile
+    --out <path>   - Location of compiled output (--in)
+
+    <patterns>     - Filename patterns to parse (*.fate)
 `
     );
   }
