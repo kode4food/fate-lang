@@ -7,7 +7,7 @@ const glob = require('glob');
 const evaluate = require('../dist/Fate')['evaluate'];
 const mixin = require('../dist/Util')['mixin'];
 
-const usesFate = /^(['"])use fate\1$/g;
+const usesFate = /(['"])use fate\1;/g;
 
 /*
  * Creates a mock console, primarily for intercepting the results of the
@@ -53,10 +53,6 @@ function evaluateEmit(script, data) {
   }
 }
 
-function isFateCompilation(filename) {
-  return usesFate.test(fs.readFileSync(filename).toString());
-}
-
 function monkeyPatchRequires(root, remappedPaths) {
   let files = glob.sync('**/*.js', { cwd: root });
   files.filter(isFateCompilation).forEach(function (file) {
@@ -71,6 +67,11 @@ function monkeyPatchRequires(root, remappedPaths) {
     });
     fs.writeFileSync(filePath, content);
   });
+
+  function isFateCompilation(file) {
+    let filePath = path.join(root, file);
+    return usesFate.test(fs.readFileSync(filePath).toString());
+  }
 }
 
 // Exported Functions

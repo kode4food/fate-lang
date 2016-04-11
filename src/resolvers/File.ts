@@ -8,8 +8,7 @@ interface Options {
   path: string;
 }
 
-const explicitPathRegex = /(\.fate)(\.js)?$/;
-const pathSuffixes = ['.js', '.fate', '/index.js', '/index.fate'];
+const pathSuffixes = ['.fate', '/index.fate'];
 
 /*
  * Creates a new FileResolver.
@@ -36,16 +35,6 @@ export function createFileResolver(options: Options) {
 }
 
 function loadFromFileSystem(name: ModuleName, basePath: DirPath) {
-  if ( explicitPathRegex.test(name) ) {
-    try {
-      let explicitPath = resolvePath(basePath, name);
-      return createModule(require(explicitPath));
-    }
-    catch ( err ) {
-      return undefined;
-    }
-  }
-
   let checkPaths = pathSuffixes.map(function (suffix) {
     return resolvePath(basePath, name + suffix);
   });
