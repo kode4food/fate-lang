@@ -7,7 +7,7 @@ const glob = require('glob');
 const evaluate = require('../dist/Fate')['evaluate'];
 const mixin = require('../dist/Util')['mixin'];
 
-const usesFate = /(['"])use fate\1;/g;
+const usesFate = /(['"])fate\-compiler:[0-9.]+\1;/g;
 
 /*
  * Creates a mock console, primarily for intercepting the results of the

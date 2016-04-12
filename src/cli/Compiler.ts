@@ -206,7 +206,7 @@ export function commandLine(inputArgs: string[], console: Console,
   function generateNodeModule(generatedCode: GeneratedCode) {
     let buffer: string[] = [];
     buffer.push('"use strict";');
-    buffer.push('"use fate";');
+    buffer.push(`"fate-compiler:${VERSION}";`);
     buffer.push("const fate=require('fatejs');");
     buffer.push("const r=fate.Runtime;");
     buffer.push(generatedCode);
