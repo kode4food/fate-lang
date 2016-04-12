@@ -4,10 +4,13 @@
 
 import minimist = require("minimist");
 
-import { readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { sync as glob } from 'glob';
 import { sync as mkdirp } from 'mkdirp';
+
+import {
+  readFileSync, writeFileSync, unlinkSync, existsSync
+} from 'fs';
 
 import {
   compileModule, wrapCompileError, GeneratedCode
@@ -20,6 +23,7 @@ const defaultPattern = '*.fate';
 interface ParsedArguments {
   'help'?: boolean;
   'parse'?: boolean;
+  'clean'?: boolean;
   'in'?: string;
   'out'?: string;
   '_'?: string[];
@@ -28,6 +32,10 @@ interface ParsedArguments {
 interface CompilerOutput {
   filePath: string;
   err?: Error;
+}
+
+function flagCount(prev: number, value: boolean) {
+  return prev + (value ? 1 : 0);
 }
 
 /*
@@ -43,7 +51,7 @@ export function commandLine(inputArgs: string[], console: Console,
   let badArg = false;
 
   let args = <ParsedArguments>minimist(inputArgs, {
-    boolean: ['parse', 'help'],
+    boolean: ['parse', 'clean', 'help'],
     string: ['in', 'out'],
     unknown: (value) => {
       let invalidFlag = /^--.+/.test(value);
@@ -58,13 +66,18 @@ export function commandLine(inputArgs: string[], console: Console,
     return;
   }
 
-  let skipWrite = args.parse;
   let patterns = args._.length ? args._ : [defaultPattern];
   let errors: CompilerOutput[] = [];
   let warnings: CompilerOutput[] = [];
   let success = 0;
+  let deleted = 0;
 
   try {
+    // pre-flight check
+    if ( [args.clean, args.parse].reduce(flagCount, 0) > 1 ) {
+      throw "Only one action can be performed at a time";
+    }
+
     // Process each pattern
     patterns.forEach(processPattern);
     // Display the results
@@ -94,24 +107,17 @@ export function commandLine(inputArgs: string[], console: Console,
       throw `No files found matching '${pattern}'`;
     }
 
-    files.forEach(function (file: string) {
+    // Bleh, make this pretty
+    let processor = args.parse ? performParse :
+                    args.clean ? performClean :
+                                 performCompile;
+
+    files.forEach(function (file) {
       let inputPath = join(inDir, file);
+      let outputPath = join(outDir, file.replace(/\.fate$/, '.js'));
 
       try {
-        let compileResult = compileInputScript(inputPath);
-        let compileWarnings = compileResult.err;
-
-        compileWarnings.forEach(function (compileWarning) {
-          warnings.push({ filePath: inputPath, err: compileWarning });
-        });
-
-        let scriptBody = compileResult.scriptBody;
-        if ( !skipWrite ) {
-          let outFile = file.replace(/\.fate$/, '.js');
-          writeNodeModule(scriptBody, join(outDir, outFile));
-        }
-
-        success += 1;
+        processor(inputPath, outputPath);
       }
       catch ( err ) {
         errors.push({ filePath: inputPath, err: err });
@@ -119,11 +125,44 @@ export function commandLine(inputArgs: string[], console: Console,
     });
   }
 
+  function parseSource(inputPath: string) {
+    let compileResult = compileInputScript(inputPath);
+    let compileWarnings = compileResult.err;
+
+    compileWarnings.forEach(function (compileWarning) {
+      warnings.push({ filePath: inputPath, err: compileWarning });
+    });
+
+    return compileResult.scriptBody;
+  }
+
+  function performParse(inputPath: string) {
+    parseSource(inputPath);
+    success++;
+  }
+
+  function performCompile(inputPath: string, outputPath: string) {
+    writeNodeModule(parseSource(inputPath), outputPath);
+    success++;
+  }
+
+  function performClean(inputPath: string, outputPath: string) {
+    if ( !existsSync(outputPath) ) {
+      return;
+    }
+    unlinkSync(outputPath);
+    deleted++;
+  }
+
   function processResults() {
     console.info("Fate Parsing Complete");
     console.info("");
+
     if ( success > 0 ) {
       console.info("   Success: " + success);
+    }
+    if ( args.clean ) {
+      console.info("   Deleted: " + deleted);
     }
     if ( warnings.length ) {
       console.info("  Warnings: " + warnings.length);
@@ -207,9 +246,10 @@ export function commandLine(inputArgs: string[], console: Console,
     Options:
 
     --help         - You're looking at me right now
-    --parse        - Parse only! Don't generate any output
     --in <path>    - Location of source files to compile
     --out <path>   - Location of compiled output (--in)
+    --parse        - Parse only! Don't generate any output
+    --clean        - Delete any compiled output
 
     <patterns>     - Filename patterns to parse (*.fate)
 `

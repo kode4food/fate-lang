@@ -98,6 +98,32 @@ exports.cli = nodeunit.testCase({
     });
   },
 
+  "Clean Compiled Files": function (test) {
+    let cons = createConsole();
+
+    compiler(["./test/cli_success/*.fate"], cons, function () {
+      test.ok(cons.contains("Fate Parsing Complete"));
+      test.ok(cons.contains("Success"));
+      test.ok(!cons.contains("Warnings"));
+      test.ok(!cons.contains("Failures"));
+
+      compiler(["--clean", "./test/**/*.fate"], cons, function () {
+        test.ok(cons.contains("Deleted: 2"));
+        test.done();
+      });
+    });
+  },
+
+  "Mutually Exclusive Actions": function (test) {
+    let cons = createConsole();
+
+    compiler(["--clean", "--parse"], cons, function () {
+      test.ok(cons.contains("Error!"));
+      test.ok(cons.contains("Only one action can be performed"));
+      test.done();
+    });
+  },
+
   "Multiple Input Paths": function (test) {
     let cons = createConsole();
     compiler(["--parse", "./test/cli_success/*.fate",
