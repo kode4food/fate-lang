@@ -140,7 +140,6 @@ export default function createTreeProcessors(visit: Visitor) {
 
         /* istanbul ignore next */
         default:
-          console.log(parameter);
           throw new Error("Stupid Coder: Bad Cardinality Value");
       }
     });

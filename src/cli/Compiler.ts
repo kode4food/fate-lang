@@ -20,22 +20,19 @@ import { VERSION } from '../Fate';
 
 const defaultPattern = '*.fate';
 
-interface ParsedArguments {
+export interface CompilerArguments {
   'help'?: boolean;
   'parse'?: boolean;
   'clean'?: boolean;
   'in'?: string;
   'out'?: string;
   '_'?: string[];
+  console?: Console;
 }
 
 interface CompilerOutput {
   filePath: string;
   err?: Error;
-}
-
-function flagCount(prev: number, value: boolean) {
-  return prev + (value ? 1 : 0);
 }
 
 /*
@@ -50,7 +47,7 @@ export function commandLine(inputArgs: string[], console: Console,
                             completedCallback: Function) {
   let badArg = false;
 
-  let args = <ParsedArguments>minimist(inputArgs, {
+  let args = <CompilerArguments>minimist(inputArgs, {
     boolean: ['parse', 'clean', 'help'],
     string: ['in', 'out'],
     unknown: (value) => {
@@ -66,37 +63,86 @@ export function commandLine(inputArgs: string[], console: Console,
     return;
   }
 
+  if ( [args.clean, args.parse].reduce(flagCount, 0) > 1 ) {
+    errorOut("Only one action can be performed at a time");
+    return;
+  }
+
+  try {
+    compile(args, completedCallback, console);
+  }
+  catch ( err ) {
+    errorOut(err);
+  }
+
+  // Support Functions
+
+  function flagCount(prev: number, value: boolean) {
+    return prev + (value ? 1 : 0);
+  }
+
+  function errorOut(message: string) {
+    displayUsage();
+    console.error("Error!");
+    console.error("");
+    console.error("  " + message);
+    console.error("");
+
+    completedCallback(1);
+  }
+
+  function displayVersion() {
+    console.info("Fate v" + VERSION);
+  }
+
+  function displayUsage() {
+    displayVersion();
+    console.info(
+`
+  Usage:
+
+    fatec (options) <patterns>
+
+  Where:
+
+    Options:
+
+    --help         - You're looking at me right now
+    --in <path>    - Location of source files to compile
+    --out <path>   - Location of compiled output (--in)
+    --parse        - Parse only! Don't generate any output
+    --clean        - Delete any compiled output
+
+    <patterns>     - Filename patterns to parse (*.fate)
+`
+    );
+  }
+}
+
+export function compile(args: CompilerArguments,
+                        completedCallback: Function,
+                        output = console) {
   let patterns = args._.length ? args._ : [defaultPattern];
   let errors: CompilerOutput[] = [];
   let warnings: CompilerOutput[] = [];
   let success = 0;
   let deleted = 0;
 
-  try {
-    // pre-flight check
-    if ( [args.clean, args.parse].reduce(flagCount, 0) > 1 ) {
-      throw "Only one action can be performed at a time";
-    }
-
-    // Process each pattern
-    patterns.forEach(processPattern);
-    // Display the results
-    processResults();
-    if ( warnings.length ) {
-      // If there are any warnings, display them
-      processWarnings();
-    }
-    if ( errors.length ) {
-      // If there are any errors, display them
-      processErrors();
-    }
-
-    // Done!
-    completedCallback(errors.length ? -2 : 0);
+  // Process each pattern
+  patterns.forEach(processPattern);
+  // Display the results
+  processResults();
+  if ( warnings.length ) {
+    // If there are any warnings, display them
+    processWarnings();
   }
-  catch ( err ) {
-    errorOut(err);
+  if ( errors.length ) {
+    // If there are any errors, display them
+    processErrors();
   }
+
+  // Done!
+  completedCallback(errors.length ? -2 : 0);
 
   function processPattern(pattern: string) {
     let inDir = args.in || process.cwd();
@@ -155,40 +201,40 @@ export function commandLine(inputArgs: string[], console: Console,
   }
 
   function processResults() {
-    console.info("Fate Parsing Complete");
-    console.info("");
+    output.info("Fate Parsing Complete");
+    output.info("");
 
     if ( success > 0 ) {
-      console.info("   Success: " + success);
+      output.info("   Success: " + success);
     }
     if ( args.clean ) {
-      console.info("   Deleted: " + deleted);
+      output.info("   Deleted: " + deleted);
     }
     if ( warnings.length ) {
-      console.info("  Warnings: " + warnings.length);
+      output.info("  Warnings: " + warnings.length);
     }
     if ( errors.length ) {
-      console.info("  Failures: " + errors.length);
+      output.info("  Failures: " + errors.length);
     }
-    console.info("");
+    output.info("");
   }
 
   function processWarnings() {
-    console.warn("Parser Warnings");
-    console.warn("===============");
+    output.warn("Parser Warnings");
+    output.warn("===============");
     warnings.forEach(displayCompilationError);
   }
 
   function processErrors() {
-    console.warn("Parsing Errors");
-    console.warn("==============");
+    output.warn("Parsing Errors");
+    output.warn("==============");
     errors.forEach(displayCompilationError);
   }
 
   function displayCompilationError(error: CompilerOutput) {
     let wrapped = wrapCompileError(error.err, error.filePath);
-    console.warn(wrapped.toString());
-    console.warn("");
+    output.warn(wrapped.toString());
+    output.warn("");
   }
 
   // Processing Functions
@@ -216,43 +262,5 @@ export function commandLine(inputArgs: string[], console: Console,
     buffer.push("module.exports);");
     return buffer.join('');
   }
-
-  // Support Functions
-
-  function errorOut(message: string) {
-    displayUsage();
-    console.error("Error!");
-    console.error("");
-    console.error("  " + message);
-    console.error("");
-
-    completedCallback(1);
-  }
-
-  function displayVersion() {
-    console.info("Fate v" + VERSION);
-  }
-
-  function displayUsage() {
-    displayVersion();
-    console.info(
-`
-  Usage:
-
-    fatec (options) <patterns>
-
-  Where:
-
-    Options:
-
-    --help         - You're looking at me right now
-    --in <path>    - Location of source files to compile
-    --out <path>   - Location of compiled output (--in)
-    --parse        - Parse only! Don't generate any output
-    --clean        - Delete any compiled output
-
-    <patterns>     - Filename patterns to parse (*.fate)
-`
-    );
-  }
 }
+
