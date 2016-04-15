@@ -201,7 +201,7 @@ export function compile(args: CompilerArguments,
   }
 
   function processResults() {
-    output.info("Fate Parsing Complete");
+    output.info("Fate Compilation Complete");
     output.info("");
 
     if ( success > 0 ) {
@@ -220,14 +220,14 @@ export function compile(args: CompilerArguments,
   }
 
   function processWarnings() {
-    output.warn("Parser Warnings");
-    output.warn("===============");
+    output.warn("Compiler Warnings");
+    output.warn("=================");
     warnings.forEach(displayCompilationError);
   }
 
   function processErrors() {
-    output.warn("Parsing Errors");
-    output.warn("==============");
+    output.warn("Compiler Errors");
+    output.warn("===============");
     errors.forEach(displayCompilationError);
   }
 

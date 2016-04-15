@@ -97,9 +97,16 @@ def arrayPatterns(test)
   [] like IntegerArray       | isFalse
   'hi' like IntegerArray     | isFalse
 
-  ['hi'] like BadArray       | isTrue
-  [] like BadArray           | isTrue
-  'hi' like BadArray         | isFalse
+  # Test with pipe operator as well
+  [1,2,3]  | IntegerArray | isTrue
+  [1.2, 3] | IntegerArray | isFalse
+  ['hi']   | IntegerArray | isFalse
+  []       | IntegerArray | isFalse
+  'hi'     | IntegerArray | isFalse
+
+  ['hi'] like BadArray | isTrue
+  [] like BadArray     | isTrue
+  'hi' like BadArray   | isFalse
 
   test.done()
 end

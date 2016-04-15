@@ -29,10 +29,10 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  "Successful Parse": function (test) {
+  "Successful Compile": function (test) {
     let cons = createConsole();
     compiler(["./test/cli_success/*.fate"], cons, function () {
-      test.ok(cons.contains("Fate Parsing Complete"));
+      test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
       test.ok(!cons.contains("Failures"));
@@ -52,10 +52,10 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  "Warning Parse": function (test) {
+  "Warning Compile": function (test) {
     let cons = createConsole();
     compiler(["./test/cli_warning/*.fate"], cons, function () {
-      test.ok(cons.contains("Fate Parsing Complete"));
+      test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(cons.contains("Warnings"));
       test.ok(!cons.contains("Failures"));
@@ -64,10 +64,10 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  "Failure Parse": function (test) {
+  "Failure Compile": function (test) {
     let cons = createConsole();
     compiler(["--in", "./test/cli_failure/"], cons, function () {
-      test.ok(cons.contains("Fate Parsing Complete"));
+      test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(!cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
       test.ok(cons.contains("Failures"));
@@ -78,7 +78,7 @@ exports.cli = nodeunit.testCase({
   "Empty Path": function (test) {
     let cons = createConsole();
     compiler(["./test/cli_empty/*.fate"], cons, function () {
-      test.ok(!cons.contains("Fate Parsing Complete"));
+      test.ok(!cons.contains("Fate Compilation Complete"));
       test.ok(!cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
       test.ok(cons.contains("Error!"));
@@ -90,7 +90,7 @@ exports.cli = nodeunit.testCase({
   "Parse Only": function (test) {
     let cons = createConsole();
     compiler(["--parse", "./test/cli_success/*.fate"], cons, function () {
-      test.ok(cons.contains("Fate Parsing Complete"));
+      test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
       test.ok(!cons.contains("Failures"));
@@ -102,7 +102,7 @@ exports.cli = nodeunit.testCase({
     let cons = createConsole();
 
     compiler(["./test/cli_success/*.fate"], cons, function () {
-      test.ok(cons.contains("Fate Parsing Complete"));
+      test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
       test.ok(!cons.contains("Failures"));
@@ -128,7 +128,7 @@ exports.cli = nodeunit.testCase({
     let cons = createConsole();
     compiler(["--parse", "./test/cli_success/*.fate",
               "./test/cli_warning/*.fate"], cons, function () {
-      test.ok(cons.contains("Fate Parsing Complete"));
+      test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(cons.contains("Warnings"));
       test.ok(!cons.contains("Failures"));
