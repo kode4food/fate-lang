@@ -250,8 +250,6 @@ export function compile(args: CompilerArguments, callback: Function) {
     deleted++;
   }
 
-  // Processing Functions
-
   function compileInputScript(inputPath: string) {
     let intContent = readFileSync(inputPath).toString();
     return compileModule(intContent);
@@ -261,19 +259,18 @@ export function compile(args: CompilerArguments, callback: Function) {
     mkdirp(dirname(outputPath));
     writeFileSync(outputPath, generateNodeModule(jsContent));
   }
-
-  function generateNodeModule(generatedCode: GeneratedCode) {
-    let buffer: string[] = [];
-    buffer.push('"use strict";');
-    buffer.push(`"fate-compiler:${VERSION}";`);
-    buffer.push("const fate=require('fatejs');");
-    buffer.push("const r=fate.Runtime;");
-    buffer.push(generatedCode);
-    buffer.push("module.__fateModule=true;");
-    buffer.push("module.result=s(");
-    buffer.push("fate.globals({__filename}),");
-    buffer.push("module.exports);");
-    return buffer.join('');
-  }
 }
 
+export function generateNodeModule(generatedCode: GeneratedCode) {
+  let buffer: string[] = [];
+  buffer.push('"use strict";');
+  buffer.push(`"fate-compiler:${VERSION}";`);
+  buffer.push("const fate=require('fatejs');");
+  buffer.push("const r=fate.Runtime;");
+  buffer.push(generatedCode);
+  buffer.push("module.__fateModule=true;");
+  buffer.push("module.result=s(");
+  buffer.push("fate.globals({__filename}),");
+  buffer.push("module.exports);");
+  return buffer.join('');
+}
