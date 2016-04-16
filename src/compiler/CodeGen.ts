@@ -265,7 +265,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
           null,  // this is an 'else' case
           function () {
             generate.returnStatement(function () {
-              generate.call(ensuredId);
+              generate.call(function () {
+                generate.retrieveAnonymous(ensuredId);
+              });
             });
           }
         );

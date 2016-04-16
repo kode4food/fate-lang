@@ -35,6 +35,13 @@ interface CompilerOutput {
   err?: Error;
 }
 
+interface CompilerResults {
+  errors: CompilerOutput[];
+  warnings: CompilerOutput[];
+  success: number;
+  deleted: number;
+}
+
 /*
  * Executes Fate command-line parsing.  This function is normally
  * invoked automatically when the cli.js script is called directly.
@@ -69,10 +76,62 @@ export function commandLine(inputArgs: string[], console: Console,
   }
 
   try {
-    compile(args, completedCallback, console);
+    compile(args, processResults);
   }
   catch ( err ) {
     errorOut(err);
+  }
+
+  function processResults(err: any, results: CompilerResults) {
+    let { errors, warnings, success, deleted } = results;
+
+    displayResults();
+    displayWarnings();
+    displayErrors();
+    completedCallback(err ? -2 : 0);
+
+    function displayResults() {
+      console.info("Fate Compilation Complete");
+      console.info("");
+
+      if ( success > 0 ) {
+        console.info("   Success: " + success);
+      }
+      if ( args.clean ) {
+        console.info("   Deleted: " + deleted);
+      }
+      if ( warnings.length ) {
+        console.info("  Warnings: " + warnings.length);
+      }
+      if ( errors.length ) {
+        console.info("  Failures: " + errors.length);
+      }
+      console.info("");
+    }
+
+    function displayWarnings() {
+      if ( warnings.length ) {
+        // If there are any warnings, display them
+        console.warn("Compiler Warnings");
+        console.warn("=================");
+        warnings.forEach(displayCompilationError);
+      }
+    }
+
+    function displayErrors() {
+      if ( errors.length ) {
+        // If there are any errors, display them
+        console.warn("Compiler Errors");
+        console.warn("===============");
+        errors.forEach(displayCompilationError);
+      }
+    }
+
+    function displayCompilationError(error: CompilerOutput) {
+      let wrapped = wrapCompileError(error.err, error.filePath);
+      console.warn(wrapped.toString());
+      console.warn("");
+    }
   }
 
   // Support Functions
@@ -119,9 +178,7 @@ export function commandLine(inputArgs: string[], console: Console,
   }
 }
 
-export function compile(args: CompilerArguments,
-                        completedCallback: Function,
-                        output = console) {
+export function compile(args: CompilerArguments, callback: Function) {
   let patterns = args._.length ? args._ : [defaultPattern];
   let errors: CompilerOutput[] = [];
   let warnings: CompilerOutput[] = [];
@@ -130,19 +187,12 @@ export function compile(args: CompilerArguments,
 
   // Process each pattern
   patterns.forEach(processPattern);
-  // Display the results
-  processResults();
-  if ( warnings.length ) {
-    // If there are any warnings, display them
-    processWarnings();
-  }
-  if ( errors.length ) {
-    // If there are any errors, display them
-    processErrors();
-  }
 
   // Done!
-  completedCallback(errors.length ? -2 : 0);
+  callback(
+    errors.length ? "Errors Encountered" : null,
+    { errors, warnings, success, deleted }
+  );
 
   function processPattern(pattern: string) {
     let inDir = args.in || process.cwd();
@@ -198,43 +248,6 @@ export function compile(args: CompilerArguments,
     }
     unlinkSync(outputPath);
     deleted++;
-  }
-
-  function processResults() {
-    output.info("Fate Compilation Complete");
-    output.info("");
-
-    if ( success > 0 ) {
-      output.info("   Success: " + success);
-    }
-    if ( args.clean ) {
-      output.info("   Deleted: " + deleted);
-    }
-    if ( warnings.length ) {
-      output.info("  Warnings: " + warnings.length);
-    }
-    if ( errors.length ) {
-      output.info("  Failures: " + errors.length);
-    }
-    output.info("");
-  }
-
-  function processWarnings() {
-    output.warn("Compiler Warnings");
-    output.warn("=================");
-    warnings.forEach(displayCompilationError);
-  }
-
-  function processErrors() {
-    output.warn("Compiler Errors");
-    output.warn("===============");
-    errors.forEach(displayCompilationError);
-  }
-
-  function displayCompilationError(error: CompilerOutput) {
-    let wrapped = wrapCompileError(error.err, error.filePath);
-    output.warn(wrapped.toString());
-    output.warn("");
   }
 
   // Processing Functions
