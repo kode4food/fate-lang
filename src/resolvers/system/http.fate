@@ -22,6 +22,6 @@ end
 
 export def get(URL as url)
   make(Promise, (resolve) ->
-    http.get( url | parseURL, resolve | streamConsumer)
+    http.get(url | parseURL, resolve | streamConsumer)
   )
 end
