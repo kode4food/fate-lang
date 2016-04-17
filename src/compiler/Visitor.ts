@@ -17,7 +17,7 @@ class Index extends Syntax.Node {
 export default class Visitor {
   public nodeStack: (Syntax.Node|Syntax.Nodes)[] = [];
 
-  constructor(public warnings: CompileErrors) { }
+  constructor(public warnings: CompileErrors) {}
 
   public ancestorTags(...tags: Syntax.TagOrTags[]) {
     return this.ancestry.apply(this, tags.map(this.tags));

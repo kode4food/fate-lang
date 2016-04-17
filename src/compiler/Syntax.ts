@@ -79,7 +79,7 @@ export class FormatOperator extends UnaryOperator {}
 export class PositiveOperator extends UnaryOperator {}
 export class NegativeOperator extends UnaryOperator {}
 export class NotOperator extends UnaryOperator {}
-export class Pattern extends UnaryOperator { }
+export class Pattern extends UnaryOperator {}
 
 export enum Resolver {
   Value, Any, All
@@ -342,7 +342,7 @@ export function isLiteral(node: Node) {
   return node instanceof Literal;
 }
 
-export class PatternSymbol extends Symbol { }
+export class PatternSymbol extends Symbol {}
 
 export class Regex extends PatternSymbol {
   public value: RegExp;

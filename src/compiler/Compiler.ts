@@ -65,7 +65,7 @@ export function generateFunction(generatedCode: GeneratedCode) {
   let context = <FateContext>createContext({
     g: globals(),
     r: Runtime,
-    module: { }
+    module: {}
   });
 
   runInContext(generateFunctionCode(generatedCode), context);

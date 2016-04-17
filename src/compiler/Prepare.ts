@@ -93,8 +93,8 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function checkParamsForDuplication(node: Syntax.Node,
                                      signatures: Syntax.Signatures) {
-    let encounteredNames: NameSet = { };
-    let duplicatedNames: NameSet = { };
+    let encounteredNames: NameSet = {};
+    let duplicatedNames: NameSet = {};
     signatures.forEach(function (signature) {
       let namedParams = signature.params.filter(param => !!param.id);
       namedParams.forEach(function (param) {
