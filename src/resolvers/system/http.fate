@@ -16,8 +16,8 @@ def streamConsumer(resolve)
   stream ->
     let content = mutable('')
     stream.on('data',  data -> content.value + data | content.set)
-    stream.on('end',   -> [content.value] | resolve)
-    stream.on('error', err -> [content.value, err] | resolve)
+          .on('end',   -> [content.value] | resolve)
+          .on('error', err -> [content.value, err] | resolve)
 end
 
 export def get(URL as url)
