@@ -394,12 +394,12 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         });
       });
 
-      group.forEach(function (assignment, idx) {
+      group.forEach(function (assignment, index) {
         createAssignmentEvaluator(assignment, function () {
           return function () {
             generate.member(
               function () { generate.retrieveAnonymous(anon); },
-              '' + idx
+              generate.literal(index)
             );
           };
         });
@@ -529,7 +529,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
           if ( argNode instanceof Syntax.Wildcard ) {
             return;
           }
-          elems.push(['' + index, <Function>defer(argNode), false]);
+          elems.push([
+            generate.literal(index), <Function>defer(argNode), false
+          ]);
         });
         generate.object(elems);
       }
@@ -567,7 +569,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       generate.assignment(id.value, function () {
         generate.member(
           function () { generate.retrieveAnonymous(result); },
-          '' + index
+          generate.literal(index)
         );
       });
     });

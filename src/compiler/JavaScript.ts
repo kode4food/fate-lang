@@ -93,6 +93,9 @@ const contextName = 'c';
 const exportsName = 'x';
 const valueName = 'v';
 
+const inlineLiteralTypes = ['number', 'string', 'boolean'];
+const inlineLiteralMaxLength = 32;
+
 function lastItem(arr: any[]) {
   return arr[arr.length - 1];
 }
@@ -146,6 +149,12 @@ export function createModule() {
     else {
       canonical = jsonStringify(literalValue);
     }
+
+    if ( inlineLiteralTypes.indexOf(typeof literalValue) !== -1 &&
+         canonical.length <= inlineLiteralMaxLength ) {
+      return canonical;
+    }
+
     let id = generatedLiterals[canonical];
     if ( id ) {
       return id;
