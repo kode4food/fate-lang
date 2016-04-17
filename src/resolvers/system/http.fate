@@ -12,14 +12,16 @@ import 'node:http' as http
 #   Node's 'url' module
 #   Node's 'http' module
 
+def streamConsumer(resolve)
+  stream ->
+    let content = mutable('')
+    stream.on('data',  data -> content.value + data | content.set)
+    stream.on('end',   -> [content.value] | resolve)
+    stream.on('error', err -> [content.value, err] | resolve)
+end
+
 export def get(URL as url)
   make(Promise, (resolve) ->
-    let content = mutable('')
-
-    let req = http.get(url | parseURL, (res) ->
-      res.on('data', data -> content.value + data | content.set)
-      res.on('end', -> [content.value] | resolve)
-      res.on('error', err -> [content.value, err] | resolve)
-    )
+    http.get( url | parseURL, resolve | streamConsumer)
   )
 end
