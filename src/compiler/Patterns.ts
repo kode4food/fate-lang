@@ -57,7 +57,7 @@ export default function createTreeProcessors(visit: Visitor) {
     }
     let contained = node.left;
     if ( !hasTag(contained, ['object', 'array']) &&
-          !hasAnnotation(contained, 'pattern/local') ) {
+         !hasAnnotation(contained, 'pattern/local') ) {
       annotate(contained, 'pattern/local', selfPatternLocal);
     }
     return node;
@@ -105,7 +105,9 @@ export default function createTreeProcessors(visit: Visitor) {
       if ( param instanceof Syntax.PatternParameter ) {
         let ident = param.id || param.template('id', idx);
         params[idx] = ident.template('idParam', ident, param.cardinality);
-        newGuards.push(ident.template('like', ident, param.pattern));
+        newGuards.push(
+          ident.template('call', param.pattern, [ident])
+        );
       }
     });
 
