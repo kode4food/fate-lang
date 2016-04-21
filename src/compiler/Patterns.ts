@@ -105,9 +105,7 @@ export default function createTreeProcessors(visit: Visitor) {
       if ( param instanceof Syntax.PatternParameter ) {
         let ident = param.id || param.template('id', idx);
         params[idx] = ident.template('idParam', ident, param.cardinality);
-        newGuards.push(
-          ident.template('call', param.pattern, [ident])
-        );
+        newGuards.push(ident.template('call', param.pattern, [ident]));
       }
     });
 
