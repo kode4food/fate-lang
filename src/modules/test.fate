@@ -1,0 +1,20 @@
+from 'node:assert'
+import equal, notEqual, deepEqual, notDeepEqual, strictEqual,
+       notStrictEqual, throws, doesNotThrow, ok
+
+# Warning: this module assumes JavaScript-specific methods
+#
+#   Basically everything from Node.js' assert module
+
+export
+let equalTo = value -> x -> equal(value, x)
+  , notEqualTo = value -> x -> notEqual(value, x)
+  , deepEqualTo = value -> x -> deepEqual(value, x)
+  , notDeepEqualTo = value -> x -> notDeepEqual(value, x)
+  , strictEqualTo = value -> x -> strictEqual(value, x)
+  , notStrictEqualTo = value -> x -> notStrictEqual(value, x)
+  , isFalse = equalTo(false)
+  , isTrue = equalTo(true)
+  , isOk = ok
+
+export throws, doesNotThrow

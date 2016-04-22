@@ -1,0 +1,74 @@
+from '../Types' import isObject, isArray
+
+from '../runtime/Pattern'
+import isPattern, definePattern
+
+export from '../runtime/Pattern'
+import isNothing as Nothing
+     , isSomething as Something
+
+from './support' import isA, setProperty
+
+# Warning: this module assumes JavaScript-specific methods
+#
+#   Array.prototype.length
+
+export let String = ~isA(self, 'string')
+export let EmptyString = ~''
+
+export let NonEmptyString = ~(
+  isA(self, 'string') and self.length > 0
+)
+
+export
+let Number = ~isA(self, 'number')
+  , PositiveNumber = ~(self > 0 and isA(self, 'number'))
+  , NonNegativeNumber = ~(self >= 0 and isA(self, 'number'))
+  , NegativeNumber = ~(self < 0 and isA(self, 'number'))
+  , Integer = ~(self mod 1 = 0 and isA(self, 'number'))
+
+export let PositiveInteger = ~(
+  self > 0 and self mod 1 = 0 and isA(self, 'number')
+)
+
+export let NonNegativeInteger = ~(
+  self >= 0 and self mod 1 = 0 and isA(self, 'number')
+)
+
+export let NegativeInteger = ~(
+  self < 0 and self mod 1 = 0 and isA(self, 'number')
+)
+
+export
+let Array = definePattern(isArray)
+  , EmptyArray = ~(isArray(self) and self.length = 0)
+  , NonEmptyArray = ~(isArray(self) and self.length > 0)
+  , Object = definePattern(isObject)
+  , Boolean = ~isA(self, 'boolean')
+
+export def ArrayOf(elementPattern)
+  let checker = definePattern(value ->
+    return false unless isArray(value)
+    [
+      for item in value
+      where not elementPattern(item)
+    ].length = 0
+  )
+
+  def decorate(pattern)
+    setProperty(pattern, 'MinLength', minLength -> (value ->
+      return false unless isArray(value) and value.length >= minLength
+      pattern(value)
+    ) | definePattern | decorate)
+
+    setProperty(pattern, 'MaxLength', maxLength -> (value ->
+      return false unless isArray(value) and value.length <= maxLength
+      pattern(value)
+    ) | definePattern | decorate)
+
+    pattern
+  end
+
+  return decorate(Array) unless isPattern(elementPattern)
+  decorate(checker)
+end
