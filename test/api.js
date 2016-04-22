@@ -3,7 +3,7 @@
 const nodeunit = require('nodeunit');
 const types = require('../dist/Types');
 const runtime = require('../dist/Runtime');
-const support = require('../dist/resolvers/system/support');
+const support = require('../dist/modules/support');
 
 exports.api = nodeunit.testCase({
 

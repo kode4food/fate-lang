@@ -4,7 +4,7 @@ import { resolve as resolvePath } from 'path';
 
 import { createModule, Module, ModuleName } from '../Types';
 
-const basePath = resolvePath(__dirname, './system');
+const basePath = resolvePath(__dirname, '../modules');
 
 export function createSystemResolver() {
   let cache: { [index: string]: Module } = {};
