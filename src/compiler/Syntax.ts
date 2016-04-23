@@ -44,7 +44,7 @@ export function hasTag(node: Node, tags?: TagOrTags): any {
     return false;
   }
 
-  if ( tags === undefined || tags === '*' ) {
+  if ( tags === undefined ) {
     return node.tag;
   }
 
@@ -54,9 +54,6 @@ export function hasTag(node: Node, tags?: TagOrTags): any {
 
   let idx = tags.indexOf(node.tag);
   if ( idx === -1 ) {
-    if ( tags.indexOf('*') !== -1 ) {
-      return node.tag;
-    }
     return false;
   }
   return tags[idx];

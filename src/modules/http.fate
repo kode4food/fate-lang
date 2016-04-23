@@ -1,10 +1,19 @@
-from 'node:welsh' import Promise
-from 'node:url' import parse as parseURL
-
-from pattern import NonEmptyString as URL
-from './support' import make
-
 import 'node:http' as http
+
+from 'node:url' import parse as parseURL
+from 'node:welsh' import Promise
+
+from './support' import make
+from '../Util' import mixin
+
+from pattern import NonEmptyString, Something
+
+let URL = NonEmptyString
+
+let RequestOptions = ~{
+  hostname: NonEmptyString,
+  method: self in ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+}
 
 # Warning: this module assumes JavaScript-specific methods
 #
@@ -19,8 +28,15 @@ let streamConsumer = (resolve -> stream ->
         .on('error', err -> [content.value, err] | resolve)
 )
 
-export def get(URL as url)
+def request(RequestOptions as options, content)
   make(Promise, (resolve) ->
-    http.get(url | parseURL, resolve | streamConsumer)
+    let req = http.request(options, resolve | streamConsumer)
+    req.on('error', err -> ['', err] | resolve)
+    req.write(content) if content like Something
+    req.end()
   )
+end
+
+export def get(URL as url)
+  mixin(url | parseURL, { method: 'GET' }) | request
 end

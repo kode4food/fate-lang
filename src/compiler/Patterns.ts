@@ -14,7 +14,7 @@ export default function createTreeProcessors(visit: Visitor) {
   let nestedPattern = visit.ancestorTags('pattern', 'pattern');
   let patternCollection = visit.ancestorTags(['object', 'array'], 'pattern');
   let selfPattern = visit.ancestorTags('self', 'pattern');
-  let patternNode = visit.ancestorTags('*', 'pattern');
+  let patternNodes = visit.ancestorTags(['object', 'array'], 'pattern');
 
   return [
     visit.matching(rollUpPatterns, nestedPattern),
@@ -22,7 +22,7 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(namePatterns, visit.tags('pattern')),
     visit.matching(nameSelfPatternAnchors, patternCollection),
     visit.matching(nameAndAnnotateSelfPatterns, selfPattern),
-    visit.matching(annotatePatternNode, patternNode),
+    visit.matching(annotatePatternNode, patternNodes),
     visit.matching(buildPatternGuards, visit.tags('signature'))
   ];
 
@@ -89,11 +89,28 @@ export default function createTreeProcessors(visit: Visitor) {
     }
   }
 
-  // all nodes inside of a Pattern should be annotated as such,
-  // so that the Code Generator can branch appropriately
+  // all top-level Objects/Arrays inside of a Pattern should be annotated
+  // as such, so that the Code Generator can branch appropriately
   function annotatePatternNode(node: Syntax.Node) {
-    annotate(node, 'pattern/node');
-    return node;
+    let nodeStack = visit.nodeStack.slice().reverse();
+    for ( let i = 0; i < nodeStack.length; i++ ) {
+      if ( !(nodeStack[i] instanceof Syntax.Node) ) {
+        continue;
+      }
+
+      let parent = <Syntax.Node>nodeStack[i];
+      if ( parent.tag === 'pattern' ) {
+        annotate(node, 'pattern/node');
+        return node;
+      }
+
+      if ( !hasTag(parent, ['index', 'objectAssignment', 'object', 'array']) ) {
+        // Not going to work
+        return node;
+      }
+    }
+    /* istanbul ignore next: should be properly matched */
+    throw new Error("Stupid Coder: Didn't stop at Pattern Node");
   }
 
   function buildPatternGuards(node: Syntax.Signature) {
