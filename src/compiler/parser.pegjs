@@ -765,7 +765,6 @@ Like    = "like"     !NameContinue  { return 'like'; }
 Mod     = "mod"      !NameContinue  { return 'mod'; }
 Not     = "not"      !NameContinue  { return 'not'; }
 In      = "in"       !NameContinue  { return 'in'; }
-NotIn   = Not _ In   !NameContinue  { return 'notIn'; }
 Return  = "return"   !NameContinue  { return 'return'; }
 Self    = "self"     !NameContinue  { return node('self'); }
 True    = "true"     !NameContinue  { return node('literal', true); }
@@ -781,6 +780,9 @@ End     = "end"      !NameContinue
 Where   = "where"    !NameContinue
 Select  = "select"   !NameContinue
 When    = "when"     !NameContinue
+
+NotLike = Not _ Like  { return 'notLike'; }
+NotIn   = Not _ In    { return 'notIn'; }
 
 ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or /
@@ -899,7 +901,7 @@ Div = "/"   { return 'div'; }
 Neg = "-"   { return 'neg'; }
 Pos = "+"   { return 'pos'; }
 
-Equality = Like / NEQ / EQ
+Equality = Like / NEQ / EQ / NotLike
 Relational = GTE / LTE / LT / GT / In / NotIn
 Additive = Add / Sub
 Multiplicative = Mul / Div / Mod

@@ -95,6 +95,7 @@ export class BinaryOperator extends Operator {
 
 export class RelationalOperator extends BinaryOperator {}
 export class LikeOperator extends RelationalOperator {}
+export class NotLikeOperator extends RelationalOperator {}
 export class NotEqualOperator extends RelationalOperator {}
 export class EqualOperator extends RelationalOperator {}
 export class GreaterOrEqualOperator extends RelationalOperator {}
@@ -485,6 +486,7 @@ let tagToConstructor: FunctionMap = {
   'or': OrOperator,
   'and': AndOperator,
   'like': LikeOperator,
+  'notLike': NotLikeOperator,
   'eq': EqualOperator,
   'neq': NotEqualOperator,
   'in': InOperator,

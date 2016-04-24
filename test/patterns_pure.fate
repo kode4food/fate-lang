@@ -11,12 +11,18 @@ let null = node.null, undefined = node.undefined
 
 def numberPatterns(test)
   "hello" like Number         | isFalse
+  "hello" not like Number     | isTrue
   99.6 like Number            | isTrue
+  99.6 not like Number        | isFalse
   {} like Number              | isFalse
+  {} not like Number          | isTrue
   Nothing like Number         | isFalse
+  Nothing not like Number     | isTrue
 
   99.6 like Integer           | isFalse
+  99.6 not like Integer       | isTrue
   99 like Integer             | isTrue
+  99 not like Integer         | isFalse
 
   -99 like PositiveInteger    | isFalse
   99.6 like PositiveInteger   | isFalse
@@ -39,15 +45,18 @@ end
 
 def stringPatterns(test)
   "" like String              | isTrue
+  "" not like String          | isFalse
   "hello" like String         | isTrue
   "" like NonEmptyString      | isFalse
   "" like EmptyString         | isTrue
   "hello" like EmptyString    | isFalse
   "hello" like NonEmptyString | isTrue
   99 like String              | isFalse
+  99 not like String          | isTrue
   {} like String              | isFalse
   [] like EmptyString         | isFalse
   null like String            | isFalse
+  null not like String        | isTrue
 
   test.done()
 end

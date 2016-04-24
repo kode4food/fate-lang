@@ -47,6 +47,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'or':  createOrEvaluator,
     'and': createAndEvaluator,
     'like': createLikeEvaluator,
+    'notLike': createNotLikeEvaluator,
     'eq':  createBinaryEvaluator,
     'neq': createBinaryEvaluator,
     'in':  createInEvaluator,
@@ -895,6 +896,12 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
   function createLikeEvaluator(node: Syntax.LikeOperator) {
     createLikeComparison(node.left, node.right);
+  }
+
+  function createNotLikeEvaluator(node: Syntax.NotLikeOperator) {
+    generate.unaryOperator('not', function () {
+      createLikeComparison(node.left, node.right);
+    });
   }
 
   function createInEvaluator(node: Syntax.InOperator) {

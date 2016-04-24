@@ -6,20 +6,20 @@ from 'node:welsh' import Promise
 from './support' import make
 from '../Util' import mixin
 
-from pattern import NonEmptyString, Something
-
-let URL = NonEmptyString
-
-let RequestOptions = ~{
-  hostname: NonEmptyString,
-  method: self in ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
-}
+from pattern import Something, NonEmptyString
 
 # Warning: this module assumes JavaScript-specific methods
 #
 #   The Welsh promise module
 #   Node's 'url' module
 #   Node's 'http' module
+
+let URL = NonEmptyString
+
+let RequestOptions = ~{
+  hostname: NonEmptyString,
+  method: self in ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH']
+}
 
 let streamConsumer = (resolve -> stream ->
   let content = mutable('') # oh, no, a mutable!
