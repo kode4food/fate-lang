@@ -73,6 +73,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'literal': createLiteral,
     'regex': createRegex,
     'self': createSelfEvaluator,
+    'global': createGlobalEvaluator,
     'pattern': createPatternEvaluator
   };
 
@@ -994,6 +995,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
     selfPatternName = generate.registerAnonymous(selfPatternName);
     generate.retrieveAnonymous(selfPatternName);
+  }
+
+  function createGlobalEvaluator(node: Syntax.Global) {
+    generate.context();
   }
 
   function createPatternEvaluator(node: Syntax.Pattern) {

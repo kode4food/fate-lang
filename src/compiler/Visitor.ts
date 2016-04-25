@@ -55,7 +55,7 @@ export default class Visitor {
   }
 
   public nodes(startNode: Syntax.Node|Syntax.Nodes, visitor: NodeVisitor,
-                matcher: NodeMatcher) {
+               matcher: NodeMatcher) {
     let self = this;
     return visitNode(startNode);
 

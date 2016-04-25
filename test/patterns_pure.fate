@@ -6,8 +6,7 @@ import Array, Object, String, NonEmptyString, EmptyString,
        NegativeInteger, NegativeNumber, ArrayOf
 
 from test import isFalse, isTrue, equalTo, throws
-
-let null = node.null, undefined = node.undefined
+from value import null, undefined
 
 def numberPatterns(test)
   "hello" like Number         | isFalse

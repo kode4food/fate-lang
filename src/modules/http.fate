@@ -3,7 +3,7 @@ import 'node:http' as http
 from 'node:url' import parse as parseURL
 from 'node:welsh' import Promise
 
-from './support' import make
+from './support' import make, mutable
 from '../Util' import mixin
 
 from pattern import Something, NonEmptyString

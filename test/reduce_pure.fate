@@ -1,6 +1,7 @@
 import nodeunit
 
 from test import equalTo, deepEqualTo
+from value import undefined
 
 def reduceStatementImplicit(test)
   let a = 50, b = 99
@@ -77,8 +78,8 @@ def reduceExpressionExplicit(test)
   reduce b = 0 for x in [4,5,6] select b + x
 
   result | equalTo(6)
-  a      | equalTo(node.undefined)  # var shouldn't leak
-  b      | equalTo(node.undefined)  # var shouldn't leak
+  a      | equalTo(undefined)  # var shouldn't leak
+  b      | equalTo(undefined)  # var shouldn't leak
   test.done()
 end
 

@@ -331,6 +331,7 @@ export class Identifier extends Symbol {
 }
 
 export class Self extends Identifier {}
+export class Global extends Identifier {}
 
 export class Literal extends Symbol {
   constructor(public value: any) { super(); }
@@ -511,6 +512,7 @@ let tagToConstructor: FunctionMap = {
   'object': ObjectConstructor,
   'id': Identifier,
   'self': Self,
+  'global': Global,
   'literal': Literal,
   'pattern': Pattern,
   'regex': Regex,

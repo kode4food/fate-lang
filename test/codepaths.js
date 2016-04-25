@@ -157,7 +157,7 @@ exports.codepaths = nodeunit.testCase({
     }, "await called outside of a 'do' block should explode");
 
     test.throws(function () {
-      evaluate("do\n-> await timeout(100)\nend");
+      evaluate("import io\ndo\n-> await io.timeout(100)\nend");
     }, "await called nested in func should explode");
 
     test.done();

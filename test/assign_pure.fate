@@ -1,6 +1,7 @@
 import nodeunit
 
 from test import equalTo
+from value import mutable
 
 def assignment(test)
   let val1 = 100

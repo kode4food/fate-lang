@@ -2,8 +2,7 @@ import nodeunit
 
 from pattern import Nothing, Something
 from test import isFalse, isTrue, equalTo, throws
-
-let null = node.null, undefined = node.undefined
+from value import null, undefined
 
 let data1 = {
   "name": "World",
