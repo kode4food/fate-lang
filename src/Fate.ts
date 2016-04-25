@@ -12,24 +12,29 @@ import {
 import { isObject } from './Types';
 import { mixin } from './Util';
 
-import Global from './Global';
-
 let pkg = require('../package.json');
 export const VERSION = pkg.version;
 
 import * as RuntimeExports from './Runtime';
 export let Runtime = RuntimeExports;
 
-export function globals(extensions?: Object) {
+type Globals = { [index: string]: any };
+
+const DefaultGlobals: Globals = {
+  '__filename': undefined,
+  '__dirname': undefined
+};
+
+export function globals(extensions?: Globals) {
   if ( isObject(extensions) ) {
-    let result = Object.create(Global);
+    let result = Object.create(DefaultGlobals);
     mixin(result, extensions);
     if ( !result.__dirname && result.__filename ) {
       result.__dirname = dirname(result.__filename);
     }
     return result;
   }
-  return Global;
+  return DefaultGlobals;
 }
 
 /*
