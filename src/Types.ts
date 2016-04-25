@@ -15,7 +15,7 @@ export interface ModuleExports {
   [index: string]: any;
 }
 
-export let isArray = Array.isArray;
+export const isArray = Array.isArray;
 
 export function isObject(obj: any) {
   return typeof obj === 'object' && obj !== null && !isArray(obj);

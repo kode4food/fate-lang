@@ -3,7 +3,7 @@
 import * as Syntax from './Syntax';
 import { CompileError, CompileErrors } from './Compiler';
 
-let slice = Array.prototype.slice;
+const slice = Array.prototype.slice;
 
 type NodeVisitor = (node: Syntax.NodeOrNodes) => any;
 type StatementsVisitor = (node: Syntax.Statement[]) => any;

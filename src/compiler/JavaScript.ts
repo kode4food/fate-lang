@@ -4,7 +4,7 @@ import { mixin } from '../Util';
 import { GeneratedCode } from './Compiler';
 import { Resolver } from './Syntax';
 
-let jsonStringify = JSON.stringify;
+const jsonStringify = JSON.stringify;
 
 type StringMap = { [index: string]: string };
 
@@ -65,7 +65,7 @@ interface Modification {
 }
 
 // presented operators are symbolic
-let operatorMap: StringMap = {
+const operatorMap: StringMap = {
   'eq': '===',
   'neq': '!==',
   'gt': '>',

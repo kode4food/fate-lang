@@ -5,17 +5,17 @@ import * as Resolvers from '../resolvers';
 import { DirPath, ModuleName, ModuleExports } from '../Types';
 
 // Register the default resolvers
-let nodeResolver = Resolvers.createNodeResolver();
-let fileResolver = Resolvers.createFileResolver({ path: process.cwd() });
-let systemResolver = Resolvers.createSystemResolver();
-let memoryResolver = Resolvers.createMemoryResolver();
+const nodeResolver = Resolvers.createNodeResolver();
+const fileResolver = Resolvers.createFileResolver({ path: process.cwd() });
+const systemResolver = Resolvers.createSystemResolver();
+const memoryResolver = Resolvers.createMemoryResolver();
 
-let _resolvers: Resolvers.Resolver[] = [
+const _resolvers: Resolvers.Resolver[] = [
   fileResolver, nodeResolver, systemResolver, memoryResolver
 ];
 
-export let registerModule = memoryResolver.register;
-export let unregisterModule = memoryResolver.unregister;
+export const registerModule = memoryResolver.register;
+export const unregisterModule = memoryResolver.unregister;
 
 export function resolve(moduleName: ModuleName, basePath?: DirPath) {
   for ( let i = _resolvers.length - 1; i >= 0; i-- ) {

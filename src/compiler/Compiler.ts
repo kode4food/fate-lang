@@ -13,8 +13,8 @@ import { createContext, runInContext } from 'vm';
 import { generateScriptBody } from './CodeGen';
 import { globals } from '../Fate';
 
-let generatedParser = require('./parser');
-let SyntaxError = generatedParser.SyntaxError;
+const generatedParser = require('./parser');
+const SyntaxError = generatedParser.SyntaxError;
 
 export type ScriptContent = string;
 export type GeneratedCode = string;
