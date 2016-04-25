@@ -7,13 +7,13 @@ interface FormatFunction {
   __fateIndexes: (string | number)[];
 }
 
-let Digits = "0|[1-9][0-9]*";
-let Ident = "[$_a-zA-Z][$_a-zA-Z0-9]*";
-let Term = ";?";
-let Params = `%((%)|(${Digits})|(${Ident}))?${Term}`;
-             /* "%" ( "%" | digits | identifier )? ";"? */
+const Digits = "0|[1-9][0-9]*";
+const Ident = "[$_a-zA-Z][$_a-zA-Z0-9]*";
+const Term = ";?";
+const Params = `%((%)|(${Digits})|(${Ident}))?${Term}`;
+               /* "%" ( "%" | digits | identifier )? ";"? */
 
-let ParamRegex = new RegExp(Params, "m");
+const ParamRegex = new RegExp(Params, "m");
 
 export function isFormatter(value: string) {
   if ( !ParamRegex.test(value) ) {

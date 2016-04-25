@@ -52,16 +52,7 @@ function timeout(delay: number) {
 }
 
 export {
-  math as Math,
-  object as Object,
-  string as String,
-  number as Number,
-  Undefined as undefined,
-  Null as null,
-  make,
-  isA,
-  setProperty,
-  print,
-  mutable,
-  timeout
+  math as Math, object as Object, string as String, number as Number,
+  make, isA, setProperty, print, mutable, timeout,
+  Undefined as undefined, Null as null
 };

@@ -12,7 +12,7 @@ import {
 import { isObject } from './Types';
 import { mixin } from './Util';
 
-let pkg = require('../package.json');
+const pkg = require('../package.json');
 export const VERSION = pkg.version;
 
 import * as RuntimeExports from './Runtime';
