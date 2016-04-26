@@ -6,6 +6,7 @@ import Visitor from './Visitor';
 import Prepare from './Prepare';
 import Patterns from './Patterns';
 import Rewrite from './Rewrite';
+import Validate from './Validate';
 
 import * as Runtime from '../Runtime';
 
@@ -33,7 +34,7 @@ export class CompileError implements Error {
 
 export type CompileErrors = CompileError[];
 
-const compilerPipeline = [Prepare, Patterns, Rewrite];
+const compilerPipeline = [Prepare, Patterns, Rewrite, Validate];
 
 export function compileModule(script: ScriptContent) {
   let syntaxTree = generatedParser.parse(script);
