@@ -54,28 +54,28 @@ export default class Visitor {
     return undefined;
   }
 
-  public nodes(startNode: Syntax.Node|Syntax.Nodes, visitor: NodeVisitor,
-               matcher: NodeMatcher) {
+  public nodes(startNode: Syntax.Node|Syntax.Nodes, matcher: NodeMatcher,
+               visitor: NodeVisitor, breadthFirst = false) {
     let self = this;
     return visitNode(startNode);
 
-    function visitNode(node: Syntax.Node|Syntax.Nodes) {
+    function visitNode(node: Syntax.NodeOrNodes): Syntax.NodeOrNodes {
       if ( !(node instanceof Syntax.Node) && !Array.isArray(node) ) {
         return node;
       }
 
-      // Depth-first Processing
-      node = self.recurseInto(node, visitNode);
-
-      // Now the real work
-      if ( matcher(node) ) {
-        return visitor(node);
+      if ( !matcher(node) ) {
+        return self.recurseInto(node, visitNode);
       }
-      return node;
+
+      if ( breadthFirst ) {
+        return self.recurseInto(visitor(node), visitNode);
+      }
+      return visitor(self.recurseInto(node, visitNode));
     }
   }
 
-  public recurseInto(node: Syntax.Node|Syntax.Nodes, visitor: NodeVisitor) {
+  public recurseInto(node: Syntax.NodeOrNodes, visitor: NodeVisitor) {
     let nodeStack = this.nodeStack;
     nodeStack.push(node);
     if ( Array.isArray(node) ) {
@@ -88,7 +88,8 @@ export default class Visitor {
     }
     else {
       let currentNode = <Syntax.Node>node;
-      Object.keys(currentNode).forEach(function (key) {
+      let keys = currentNode.visitorKeys || Object.keys(currentNode);
+      keys.forEach(function (key) {
         currentNode[key] = visitor(currentNode[key]);
       });
     }
@@ -98,13 +99,19 @@ export default class Visitor {
 
   public matching(visitor: NodeVisitor, matcher: NodeMatcher) {
     return (node: Syntax.Node) => {
-      return this.nodes(node, visitor, matcher);
+      return this.nodes(node, matcher, visitor);
+    };
+  }
+
+  public breadthMatching(visitor: NodeVisitor, matcher: NodeMatcher) {
+    return (node: Syntax.Node) => {
+      return this.nodes(node, matcher, visitor, true);
     };
   }
 
   public statements(visitor: StatementsVisitor) {
     return (node: Syntax.Node) => {
-      return this.nodes(node, statementsProcessor, Syntax.isStatements);
+      return this.nodes(node, Syntax.isStatements, statementsProcessor);
     };
 
     function statementsProcessor(node: Syntax.Statements) {
@@ -116,7 +123,7 @@ export default class Visitor {
   // Iterates over a set of statements and presents adjacent groups
   // to the callback function for replacement
   public statementGroups(visitor: StatementsVisitor, matcher: NodeMatcher,
-                          minGroupSize = 2) {
+                         minGroupSize = 2) {
     return this.statements(groupProcessor);
 
     function groupProcessor(statements: Syntax.Statement[]) {

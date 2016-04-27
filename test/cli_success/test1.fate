@@ -1,5 +1,7 @@
 # Simple test for successful parse
 
+let people = []
+
 for person in people, sibling in person.siblings
   global.emit([person.name, sibling.name] | "% is the sibling of %")
 end

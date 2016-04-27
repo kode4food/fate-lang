@@ -185,10 +185,10 @@ moduleItems
 
 moduleItem
   = name:Name alias:alias  {
-      return node('moduleItem', name, alias);
+      return node('moduleItem', literalName(name), alias);
     }
   / name:Identifier  {
-      return node('moduleItem', name, null);
+      return node('moduleItem', literalName(name), name);
     }
 
 moduleSpecifiers

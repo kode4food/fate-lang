@@ -20,11 +20,13 @@ export type ArrayElements = ArrayElement[];
 export type ObjectElements = ObjectAssignment[];
 
 type FunctionMap = { [index: string]: Function };
+type StringFunction = (value: string) => any;
 
 export class Node implements Annotated {
   [index: string]: any;
 
   public tag: Tag;
+  public visitorKeys: string[];
   public annotations: Annotations;
   public line: number;
   public column: number;
@@ -48,15 +50,15 @@ export function hasTag(node: Node, tags?: TagOrTags): any {
     return node.tag;
   }
 
-  if ( !Array.isArray(tags) ) {
-    return tags === node.tag;
+  if ( Array.isArray(tags) ) {
+    let idx = tags.indexOf(node.tag);
+    if (idx === -1) {
+      return false;
+    }
+    return tags[idx];
   }
 
-  let idx = tags.indexOf(node.tag);
-  if ( idx === -1 ) {
-    return false;
-  }
-  return tags[idx];
+  return tags === node.tag;
 }
 
 // Expression Nodes *********************************************************
@@ -144,6 +146,8 @@ export class ReduceExpression extends Expression {
 type WhenClause = LetStatement|Expression;
 
 export class DoExpression extends Expression {
+//  public visitorKeys = ['whenClause', 'statements'];
+
   constructor(public statements: Statements,
               public whenClause?: WhenClause) { super(); }
 }
@@ -224,6 +228,10 @@ export class ExpressionStatement extends Statement {
 }
 
 export class ForStatement extends Statement {
+  // public visitorKeys = [
+  //   'reduceAssignments', 'ranges', 'loopStatements', 'elseStatements'
+  // ];
+
   constructor(public ranges: Ranges,
               public loopStatements: Statements,
               public elseStatements: Statements,
@@ -394,11 +402,11 @@ export class PatternParameter extends Parameter {
 }
 
 export class ModuleItem extends Node {
-  constructor(public name: Identifier,
+  constructor(public name: Literal,
               public alias: Identifier) {
     super();
     if ( !alias ) {
-      this.alias = name;
+      this.alias = name.template('id', name.value);
     }
   }
 }

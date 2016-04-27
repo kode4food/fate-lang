@@ -3,7 +3,7 @@ import nodeunit
 from pattern
 import Array, Object, String, NonEmptyString, EmptyString,
        Boolean, Number, Integer, PositiveInteger, PositiveNumber,
-       NegativeInteger, NegativeNumber, ArrayOf
+       NegativeInteger, NegativeNumber, ArrayOf, Nothing
 
 from test import isFalse, isTrue, equalTo, throws
 from value import null, undefined

@@ -78,8 +78,6 @@ def reduceExpressionExplicit(test)
   reduce b = 0 for x in [4,5,6] select b + x
 
   result | equalTo(6)
-  a      | equalTo(undefined)  # var shouldn't leak
-  b      | equalTo(undefined)  # var shouldn't leak
   test.done()
 end
 

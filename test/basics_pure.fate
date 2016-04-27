@@ -113,9 +113,6 @@ def nothingSomething(test)
   true = Nothing            | isFalse
   Nothing != Nothing        | isFalse
   Nothing = Nothing         | isTrue
-  bogusValue != Nothing     | isTrue
-  bogusValue = Nothing      | isFalse
-  bogusValue like Nothing   | isTrue
 
   null like Nothing         | isTrue
   undefined like Nothing    | isTrue

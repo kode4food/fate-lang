@@ -647,7 +647,7 @@ export function createModule() {
         return;
       }
 
-      // pull the value from the global context
+      // TODO: This will go away as part of the id requirements
       write('let ', localNameId, '=');
       member(context, literal(name));
       write(';');
