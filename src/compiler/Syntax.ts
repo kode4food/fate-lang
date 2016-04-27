@@ -13,18 +13,21 @@ export type Parameters = Parameter[];
 export type Identifiers = Identifier[];
 export type Expressions = Expression[];
 export type Assignments = Assignment[];
-export type ModuleItems = ModuleItem[];
+export type ImportModuleItems = ImportModuleItem[];
+export type ExportModuleItems = ExportModuleItem[];
 export type ModuleSpecifiers = ModuleSpecifier[];
 export type ArrayElement = Expression|Pattern;
 export type ArrayElements = ArrayElement[];
 export type ObjectElements = ObjectAssignment[];
 
 type FunctionMap = { [index: string]: Function };
+type StringFunction = (value: string) => any;
 
 export class Node implements Annotated {
   [index: string]: any;
 
   public tag: Tag;
+  public visitorKeys: string[];
   public annotations: Annotations;
   public line: number;
   public column: number;
@@ -48,15 +51,15 @@ export function hasTag(node: Node, tags?: TagOrTags): any {
     return node.tag;
   }
 
-  if ( !Array.isArray(tags) ) {
-    return tags === node.tag;
+  if ( Array.isArray(tags) ) {
+    let idx = tags.indexOf(node.tag);
+    if (idx === -1) {
+      return false;
+    }
+    return tags[idx];
   }
 
-  let idx = tags.indexOf(node.tag);
-  if ( idx === -1 ) {
-    return false;
-  }
-  return tags[idx];
+  return tags === node.tag;
 }
 
 // Expression Nodes *********************************************************
@@ -144,6 +147,8 @@ export class ReduceExpression extends Expression {
 type WhenClause = LetStatement|Expression;
 
 export class DoExpression extends Expression {
+  public visitorKeys = ['whenClause', 'statements'];
+
   constructor(public statements: Statements,
               public whenClause?: WhenClause) { super(); }
 }
@@ -224,6 +229,10 @@ export class ExpressionStatement extends Statement {
 }
 
 export class ForStatement extends Statement {
+  public visitorKeys = [
+    'reduceAssignments', 'ranges', 'loopStatements', 'elseStatements'
+  ];
+
   constructor(public ranges: Ranges,
               public loopStatements: Statements,
               public elseStatements: Statements,
@@ -257,17 +266,17 @@ export class ReturnStatement extends Statement {
 }
 
 export abstract class ExportableStatement extends Statement {
-  public abstract getModuleItems(): ModuleItems;
+  public abstract getModuleItems(): ExportModuleItems;
 }
 
 export class LetStatement extends ExportableStatement {
   constructor(public assignments: Assignments) { super(); }
 
   public getModuleItems() {
-    let result: ModuleItems = [];
+    let result: ExportModuleItems = [];
     this.assignments.forEach(assignment => {
       assignment.getIdentifiers().forEach(id => {
-        result.push(id.template('moduleItem', id));
+        result.push(id.template('exportModuleItem', id));
       });
     });
     return result;
@@ -276,11 +285,11 @@ export class LetStatement extends ExportableStatement {
 
 export class FromStatement extends ExportableStatement {
   constructor(public path: ModulePath,
-              public importList: ModuleItems) { super(); }
+              public importList: ImportModuleItems) { super(); }
 
   public getModuleItems() {
     return this.importList.map(moduleItem => {
-      return node('moduleItem', moduleItem.alias);
+      return node('exportModuleItem', moduleItem.id);
     });
   }
 }
@@ -290,7 +299,7 @@ export class ImportStatement extends ExportableStatement {
 
   public getModuleItems() {
     return this.modules.map(moduleSpecifier => {
-      return node('moduleItem', moduleSpecifier.alias);
+      return node('exportModuleItem', moduleSpecifier.alias);
     });
   }
 }
@@ -300,15 +309,15 @@ export class FunctionDeclaration extends ExportableStatement {
               public statements: Statements) { super(); }
 
   public getModuleItems() {
-    return [node('moduleItem', this.signature.id)];
+    return [node('exportModuleItem', this.signature.id)];
   }
 }
 
 export class ExportStatement extends Statement {
   public statement: ExportableStatement;
-  public exportItems: ModuleItems;
+  public exportItems: ExportModuleItems;
 
-  constructor(public exportable: ExportableStatement|ModuleItems) {
+  constructor(exportable: ExportableStatement|ExportModuleItems) {
     super();
 
     if ( Array.isArray(exportable) ) {
@@ -331,6 +340,7 @@ export class Identifier extends Symbol {
 }
 
 export class Self extends Identifier {}
+export class Global extends Identifier {}
 
 export class Literal extends Symbol {
   constructor(public value: any) { super(); }
@@ -392,12 +402,17 @@ export class PatternParameter extends Parameter {
   }
 }
 
-export class ModuleItem extends Node {
-  constructor(public name: Identifier,
-              public alias: Identifier) {
+export class ImportModuleItem extends Node {
+  constructor(public moduleKey: Literal,
+              public id: Identifier) { super(); }
+}
+
+export class ExportModuleItem extends Node {
+  constructor(public id: Identifier,
+              public moduleKey: Literal) {
     super();
-    if ( !alias ) {
-      this.alias = name;
+    if ( !moduleKey ) {
+      this.moduleKey = id.template('literal', id.value);
     }
   }
 }
@@ -511,6 +526,7 @@ let tagToConstructor: FunctionMap = {
   'object': ObjectConstructor,
   'id': Identifier,
   'self': Self,
+  'global': Global,
   'literal': Literal,
   'pattern': Pattern,
   'regex': Regex,
@@ -520,7 +536,8 @@ let tagToConstructor: FunctionMap = {
   'signature': Signature,
   'idParam': Parameter,
   'patternParam': PatternParameter,
-  'moduleItem': ModuleItem,
+  'importModuleItem': ImportModuleItem,
+  'exportModuleItem': ExportModuleItem,
   'moduleSpecifier': ModuleSpecifier,
   'modulePath': ModulePath,
   'assignment': DirectAssignment,

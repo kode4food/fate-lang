@@ -5,27 +5,28 @@ import * as Syntax from './Syntax';
 import { isTrue, isFalse, isIn } from '../Types';
 import { annotate, hasAnnotation } from './Annotations';
 
-let hasTag = Syntax.hasTag;
-let isLiteral = Syntax.isLiteral;
+const hasTag = Syntax.hasTag;
+const isLiteral = Syntax.isLiteral;
 
 type LiteralArray = any[];
 type StringMap = { [index: string]: string };
 type LiteralObject = { [index: string]: any };
 type FunctionMap = { [index: string]: Function };
 
-let inverseOperators: StringMap = {
+const inverseOperators: StringMap = {
   'eq': 'neq', 'neq': 'eq',
   'lt': 'gte', 'gte': 'lt',
   'gt': 'lte', 'lte': 'gt'
 };
 
-let unaryConstantFolders: FunctionMap = {
+const unaryConstantFolders: FunctionMap = {
   'not':   function (v: any) { return isFalse(v); },
   'neg':   function (v: any) { return -v; }
 };
-let unaryConstantFolderKeys = Object.keys(unaryConstantFolders);
 
-let binaryConstantFolders: FunctionMap = {
+const unaryConstantFolderKeys = Object.keys(unaryConstantFolders);
+
+const binaryConstantFolders: FunctionMap = {
   'add':   function (l: any, r: any) { return l + r; },
   'sub':   function (l: any, r: any) { return l - r; },
   'mul':   function (l: any, r: any) { return l * r; },
@@ -40,9 +41,10 @@ let binaryConstantFolders: FunctionMap = {
   'lte':   function (l: any, r: any) { return l <= r; },
   'mod':   function (l: any, r: any) { return l % r; }
 };
-let binaryConstantFolderKeys = Object.keys(binaryConstantFolders);
 
-let shortCircuitFolders: FunctionMap = {
+const binaryConstantFolderKeys = Object.keys(binaryConstantFolders);
+
+const shortCircuitFolders: FunctionMap = {
   'or': function (node: Syntax.OrOperator) {
     if ( !isLiteral(node.left) ) {
       return node;
@@ -65,7 +67,8 @@ let shortCircuitFolders: FunctionMap = {
     return isTrue(value) ? node.trueResult : node.falseResult;
   }
 };
-let shortCircuitFolderKeys = Object.keys(shortCircuitFolders);
+
+const shortCircuitFolderKeys = Object.keys(shortCircuitFolders);
 
 export default function createTreeProcessors(visit: Visitor) {
   let foldableShortCircuit = visit.tags(shortCircuitFolderKeys);

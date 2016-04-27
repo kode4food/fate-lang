@@ -2,13 +2,13 @@
 
 import { isArray, isObject } from '../Types';
 
-let generator = require('../generator');
-let isGenerator = generator.isGenerator;
-let generateIndexedSet = generator.generateIndexedSet;
+const generator = require('../generator');
+const isGenerator = generator.isGenerator;
+const generateIndexedSet = generator.generateIndexedSet;
 
 export type Collection = any[]|any|Function;
 
-let EmptyCollection: Collection = [];
+const EmptyCollection: Collection = [];
 
 export function createIterator(collection: Collection) {
   if ( isArray(collection) || isObject(collection) ||

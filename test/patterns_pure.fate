@@ -3,11 +3,10 @@ import nodeunit
 from pattern
 import Array, Object, String, NonEmptyString, EmptyString,
        Boolean, Number, Integer, PositiveInteger, PositiveNumber,
-       NegativeInteger, NegativeNumber, ArrayOf
+       NegativeInteger, NegativeNumber, ArrayOf, Nothing
 
 from test import isFalse, isTrue, equalTo, throws
-
-let null = node.null, undefined = node.undefined
+from value import null, undefined
 
 def numberPatterns(test)
   "hello" like Number         | isFalse

@@ -156,7 +156,7 @@ patternExpr
 
 importStatement
   = op:From path:(modulePath / stringPath)
-    __ Import __ imports:moduleItems  {
+    __ Import __ imports:importModuleItems  {
       return node(op, path, imports);
     }
   / op:Import __ modules:moduleSpecifiers  {
@@ -178,17 +178,32 @@ moduleComp
       return name.value;
     }
 
-moduleItems
-  = head:moduleItem tail:( LIST_SEP item:moduleItem { return item; } )*  {
+importModuleItems
+  = head:importModuleItem
+    tail:( LIST_SEP item:importModuleItem { return item; } )*  {
       return [head].concat(tail);
     }
 
-moduleItem
+importModuleItem
   = name:Name alias:alias  {
-      return node('moduleItem', name, alias);
+      return node('importModuleItem', literalName(name), alias);
     }
   / name:Identifier  {
-      return node('moduleItem', name, null);
+      return node('importModuleItem', literalName(name), name);
+    }
+
+exportModuleItems
+  = head:exportModuleItem
+    tail:( LIST_SEP item:exportModuleItem { return item; } )*  {
+      return [head].concat(tail);
+    }
+
+exportModuleItem
+  = name:Name alias:alias  {
+      return node('exportModuleItem', name, literalName(alias));
+    }
+  / name:Identifier  {
+      return node('exportModuleItem', name, literalName(name));
     }
 
 moduleSpecifiers
@@ -214,7 +229,7 @@ exportable
   = letStatement
   / importStatement
   / funcDeclaration
-  / moduleItems
+  / exportModuleItems
 
 forStatement
   = Reduce reduceAssignments:reduceAssignments __
@@ -719,6 +734,7 @@ literal
   / regex
   / boolean
   / self
+  / global
   / reference
   / wildcard
 
@@ -744,6 +760,7 @@ boolean = True / False
 identifier = Identifier
 number = Number
 self = Self
+global = Global
 wildcard = Wildcard
 
 /* Lexer *********************************************************************/
@@ -767,6 +784,7 @@ Not     = "not"      !NameContinue  { return 'not'; }
 In      = "in"       !NameContinue  { return 'in'; }
 Return  = "return"   !NameContinue  { return 'return'; }
 Self    = "self"     !NameContinue  { return node('self'); }
+Global  = "global"   !NameContinue  { return node('global'); }
 True    = "true"     !NameContinue  { return node('literal', true); }
 False   = "false"    !NameContinue  { return node('literal', false); }
 If      = "if"       !NameContinue  { return true; }
@@ -788,7 +806,7 @@ ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or /
       Like / Mod / Not / If / Unless / True / False / As / In /
       Return / Self / Else / End / Where / Select / Reduce / Await /
-      Any / All / When / Case / Match )
+      Any / All / When / Case / Match / Global )
 
 Identifier "identifier"
   = !ReservedWord name:Name  {

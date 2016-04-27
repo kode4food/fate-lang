@@ -2,9 +2,9 @@
 
 type ArgTemplate = { [index: number]: any };
 
-let slice = Array.prototype.slice;
+const slice = Array.prototype.slice;
 
-function functionNotExhaustive() {
+export function functionNotExhaustive() {
   throw new Error("Function invocation not exhaustive");
 }
 

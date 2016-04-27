@@ -31,8 +31,8 @@ exports.math = nodeunit.testCase({
     test.equal(evaluate("1 + 1"), 2);
     test.equal(evaluate("10 - 7"), 3);
     test.equal(evaluate("10 + 30 - 5"), 35);
-    test.equal(evaluate("people[0].age + 10", this.data), 60);
-    test.equal(evaluate("60 - people[0].age", this.data), 10);
+    test.equal(evaluate("global.people[0].age + 10", this.data), 60);
+    test.equal(evaluate("60 - global.people[0].age", this.data), 10);
     test.done();
   },
 
@@ -41,11 +41,11 @@ exports.math = nodeunit.testCase({
     test.equal(evaluate("100 / 5"), 20);
     test.equal(evaluate("99 mod 6"), 3);
     test.equal(evaluate("33 * 3 mod 6"), 3);
-    test.equal(evaluate("people[0].age * 2", this.data), 100);
-    test.equal(evaluate("people[0].age / 2", this.data), 25);
-    test.equal(evaluate("100 / people[0].age", this.data), 2);
-    test.equal(evaluate("3 * people[0].age", this.data), 150);
-    test.equal(evaluate("(33 * 6 - (people[0].age + 1)) mod 6", this.data), 3);
+    test.equal(evaluate("global.people[0].age * 2", this.data), 100);
+    test.equal(evaluate("global.people[0].age / 2", this.data), 25);
+    test.equal(evaluate("100 / global.people[0].age", this.data), 2);
+    test.equal(evaluate("3 * global.people[0].age", this.data), 150);
+    test.equal(evaluate("(33 * 6 - (global.people[0].age + 1)) mod 6", this.data), 3);
     test.done();
   },
 

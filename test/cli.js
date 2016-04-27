@@ -5,7 +5,6 @@ const path = require('path');
 const nodeunit = require('nodeunit');
 const compiler = require('../dist/cli/Compiler')['commandLine'];
 const interpreter = require('../dist/cli/Interpreter')['commandLine'];
-const Global = require('../dist/Global')['default'];
 const helpers = require('./helpers');
 const createConsole = helpers.createConsole;
 
@@ -137,15 +136,13 @@ exports.cli = nodeunit.testCase({
   },
 
   "Interpreter": function (test) {
-    let cons, printHolder, consoleHolder;
+    let cons, logHolder;
     start();
 
     function start() {
       cons = createConsole();
-      printHolder = Global.print;
-      consoleHolder = Global.node.console;
-      Global.print = cons.log.bind(cons.log);
-      Global.node.console = cons;
+      logHolder = console.log;
+      console.log = cons.log.bind(cons.log);
       successTest();
     }
 
@@ -174,8 +171,7 @@ exports.cli = nodeunit.testCase({
     }
 
     function finish() {
-      Global.print = printHolder;
-      Global.node.console = consoleHolder;
+      console.log = logHolder;
       test.done();
     }
   }

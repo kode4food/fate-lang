@@ -2,6 +2,9 @@
 let a = 100
 a = 99  # should generate a warning
 
+def renderItem(name, brother)
+  global.emit("%brother is the brother of %name")
+end
 
 def renderList(people)
   # will be shadowed
@@ -9,20 +12,16 @@ end
 
 def renderList(people)
   # otherwise will fall through to this
-  emit(people | "There are %length stooges")
+  global.emit(people | "There are %length stooges")
   for person in people, brother in person.brothers
-    emit(renderItem(person.name, brother))
+    global.emit(renderItem(person.name, brother))
   end
 end
 
 def renderList(people)
 where not people
   # will be called if people is not defined or is empty
-  emit("There are no people!")
-end
-
-def renderItem(name, brother)
-  emit("%brother is the brother of %name")
+  global.emit("There are no people!")
 end
 
 export def renderTest(name)

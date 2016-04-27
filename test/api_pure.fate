@@ -2,8 +2,7 @@ import nodeunit
 
 from pattern import Nothing, Something
 from test import isFalse, isTrue
-
-let null = node.null, undefined = node.undefined
+from value import null, undefined
 
 import '../dist/Types' as types
 import '../dist/Runtime' as runtime

@@ -3,6 +3,7 @@ import nodeunit
 import object
 import array
 
+from value import undefined
 from test import equalTo, deepEqualTo, isFalse, isTrue
 
 def listBasics(test)

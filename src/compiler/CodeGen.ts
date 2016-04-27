@@ -3,6 +3,8 @@
 import * as JavaScript from './JavaScript';
 import * as Syntax from './Syntax';
 
+import { BodyEntry } from './JavaScript';
+
 import { hasAnnotation, getAnnotation } from './Annotations';
 
 type FunctionMap = { [index: string]: Function };
@@ -73,6 +75,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'literal': createLiteral,
     'regex': createRegex,
     'self': createSelfEvaluator,
+    'global': createGlobalEvaluator,
     'pattern': createPatternEvaluator
   };
 
@@ -179,15 +182,15 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       }
     ]);
 
-    node.importList.forEach(function (item: Syntax.ModuleItem) {
+    node.importList.forEach(function (item: Syntax.ImportModuleItem) {
       assigns.push([
-        item.alias.value,
+        item.id.value,
         function () {
           generate.member(
             function () {
               generate.retrieveAnonymous(anon);
             },
-            generate.literal(item.name.value)
+            generate.literal(item.moduleKey.value)
           );
         }
       ]);
@@ -197,11 +200,13 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createExportEvaluator(node: Syntax.ExportStatement) {
-    let exports = node.exportItems.map(function (item: Syntax.ModuleItem) {
-      let name = item.name.value;
-      let alias = item.alias.value;
-      return <JavaScript.ModuleItem>[name, alias];
-    });
+    let exports = node.exportItems.map(
+      function (item: Syntax.ExportModuleItem) {
+        let name = item.id.value;
+        let alias = item.moduleKey.value;
+        return <JavaScript.ModuleItem>[name, alias];
+      }
+    );
 
     generate.exports(exports);
   }
@@ -209,22 +214,6 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   function getFuncOrLambdaInternalId(node: Syntax.Node) {
     let hasSelf = hasAnnotation(node, 'function/self');
     return hasSelf ? generate.selfName : undefined;
-  }
-
-  function generateEnsured(signatureName: Syntax.Identifier,
-                           signatureType: string) {
-    let ensure = generate.runtimeImport('ensure' + signatureType);
-    let ensuredId = generate.createAnonymous();
-
-    generate.statement(function () {
-      generate.assignAnonymous(ensuredId, function () {
-        generate.call(ensure, [function () {
-          generate.getter(signatureName.value);
-        }]);
-      });
-    });
-
-    return ensuredId;
   }
 
   function createFunctionEvaluator(node: Syntax.FunctionDeclaration) {
@@ -251,7 +240,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
     function createGuarded() {
       let functionName = node.signature.id;
-      let ensuredId = generateEnsured(functionName, 'Function');
+      let ensured = generateEnsured(functionName);
 
       generate.funcDeclaration(functionName.value, {
         internalId: getFuncOrLambdaInternalId(node),
@@ -266,14 +255,33 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
           null,  // this is an 'else' case
           function () {
             generate.returnStatement(function () {
-              generate.call(function () {
-                generate.retrieveAnonymous(ensuredId);
-              });
+              generate.call(ensured);
             });
           }
         );
         createStatementsEvaluator(node.statements);
       }
+    }
+
+    function generateEnsured(functionName: Syntax.Identifier): BodyEntry {
+      if ( !hasAnnotation(node, 'function/shadow') ) {
+        return generate.runtimeImport('functionNotExhaustive');
+      }
+
+      let ensure = generate.runtimeImport('ensureFunction');
+      let ensuredId = generate.createAnonymous();
+
+      generate.statement(function () {
+        generate.assignAnonymous(ensuredId, function () {
+          generate.call(ensure, [function () {
+            generate.getter(functionName.value);
+          }]);
+        });
+      });
+
+      return function () {
+        generate.retrieveAnonymous(ensuredId);
+      };
     }
   }
 
@@ -478,7 +486,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       });
     }
 
-    function generateBody(valueGenerator: JavaScript.BodyEntry) {
+    function generateBody(valueGenerator: BodyEntry) {
       let value = generate.createAnonymous();
       generate.statement(function () {
         generate.assignAnonymous(value, valueGenerator);
@@ -959,7 +967,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       return;
     }
     let elems = node.elements.map(function (elem: Syntax.ObjectAssignment) {
-      let name: string|Function;
+      let name: BodyEntry;
       if ( elem.id instanceof Syntax.Literal ) {
         name = (<Syntax.Literal>elem.id).value;
       }
@@ -994,6 +1002,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
     selfPatternName = generate.registerAnonymous(selfPatternName);
     generate.retrieveAnonymous(selfPatternName);
+  }
+
+  function createGlobalEvaluator(node: Syntax.Global) {
+    generate.context();
   }
 
   function createPatternEvaluator(node: Syntax.Pattern) {
@@ -1080,7 +1092,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     generate.writeAndGroup(expressions);
 
     function pushElement(element: Syntax.Node, elementValue: Syntax.Node,
-                         elementIndex: string|Function) {
+                         elementIndex: BodyEntry) {
       if ( elementValue.tag === 'self' ) {
         return;
       }
@@ -1094,7 +1106,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
 
     function generateEquality(elementValue: Syntax.Node,
-                              elementIndex: string|Function) {
+                              elementIndex: BodyEntry) {
       if ( elementValue instanceof Syntax.Literal ) {
         return function () {
           createLikeComparison(value, elementValue);
@@ -1115,7 +1127,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
 
     function generateNested(element: Syntax.Node, elementValue: Syntax.Node,
-                            elementIndex: string|Function) {
+                            elementIndex: BodyEntry) {
       let elementLocal = getAnnotation(element, 'pattern/local');
       elementLocal = generate.registerAnonymous(elementLocal);
 

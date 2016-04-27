@@ -20,14 +20,14 @@ exports.lists = nodeunit.testCase({
       }
     };
 
-    let script1 = "[for y in yl select y * 2]";
-    let script2 = "[for y in yl where y > 50 select y * 2]";
-    let script3 = "[for y in yl, x in xl where x.friend = y select x.val * y]";
-    let script4 = "{for y in yl where y > 50 select y * 2: y * 4}[102]";
-    let script5 = "{for y in yl select (y): y * 2}[51]";
-    let script6 = "{for y in yl select val: y}['val']";
-    let script7 = "[for y in yl where y > 50]";
-    let script8 = "{for name:value in zl where name >= 20}";
+    let script1 = "[for y in global.yl select y * 2]";
+    let script2 = "[for y in global.yl where y > 50 select y * 2]";
+    let script3 = "[for y in global.yl, x in global.xl where x.friend = y select x.val * y]";
+    let script4 = "{for y in global.yl where y > 50 select y * 2: y * 4}[102]";
+    let script5 = "{for y in global.yl select (y): y * 2}[51]";
+    let script6 = "{for y in global.yl select val: y}['val']";
+    let script7 = "[for y in global.yl where y > 50]";
+    let script8 = "{for name:value in global.zl where name >= 20}";
 
     test.deepEqual(evaluate(script1, data), [20,40,60,100,102,150,180,200]);
     test.deepEqual(evaluate(script2, data), [102,150,180,200]);
@@ -69,8 +69,8 @@ exports.lists = nodeunit.testCase({
     test.equal(evaluate("{name:'Thom',age:42}.age"), 42);
     test.equal(evaluate("{name:'Thom',age:21*2}.age"), 42);
     test.equal(evaluate("{age:21*2}.age"), 42);
-    test.equal(evaluate("{name + '1': value + 1}['hello1']", data), 10);
-    test.equal(evaluate("{name + '2': value + 1}['hello2']", data), 10);
+    test.equal(evaluate("{global.name + '1': global.value + 1}['hello1']", data), 10);
+    test.equal(evaluate("{global.name + '2': global.value + 1}['hello2']", data), 10);
     test.equal(evaluate('let a = "hello"\n{ "test": a }')['test'], 'hello');
     test.equal(evaluate('let a = "hello"\n{ a }["a"]'), 'hello');
     test.equal(evaluate('{ "hello" }["hello"]'), 'hello');

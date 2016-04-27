@@ -13,7 +13,6 @@ const assignmentTypes = ['assignment', 'arrayDestructure', 'objectDestructure'];
 
 export default function createTreeProcessors(visit: Visitor) {
   let selfFunction = visit.ancestorTags('self', ['function', 'lambda']);
-  let functionIdRetrieval = visit.ancestorTags('id', ['function']);
   let whenReference = visit.ancestorTags('id', assignmentTypes, 'let', 'do');
 
   return [
@@ -23,7 +22,6 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(validateSelfReferences, visit.tags('self')),
     visit.matching(validateFunctionArgs, visit.tags(['function', 'lambda'])),
     visit.matching(annotateSelfFunctions, selfFunction),
-    visit.matching(annotateRecursiveFunctions, functionIdRetrieval),
     visit.matching(annotateWhenReferences, whenReference),
     visit.matching(groupWhenAssignments, visit.tags('do')),
     visit.statementGroups(validateAssignments, visit.tags('let'), 1),
@@ -151,19 +149,6 @@ export default function createTreeProcessors(visit: Visitor) {
     }
     let func = visit.hasAncestorTags(['function', 'lambda'])[0];
     annotate(func, 'function/self');
-    annotate(func, 'no_merge');
-    return node;
-  }
-
-  function annotateRecursiveFunctions(node: Syntax.Identifier) {
-    let func = visit.hasAncestorTags('function')[0];
-    if ( node === func.signature.id ) {
-      return node;
-    }
-    if ( node.value !== func.signature.id.value ) {
-      return node;
-    }
-    annotate(func, 'function/no_merge');
     return node;
   }
 

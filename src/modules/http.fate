@@ -7,6 +7,7 @@ from './support' import make
 from '../Util' import mixin
 
 from pattern import Something, NonEmptyString
+from io import streamConsumer
 
 # Warning: this module assumes JavaScript-specific methods
 #
@@ -20,13 +21,6 @@ let RequestOptions = ~{
   hostname: NonEmptyString,
   method: self in ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH']
 }
-
-let streamConsumer = (resolve -> stream ->
-  let content = mutable('') # oh, no, a mutable!
-  stream.on('data',  data -> content.value + data | content.set)
-        .on('end',   -> [content.value] | resolve)
-        .on('error', err -> [content.value, err] | resolve)
-)
 
 def request(RequestOptions as options, content)
   make(Promise, (resolve) ->

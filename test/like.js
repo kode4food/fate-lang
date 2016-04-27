@@ -123,33 +123,33 @@ exports.like = nodeunit.testCase({
       null_value: null
     };
 
-    let script1 = 'if person1 like person2\n' +
+    let script1 = 'if global.person1 like global.person2\n' +
                   '  "They match!"\n' +
                   'end';
 
-    let script2 = 'unless person1 like person3\n' +
+    let script2 = 'unless global.person1 like global.person3\n' +
                   '  "They don\'t match!"\n' +
                   'end';
 
-    let script3 = 'unless person1 like person4\n' +
+    let script3 = 'unless global.person1 like global.person4\n' +
                   '  "They don\'t match!"\n' +
                   'end';
 
-    let script4 = 'if array like ["red", "green", "blue"]\n' +
+    let script4 = 'if global.array like ["red", "green", "blue"]\n' +
                   '  "They match!"\n' +
                   'else\n' +
                   '  "They don\'t match!"\n' +
                   'end';
 
-    let script5 = 'unless person1 like {name: "Thom", age: 56}\n' +
+    let script5 = 'unless global.person1 like {name: "Thom", age: 56}\n' +
                   '  "They don\'t match!"\n' +
                   'end';
 
     let script6 = "import pattern\n" +
-                  "pattern.Nothing like null_value";
+                  "pattern.Nothing like global.null_value";
 
     let script7 = "import pattern\n" +
-                  "null_value like pattern.Nothing";
+                  "global.null_value like pattern.Nothing";
 
     test.equal(evaluate(script1, data), "They match!");
     test.equal(evaluate(script1, { person1: null }), "They match!");
@@ -166,7 +166,7 @@ exports.like = nodeunit.testCase({
 
     test.equal(evaluate(script6, data), true);
     test.equal(evaluate(script7, data), true);
-    test.equal(evaluate("person1 like person1", data), true);
+    test.equal(evaluate("global.person1 like global.person1", data), true);
 
     test.done();
   }

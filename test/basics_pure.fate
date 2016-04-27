@@ -2,8 +2,7 @@ import nodeunit
 
 from pattern import Nothing, Something
 from test import isFalse, isTrue, equalTo, throws
-
-let null = node.null, undefined = node.undefined
+from value import null, undefined
 
 let data1 = {
   "name": "World",
@@ -114,9 +113,6 @@ def nothingSomething(test)
   true = Nothing            | isFalse
   Nothing != Nothing        | isFalse
   Nothing = Nothing         | isTrue
-  bogusValue != Nothing     | isTrue
-  bogusValue = Nothing      | isFalse
-  bogusValue like Nothing   | isTrue
 
   null like Nothing         | isTrue
   undefined like Nothing    | isTrue

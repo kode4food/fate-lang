@@ -4,7 +4,7 @@ import { mixin } from '../Util';
 import { GeneratedCode } from './Compiler';
 import { Resolver } from './Syntax';
 
-let jsonStringify = JSON.stringify;
+const jsonStringify = JSON.stringify;
 
 type StringMap = { [index: string]: string };
 
@@ -65,7 +65,7 @@ interface Modification {
 }
 
 // presented operators are symbolic
-let operatorMap: StringMap = {
+const operatorMap: StringMap = {
   'eq': '===',
   'neq': '!==',
   'gt': '>',
@@ -642,15 +642,15 @@ export function createModule() {
 
       let firstAccess = scopeInfo.firstAccess[name];
       let assignedEarly = firstAccess === FirstAccess.Write;
+
+      /* istanbul ignore else: shouldn't happen */
       if ( isAnonymous(name) || assignedEarly ) {
         undefinedVars.push(localNameId);
         return;
       }
-
-      // pull the value from the global context
-      write('let ', localNameId, '=');
-      member(context, literal(name));
-      write(';');
+      else {
+        throw new Error(`Stupid Coder: '${name}' was not declared`);
+      }
     });
 
     if ( undefinedVars.length ) {
