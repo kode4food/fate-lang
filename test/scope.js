@@ -35,32 +35,31 @@ exports.scope = nodeunit.testCase({
     test.equal(evaluate(script1, this.globals), "Local Hello Not Hello");
     test.equal(evaluate(script2, this.globals),
                "More Local Hello Local Hello Not Hello");
-    test.equal(evaluate("greeting", this.globals), "Hello, World!");
+    test.equal(evaluate("global.greeting", this.globals), "Hello, World!");
+
+    test.throws(function () {
+      evaluate("greeting", this.globals);
+    });
+
     test.done();
   },
 
   "Inherit Local Scope": function (test) {
     let script1 = "let greeting = 'Outer Hello'\n" +
                   "def localGreeting()\n" +
-                  "  emit(greeting)\n" +
+                  "  global.emit(greeting)\n" +
                   "  let greeting = 'Inner Hello'\n" +
-                  "  emit(greeting)\n" +
+                  "  global.emit(greeting)\n" +
                   "end\n" +
                   "localGreeting()\n" +
-                  "emit(greeting)";
+                  "global.emit(greeting)";
 
     test.deepEqual(evaluateEmit(script1), ["Outer Hello", "Inner Hello", "Outer Hello"]);
     test.done();
   },
 
-  "Shadow Global Scope": function (test) {
-    test.equal(evaluate("let greeting='Not Hello!'\ngreeting", this.globals), "Not Hello!");
-    test.equal(evaluate("greeting", this.globals), "Hello, World!");
-    test.done();
-  },
-
   "Scope Override": function (test) {
-    let script = "let b = a\n" +
+    let script = "let b = global.a\n" +
                  "let a = 'child'\n" +
                  "b + ' ' + a";
 
@@ -69,7 +68,8 @@ exports.scope = nodeunit.testCase({
   },
 
   "Conditional Scope": function (test) {
-    let script = "let c = a\n" +
+    let script = "let a=global.a, b=global.b\n" +
+                 "let c = a\n" +
                  "if b\n" +
                  "  let a = 'child'\n" +
                  "  let d = a\n" +

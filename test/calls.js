@@ -21,7 +21,7 @@ exports.calls = nodeunit.testCase({
   "Left Calls": function (test) {
     let script1 = 'from string import title\n' +
                   'from array import join\n' +
-                  'let formatted = title(join(name))\n' +
+                  'let formatted = title(join(global.name))\n' +
                   '{ formatted } | "Hello, %formatted!"';
 
     test.equal(evaluate(script1, this.data), "Hello, Title Case!");
@@ -32,7 +32,7 @@ exports.calls = nodeunit.testCase({
   "Right Calls": function (test) {
     let script1 = 'from string import title\n' +
                   'from array import join\n' +
-                  'let formatted = name | join | title\n' +
+                  'let formatted = global.name | join | title\n' +
                   '{ formatted } | "Hello, %formatted!"';
 
     let script2 = "['hello', 'there'] | '%1-%0'";

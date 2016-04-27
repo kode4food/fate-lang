@@ -156,7 +156,7 @@ patternExpr
 
 importStatement
   = op:From path:(modulePath / stringPath)
-    __ Import __ imports:moduleItems  {
+    __ Import __ imports:importModuleItems  {
       return node(op, path, imports);
     }
   / op:Import __ modules:moduleSpecifiers  {
@@ -178,17 +178,32 @@ moduleComp
       return name.value;
     }
 
-moduleItems
-  = head:moduleItem tail:( LIST_SEP item:moduleItem { return item; } )*  {
+importModuleItems
+  = head:importModuleItem
+    tail:( LIST_SEP item:importModuleItem { return item; } )*  {
       return [head].concat(tail);
     }
 
-moduleItem
+importModuleItem
   = name:Name alias:alias  {
-      return node('moduleItem', literalName(name), alias);
+      return node('importModuleItem', literalName(name), alias);
     }
   / name:Identifier  {
-      return node('moduleItem', literalName(name), name);
+      return node('importModuleItem', literalName(name), name);
+    }
+
+exportModuleItems
+  = head:exportModuleItem
+    tail:( LIST_SEP item:exportModuleItem { return item; } )*  {
+      return [head].concat(tail);
+    }
+
+exportModuleItem
+  = name:Name alias:alias  {
+      return node('exportModuleItem', name, literalName(alias));
+    }
+  / name:Identifier  {
+      return node('exportModuleItem', name, literalName(name));
     }
 
 moduleSpecifiers
@@ -214,7 +229,7 @@ exportable
   = letStatement
   / importStatement
   / funcDeclaration
-  / moduleItems
+  / exportModuleItems
 
 forStatement
   = Reduce reduceAssignments:reduceAssignments __

@@ -39,18 +39,18 @@ exports.loops = nodeunit.testCase({
                   '  global.emit({ name, value } | "%name=%value")\n' +
                   'end';
 
-    let script5 = 'for person in people, brother in person.brothers\n' +
+    let script5 = 'for person in global.people, brother in person.brothers\n' +
                   '  let name = person.name\n' +
                   '  global.emit({ name, brother } | "%name-%brother")\n' +
                   'end';
 
-    let script6 = 'for person in people\n' +
+    let script6 = 'for person in global.people\n' +
                   '  for brother in person.brothers\n' +
                   '    global.emit(person.name + "-" + brother)\n' +
                   '  else: global.emit("-")\n' +
                   'end';
 
-    let script7 = 'for person in people\n' +
+    let script7 = 'for person in global.people\n' +
                   '  for brother in person.brothers\n' +
                   '    let name = person.name\n' +
                   '    global.emit({ name, brother } | "%name-%brother")\n' +
@@ -72,7 +72,7 @@ exports.loops = nodeunit.testCase({
 
   "Shadowing Loops": function (test) {
     let script5 = 'let name = "Bobby"\n' +
-                  'for person in people, brother in person.brothers\n' +
+                  'for person in global.people, brother in person.brothers\n' +
                   '  let name = person.name\n' +
                   '  global.emit({ name, brother } | "%name-%brother")\n' +
                   'end\n' +
@@ -110,10 +110,10 @@ exports.loops = nodeunit.testCase({
       yield "blue";
     }
 
-    let script1 = '[for idx:brother in people[2].brothers ' +
+    let script1 = '[for idx:brother in global.people[2].brothers ' +
                   'select brother + ":" + idx]';
 
-    let script2 = '[for idx:color in colors() select color + ":" + idx]';
+    let script2 = '[for idx:color in global.colors() select color + ":" + idx]';
 
     let script3 = '[for color in 97]';
     let script4 = '{for x:y in 100}';

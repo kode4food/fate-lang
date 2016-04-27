@@ -640,17 +640,7 @@ export function createModule() {
         return;
       }
 
-      let firstAccess = scopeInfo.firstAccess[name];
-      let assignedEarly = firstAccess === FirstAccess.Write;
-      if ( isAnonymous(name) || assignedEarly ) {
-        undefinedVars.push(localNameId);
-        return;
-      }
-
-      // TODO: This will go away as part of the id requirements
-      write('let ', localNameId, '=');
-      member(context, literal(name));
-      write(';');
+      undefinedVars.push(localNameId);
     });
 
     if ( undefinedVars.length ) {

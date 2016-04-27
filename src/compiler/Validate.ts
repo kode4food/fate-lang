@@ -79,17 +79,17 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function visitFunctionDeclaration(node: Syntax.FunctionDeclaration) {
-    if ( node.signature.id ) {
-      declareId(node.signature.id);
+    let funcId = node.signature.id;
+    if ( isIdDeclared(funcId) ) {
+      annotate(node, 'function/shadow');
     }
+    declareId(funcId);
     return node;
   }
 
   function visitSignature(node: Syntax.Signature) {
     node.params.forEach(function (param) {
-      if ( param.id ) {
-        declareId(param.id);
-      }
+      declareId(param.id);
     });
     return node;
   }
@@ -118,14 +118,14 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function visitExportableStatement(node: Syntax.ExportableStatement) {
     node.getModuleItems().forEach(function (moduleItem) {
-      declareId(moduleItem.alias);
+      declareId(moduleItem.id);
     });
     return node;
   }
 
   function visitIdentifier(node: Syntax.Identifier) {
     if ( !isIdDeclared(node) ) {
-      visit.issueWarning(node, `'${node.value}' has not been declared`);
+      visit.issueError(node, `'${node.value}' has not been declared`);
     }
     return node;
   }

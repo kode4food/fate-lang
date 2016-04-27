@@ -32,10 +32,10 @@ exports.basics = nodeunit.testCase({
     test.equal(evaluate("99 mod 6 >= 3"), true);
     test.equal(evaluate("33 * 3 mod 6 <= 2"), false);
     test.equal(evaluate("33 * 3 mod 6 <= 2"), false);
-    test.equal(evaluate("people[0].age * 2 > 99", this.data), true);
-    test.equal(evaluate("people[0].age / 2 < 24", this.data), false);
-    test.equal(evaluate("100 / people[0].age >= 2", this.data), true);
-    test.equal(evaluate("3 * people[0].age <= 149", this.data), false);
+    test.equal(evaluate("global.people[0].age * 2 > 99", this.data), true);
+    test.equal(evaluate("global.people[0].age / 2 < 24", this.data), false);
+    test.equal(evaluate("100 / global.people[0].age >= 2", this.data), true);
+    test.equal(evaluate("3 * global.people[0].age <= 149", this.data), false);
     test.done();
   },
 
@@ -44,10 +44,10 @@ exports.basics = nodeunit.testCase({
     test.equal(evaluate("100 / 5 != 19"), true);
     test.equal(evaluate("99 mod 6 = 3"), true);
     test.equal(evaluate("33 * 3 mod 6 != 2"), true);
-    test.equal(evaluate("people[0].age * 2 = 99", this.data), false);
-    test.equal(evaluate("people[0].age / 2 != 25", this.data), false);
-    test.equal(evaluate("100 / people[0].age = 2", this.data), true);
-    test.equal(evaluate("3 * people[0].age != 149", this.data), true);
+    test.equal(evaluate("global.people[0].age * 2 = 99", this.data), false);
+    test.equal(evaluate("global.people[0].age / 2 != 25", this.data), false);
+    test.equal(evaluate("100 / global.people[0].age = 2", this.data), true);
+    test.equal(evaluate("3 * global.people[0].age != 149", this.data), true);
     test.done();
   },
 
@@ -59,15 +59,15 @@ exports.basics = nodeunit.testCase({
       stringValue: "a name value"
     };
     test.equal(evaluate("10 in [1,10,30]"), true);
-    test.equal(evaluate("10 in numbers", data), true);
+    test.equal(evaluate("10 in global.numbers", data), true);
     test.equal(evaluate("'name' in {age:43, name:'Thom'}"), true);
-    test.equal(evaluate("'name' in person", data), true);
+    test.equal(evaluate("'name' in global.person", data), true);
     test.equal(evaluate("'name' in 'a name value'"), false);
-    test.equal(evaluate("'name' in stringValue", data), false);
+    test.equal(evaluate("'name' in global.stringValue", data), false);
     test.equal(evaluate("'fred' in ['bill', 'ted']"), false);
-    test.equal(evaluate("'fred' in names", data), false);
+    test.equal(evaluate("'fred' in global.names", data), false);
     test.equal(evaluate("'nothing' in {age:43, name:'Thom'}"), false);
-    test.equal(evaluate("'nothing' in person", data), false);
+    test.equal(evaluate("'nothing' in global.person", data), false);
     test.done();
   },
 
@@ -75,29 +75,30 @@ exports.basics = nodeunit.testCase({
     let data = {
       numbers: [1,10,30],
       names: ['bill', 'ted'],
-      person: {age:43, name:'Thom'}
+      person: {age:43, name:'Thom'},
+      stringValue: "a name value"
     };
     test.equal(evaluate("10 not in [1,10,30]"), false);
-    test.equal(evaluate("10 not in numbers", data), false);
+    test.equal(evaluate("10 not in global.numbers", data), false);
     test.equal(evaluate("'name' not in {age:43, name:'Thom'}"), false);
-    test.equal(evaluate("'name' not in person", data), false);
+    test.equal(evaluate("'name' not in global.person", data), false);
     test.equal(evaluate("'name' not in 'a name value'"), true);
-    test.equal(evaluate("'name' not in stringValue", data), true);
+    test.equal(evaluate("'name' not in global.stringValue", data), true);
     test.equal(evaluate("'fred' not in ['bill', 'ted']"), true);
-    test.equal(evaluate("'fred' not in names", data), true);
+    test.equal(evaluate("'fred' not in global.names", data), true);
     test.equal(evaluate("'nothing' not in {age:43, name:'Thom'}"), true);
-    test.equal(evaluate("'nothing' not in person", data), true);
+    test.equal(evaluate("'nothing' not in global.person", data), true);
     test.done();
   },
 
   "Boolean Or/And Evaluation": function (test) {
     test.equal(evaluate("true and false"), false);
     test.equal(evaluate("true or false"), true);
-    test.equal(evaluate("people[0].age * 2 = 100 and 'yep'", this.data), "yep");
-    test.equal(evaluate("people[0].age * 2 = 99 or 'nope'", this.data), "nope");
-    test.equal(evaluate("'yep' and people[0].age * 2", this.data), 100);
-    test.equal(evaluate("'yep' or people[0].age * 2", this.data), "yep");
-    test.equal(evaluate("false or people[0].age * 2", this.data), 100);
+    test.equal(evaluate("global.people[0].age * 2 = 100 and 'yep'", this.data), "yep");
+    test.equal(evaluate("global.people[0].age * 2 = 99 or 'nope'", this.data), "nope");
+    test.equal(evaluate("'yep' and global.people[0].age * 2", this.data), 100);
+    test.equal(evaluate("'yep' or global.people[0].age * 2", this.data), "yep");
+    test.equal(evaluate("false or global.people[0].age * 2", this.data), 100);
     test.equal(evaluate("not true and not false"), false);
     test.equal(evaluate("not(true or false)"), false);
     test.equal(evaluate("not true or not false"), true);
@@ -110,9 +111,9 @@ exports.basics = nodeunit.testCase({
     test.equal(evaluate("not false"), true);
     test.equal(evaluate("not true"), false);
     test.equal(evaluate("not (----10 - 10)"), true);
-    test.equal(evaluate("-people[0].age", this.data), -50);
-    test.equal(evaluate("-people[0].age + 10", this.data), -40);
-    test.equal(evaluate("not (people[0].age = 25)", this.data), true);
+    test.equal(evaluate("-global.people[0].age", this.data), -50);
+    test.equal(evaluate("-global.people[0].age + 10", this.data), -40);
+    test.equal(evaluate("not (global.people[0].age = 25)", this.data), true);
     test.done();
   },
 
@@ -122,16 +123,13 @@ exports.basics = nodeunit.testCase({
     test.equal(evaluate(importNothing + "true = Nothing"), false);
     test.equal(evaluate(importNothing + "Nothing != Nothing"), false);
     test.equal(evaluate(importNothing + "Nothing = Nothing"), true);
-    test.equal(evaluate(importNothing + "bogusValue != Nothing"), true);
-    test.equal(evaluate(importNothing + "bogusValue = Nothing"), false);
-    test.equal(evaluate(importNothing + "bogusValue like Nothing"), true);
     test.done();
   },
 
   "Conditional Evaluation": function (test) {
-    let script = "'cond1' if cond1 else " +
-                 "'cond2' if cond2 else " +
-                 "'cond4' unless cond3 else 'cond3'";
+    let script = "'cond1' if global.cond1 else " +
+                 "'cond2' if global.cond2 else " +
+                 "'cond4' unless global.cond3 else 'cond3'";
 
     test.equal(evaluate(script, {cond1: true}), "cond1");
     test.equal(evaluate(script, {cond2: true}), "cond2");
@@ -149,7 +147,7 @@ exports.basics = nodeunit.testCase({
       }
     };
 
-    let script1 = 'if person like {name: "Thom", age: 42}: true';
+    let script1 = 'if global.person like {name: "Thom", age: 42}: true';
 
     test.equal(evaluate(script1, data), true);
     test.done();
@@ -178,12 +176,12 @@ exports.basics = nodeunit.testCase({
       }]
     };
 
-    test.equal(evaluate("root[0].colors[1]", data), "green");
-    test.equal(evaluate("root[0].info.description", data), "this is a description");
-    test.equal(evaluate("root[0].info['description']", data), "this is a description");
-    test.equal(evaluate("root[0].info.notThere", data), undefined);
+    test.equal(evaluate("global.root[0].colors[1]", data), "green");
+    test.equal(evaluate("global.root[0].info.description", data), "this is a description");
+    test.equal(evaluate("global.root[0].info['description']", data), "this is a description");
+    test.equal(evaluate("global.root[0].info.notThere", data), undefined);
     test.throws(function () {
-      test.equal(evaluate("root[1].info['description']", data));
+      test.equal(evaluate("global.root[1].info['description']", data));
     });
     test.done();
   },
@@ -197,9 +195,9 @@ exports.basics = nodeunit.testCase({
 
   "Context": function (test) {
     let person = { name: 'thom', age: 43, colors: ['red', 'green', 'blue'] };
-    test.equal(evaluate("name", person), 'thom');
-    test.deepEqual(evaluate("colors", person), person.colors);
-    test.equal(evaluate("age", person), 43);
+    test.equal(evaluate("global.name", person), 'thom');
+    test.deepEqual(evaluate("global.colors", person), person.colors);
+    test.equal(evaluate("global.age", person), 43);
     test.done();
   }
 });
