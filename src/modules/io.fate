@@ -1,6 +1,8 @@
-from './support' import mutable
+from 'node:welsh' import Promise
 
-export from './support' import print, timeout
+from './support' import make, mutable, timeout as doTimeout
+
+export from './support' import print
 
 export let streamConsumer = (resolve -> stream ->
   let content = mutable('') # oh, no, a mutable!
@@ -8,3 +10,9 @@ export let streamConsumer = (resolve -> stream ->
         .on('end',   -> [content.value] | resolve)
         .on('error', err -> [content.value, err] | resolve)
 )
+
+export def timeout(delay)
+  make(Promise, (resolve) ->
+    doTimeout(-> resolve(delay), delay)
+  )
+end

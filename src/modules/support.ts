@@ -1,11 +1,10 @@
 "use strict";
 
-const Promise = require('welsh').Promise;
-
 const math = Math;
 const object = Object;
 const string = String;
 const number = Number;
+const timeout = setTimeout;
 
 const Undefined: any = undefined;
 const Null: any = null;
@@ -43,16 +42,8 @@ function mutable(value: any) {
   }
 }
 
-function timeout(delay: number) {
-  return new Promise(function (resolve: Function) {
-    setTimeout(function () {
-      resolve(delay);
-    }, delay);
-  });
-}
-
 export {
-  math as Math, object as Object, string as String, number as Number,
-  make, isA, setProperty, print, mutable, timeout,
-  Undefined as undefined, Null as null
+  math as Math, object as Object, string as String,
+  number as Number, timeout, make, isA, setProperty,
+  print, mutable, Undefined as undefined, Null as null
 };
