@@ -2,7 +2,7 @@
   "name": "fatejs",
   "description": "Patterns & Guards & Joins, Oh My!",
   "author": "Thomas S. Bradford",
-  "version": "0.5.11",
+  "version": "0.6.0",
   "license": "MIT",
   "homepage": "http://www.fate-lang.org/",
   "main": "dist/Fate.js",
@@ -35,15 +35,15 @@
     "del": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-copy": "0.0.2",
-    "gulp-istanbul": "^0.10.3",
+    "gulp-istanbul": "^0.10.4",
     "gulp-istanbul-enforcer": "^1.0.3",
     "gulp-nodeunit": "0.0.5",
     "gulp-peg": "^0.2.0",
     "gulp-rename": "^1.2.2",
-    "gulp-tslint": "^4.3.4",
-    "gulp-typescript": "^2.12.1",
+    "gulp-tslint": "^5.0.0",
+    "gulp-typescript": "^2.13.0",
     "nodeunit": "^0.9.1",
-    "tslint": "^3.6.0",
-    "typescript": "^1.8.9"
+    "tslint": "^3.8.1",
+    "typescript": "^1.8.10"
   }
 }

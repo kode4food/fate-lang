@@ -33,12 +33,7 @@ export default function createTreeProcessors(visit: Visitor) {
   ];
 
   function visitNode(node: Syntax.Node) {
-    let visitor = visitors[node.tag];
-    /* istanbul ignore if: All tags should be covered */
-    if ( !visitor ) {
-      throw new Error(`Stupid Coder: No Visitor for ${node.tag} Node`);
-    }
-    return visitor(node);
+    return visitors[node.tag](node);
   }
 
   function isScopeContainer(node: Syntax.Node) {
@@ -73,7 +68,6 @@ export default function createTreeProcessors(visit: Visitor) {
         return;
       }
     }
-
     /* istanbul ignore next: we should always find the root */
     throw new Error("Stupid Coder: No root to declare an Identifier?");
   }
