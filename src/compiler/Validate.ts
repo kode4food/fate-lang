@@ -96,6 +96,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function visitForStatement(node: Syntax.ForStatement) {
+    // we do this because reduce assignments live beyond the loop
     if ( node.reduceAssignments ) {
       node.reduceAssignments.forEach(function (assignment) {
         assignment.getIdentifiers().forEach(declareId);
