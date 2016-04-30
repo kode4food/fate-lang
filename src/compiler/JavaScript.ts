@@ -640,17 +640,7 @@ export function createModule() {
         return;
       }
 
-      let firstAccess = scopeInfo.firstAccess[name];
-      let assignedEarly = firstAccess === FirstAccess.Write;
-
-      /* istanbul ignore else: shouldn't happen */
-      if ( isAnonymous(name) || assignedEarly ) {
-        undefinedVars.push(localNameId);
-        return;
-      }
-      else {
-        throw new Error(`Stupid Coder: '${name}' was not declared`);
-      }
+      undefinedVars.push(localNameId);
     });
 
     if ( undefinedVars.length ) {

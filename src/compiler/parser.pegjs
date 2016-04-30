@@ -199,11 +199,11 @@ exportModuleItems
     }
 
 exportModuleItem
-  = name:Name alias:alias  {
-      return node('exportModuleItem', name, literalName(alias));
+  = name:Identifier alias:alias  {
+      return node('exportModuleItem', reference(name), literalName(alias));
     }
   / name:Identifier  {
-      return node('exportModuleItem', name, literalName(name));
+      return node('exportModuleItem', reference(name), literalName(name));
     }
 
 moduleSpecifiers
