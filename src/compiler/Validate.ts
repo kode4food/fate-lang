@@ -16,10 +16,10 @@ export default function createTreeProcessors(visit: Visitor) {
     'function': visitFunctionDeclaration,
     'signature': visitSignature,
     'range': visitRange,
-    'for': visitForStatement,
     'assignment': visitAssignment,
     'arrayDestructure': visitAssignment,
     'objectDestructure': visitAssignment,
+    'for': visitExportableStatement,
     'let': visitExportableStatement,
     'from': visitExportableStatement,
     'import': visitExportableStatement,
@@ -92,16 +92,6 @@ export default function createTreeProcessors(visit: Visitor) {
       declareId(node.nameId);
     }
     declareId(node.valueId);
-    return node;
-  }
-
-  function visitForStatement(node: Syntax.ForStatement) {
-    // we do this because reduce assignments live beyond the loop
-    if ( node.reduceAssignments ) {
-      node.reduceAssignments.forEach(function (assignment) {
-        assignment.getIdentifiers().forEach(declareId);
-      });
-    }
     return node;
   }
 

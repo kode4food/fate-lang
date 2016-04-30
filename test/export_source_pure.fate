@@ -10,3 +10,7 @@ export from 'nodeunit' import testCase as nodeunit_tc
 export def func_a(name)
   {name} | "Hello, %name!"
 end
+
+export reduce reduce_val = 0 for i in [1, 2, 3]
+  let reduce_val = reduce_val + i
+end

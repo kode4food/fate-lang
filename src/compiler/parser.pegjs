@@ -230,6 +230,12 @@ exportable
   / importStatement
   / funcDeclaration
   / exportModuleItems
+  / forStatement:forStatement  {
+      if ( !forStatement.reduceAssignments ) {
+        error("'for' statements are not exportable");
+      }
+      return forStatement;
+    }
 
 forStatement
   = Reduce reduceAssignments:reduceAssignments __

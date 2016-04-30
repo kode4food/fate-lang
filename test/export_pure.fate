@@ -11,6 +11,7 @@ def imports(test)
   source.alias_val_b | equalTo(2)
   source.val_c       | equalTo(3)
   source.val_d       | equalTo(4)
+  source.reduce_val  | equalTo(6)
 
   source.nodeunit_nu | equalTo(nodeunit)
   source.nodeunit_tc | equalTo(nodeunit.testCase)

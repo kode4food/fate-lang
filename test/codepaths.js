@@ -279,12 +279,24 @@ exports.codepaths = nodeunit.testCase({
       evaluate("let a = b");
     });
 
+    test.throws(function () {
+      evaluate("let a = a");
+    });
+
     test.throws(function() {
       evaluate("'hello' | noFunc");
     });
 
     test.throws(function () {
       evaluate("def hi(x)\n'hello'\nend\nx");
+    });
+
+    test.done();
+  },
+
+  "For not Exportable": function (test) {
+    test.throws(function () {
+      evaluate("export for i in [1,2,3]\ni * 2\nend");
     });
 
     test.done();

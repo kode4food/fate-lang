@@ -228,27 +228,6 @@ export class ExpressionStatement extends Statement {
   constructor(public expression: Expression) { super(); }
 }
 
-export class ForStatement extends Statement {
-  public visitorKeys = [
-    'reduceAssignments', 'ranges', 'loopStatements', 'elseStatements'
-  ];
-
-  constructor(public ranges: Ranges,
-              public loopStatements: Statements,
-              public elseStatements: Statements,
-              public reduceAssignments?: Assignment[]) { super(); }
-
-  public getReduceIdentifiers() {
-    let result: Identifiers = [];
-    this.reduceAssignments.forEach(assignment => {
-      assignment.getIdentifiers().forEach(function (id) {
-        result.push(id);
-      });
-    });
-    return result;
-  }
-}
-
 export class IfStatement extends Statement {
   constructor(public condition: Expression,
               public thenStatements: Statements,
@@ -267,6 +246,38 @@ export class ReturnStatement extends Statement {
 
 export abstract class ExportableStatement extends Statement {
   public abstract getModuleItems(): ExportModuleItems;
+}
+
+export class ForStatement extends ExportableStatement {
+  public visitorKeys = [
+    'reduceAssignments', 'ranges', 'loopStatements', 'elseStatements'
+  ];
+
+  constructor(public ranges: Ranges,
+              public loopStatements: Statements,
+              public elseStatements: Statements,
+              public reduceAssignments?: Assignment[]) { super(); }
+
+  public getReduceIdentifiers() {
+    let result: Identifiers = [];
+    this.reduceAssignments.forEach(assignment => {
+      assignment.getIdentifiers().forEach(function (id) {
+        result.push(id);
+      });
+    });
+    return result;
+  }
+
+  public getModuleItems() {
+    if ( this.reduceAssignments ) {
+      let result: ExportModuleItems = [];
+      this.getReduceIdentifiers().forEach(id => {
+        result.push(id.template('exportModuleItem', id));
+      });
+      return result;
+    }
+    return [];
+  }
 }
 
 export class LetStatement extends ExportableStatement {
