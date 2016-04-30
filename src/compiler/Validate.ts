@@ -3,7 +3,7 @@
 import Visitor from './Visitor';
 import * as Syntax from './Syntax';
 
-import { annotate, getAnnotation } from './Annotations';
+import { annotate, getAnnotation, hasAnnotation } from './Annotations';
 
 interface Visitors {
   [index: string]: Function;
@@ -27,10 +27,9 @@ export default function createTreeProcessors(visit: Visitor) {
   };
 
   let nodesToVisit = visit.tags(Object.keys(visitors));
+  let processNode = visit.breadthMatching(visitNode, nodesToVisit);
 
-  return [
-    visit.breadthMatching(visitNode, nodesToVisit)
-  ];
+  return [processNode];
 
   function visitNode(node: Syntax.Node) {
     return visitors[node.tag](node);
@@ -106,11 +105,13 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function visitAssignment(node: Syntax.Assignment) {
+    visit.recurseInto(node, processNode); // Children first
     node.getIdentifiers().forEach(declareId);
     return node;
   }
 
   function visitExportableStatement(node: Syntax.ExportableStatement) {
+    visit.recurseInto(node, processNode); // Children first
     node.getModuleItems().forEach(function (moduleItem) {
       declareId(moduleItem.id);
     });
@@ -118,7 +119,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function visitIdentifier(node: Syntax.Identifier) {
-    if ( !isIdDeclared(node) ) {
+    if ( hasAnnotation(node, 'id/reference') && !isIdDeclared(node) ) {
       visit.issueError(node, `'${node.value}' has not been declared`);
     }
     return node;
