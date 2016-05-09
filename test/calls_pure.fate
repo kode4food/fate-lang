@@ -36,15 +36,8 @@ def rightCalls(test)
 end
 
 def awaitCalls(test)
-  def double(arr)
-    do
-      [for a in arr select a * 2]
-    end
-  end
-
-  def timeouts(arr)
-    [for a in arr select timeout(a)]
-  end
+  let double = (arr -> do: [for a in arr select a * 2])
+  let timeouts = (arr -> [for a in arr select timeout(a)])
 
   do
     [100, 200, 300] | timeouts |all| double || deepEqualTo([200, 400, 600])
