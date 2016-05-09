@@ -38,7 +38,9 @@ export default function createTreeProcessors(visit: Visitor) {
     let fnAncestors = visit.hasAncestorTags(awaitBarriers);
 
     if ( !doAncestors ) {
-      visit.issueError(node, "'await' must appear in a 'do' block");
+      visit.issueError(node,
+        "awaited expression must appear in a 'do' block"
+      );
     }
 
     if ( !fnAncestors ) {
@@ -48,7 +50,9 @@ export default function createTreeProcessors(visit: Visitor) {
     let doIndex = visit.nodeStack.indexOf(doAncestors[0]);
     let fnIndex = visit.nodeStack.indexOf(fnAncestors[0]);
     if ( fnIndex > doIndex ) {
-      visit.issueError(node, "'await' must not appear in a nested function");
+      visit.issueError(node,
+        "awaited expression must not appear in a nested function"
+      );
     }
     return node;
   }

@@ -390,29 +390,37 @@ returnStatement
     }
 
 expr
-  = awaitCall
-
-awaitCall
-  = args:rightCall calls:( __ "||" __ c:rightCall { return c; } )* {
-      if ( calls && calls.length ) {
-        for ( let i = 0, len = calls.length; i < len; i++ ) {
-          args = calls[i].template('call', calls[i], [
-            args.template('await', args, null)
-          ]);
-        }
-      }
-      return args;
-    }
+  = rightCall
 
 rightCall
-  = args:conditional calls:( __ "|" __ c:conditional { return c; } )* {
-      if ( calls && calls.length ) {
-        for ( let i = 0, len = calls.length; i < len; i++ ) {
-          args = node('call', calls[i], [args]);
-        }
+  = args:conditional
+    calls:( __ op:rightCallOperator __ c:conditional { return [op, c]; } )* {
+      if ( !calls || !calls.length ) {
+        return args;
       }
+
+      calls.forEach(function (call) {
+        let op = call[0];
+        let target = call[1];
+
+        if ( op === null ) {
+          args = node('call', target, [args]);
+          return;
+        }
+
+        args = target.template('call', target, [
+          args.template('await', args, op)
+        ]);
+      });
+
       return args;
     }
+
+rightCallOperator
+  = "|" __ Any __ "|" { return Syntax.Resolver.Any; }
+  / "|" __ All __ "|" { return Syntax.Resolver.All; }
+  / "|" __ "|"        { return Syntax.Resolver.Value; }
+  / "|"               { return null; }
 
 conditional
   = tval:or _ op:IfUnless __ cond:or __ Else __ fval:conditional {
@@ -460,7 +468,7 @@ multiplicative
     }
 
 await
-  = op:Await mod:awaitModifier? _ expr:pattern {
+  = op:Await mod:awaitModifier? __ expr:pattern {
       return node(op, expr, mod);
     }
   / pattern
