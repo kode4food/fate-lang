@@ -1,6 +1,7 @@
 import nodeunit
 
-from test import equalTo
+from io import timeout
+from test import equalTo, deepEqualTo
 
 let data = {
   "name": ["title", "case"],
@@ -34,6 +35,24 @@ def rightCalls(test)
   test.done()
 end
 
+def awaitCalls(test)
+  def double(arr)
+    do
+      [for a in arr select a * 2]
+    end
+  end
+
+  def timeouts(arr)
+    [for a in arr select timeout(a)]
+  end
+
+  do
+    [100, 200, 300] | timeouts |all| double || deepEqualTo([200, 400, 600])
+    [100, 200, 300] | timeouts |any| (x -> x * 2) || equalTo(200)
+    test.done()
+  end
+end
+
 def recursiveCalls(test)
   def callMe(x)
     if x > 0
@@ -62,5 +81,6 @@ end
 export let tests = nodeunit.testCase({
   "Left Function Calls": leftCalls,
   "Right Piped Calls": rightCalls,
+  "Awaiting Calls": awaitCalls,
   "Recursive Calls": recursiveCalls
 })
