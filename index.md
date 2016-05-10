@@ -184,6 +184,13 @@ let eventualResult = do
   case timeout(100)
     print("couldn't get name or http content in 100ms")
 end
+
+# Chained and Awaiting Function calls
+let numbers = [100, 150, 400]
+do
+  # will eventualy print '[ 200, 300, 800 ]'
+  numbers | (x -> x | io.timeout) |all| (x -> x * 2) | io.print
+end
 ```
 
 ### Importing To/Exporting From A Module
