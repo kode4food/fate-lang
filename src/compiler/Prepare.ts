@@ -97,9 +97,9 @@ export default function createTreeProcessors(visit: Visitor) {
                                      signatures: Syntax.Signatures) {
     let encounteredNames: NameSet = {};
     let duplicatedNames: NameSet = {};
-    signatures.forEach(function (signature) {
+    signatures.forEach(signature => {
       let namedParams = signature.params.filter(param => !!param.id);
-      namedParams.forEach(function (param) {
+      namedParams.forEach(param => {
         let name = param.id.value;
         if ( encounteredNames[name] ) {
           duplicatedNames[name] = true;
@@ -121,7 +121,7 @@ export default function createTreeProcessors(visit: Visitor) {
   function checkParamCardinality(node: Syntax.Signature) {
     // the rules, for now: required* -> zeroToMany?
     let state = 0;
-    node.params.forEach(function (parameter) {
+    node.params.forEach(parameter => {
       switch ( parameter.cardinality ) {
         case Syntax.Cardinality.Required:
           if ( state !== 0 ) {
@@ -161,7 +161,7 @@ export default function createTreeProcessors(visit: Visitor) {
       return node;
     }
 
-    visit.nodeStack.forEach(function (parent) {
+    visit.nodeStack.forEach(parent => {
       if ( parent instanceof Syntax.Node &&
            Syntax.hasTag(parent, assignmentTypes) ) {
         addDoReference(<Syntax.Assignment>parent, node);
@@ -184,10 +184,10 @@ export default function createTreeProcessors(visit: Visitor) {
 
     let whenClause = <Syntax.LetStatement>node.whenClause;
     let encountered: AssignmentMap = {};
-    whenClause.assignments.forEach(function (assignment) {
+    whenClause.assignments.forEach(assignment => {
       let getters: NameSet = getAnnotation(assignment, 'do/references') || {};
 
-      Object.keys(getters).forEach(function (getter) {
+      Object.keys(getters).forEach(getter => {
         let prevAssignment = encountered[getter];
         if ( !prevAssignment ) {
           return;
@@ -201,7 +201,7 @@ export default function createTreeProcessors(visit: Visitor) {
         }
       });
 
-      assignment.getIdentifiers().forEach(function (id) {
+      assignment.getIdentifiers().forEach(id => {
         encountered[id.value] = assignment;
       });
     });
@@ -210,9 +210,9 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function validateAssignments(statements: Syntax.LetStatement[]) {
     let namesSeen: NameSet = {};
-    statements.forEach(function (statement) {
-      statement.assignments.forEach(function (assignment) {
-        assignment.getIdentifiers().forEach(function (id) {
+    statements.forEach(statement => {
+      statement.assignments.forEach(assignment => {
+        assignment.getIdentifiers().forEach(id => {
           let name = id.value;
           if ( namesSeen[name] ) {
             visit.issueWarning(id,
@@ -231,16 +231,16 @@ export default function createTreeProcessors(visit: Visitor) {
       return true;
     }
 
-    return signature.params.filter(function (param) {
-      return param instanceof Syntax.PatternParameter;
-    }).length !== 0;
+    return signature.params.filter(
+      param => param instanceof Syntax.PatternParameter
+    ).length !== 0;
   }
 
   function warnFunctionShadowing(statements: Syntax.FunctionDeclaration[]) {
     let namesSeen: NameSet = {};
     let lastName: string;
 
-    statements.forEach(function (statement) {
+    statements.forEach(statement => {
       let signature = statement.signature;
       let name = signature.id.value;
 

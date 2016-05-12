@@ -10,7 +10,7 @@ interface GeneratorResult {
 }
 
 export function createDoBlock(generator: Function) {
-  return new Promise(function (resolve: Function) {
+  return new Promise((resolve: Function) => {
     let generating = generator.apply(null);
     step(generating.next());
 

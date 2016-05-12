@@ -42,10 +42,10 @@ export function compileModule(script: ScriptContent) {
   let warnings: CompileErrors = [];
   let visitor = new Visitor(warnings);
 
-  compilerPipeline.forEach(function (createTreeProcessors) {
+  compilerPipeline.forEach(createTreeProcessors => {
     let processors = createTreeProcessors(visitor);
 
-    processors.forEach(function (processor) {
+    processors.forEach(processor => {
       syntaxTree = processor(syntaxTree);
     });
   });

@@ -89,7 +89,7 @@ export default class Visitor {
     else {
       let currentNode = <Syntax.Node>node;
       let keys = currentNode.visitorKeys || Object.keys(currentNode);
-      keys.forEach(function (key) {
+      keys.forEach(key => {
         currentNode[key] = visitor(currentNode[key]);
       });
     }
@@ -130,7 +130,7 @@ export default class Visitor {
       let group: Syntax.Statement[] = [];
       let output: Syntax.Statement[] = [];
 
-      statements.forEach(function (statement) {
+      statements.forEach(statement => {
         if ( matcher(statement) ) {
           group.push(statement);
         }

@@ -16,7 +16,7 @@
       return head;
     }
 
-    tail.forEach(function (item) {
+    tail.forEach(item => {
       item.left = head;
       head = item;
     });
@@ -28,7 +28,7 @@
     if ( !arr ) {
       return node('statements', []);
     }
-    return node('statements', arr.filter(function (value) {
+    return node('statements', arr.filter(value => {
       return value !== null;
     }));
   }
@@ -399,7 +399,7 @@ rightCall
         return args;
       }
 
-      calls.forEach(function (call) {
+      calls.forEach(call => {
         let op = call[0];
         let target = call[1];
 

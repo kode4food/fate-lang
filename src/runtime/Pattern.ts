@@ -36,13 +36,13 @@ export function isPattern(value: any) {
   return typeof value === 'function' && value.__fatePattern;
 }
 
-export let isNothing: Pattern = definePattern(function (value: any) {
-  return value === null || value === undefined || value === isNothing;
-});
+export let isNothing: Pattern = definePattern((value: any) =>
+  value === null || value === undefined || value === isNothing
+);
 
-export let isSomething: Pattern = definePattern(function (value: any) {
-  return value !== null && value !== undefined && value !== isNothing;
-});
+export let isSomething: Pattern = definePattern((value: any) =>
+  value !== null && value !== undefined && value !== isNothing
+);
 
 /*
  * Basic dynamic matcher to support the `like` operator.

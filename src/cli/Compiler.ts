@@ -208,7 +208,7 @@ export function compile(args: CompilerArguments, callback: Function) {
                     args.clean ? performClean :
                                  performCompile;
 
-    files.forEach(function (file) {
+    files.forEach(file => {
       let inputPath = join(inDir, file);
       let outputPath = join(outDir, file.replace(/\.fate$/, '.js'));
 
@@ -225,7 +225,7 @@ export function compile(args: CompilerArguments, callback: Function) {
     let compileResult = compileInputScript(inputPath);
     let compileWarnings = compileResult.err;
 
-    compileWarnings.forEach(function (compileWarning) {
+    compileWarnings.forEach(compileWarning => {
       warnings.push({ filePath: inputPath, err: compileWarning });
     });
 

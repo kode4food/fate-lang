@@ -15,11 +15,16 @@ from io import streamConsumer
 #   Node's 'url' module
 #   Node's 'http' module
 
-let URL = NonEmptyString
+let URL = NonEmptyString,
+    HostName = NonEmptyString
+
+let HttpMethod = ~(
+  self in ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+)
 
 let RequestOptions = ~{
-  hostname: NonEmptyString,
-  method: self in ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH']
+  hostname: HostName,
+  method: HttpMethod
 }
 
 def request(RequestOptions as options, content)

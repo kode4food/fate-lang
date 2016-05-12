@@ -81,7 +81,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function visitSignature(node: Syntax.Signature) {
-    node.params.forEach(function (param) {
+    node.params.forEach(param => {
       declareId(param.id);
     });
     return node;
@@ -103,7 +103,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function visitExportableStatement(node: Syntax.ExportableStatement) {
     visit.recurseInto(node, processNode); // Children first
-    node.getModuleItems().forEach(function (moduleItem) {
+    node.getModuleItems().forEach(moduleItem => {
       declareId(moduleItem.id);
     });
     return node;

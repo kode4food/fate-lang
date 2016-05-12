@@ -64,7 +64,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function nameSelfPatternAnchors(node: Syntax.ElementsConstructor) {
     annotate(node, 'pattern/local', getAnchorName());
-    node.elements.forEach(function (element) {
+    node.elements.forEach(element => {
       if ( hasAnnotation(element, 'pattern/local') ) {
         return;
       }

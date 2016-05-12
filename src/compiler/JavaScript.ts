@@ -214,7 +214,7 @@ export function createModule() {
 
   function extendNames(namesMap: NameIdsMap) {
     let result: NameIdsMap = {};
-    Object.keys(namesMap).forEach(function (name) {
+    Object.keys(namesMap).forEach(name => {
       result[name] = [lastItem(namesMap[name])];
     });
     return result;
@@ -321,7 +321,7 @@ export function createModule() {
     let myScopeInfo = scopeInfo.snapshot();
     let myNames = names;
 
-    return function () {
+    return () => {
       pushLocalScope();
       scopeInfo = myScopeInfo;
       names = myNames;
@@ -331,10 +331,10 @@ export function createModule() {
   }
 
   function write(...content: any[]) {
-    let args = content.filter(function (arg) {
-      return arg !== undefined && arg !== null;
-    });
-    args.forEach(function (arg) {
+    let args = content.filter(
+      arg => arg !== undefined && arg !== null
+    );
+    args.forEach(arg => {
       if ( typeof arg === 'function' ) {
         body.push(captureState(arg));
       }
@@ -354,7 +354,7 @@ export function createModule() {
     if ( delimiter === undefined ) {
       delimiter = ',';
     }
-    items.forEach(function (item, i) {
+    items.forEach((item, i) => {
       if ( i > 0 ) {
         write(delimiter);
       }
@@ -379,7 +379,7 @@ export function createModule() {
   }
 
   function assignments(items: AssignmentItems) {
-    items.forEach(function (item) {
+    items.forEach(item => {
       let name = item[0];
       let value = code(item[1]);
 
@@ -389,7 +389,7 @@ export function createModule() {
   }
 
   function exports(items: ModuleItems) {
-    items.forEach(function (item) {
+    items.forEach(item => {
       let name = item[0];
       let alias = item[1];
 
@@ -452,10 +452,10 @@ export function createModule() {
     // step 1: Code the branches, gathering the assignments
     let originalNames = names;
     let modificationSets: NameModificationsMap = {};
-    branches.forEach(function (branch, index) {
+    branches.forEach((branch, index) => {
       names = extendNames(originalNames);
       branchContent[index] = branch ? code(branch) : "";
-       Object.keys(names).forEach(function (key) {
+       Object.keys(names).forEach(key => {
         let created = !originalNames[key];
         if ( created || names[key].length > 1 ) {
           let modificationSet = modificationSets[key];
@@ -473,7 +473,7 @@ export function createModule() {
     names = originalNames;
 
     // step 2: Create Phi functions for each name
-    Object.keys(modificationSets).forEach(function (key) {
+    Object.keys(modificationSets).forEach(key => {
       let parentIds = names[key] || [];
       let passthruId = parentIds.length ? lastItem(parentIds) : null;
       let sourceIds: Ids = [];
@@ -493,7 +493,7 @@ export function createModule() {
       names[key] = parentIds;
 
       let targetId = localForWrite(key);
-      sourceIds.forEach(function (sourceId, index) {
+      sourceIds.forEach((sourceId, index) => {
         if ( !sourceId || sourceId === targetId ) {
           return;
         }
@@ -514,7 +514,7 @@ export function createModule() {
 
     let iteratorName = itemName ? 'createNamedIterator' : 'createIterator';
     let iterator = runtimeImport(iteratorName);
-    let iteratorContent = code(function () {
+    let iteratorContent = code(() => {
       write(iterator, '(', collection, ')');
     });
 
@@ -527,11 +527,11 @@ export function createModule() {
     }
     let argNames = contextArgs.map(localForWrite);
 
-    let bodyContent = code(function () {
+    let bodyContent = code(() => {
       generate(loopBody);
     });
 
-    let guardContent = code(function () {
+    let guardContent = code(() => {
       generate(loopGuard);
     });
 
@@ -558,8 +558,8 @@ export function createModule() {
   }
 
   function funcDeclaration(name: Name, options: FunctionOptions) {
-    statement(function () {
-      assignResult(function () {
+    statement(() => {
+      assignResult(() => {
         let functionId = localForWrite(name);
         write(functionId, '=');
         func(options);
@@ -568,8 +568,8 @@ export function createModule() {
   }
 
   function iife(funcBody: BodyEntry) {
-    parens(function () {
-      call(function () {
+    parens(() => {
+      call(() => {
         func({ body: funcBody });
       }, []);
     });
@@ -579,7 +579,7 @@ export function createModule() {
     let parentNames = names;
     pushLocalScope();
 
-    let bodyContent = code(function () {
+    let bodyContent = code(() => {
       generate(scopeBody);
     });
 
@@ -600,7 +600,7 @@ export function createModule() {
 
     let localNames = contextArgs.map(localForRead);
 
-    let bodyContent = code(function () {
+    let bodyContent = code(() => {
       generate(funcBody);
     });
 
@@ -629,7 +629,7 @@ export function createModule() {
 
   function writeLocalVariables(parentNames: NameIdsMap, argNames: Names) {
     let undefinedVars: Names = [];
-    Object.keys(names).forEach(function (name) {
+    Object.keys(names).forEach(name => {
       let localNameIds = names[name];
       let localNameId = localNameIds[0];
 
@@ -694,15 +694,11 @@ export function createModule() {
   }
 
   function object(items: ObjectAssignmentItems) {
-    items = items.map(function (item) {
-      item[2] = typeof item[0] === 'function';
-      return item;
-    });
-
     let literals: ObjectAssignmentItems = [];
     let expressions: ObjectAssignmentItems = [];
 
-    items.forEach(function (item) {
+    items.forEach(item => {
+      item[2] = typeof item[0] === 'function';
       let target = item[2] ? expressions : literals;
       target.push(item);
     });
@@ -711,19 +707,19 @@ export function createModule() {
       let dictVar = createAnonymous();
       let components: BodyEntries = [];
 
-      components.push(function () {
+      components.push(() => {
         assignAnonymous(dictVar, writeLiterals);
       });
 
-      expressions.forEach(function (item) {
-        components.push(function () {
+      expressions.forEach(item => {
+        components.push(() => {
           let name = item[2] ? item[0] : literal(item[0]);
           member(dictVar, name);
           write('=', item[1]);
         });
       });
 
-      components.push(function () {
+      components.push(() => {
         retrieveAnonymous(dictVar);
       });
 
@@ -735,7 +731,7 @@ export function createModule() {
 
     function writeLiterals() {
       write('{');
-      literals.forEach(function (item, i) {
+      literals.forEach((item, i) => {
         if ( i > 0 ) {
           write(',');
         }

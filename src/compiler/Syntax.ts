@@ -261,7 +261,7 @@ export class ForStatement extends ExportableStatement {
   public getReduceIdentifiers() {
     let result: Identifiers = [];
     this.reduceAssignments.forEach(assignment => {
-      assignment.getIdentifiers().forEach(function (id) {
+      assignment.getIdentifiers().forEach(id => {
         result.push(id);
       });
     });

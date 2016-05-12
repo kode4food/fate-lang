@@ -35,9 +35,9 @@ export function createFileResolver(options: Options) {
 }
 
 function loadFromFileSystem(name: ModuleName, basePath: DirPath) {
-  let checkPaths = pathSuffixes.map(function (suffix) {
-    return resolvePath(basePath, name + suffix);
-  });
+  let checkPaths = pathSuffixes.map(
+    suffix => resolvePath(basePath, name + suffix)
+  );
 
   for ( let i = 0; i < checkPaths.length; i++ ) {
     try {

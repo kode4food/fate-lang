@@ -20,46 +20,46 @@ const inverseOperators: StringMap = {
 };
 
 const unaryConstantFolders: FunctionMap = {
-  'not':   function (v: any) { return isFalse(v); },
-  'neg':   function (v: any) { return -v; }
+  'not':   (v: any) => isFalse(v),
+  'neg':   (v: any) => -v
 };
 
 const unaryConstantFolderKeys = Object.keys(unaryConstantFolders);
 
 const binaryConstantFolders: FunctionMap = {
-  'add':   function (l: any, r: any) { return l + r; },
-  'sub':   function (l: any, r: any) { return l - r; },
-  'mul':   function (l: any, r: any) { return l * r; },
-  'div':   function (l: any, r: any) { return l / r; },
-  'eq':    function (l: any, r: any) { return l === r; },
-  'neq':   function (l: any, r: any) { return l !== r; },
-  'in':    function (l: any, r: any) { return isIn(l, r); },
-  'notIn': function (l: any, r: any) { return !isIn(l, r); },
-  'gt':    function (l: any, r: any) { return l > r; },
-  'lt':    function (l: any, r: any) { return l < r; },
-  'gte':   function (l: any, r: any) { return l >= r; },
-  'lte':   function (l: any, r: any) { return l <= r; },
-  'mod':   function (l: any, r: any) { return l % r; }
+  'add':   (l: any, r: any) => l + r,
+  'sub':   (l: any, r: any) => l - r,
+  'mul':   (l: any, r: any) => l * r,
+  'div':   (l: any, r: any) => l / r,
+  'eq':    (l: any, r: any) => l === r,
+  'neq':   (l: any, r: any) => l !== r,
+  'in':    (l: any, r: any) => isIn(l, r),
+  'notIn': (l: any, r: any) => !isIn(l, r),
+  'gt':    (l: any, r: any) => l > r,
+  'lt':    (l: any, r: any) => l < r,
+  'gte':   (l: any, r: any) => l >= r,
+  'lte':   (l: any, r: any) => l <= r,
+  'mod':   (l: any, r: any) => l % r
 };
 
 const binaryConstantFolderKeys = Object.keys(binaryConstantFolders);
 
 const shortCircuitFolders: FunctionMap = {
-  'or': function (node: Syntax.OrOperator) {
+  'or': (node: Syntax.OrOperator) => {
     if ( !isLiteral(node.left) ) {
       return node;
     }
     let value = (<Syntax.Literal>node.left).value;
     return isTrue(value) ? node.left : node.right;
   },
-  'and': function (node: Syntax.AndOperator) {
+  'and': (node: Syntax.AndOperator) => {
     if ( !isLiteral(node.left) ) {
       return node;
     }
     let value = (<Syntax.Literal>node.left).value;
     return isFalse(value) ? node.left : node.right;
   },
-  'conditional': function (node: Syntax.ConditionalOperator) {
+  'conditional': (node: Syntax.ConditionalOperator) => {
     if ( !isLiteral(node.condition) ) {
       return node;
     }
@@ -173,7 +173,7 @@ export default function createTreeProcessors(visit: Visitor) {
   // the inapplicable branch and just inline the matching statements
   function foldIfStatements(statements: Syntax.IfStatement[]) {
     let output: Syntax.Statement[] = [];
-    statements.forEach(function (statement) {
+    statements.forEach(statement => {
       if ( !hasTag(statement, 'if') || !isLiteral(statement.condition) ) {
         output.push(statement);
         return;
@@ -272,7 +272,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function splitExportStatements(statements: Syntax.ExportStatement[]) {
     let result: Syntax.Statement[] = [];
-    statements.forEach(function (statement) {
+    statements.forEach(statement => {
       let exportedStatement = statement.statement;
       if ( exportedStatement ) {
         result.push(exportedStatement);

@@ -20,17 +20,13 @@ export function createIterator(collection: Collection) {
 
 export function createNamedIterator(collection: Collection) {
   if ( isArray(collection) ) {
-    return collection.map(function (item: any, index: number) {
-      return [item, index];
-    });
+    return collection.map((item: any, index: number) => [item, index]);
   }
   if ( isGenerator(collection) ) {
     return generateIndexedSet(collection);
   }
   if ( isObject(collection) ) {
-    return Object.keys(collection).map(function (key) {
-      return [collection[key], key];
-    });
+    return Object.keys(collection).map(key => [collection[key], key]);
   }
   return EmptyCollection;
 }

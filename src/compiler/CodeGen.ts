@@ -92,7 +92,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     generate.func({
       internalId: generate.selfName,
       internalArgs: [generate.contextName, generate.exportsName],
-      body: function () {
+      body: () => {
         createStatementsEvaluator(statements);
       }
     });
@@ -109,9 +109,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       func = createEvaluator;
     }
 
-    return function () {
-      return func.apply(null, args);
-    };
+    return () => func.apply(null, args);
   }
 
   /*
@@ -144,7 +142,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
   function createImportEvaluator(node: Syntax.ImportStatement) {
     let assigns: JavaScript.AssignmentItems = [];
-    node.modules.forEach(function (module: Syntax.ModuleSpecifier) {
+    node.modules.forEach(module => {
       let moduleName = module.path.value;
       let moduleAlias = module.alias.value;
 
@@ -153,7 +151,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
       assigns.push([
         moduleAlias,
-        function () {
+        () => {
           generate.call(importer, [createImporterArguments]);
         }
       ]);
@@ -163,7 +161,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
   function createImporterArguments() {
     generate.member(
-      function () { generate.context(); },
+      () => { generate.context(); },
       generate.currentDirectory()
     );
   }
@@ -177,17 +175,17 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     let anon = generate.createAnonymous();
     assigns.push([
       anon,
-      function () {
+      () => {
         generate.call(importer, [createImporterArguments]);
       }
     ]);
 
-    node.importList.forEach(function (item: Syntax.ImportModuleItem) {
+    node.importList.forEach(item => {
       assigns.push([
         item.id.value,
-        function () {
+        () => {
           generate.member(
-            function () {
+            () => {
               generate.retrieveAnonymous(anon);
             },
             generate.literal(item.moduleKey.value)
@@ -200,13 +198,11 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createExportEvaluator(node: Syntax.ExportStatement) {
-    let exports = node.exportItems.map(
-      function (item: Syntax.ExportModuleItem) {
-        let name = item.id.value;
-        let alias = item.moduleKey.value;
-        return <JavaScript.ModuleItem>[name, alias];
-      }
-    );
+    let exports = node.exportItems.map(item => {
+      let name = item.id.value;
+      let alias = item.moduleKey.value;
+      return <JavaScript.ModuleItem>[name, alias];
+    });
 
     generate.exports(exports);
   }
@@ -253,8 +249,8 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         generate.ifStatement(
           defer(signature.guard),
           null,  // this is an 'else' case
-          function () {
-            generate.returnStatement(function () {
+          () => {
+            generate.returnStatement(() => {
               generate.call(ensured);
             });
           }
@@ -271,15 +267,15 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       let ensure = generate.runtimeImport('ensureFunction');
       let ensuredId = generate.createAnonymous();
 
-      generate.statement(function () {
-        generate.assignAnonymous(ensuredId, function () {
-          generate.call(ensure, [function () {
+      generate.statement(() => {
+        generate.assignAnonymous(ensuredId, () => {
+          generate.call(ensure, [() => {
             generate.getter(functionName.value);
           }]);
         });
       });
 
-      return function () {
+      return () => {
         generate.retrieveAnonymous(ensuredId);
       };
     }
@@ -290,7 +286,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     let params = signature.params;
     let paramNames = getFixedParamNames(params);
 
-    generate.parens(function () {
+    generate.parens(() => {
       generate.func({
         internalId: getFuncOrLambdaInternalId(node),
         contextArgs: paramNames,
@@ -306,10 +302,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
   function getFixedParamNames(params: Syntax.Parameters) {
     let isFixed = true;
-    return params.filter(function (param: Syntax.Parameter) {
+    return params.filter(param => {
       isFixed = isFixed && param.cardinality === Syntax.Cardinality.Required;
       return isFixed;
-    }).map(function (param: Syntax.Parameter) {
+    }).map(param => {
       return param.id.value;
     });
   }
@@ -321,7 +317,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
 
     let nonFixed = params.slice(fixedCount);
-    nonFixed.forEach(function (param: Syntax.Parameter, idx: number) {
+    nonFixed.forEach((param, idx) => {
       /* istanbul ignore if: untestable */
       if ( param.cardinality !== Syntax.Cardinality.ZeroToMany ) {
         throw new Error("Stupid Coder: Unexpected cardinality");
@@ -329,7 +325,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
       generate.assignment(
         param.id.value,
-        function () { generate.args(fixedCount); }
+        () => { generate.args(fixedCount); }
       );
     });
   }
@@ -347,7 +343,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
     let isSingle = hasAnnotation(node, 'function/single_expression');
     let bodyGenerator = isSingle ? generate.scope : generate.iife;
-    bodyGenerator(function () {
+    bodyGenerator(() => {
       createForEvaluator(forNode);
     });
   }
@@ -355,7 +351,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   function createDoEvaluator(node: Syntax.DoExpression,
                              caseGuard?: Function) {
     generate.call(generate.runtimeImport('createDoBlock'), [
-      function () {
+      () => {
         generate.func({
           generator: true,
           body: doBody
@@ -380,9 +376,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
 
     function generateExpression(expression: Syntax.Expression) {
-      generate.statement(function () {
-        generate.assignResult(function () {
-          generate.waitFor(Syntax.Resolver.Value, function () {
+      generate.statement(() => {
+        generate.assignResult(() => {
+          generate.waitFor(Syntax.Resolver.Value, () => {
             createEvaluator(expression);
           });
         });
@@ -391,23 +387,21 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
     function generateAssignment(group: Syntax.Assignments) {
       let anon = generate.createAnonymous();
-      generate.statement(function () {
-        generate.assignAnonymous(anon, function () {
-          generate.waitFor(Syntax.Resolver.All, function () {
+      generate.statement(() => {
+        generate.assignAnonymous(anon, () => {
+          generate.waitFor(Syntax.Resolver.All, () => {
             generate.array(
-              group.map(function (assignment) {
-                return defer(assignment.value);
-              })
+              group.map(assignment => defer(assignment.value))
             );
           });
         });
       });
 
-      group.forEach(function (assignment, index) {
-        createAssignmentEvaluator(assignment, function () {
-          return function () {
+      group.forEach((assignment, index) => {
+        createAssignmentEvaluator(assignment, () => {
+          return () => {
             generate.member(
-              function () { generate.retrieveAnonymous(anon); },
+              () => { generate.retrieveAnonymous(anon); },
               generate.literal(index)
             );
           };
@@ -418,7 +412,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     function getAssignmentGroups(assignments: Syntax.Assignments) {
       let groups: Syntax.Assignments[] = [];
 
-      assignments.forEach(function (assignment) {
+      assignments.forEach(assignment => {
         let groupNum = getAnnotation(assignment, 'when/group') || 0;
         let group = groups[groupNum] || (groups[groupNum] = []);
         group.push(assignment);
@@ -430,7 +424,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
   function createCaseEvaluator(node: Syntax.CaseExpression) {
     generate.call(generate.runtimeImport('createDoBlock'), [
-      function () {
+      () => {
         generate.func({
           generator: true,
           body: doBody
@@ -441,18 +435,18 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     function doBody() {
       let triggered = generate.createAnonymous();
 
-      generate.returnStatement(function () {
-        generate.waitFor(Syntax.Resolver.Any, function () {
-          generate.array(node.cases.map(function (doCase) {
-            return function () {
-              createDoEvaluator(doCase, function () {
+      generate.returnStatement(() => {
+        generate.waitFor(Syntax.Resolver.Any, () => {
+          generate.array(node.cases.map(doCase => {
+            return () => {
+              createDoEvaluator(doCase, () => {
                 generate.ifStatement(
-                  function () { generate.retrieveAnonymous(triggered); },
-                  function () { generate.returnStatement(); },
+                  () => { generate.retrieveAnonymous(triggered); },
+                  () => { generate.returnStatement(); },
                   null
                 );
 
-                generate.statement(function () {
+                generate.statement(() => {
                   generate.assignAnonymous(
                     triggered, generate.literal(true)
                   );
@@ -470,16 +464,16 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     generator();
 
     function generateExpression() {
-      generate.iife(function () {
+      generate.iife(() => {
         generateBody(defer(node.value));
       });
     }
 
     function generateFunction() {
-      generate.parens(function () {
+      generate.parens(() => {
         generate.func({
           internalArgs: [generate.valueName],
-          body: function () {
+          body: () => {
             generateBody(generate.valueName);
           }
         });
@@ -488,19 +482,19 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
     function generateBody(valueGenerator: BodyEntry) {
       let value = generate.createAnonymous();
-      generate.statement(function () {
+      generate.statement(() => {
         generate.assignAnonymous(value, valueGenerator);
       });
 
-      node.matches.forEach(function (match) {
+      node.matches.forEach(match => {
         generate.ifStatement(
-          function () {
+          () => {
             createLikeComparison(
-              function () { generate.retrieveAnonymous(value); },
+              () => { generate.retrieveAnonymous(value); },
               defer(match.pattern)
             );
           },
-          function () {
+          () => {
             createStatementsEvaluator(match.statements);
             generate.returnStatement();
           },
@@ -510,7 +504,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
       if ( node.elseStatements.isEmpty() ) {
         let exploder = generate.runtimeImport('matchNotExhaustive');
-        generate.statement(function () {
+        generate.statement(() => {
           generate.call(exploder, []);
         });
         return;
@@ -523,18 +517,16 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   function createCallEvaluator(node: Syntax.CallOperator) {
     generate.call(
       defer(node.left),
-      node.right.map(function (argNode) {
-        return defer(argNode);
-      })
+      node.right.map(argNode => defer(argNode))
     );
   }
 
   function createBindEvaluator(node: Syntax.BindOperator) {
     generate.call(generate.runtimeImport('bindFunction'), [
       defer(node.left),
-      function () {
+      () => {
         let elems: JavaScript.ObjectAssignmentItems = [];
-        node.right.forEach(function (argNode, index) {
+        node.right.forEach((argNode, index) => {
           if ( argNode instanceof Syntax.Wildcard ) {
             return;
           }
@@ -570,14 +562,14 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
                                            getValue: Function) {
     let result = generate.createAnonymous();
 
-    generate.statement(function () {
+    generate.statement(() => {
       generate.assignAnonymous(result, getValue(node));
     });
 
-    node.getIdentifiers().forEach(function (id, index) {
-      generate.assignment(id.value, function () {
+    node.getIdentifiers().forEach((id, index) => {
+      generate.assignment(id.value, () => {
         generate.member(
-          function () { generate.retrieveAnonymous(result); },
+          () => { generate.retrieveAnonymous(result); },
           generate.literal(index)
         );
       });
@@ -588,14 +580,14 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
                                             getValue: Function) {
     let result = generate.createAnonymous();
 
-    generate.statement(function () {
+    generate.statement(() => {
       generate.assignAnonymous(result, getValue(node));
     });
 
-    node.items.forEach(function (item) {
-      generate.assignment(item.id.value, function () {
+    node.items.forEach(item => {
+      generate.assignment(item.id.value, () => {
         generate.member(
-          function () { generate.retrieveAnonymous(result); },
+          () => { generate.retrieveAnonymous(result); },
           defer(item.value)
         );
       });
@@ -609,7 +601,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   // generate an evaluator that assigns the result of an expression
   // to the last result scratch variable
   function createExpressionEvaluator(node: Syntax.ExpressionStatement) {
-    generate.statement(function () {
+    generate.statement(() => {
       generate.assignResult(defer(node.expression));
     });
   }
@@ -625,22 +617,22 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       let createBody = isObject ? createNameValueBody : createValueBody;
       let result = generate.createAnonymous();
 
-      generate.statement(function () {
-        generate.assignAnonymous(result, function () {
+      generate.statement(() => {
+        generate.assignAnonymous(result, () => {
           (<Function>genContainer)([]);
         });
       });
 
       createLoop(node.ranges, createBody);
-      generate.statement(function () {
-        generate.assignResult(function () {
+      generate.statement(() => {
+        generate.assignResult(() => {
           generate.retrieveAnonymous(result);
         });
       });
 
       function createValueBody() {
         let arrayCompNode = <Syntax.ArrayComprehension>node;
-        generate.statement(function () {
+        generate.statement(() => {
           generate.arrayAppend(result, defer(arrayCompNode.value));
         });
       }
@@ -648,7 +640,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       function createNameValueBody() {
         let objectCompNode = <Syntax.ObjectComprehension>node;
         let assign = objectCompNode.assignment;
-        generate.statement(function () {
+        generate.statement(() => {
           generate.objectAssign(
             result, defer(assign.id), defer(assign.value)
           );
@@ -686,25 +678,23 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       generate.assignment(successVar, generate.literal(false));
       generateLoop(successVar);
       generate.ifStatement(
-        function () { generate.retrieveAnonymous(successVar); },
+        () => { generate.retrieveAnonymous(successVar); },
         null,
         defer(createStatementsEvaluator, elseStatements)
       );
     }
 
     function generateReduceResult() {
-      generate.statement(function () {
-        generate.assignResult(function () {
+      generate.statement(() => {
+        generate.assignResult(() => {
           let ids = node.getReduceIdentifiers();
           if ( ids.length === 1 ) {
             generate.getter(ids[0].value);
             return;
           }
-          generate.array(ids.map(function (id) {
-            return function () {
-              generate.getter(id.value);
-            };
-          }));
+          generate.array(ids.map(
+            id => () => { generate.getter(id.value); }
+          ));
         });
       });
     }
@@ -714,7 +704,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
 
     function createAnonymousCounters() {
-      idMappings = node.getReduceIdentifiers().map(function (id) {
+      idMappings = node.getReduceIdentifiers().map(id => {
         return {
           id: id.value,
           anon: generate.createAnonymous()
@@ -723,17 +713,17 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
 
     function generateResultAssignments() {
-      idMappings.forEach(function (mapping) {
-        generate.assignment(mapping.id, function () {
+      idMappings.forEach(mapping => {
+        generate.assignment(mapping.id, () => {
           generate.retrieveAnonymous(mapping.anon);
         });
       });
     }
 
     function generateAnonymousAssignments() {
-      idMappings.forEach(function (mapping) {
-        generate.statement(function () {
-          generate.assignAnonymous(mapping.anon, function () {
+      idMappings.forEach(mapping => {
+        generate.statement(() => {
+          generate.assignAnonymous(mapping.anon, () => {
             generate.getter(mapping.id);
           });
         });
@@ -749,7 +739,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
 
     function generateForLoop(successVar?: string) {
-      generate.statement(function () {
+      generate.statement(() => {
         createLoop(node.ranges, generateBody, successVar);
       });
     }
@@ -772,7 +762,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     function processRange(i: number) {
       if ( i === ranges.length ) {
         if ( successVar ) {
-          generate.statement(function () {
+          generate.statement(() => {
             generate.assignAnonymous(successVar, generate.literal(true));
           });
         }
@@ -787,11 +777,11 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
       if ( range.guard ) {
         // we have a guard
-        guardFunc = function () {
+        guardFunc = () => {
           generate.ifStatement(
             defer(range.guard),
             null,
-            function () { generate.loopContinue(); }
+            () => { generate.loopContinue(); }
           );
         };
       }
@@ -809,7 +799,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
           name: nameId,
           collection: defer(range.collection),
           guard: guardFunc,
-          body: function () {
+          body: () => {
             processRange(i + 1);
           }
         });
@@ -840,10 +830,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
     let assignments = letStatement.assignments;
     let conditions: string[] = [];
-    assignments.forEach(function (assignment) {
-      assignment.getIdentifiers().forEach(function (id) {
-        conditions.push(generate.code(function () {
-          generate.call(some, [function () {
+    assignments.forEach(assignment => {
+      assignment.getIdentifiers().forEach(id => {
+        conditions.push(generate.code(() => {
+          generate.call(some, [() => {
             generate.getter(id.value);
           }]);
         }));
@@ -851,7 +841,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     });
 
     generateIf(
-      function () { generate.writeAndGroup(conditions); },
+      () => { generate.writeAndGroup(conditions); },
       node.thenStatements,
       node.elseStatements
     );
@@ -873,10 +863,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   function createOrEvaluator(node: Syntax.OrOperator) {
     let leftAnon = generate.createAnonymous();
     generate.compoundExpression([
-      function () {
+      () => {
         generate.assignAnonymous(leftAnon, defer(node.left));
       },
-      function () {
+      () => {
         generate.conditionalOperator(
           leftAnon,
           leftAnon,
@@ -889,10 +879,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   function createAndEvaluator(node: Syntax.AndOperator) {
     let leftAnon = generate.createAnonymous();
     generate.compoundExpression([
-      function () {
+      () => {
         generate.assignAnonymous(leftAnon, defer(node.left));
       },
-      function () {
+      () => {
         generate.conditionalOperator(
           leftAnon,
           defer(node.right),
@@ -907,7 +897,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createNotLikeEvaluator(node: Syntax.NotLikeOperator) {
-    generate.unaryOperator('not', function () {
+    generate.unaryOperator('not', () => {
       createLikeComparison(node.left, node.right);
     });
   }
@@ -918,14 +908,14 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createNotInEvaluator(node: Syntax.NotInOperator) {
-    generate.unaryOperator('not', function () {
+    generate.unaryOperator('not', () => {
       let isIn = generate.runtimeImport('isIn');
       generate.call(isIn, [defer(node.left), defer(node.right)]);
     });
   }
 
   function createNotEvaluator(node: Syntax.NotOperator) {
-    generate.unaryOperator('not', function () {
+    generate.unaryOperator('not', () => {
       let isTrue = generate.runtimeImport('isTrue');
       generate.call(isTrue, [defer(node.left)]);
     });
@@ -966,7 +956,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       createPatternTemplate(node);
       return;
     }
-    let elems = node.elements.map(function (elem: Syntax.ObjectAssignment) {
+    let elems = node.elements.map(elem => {
       let name: BodyEntry;
       if ( elem.id instanceof Syntax.Literal ) {
         name = (<Syntax.Literal>elem.id).value;
@@ -1011,7 +1001,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   function createPatternEvaluator(node: Syntax.Pattern) {
     let definePattern = generate.runtimeImport('definePattern');
     generate.call(definePattern, [
-      function () {
+      () => {
         generate.func({
           internalArgs: [generate.exportsName],
           body: patternBody
@@ -1023,11 +1013,11 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       let localName = getAnnotation(node, 'pattern/local');
       localName = generate.registerAnonymous(localName);
 
-      generate.statement(function () {
+      generate.statement(() => {
         generate.assignAnonymous(localName, generate.exportsName);
       });
 
-      generate.returnStatement(function () {
+      generate.returnStatement(() => {
         createPatternTemplate(node.left);
       });
     }
@@ -1045,7 +1035,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       default:
         if ( canGenerateEquality(node) ) {
           createLikeComparison(
-            function () {
+            () => {
               let localName = getAnnotation(node, 'pattern/local');
               localName = generate.registerAnonymous(localName);
               generate.retrieveAnonymous(localName);
@@ -1072,20 +1062,20 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     let containerCheckName = isObject ? 'isObject' : 'isArray';
 
     let expressions: Function[] = [];
-    expressions.push(function () {
+    expressions.push(() => {
       let checker = generate.runtimeImport(containerCheckName);
-      generate.call(checker, [function () {
+      generate.call(checker, [() => {
         generate.retrieveAnonymous(parentLocal);
       }]);
     });
 
     if ( isObject ) {
-      node.elements.forEach(function (assign: Syntax.ObjectAssignment) {
+      node.elements.forEach((assign: Syntax.ObjectAssignment) => {
         pushElement(assign, assign.value, defer(assign.id));
       });
     }
     else {
-      node.elements.forEach(function (expr: Syntax.Expression, idx: number) {
+      node.elements.forEach((expr, idx) => {
         pushElement(expr, expr, generate.literal(idx));
       });
     }
@@ -1108,11 +1098,11 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     function generateEquality(elementValue: Syntax.Node,
                               elementIndex: BodyEntry) {
       if ( elementValue instanceof Syntax.Literal ) {
-        return function () {
+        return () => {
           createLikeComparison(value, elementValue);
         };
       }
-      return function () {
+      return () => {
         createLikeComparison(
           value, defer(elementValue, createPatternTemplate)
         );
@@ -1120,7 +1110,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
       function value() {
         generate.member(
-          function () { generate.retrieveAnonymous(parentLocal); },
+          () => { generate.retrieveAnonymous(parentLocal); },
           elementIndex
         );
       }
@@ -1131,14 +1121,14 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       let elementLocal = getAnnotation(element, 'pattern/local');
       elementLocal = generate.registerAnonymous(elementLocal);
 
-      return function () {
+      return () => {
         generate.compoundExpression([
-          function () {
+          () => {
             generate.assignAnonymous(
               elementLocal,
-              function () {
+              () => {
                 generate.member(
-                  function () { generate.retrieveAnonymous(parentLocal); },
+                  () => { generate.retrieveAnonymous(parentLocal); },
                   elementIndex
                 );
               }
