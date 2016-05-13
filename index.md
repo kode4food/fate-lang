@@ -189,7 +189,7 @@ end
 let numbers = [100, 150, 400]
 do
   # will eventualy print '[ 200, 300, 800 ]'
-  numbers | (x -> x | io.timeout) |all| (x -> x * 2) | io.print
+  numbers | (x -> x | io.timeout) :| (x -> x * 2) | io.print
 end
 ```
 
