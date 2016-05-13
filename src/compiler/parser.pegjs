@@ -415,10 +415,10 @@ rightCall
     }
 
 rightCallOperator
-  = "|" __ Any __ "|" { return Syntax.Resolver.Any; }
-  / "|" __ All __ "|" { return Syntax.Resolver.All; }
-  / "|" __ "|"        { return Syntax.Resolver.Value; }
-  / "|"               { return null; }
+  = "?" __ "|" { return Syntax.Resolver.Any; }
+  / ":" __ "|" { return Syntax.Resolver.All; }
+  / "." __ "|" { return Syntax.Resolver.Value; }
+  / "|"        { return null; }
 
 conditional
   = tval:or _ op:IfUnless __ cond:or __ Else __ fval:conditional {

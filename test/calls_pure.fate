@@ -40,8 +40,8 @@ def awaitCalls(test)
   let timeouts = (arr -> [for a in arr select timeout(a)])
 
   do
-    [100, 250, 300] | timeouts |all| double || deepEqualTo([200, 500, 600])
-    [100, 250, 300] | timeouts |any| (x -> x * 2) || equalTo(200)
+    [100, 250, 300] | timeouts :| double .| deepEqualTo([200, 500, 600])
+    [100, 250, 300] | timeouts ?| (x -> x * 2) .| equalTo(200)
     test.done()
   end
 end
