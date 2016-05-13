@@ -18,21 +18,19 @@ let AssertModule = ~(
   ]) = 0
 )
 
-export def wrap(AssertModule as module)
-  {
-    equalTo:          value -> x -> module.equal(value, x),
-    notEqualTo:       value -> x -> module.notEqual(value, x),
-    deepEqualTo:      value -> x -> module.deepEqual(value, x),
-    notDeepEqualTo:   value -> x -> module.notDeepEqual(value, x),
-    strictEqualTo:    value -> x -> module.strictEqual(value, x),
-    notStrictEqualTo: value -> x -> module.notStrictEqual(value, x),
-    isOk:             module.ok,
-    throws:           module.throws,
-    doesNotThrow:     module.doesNotThrow,
-    isFalse:          x -> module.equal(false, x),
-    isTrue:           x -> module.equal(true, x)
-  }
-end
+export def wrap(AssertModule as module): {
+  equalTo:          value -> x -> module.equal(value, x),
+  notEqualTo:       value -> x -> module.notEqual(value, x),
+  deepEqualTo:      value -> x -> module.deepEqual(value, x),
+  notDeepEqualTo:   value -> x -> module.notDeepEqual(value, x),
+  strictEqualTo:    value -> x -> module.strictEqual(value, x),
+  notStrictEqualTo: value -> x -> module.notStrictEqual(value, x),
+  isOk:             module.ok,
+  throws:           module.throws,
+  doesNotThrow:     module.doesNotThrow,
+  isFalse:          x -> module.equal(false, x),
+  isTrue:           x -> module.equal(true, x)
+}
 
 import 'node:assert' as assert
 
