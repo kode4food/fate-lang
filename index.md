@@ -186,10 +186,12 @@ let eventualResult = do
 end
 
 # Chained and Awaiting Function calls
+import io
 let numbers = [100, 150, 400]
 do
-  # will eventualy print '[ 200, 300, 800 ]'
-  numbers | (x -> x | io.timeout) :| (x -> x * 2) | io.print
+  # will eventually print '[ 200, 300, 800 ]'
+  numbers | (arr -> [for x in arr select x | io.timeout]) :| (x -> x * 2)
+          | io.print
 end
 ```
 
