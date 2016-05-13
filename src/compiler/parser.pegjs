@@ -28,9 +28,7 @@
     if ( !arr ) {
       return node('statements', []);
     }
-    return node('statements', arr.filter(value => {
-      return value !== null;
-    }));
+    return node('statements', arr.filter(value => value !== null));
   }
 
   function literalName(node) {

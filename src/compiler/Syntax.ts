@@ -299,9 +299,9 @@ export class FromStatement extends ExportableStatement {
               public importList: ImportModuleItems) { super(); }
 
   public getModuleItems() {
-    return this.importList.map(moduleItem => {
-      return node('exportModuleItem', moduleItem.id);
-    });
+    return this.importList.map(
+      moduleItem => node('exportModuleItem', moduleItem.id)
+    );
   }
 }
 
@@ -309,9 +309,9 @@ export class ImportStatement extends ExportableStatement {
   constructor(public modules: ModuleSpecifiers) { super(); }
 
   public getModuleItems() {
-    return this.modules.map(moduleSpecifier => {
-      return node('exportModuleItem', moduleSpecifier.alias);
-    });
+    return this.modules.map(
+      moduleSpecifier => node('exportModuleItem', moduleSpecifier.alias)
+    );
   }
 }
 

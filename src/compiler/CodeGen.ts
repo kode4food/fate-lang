@@ -305,9 +305,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     return params.filter(param => {
       isFixed = isFixed && param.cardinality === Syntax.Cardinality.Required;
       return isFixed;
-    }).map(param => {
-      return param.id.value;
-    });
+    }).map(param => param.id.value);
   }
 
   function generateParamProcessor(params: Syntax.Parameters) {
@@ -437,8 +435,8 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
       generate.returnStatement(() => {
         generate.waitFor(Syntax.Resolver.Any, () => {
-          generate.array(node.cases.map(doCase => {
-            return () => {
+          generate.array(node.cases.map(
+            doCase => () => {
               createDoEvaluator(doCase, () => {
                 generate.ifStatement(
                   () => { generate.retrieveAnonymous(triggered); },
@@ -452,8 +450,8 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
                   );
                 });
               });
-            };
-          }));
+            }
+          ));
         });
       });
     }
