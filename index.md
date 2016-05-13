@@ -190,7 +190,8 @@ import io
 let numbers = [100, 150, 400]
 do
   # will eventually print '[ 200, 300, 800 ]'
-  numbers | (arr -> [for x in arr select x | io.timeout]) :| (x -> x * 2)
+  numbers | (arr -> [for x in arr select x | io.timeout])
+         :| (x -> x * 2)
           | io.print
 end
 ```
