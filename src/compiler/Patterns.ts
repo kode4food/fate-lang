@@ -7,6 +7,8 @@ import { annotate, getAnnotation, hasAnnotation } from './Annotations';
 const hasTag = Syntax.hasTag;
 const selfPatternLocal = 'p';
 
+const patternNodeParent = ['index', 'objectAssignment', 'object', 'array'];
+
 export default function createTreeProcessors(visit: Visitor) {
   let selfPatternNumbering = 0;
 
@@ -103,7 +105,7 @@ export default function createTreeProcessors(visit: Visitor) {
         return node;
       }
 
-      if ( !hasTag(parent, ['index', 'objectAssignment', 'object', 'array']) ) {
+      if ( !hasTag(parent, patternNodeParent) ) {
         // Not going to work
         return node;
       }

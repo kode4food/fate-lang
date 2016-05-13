@@ -1,8 +1,10 @@
 import nodeunit
 
-from test import equalTo, isOk
+from test import wrap
 
 def imports(test)
+  let { equalTo } = wrap(test)
+
   import './export_source_pure.fate' as source
 
   source.val_a       | equalTo(1)

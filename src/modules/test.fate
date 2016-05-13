@@ -1,20 +1,42 @@
-from 'node:assert'
-import equal, notEqual, deepEqual, notDeepEqual, strictEqual,
-       notStrictEqual, throws, doesNotThrow, ok
-
 # Warning: this module assumes JavaScript-specific methods
 #
 #   Basically everything from Node.js' assert module
 
-export
-let equalTo = value -> x -> equal(value, x)
-  , notEqualTo = value -> x -> notEqual(value, x)
-  , deepEqualTo = value -> x -> deepEqual(value, x)
-  , notDeepEqualTo = value -> x -> notDeepEqual(value, x)
-  , strictEqualTo = value -> x -> strictEqual(value, x)
-  , notStrictEqualTo = value -> x -> notStrictEqual(value, x)
-  , isFalse = equalTo(false)
-  , isTrue = equalTo(true)
-  , isOk = ok
+from pattern import Function, Object
+from array import length
 
-export throws, doesNotThrow
+let ModuleKeys = [
+  'equal', 'notEqual', 'deepEqual', 'notDeepEqual', 'strictEqual',
+  'notStrictEqual', 'ok', 'throws', 'doesNotThrow'
+]
+
+let AssertModule = ~(
+  (self like Function or self like Object) and
+  length([
+    for key in ModuleKeys
+    where self[key] not like Function
+  ]) = 0
+)
+
+export def wrap(AssertModule as module)
+  {
+    equalTo:          value -> x -> module.equal(value, x),
+    notEqualTo:       value -> x -> module.notEqual(value, x),
+    deepEqualTo:      value -> x -> module.deepEqual(value, x),
+    notDeepEqualTo:   value -> x -> module.notDeepEqual(value, x),
+    strictEqualTo:    value -> x -> module.strictEqual(value, x),
+    notStrictEqualTo: value -> x -> module.notStrictEqual(value, x),
+    isOk:             module.ok,
+    throws:           module.throws,
+    doesNotThrow:     module.doesNotThrow,
+    isFalse:          x -> module.equal(false, x),
+    isTrue:           x -> module.equal(true, x)
+  }
+end
+
+import 'node:assert' as assert
+
+export let {
+  equalTo, notEqualTo, deepEqualTo, notDeepEqualTo, strictEqualTo,
+  notStrictEqualTo, isFalse, isTrue, isOk, throws, doesNotThrow
+} = wrap(assert)

@@ -2,10 +2,12 @@ import nodeunit
 import http
 
 from pattern import NonEmptyString
-from test import equalTo, deepEqualTo, isOk
+from test import wrap
 from io import print, timeout
 
 def basics(test)
+  let { equalTo } = wrap(test)
+
   let x = do
     await timeout(200)
     'hello'
@@ -18,6 +20,8 @@ def basics(test)
 end
 
 def doWhenSimple(test)
+  let { equalTo } = wrap(test)
+
   do when t = 100
     t | equalTo(100)
     test.done()
@@ -25,6 +29,8 @@ def doWhenSimple(test)
 end
 
 def doWhenNoDependencies(test)
+  let { equalTo } = wrap(test)
+
   do when a = timeout(10), b = timeout(200), [c, d] = [90, 80]
     a | equalTo(10)
     b | equalTo(200)
@@ -35,6 +41,8 @@ def doWhenNoDependencies(test)
 end
 
 def doWhenDependencies(test)
+  let { equalTo } = wrap(test)
+
   do when a = timeout(10), b = timeout(a * 20), [c, d] = [90, 80],
           e = timeout(30 * a), [f] = [c]
     a | equalTo(10)
@@ -52,6 +60,8 @@ def doWhenExpression(test)
 end
 
 def awaitDoWhenExpression(test)
+  let { equalTo } = wrap(test)
+
   do
     await (do when timeout(10): 'hello') | equalTo('hello')
     test.done()
@@ -59,6 +69,8 @@ def awaitDoWhenExpression(test)
 end
 
 def doWhenNested(test)
+  let { equalTo } = wrap(test)
+
   do when a = timeout(10),
           b = do: a * 20
     a | equalTo(10)
@@ -68,6 +80,8 @@ def doWhenNested(test)
 end
 
 def awaitAny(test)
+  let { equalTo } = wrap(test)
+
   let arr = [
     for x in [100, 10, 50]
     select x | timeout
@@ -80,6 +94,8 @@ def awaitAny(test)
 end
 
 def awaitAll(test)
+  let { deepEqualTo } = wrap(test)
+
   let arr = [
     for x in [100, 10, 50]
     select x | timeout
@@ -92,25 +108,29 @@ def awaitAll(test)
 end
 
 def caseExpression(test)
+  let { isOk, equalTo } = wrap(test)
+
   let z = timeout(5)
 
   do
     case x = timeout(10)
       print("should not happen")
-      test.ok(false)
+      isOk(false)
 
     case timeout(20)
       print("should not happen")
-      test.ok(false)
+      isOk(false)
 
     case z = timeout(5)
-      test.ok(true)
+      isOk(true)
       z | equalTo(5)
       test.done()
   end
 end
 
 def casePropagate(test)
+  let { equalTo } = wrap(test)
+
   let notHello = do
     await timeout(20)
     "not hello"
@@ -131,6 +151,8 @@ def casePropagate(test)
 end
 
 def caseOrdering(test)
+  let { equalTo } = wrap(test)
+
   let result = do
     case 1: "first"
     case 2: "second"

@@ -45,6 +45,7 @@ let Array = definePattern(isArray)
   , NonEmptyArray = ~(isArray(self) and self.length > 0)
   , Object = definePattern(isObject)
   , Boolean = ~isA(self, 'boolean')
+  , Function = ~isA(self, 'function')
 
 export def ArrayOf(elementPattern)
   let checker = definePattern(value ->

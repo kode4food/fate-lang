@@ -1,9 +1,11 @@
 import nodeunit
 
-from test import equalTo
+from test import wrap
 from value import mutable
 
 def assignment(test)
+  let { equalTo } = wrap(test)
+
   let val1 = 100
   val1 | equalTo(100)
 
@@ -57,6 +59,8 @@ def assignment(test)
 end
 
 def testMutable(test)
+  let { equalTo } = wrap(test)
+
   let a = mutable("there")
   "hello " + a.value | equalTo("hello there")
 
@@ -67,6 +71,8 @@ def testMutable(test)
 end
 
 def testArrayDestructuring(test)
+  let { equalTo } = wrap(test)
+
   let [a, b] = [1, 2]
   a | equalTo(1)
   b | equalTo(2)
@@ -75,6 +81,8 @@ def testArrayDestructuring(test)
 end
 
 def testObjectDestructuring(test)
+  let { equalTo } = wrap(test)
+
   let myObject = { name: 'Fate', age: 1 }
   myObject.name | equalTo('Fate')
   myObject.age  | equalTo(1)

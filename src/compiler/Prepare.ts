@@ -9,11 +9,11 @@ type AssignmentMap = { [index: string]: Syntax.Assignment };
 type NameSet = { [index: string]: boolean };
 
 const awaitBarriers = ['function', 'lambda', 'pattern'];
-const assignmentTypes = ['assignment', 'arrayDestructure', 'objectDestructure'];
+const whenAssigns = ['assignment', 'arrayDestructure', 'objectDestructure'];
 
 export default function createTreeProcessors(visit: Visitor) {
   let selfFunction = visit.ancestorTags('self', ['function', 'lambda']);
-  let whenReference = visit.ancestorTags('id', assignmentTypes, 'let', 'do');
+  let whenReference = visit.ancestorTags('id', whenAssigns, 'let', 'do');
 
   return [
     visit.matching(rollUpParens, visit.tags('parens')),
@@ -163,7 +163,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
     visit.nodeStack.forEach(parent => {
       if ( parent instanceof Syntax.Node &&
-           Syntax.hasTag(parent, assignmentTypes) ) {
+           Syntax.hasTag(parent, whenAssigns) ) {
         addDoReference(<Syntax.Assignment>parent, node);
       }
     });

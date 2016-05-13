@@ -1,11 +1,13 @@
 import nodeunit
 
-from test import equalTo
+from test import wrap
 
 let a0 = "parent"
 let b0 = true
 
 def scopeTest(test)
+  let { equalTo } = wrap(test)
+
  	let greeting = "Not Hello"
  	def localGreeting()
  		let greeting = "Local Hello"
@@ -21,6 +23,8 @@ def scopeTest(test)
 end
 
 def nestedScopeTest(test)
+  let { equalTo } = wrap(test)
+
 	let a = 3
 	let b = 4
 	def first()
@@ -42,6 +46,8 @@ def nestedScopeTest(test)
 end
 
 def argumentsScopeTest(test)
+  let { equalTo } = wrap(test)
+
 	let a = 0
 	let b = 0
 	def add(a, b)
@@ -53,6 +59,8 @@ def argumentsScopeTest(test)
 end
 
 def scopeOverrideTest(test)
+  let { equalTo } = wrap(test)
+
 	let b = a0
 	let a0 = "child"
 
@@ -62,6 +70,8 @@ def scopeOverrideTest(test)
 end
 
 def conditionalScopeTest(test)
+  let { equalTo } = wrap(test)
+
 	let c0 = a0
 	if b0
 		let a0 = "child"

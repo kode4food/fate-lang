@@ -1,13 +1,15 @@
 import nodeunit
 
 from pattern import Nothing, Something
-from test import isFalse, isTrue
+from test import wrap
 from value import null, undefined
 
 import '../dist/Types' as types
 import '../dist/Runtime' as runtime
 
 def trueFalse(test)
+  let { isFalse, isTrue } = wrap(test)
+
   types.isTrue(Nothing)           | isFalse
   types.isTrue(Something)         | isTrue
   types.isTrue(null)              | isFalse
@@ -29,6 +31,8 @@ def trueFalse(test)
 end
 
 def somethingNothing(test)
+  let { isFalse, isTrue } = wrap(test)
+
   runtime.isSomething(null)      | isFalse
   runtime.isSomething(undefined) | isFalse
   runtime.isSomething(Something) | isTrue

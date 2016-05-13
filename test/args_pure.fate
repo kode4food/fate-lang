@@ -1,9 +1,11 @@
 import nodeunit
 
-from test import equalTo, deepEqualTo, throws
+from test import wrap
 from pattern import ArrayOf, NonEmptyString
 
 def zeroOrMore(test)
+  let { equalTo, deepEqualTo } = wrap(test)
+
   def func(x, y, z*)
     x | equalTo('hello')
     y | equalTo('world')
@@ -15,6 +17,8 @@ def zeroOrMore(test)
 end
 
 def withPattern(test)
+  let { equalTo, deepEqualTo, throws } = wrap(test)
+
   def func(x, ArrayOf(NonEmptyString) as y*)
     x | equalTo('hello')
     y | deepEqualTo(['this', 'is', 'a', 'test'])

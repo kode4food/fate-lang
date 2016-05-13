@@ -1,8 +1,10 @@
 import nodeunit
 
-from test import equalTo, throws
+from test import wrap
 
 def guardOnly(test)
+  let { equalTo, throws } = wrap(test)
+
   def testFunc(x) where x > 10
     x * 10
   end
@@ -13,6 +15,8 @@ def guardOnly(test)
 end
 
 def guardAndDefault(test)
+  let { equalTo } = wrap(test)
+
   def testFunc(x)
     x * 5
   end
@@ -27,6 +31,8 @@ def guardAndDefault(test)
 end
 
 def anonymousPatternArgument(test)
+  let { equalTo } = wrap(test)
+
   def testFunc(x)
     x * 5
   end
@@ -41,6 +47,8 @@ def anonymousPatternArgument(test)
 end
 
 def noArguments(test)
+  let { equalTo } = wrap(test)
+
   let a = 99
 
   def testFunc

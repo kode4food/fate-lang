@@ -1,8 +1,10 @@
 import nodeunit
 
-from test import equalTo, deepEqualTo
+from test import wrap
 
 def lambdas(test)
+  let { equalTo, deepEqualTo } = wrap(test)
+
   let lambda1 = (x, y -> x + y)
   let lambda2 = (x -> x * 2)
   let lambda3 = (x -> [for y in x where y > 50 select y * 3])
@@ -15,6 +17,8 @@ def lambdas(test)
 end
 
 def rolledUpLoops(test)
+  let { equalTo, deepEqualTo } = wrap(test)
+
   let maybe_filtered = (filtered, values ->
     if filtered
       [for nothing in "ignored"]
@@ -41,6 +45,8 @@ def rolledUpLoops(test)
 end
 
 def fatLambdas(test)
+  let { equalTo } = wrap(test)
+
   let lambda1 = (x, y ->
     let r = x + y
     r * x * y)
@@ -56,6 +62,8 @@ def fatLambdas(test)
 end
 
 def curryTest(test)
+  let { equalTo } = wrap(test)
+
 	let lambda1 = (x, y -> x + y)
 	let curry = lambda1(5, ?)
 	curry(5) | equalTo(10)

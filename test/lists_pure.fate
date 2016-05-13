@@ -4,9 +4,11 @@ import object
 import array
 
 from value import undefined
-from test import equalTo, deepEqualTo, isFalse, isTrue
+from test import wrap
 
 def listBasics(test)
+  let { equalTo, deepEqualTo, isFalse } = wrap(test)
+
   let intList = [10, 20, 30, 50, 51, 75, 90, 100]
   let objectList = {
         "10": "that was ten",
@@ -43,6 +45,8 @@ def listBasics(test)
 end
 
 def arrayBasics(test)
+  let { equalTo } = wrap(test)
+
   let arr = [9,8,'Hello',7,3]
   arr[0] | equalTo(9)
   arr[2] | equalTo('Hello')
@@ -62,6 +66,8 @@ def arrayBasics(test)
 end
 
 def arrayFunctions(test)
+  let { equalTo, deepEqualTo, isFalse, isTrue } = wrap(test)
+
   let thisIsFate = ['this','is','fate']
   let oneTwoThree = [1,2,3]
 
@@ -82,6 +88,8 @@ def arrayFunctions(test)
 end
 
 def objectFunctions(test)
+  let { deepEqualTo } = wrap(test)
+
   let obj = {name:'Reinhard',age:28}
   object.keys(obj) | deepEqualTo(['name', 'age'])
   object.values(obj) | deepEqualTo(['Reinhard', 28])

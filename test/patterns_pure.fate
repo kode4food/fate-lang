@@ -5,10 +5,12 @@ import Array, Object, String, NonEmptyString, EmptyString,
        Boolean, Number, Integer, PositiveInteger, PositiveNumber,
        NegativeInteger, NegativeNumber, ArrayOf, Nothing
 
-from test import isFalse, isTrue, equalTo, throws
+from test import wrap
 from value import null, undefined
 
 def numberPatterns(test)
+  let { isFalse, isTrue } = wrap(test)
+
   "hello" like Number         | isFalse
   "hello" not like Number     | isTrue
   99.6 like Number            | isTrue
@@ -43,6 +45,8 @@ def numberPatterns(test)
 end
 
 def stringPatterns(test)
+  let { isFalse, isTrue } = wrap(test)
+
   "" like String              | isTrue
   "" not like String          | isFalse
   "hello" like String         | isTrue
@@ -61,6 +65,8 @@ def stringPatterns(test)
 end
 
 def booleanPatterns(test)
+  let { isFalse, isTrue } = wrap(test)
+
   true like Boolean    | isTrue
   false like Boolean   | isTrue
   "" like Boolean      | isFalse
@@ -74,6 +80,8 @@ def booleanPatterns(test)
 end
 
 def objectPatterns(test)
+  let { isFalse, isTrue } = wrap(test)
+
   true like Object    | isFalse
   false like Object   | isFalse
   "" like Object      | isFalse
@@ -87,6 +95,8 @@ def objectPatterns(test)
 end
 
 def arrayPatterns(test)
+  let { isFalse, isTrue } = wrap(test)
+
   true like Array    | isFalse
   false like Array   | isFalse
   "" like Array      | isFalse
@@ -120,6 +130,8 @@ def arrayPatterns(test)
 end
 
 def matchExpression(test)
+  let { equalTo, throws } = wrap(test)
+
   let result = match 42
     self > 50  : "over 50"
     self < 40  : "under 40"

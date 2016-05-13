@@ -1,7 +1,7 @@
 import nodeunit
 
 from pattern import Nothing, Something
-from test import isFalse, isTrue, equalTo, throws
+from test import wrap
 from value import null, undefined
 
 let data1 = {
@@ -15,6 +15,8 @@ let data1 = {
 }
 
 def relational(test)
+  let { isFalse, isTrue } = wrap(test)
+
   10 * 99 > 900                  | isTrue
   100 / 5 >= 30                  | isFalse
   99 mod 6 >= 3                  | isTrue
@@ -27,6 +29,8 @@ def relational(test)
 end
 
 def equality(test)
+  let { isFalse, isTrue } = wrap(test)
+
   10 * 99 = 990                  | isTrue
   100 / 5 != 19                  | isTrue
   99 mod 6 = 3                   | isTrue
@@ -46,6 +50,8 @@ let data2 = {
 }
 
 def inEvaluation(test)
+  let { isFalse, isTrue } = wrap(test)
+
   10 in [1,10,30]                    | isTrue
   10 in data2.numbers                | isTrue
   'name' in {age:43, name:'Thom'}    | isTrue
@@ -66,6 +72,8 @@ let data3 = {
 }
 
 def notIn(test)
+  let { isFalse, isTrue } = wrap(test)
+
   10 not in [1,10,30]                    | isFalse
   10 not in data3.numbers                | isFalse
   'name' not in {age:43, name:'Thom'}    | isFalse
@@ -80,6 +88,8 @@ def notIn(test)
 end
 
 def bool(test)
+  let { isFalse, isTrue, equalTo } = wrap(test)
+
   true and false                          | isFalse
   true or false                           | isTrue
   data1.people[0].age * 2 = 100 and 'yep' | equalTo("yep")
@@ -95,6 +105,8 @@ def bool(test)
 end
 
 def unary(test)
+  let { isFalse, isTrue, equalTo } = wrap(test)
+
   let a = "99"
 
   +1                             | equalTo(1)
@@ -110,6 +122,8 @@ def unary(test)
 end
 
 def nothingSomething(test)
+  let { isFalse, isTrue, equalTo } = wrap(test)
+
   true = Nothing            | isFalse
   Nothing != Nothing        | isFalse
   Nothing = Nothing         | isTrue
@@ -162,6 +176,8 @@ def nothingSomething(test)
 end
 
 def conditional(test)
+  let { equalTo } = wrap(test)
+
   let script = (data -> 'cond1' if data.cond1 else
                         'cond2' if data.cond2 else
                         'cond4' unless data.cond3 else
@@ -175,6 +191,8 @@ def conditional(test)
 end
 
 def trailingIfStatement(test)
+  let { equalTo } = wrap(test)
+
   def test1(value)
     return 'cond 1' if value = 99
     return 'cond 2' unless value = 100
@@ -189,6 +207,8 @@ def trailingIfStatement(test)
 end
 
 def ifLetStatement(test)
+  let { equalTo } = wrap(test)
+
   def test1(val1, val2, val3)
     if let a = val1, b = val2, c = val3
       {a, b, c} | "%a-%b-%c"
@@ -217,6 +237,8 @@ def ifLetStatement(test)
 end
 
 def objectLike(test)
+  let { isFalse, isTrue } = wrap(test)
+
   let person = {
     name: "Thom",
     age: 42,
@@ -233,6 +255,8 @@ def objectLike(test)
 end
 
 def arrayLike(test)
+  let { isFalse, isTrue } = wrap(test)
+
   let a = 99, b = 'hello', c = [1, 2, 3]
 
   [1, 2, 3] like [1, 2]    | isTrue
@@ -247,6 +271,8 @@ def arrayLike(test)
 end
 
 def deepPaths(test)
+  let { equalTo, throws } = wrap(test)
+
   let root = [{
     colors: ['red', 'green', 'blue'],
     info: {
@@ -263,6 +289,8 @@ def deepPaths(test)
 end
 
 def regularExpressions(test)
+  let { isFalse, isTrue } = wrap(test)
+
   let pattern1 = /dy$/
   let pattern2 = ~/dy$/
 
@@ -300,6 +328,8 @@ def regularExpressions(test)
 end
 
 def assignments(test)
+  let { equalTo } = wrap(test)
+
   let a = 99
   a | equalTo(99)
 
@@ -313,6 +343,8 @@ def assignments(test)
 end
 
 def nestedMatchers(test)
+  let { isFalse, isTrue } = wrap(test)
+
   let n = Nothing, p = ~(42)
 
   39 like ~(p)      | isFalse

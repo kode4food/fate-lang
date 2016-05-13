@@ -1,7 +1,7 @@
 import nodeunit
 
 from io import timeout
-from test import equalTo, deepEqualTo
+from test import wrap
 
 let data = {
   "name": ["title", "case"],
@@ -13,6 +13,8 @@ let data = {
 }
 
 def leftCalls(test)
+  let { equalTo } = wrap(test)
+
   from string import title
   from array import join
   let formatted = title(join(data.name))
@@ -23,6 +25,8 @@ def leftCalls(test)
 end
 
 def rightCalls(test)
+  let { equalTo } = wrap(test)
+
   from string import title
   from array import join
   let formatted = data.name | join | title
@@ -36,6 +40,8 @@ def rightCalls(test)
 end
 
 def awaitCalls(test)
+  let { equalTo, deepEqualTo } = wrap(test)
+
   let double = (arr -> do: [for a in arr select a * 2])
   let timeouts = (arr -> [for a in arr select timeout(a)])
 
@@ -57,6 +63,8 @@ def awaitCalls(test)
 end
 
 def recursiveCalls(test)
+  let { equalTo } = wrap(test)
+
   def callMe(x)
     if x > 0
       x + ', ' + callMe(x-1)
