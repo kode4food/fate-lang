@@ -1,5 +1,19 @@
 # Change History
 
+## Version 0.6.1 - Awaiting Right Calls
+Three new operators have been introduced at the same level of associativity as the right call (`|`) operator.  They are designed to await the resolution of the left expression before passing it into the function on the right. They are: `.|` (await), `:|` (await all) and `?|` (await any).  Example:
+
+```ruby
+import io
+
+let numbers = [100, 150, 400]
+do
+  # will eventually print '[ 200, 300, 800 ]'
+  numbers | (arr -> [for x in arr select x | io.timeout]) :| (x -> x * 2)
+          | io.print
+end
+```
+
 ## Version 0.6.0 - Global Variables Begone!
 When a Fate compiled module is invoked, the programmer can supply an Object to it that will provide globally available data.  Before version 0.6, the keys in that Object would be resolved simply by retrieving an identifier that had not been explicitly declared.  There were a couple of drawbacks to this approach.  First, you couldn't retrieve keys that didn't match Fate's Identifier naming pattern.  Second, it made debugging a nightmare.
 
