@@ -1,4 +1,4 @@
-from pattern import Array
+from pattern import Array, String
 
 from '../Types' import isArray
 
@@ -11,8 +11,12 @@ export def first(Array as value)
   value[0]
 end
 
-export def join(Array as value, delim)
-  value.join(delim or ' ')
+export def join(Array as value)
+  value.join(' ')
+end
+
+export def join(Array as value, String  as delim)
+  value.join(delim)
 end
 
 export def last(Array as value)

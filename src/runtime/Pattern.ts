@@ -1,6 +1,23 @@
 "use strict";
 
+import { isTrue } from '../Types';
+
 const isArray = Array.isArray;
+
+// Partially borrowed from the ES6 Typings ************************************
+
+interface WeakMap<K, V> {
+  get(key: K): V;
+  set(key: K, value?: V): WeakMap<K, V>;
+}
+
+interface WeakMapConstructor {
+  new <K, V>(): WeakMap<K, V>;
+}
+
+declare var WeakMap: WeakMapConstructor;
+
+// ****************************************************************************
 
 type Matcher = (value: any) => boolean;
 type Matchers = Matcher[];
@@ -17,17 +34,45 @@ export function matchNotExhaustive() {
   throw new Error("Match invocation not exhaustive");
 }
 
-export function definePattern(value: Pattern) {
-  value.__fatePattern = true;
-  return value;
+export function definePattern(pattern: Pattern) {
+  (<Pattern>wrapped).__fatePattern = true;
+  return wrapped;
+
+  function wrapped(value: any): boolean {
+    return isTrue(pattern(value));
+  }
+}
+
+const CachedTrue = "true";
+const CachedFalse = "false";
+
+export function defineCachedPattern(pattern: Pattern) {
+  let cache = new WeakMap<Object, string>();
+  (<Pattern>wrapped).__fatePattern = true;
+  return wrapped;
+
+  function wrapped(value: any): boolean {
+    if ( typeof value !== 'object' || value === null ) {
+      return isTrue(pattern(value));
+    }
+
+    let cached = cache.get(value);
+    if ( cached ) {
+      return cached === CachedTrue;
+    }
+
+    let result = isTrue(pattern(value));
+    cache.set(value, result ? CachedTrue : CachedFalse);
+    return result;
+  }
 }
 
 export function defineRegexPattern(regex: RegExp) {
-  (<Pattern>pattern).__fatePattern = true;
-  (<Pattern>pattern).native = regex;
-  return pattern;
+  (<Pattern>wrapped).__fatePattern = true;
+  (<Pattern>wrapped).native = regex;
+  return wrapped;
 
-  function pattern(value: any) {
+  function wrapped(value: any): boolean {
     return regex.test(value);
   }
 }

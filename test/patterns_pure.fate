@@ -94,6 +94,40 @@ def objectPatterns(test)
   test.done()
 end
 
+def definedPatterns(test)
+  let { isFalse, isTrue } = wrap(test)
+
+  let Color = ~(self in ['red', 'green', 'blue'])
+
+  let Person = ~{
+    firstName: NonEmptyString,
+    lastName: NonEmptyString,
+    age: PositiveInteger,
+    address: NonEmptyString,
+    postalCode: PositiveInteger,
+    colors: ArrayOf(Color)
+  }
+
+  let trueObj = {
+    firstName: 'Bill',
+    lastName: 'Murray',
+    age: 78,
+    address: "123 Main Street",
+    postalCode: 90210,
+    colors: ['red', 'blue']
+  }
+
+  let falseObj = {
+    notWorking: true
+  }
+
+  trueObj like Person  | isTrue
+  falseObj like Person | isFalse
+  trueObj like Person  | isTrue   # still true?
+
+  test.done()
+end
+
 def arrayPatterns(test)
   let { isFalse, isTrue } = wrap(test)
 
@@ -165,6 +199,7 @@ export let tests = nodeunit.testCase({
   "Strings": stringPatterns,
   "Boolean": booleanPatterns,
   "Objects": objectPatterns,
+  "Defined": definedPatterns,
   "Arrays": arrayPatterns,
   "Match": matchExpression
 })

@@ -24,6 +24,7 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(nameSelfPatternAnchors, patternCollection),
     visit.matching(nameAndAnnotateSelfPatterns, selfPattern),
     visit.matching(annotatePatternNode, patternNodes),
+    visit.matching(annotateComplexity, visit.isNode),
     visit.matching(buildPatternGuards, visit.tags('signature'))
   ];
 
@@ -112,6 +113,15 @@ export default function createTreeProcessors(visit: Visitor) {
     }
     /* istanbul ignore next: should be properly matched */
     throw new Error("Stupid Coder: Didn't stop at Pattern Node");
+  }
+
+  function annotateComplexity(node: Syntax.Node) {
+    let anchor = visit.findAncestor('pattern');
+    if ( anchor ) {
+      let complexity = getAnnotation(anchor, 'pattern/complexity') || 0;
+      annotate(anchor, 'pattern/complexity', complexity + 1);
+    }
+    return node;
   }
 
   function buildPatternGuards(node: Syntax.Signature) {

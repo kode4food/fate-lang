@@ -1,7 +1,7 @@
 from '../Types' import isObject, isArray
 
 from '../runtime/Pattern'
-import isPattern, definePattern
+import isPattern, definePattern, defineCachedPattern
 
 export from '../runtime/Pattern'
 import isNothing as Nothing

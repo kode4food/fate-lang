@@ -54,6 +54,17 @@ export default class Visitor {
     return undefined;
   }
 
+  public findAncestor(tag: Syntax.TagOrTags): Syntax.Node {
+    let nodeStack = this.nodeStack;
+    for ( let i = nodeStack.length - 1; i >= 0; i-- ) {
+      let node: Syntax.NodeOrNodes = nodeStack[i];
+      if ( node instanceof Syntax.Node && Syntax.hasTag(node, tag) ) {
+        return node;
+      }
+    }
+    return undefined;
+  }
+
   public nodes(startNode: Syntax.Node|Syntax.Nodes, matcher: NodeMatcher,
                visitor: NodeVisitor, breadthFirst = false) {
     let self = this;
@@ -149,6 +160,10 @@ export default class Visitor {
         group = [];
       }
     }
+  }
+
+  public isNode(node: Syntax.Node) {
+    return node instanceof Syntax.Node;
   }
 
   public tags(tags: Syntax.TagOrTags) {

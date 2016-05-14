@@ -12,6 +12,7 @@ type IdMapping = { id: string, anon: string };
 
 const slice = Array.prototype.slice;
 const likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
+const cachedPatternThreshold = 8;
 
 /*
  * Converts a parse tree into source code (initially JavaScript). Host
@@ -978,7 +979,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
   function createRegex(node: Syntax.Regex) {
     let regex = generate.builder('defineRegexPattern',
-                                generate.literal(node.value));
+                                 generate.literal(node.value));
     generate.write(regex);
   }
 
@@ -996,8 +997,15 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     generate.context();
   }
 
+  function getPatternDefineMethodName(node: Syntax.Pattern) {
+    let complexity = getAnnotation(node, 'pattern/complexity');
+    return complexity > cachedPatternThreshold ? 'defineCachedPattern'
+                                               : 'definePattern';
+  }
+
   function createPatternEvaluator(node: Syntax.Pattern) {
-    let definePattern = generate.runtimeImport('definePattern');
+    let defineName = getPatternDefineMethodName(node);
+    let definePattern = generate.runtimeImport(defineName);
     generate.call(definePattern, [
       () => {
         generate.func({
