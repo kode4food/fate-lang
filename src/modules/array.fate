@@ -15,7 +15,7 @@ export def join(Array as value)
   value.join(' ')
 end
 
-export def join(Array as value, String  as delim)
+export def join(Array as value, String as delim)
   value.join(delim)
 end
 

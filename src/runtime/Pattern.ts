@@ -1,7 +1,5 @@
 "use strict";
 
-import { isTrue } from '../Types';
-
 const isArray = Array.isArray;
 
 // Partially borrowed from the ES6 Typings ************************************
@@ -30,30 +28,51 @@ export interface Pattern {
   native?: RegExp;
 }
 
+export function isPattern(value: any) {
+  return typeof value === 'function' && value.__fatePattern;
+}
+
+export let isNothing: Pattern = definePattern((value: any) =>
+  value === null || value === undefined || value === isNothing
+);
+
+export let isSomething: Pattern = definePattern((value: any) =>
+  value !== null && value !== undefined && value !== isNothing
+);
+
 export function matchNotExhaustive() {
   throw new Error("Match invocation not exhaustive");
 }
 
-export function definePattern(pattern: Pattern) {
-  (<Pattern>wrapped).__fatePattern = true;
+function coerceBooleanResult(pattern: Pattern) {
   return wrapped;
 
   function wrapped(value: any): boolean {
-    return isTrue(pattern(value));
+    let result: any = pattern(value);
+    return result !== false && result !== null &&
+           result !== undefined && result !== 0 &&
+           result !== isNothing;
   }
+}
+
+export function definePattern(pattern: Pattern) {
+  let wrapped = coerceBooleanResult(pattern);
+  (<Pattern>wrapped).__fatePattern = true;
+  return wrapped;
 }
 
 const CachedTrue = "true";
 const CachedFalse = "false";
 
 export function defineCachedPattern(pattern: Pattern) {
+  let wrapped = coerceBooleanResult(pattern);
   let cache = new WeakMap<Object, string>();
-  (<Pattern>wrapped).__fatePattern = true;
-  return wrapped;
+  (<Pattern>caching).__fatePattern = true;
+  return caching;
 
-  function wrapped(value: any): boolean {
+  function caching(value: any): boolean {
     if ( typeof value !== 'object' || value === null ) {
-      return isTrue(pattern(value));
+      return wrapped(value);
     }
 
     let cached = cache.get(value);
@@ -61,7 +80,7 @@ export function defineCachedPattern(pattern: Pattern) {
       return cached === CachedTrue;
     }
 
-    let result = isTrue(pattern(value));
+    let result = wrapped(value);
     cache.set(value, result ? CachedTrue : CachedFalse);
     return result;
   }
@@ -76,18 +95,6 @@ export function defineRegexPattern(regex: RegExp) {
     return regex.test(value);
   }
 }
-
-export function isPattern(value: any) {
-  return typeof value === 'function' && value.__fatePattern;
-}
-
-export let isNothing: Pattern = definePattern((value: any) =>
-  value === null || value === undefined || value === isNothing
-);
-
-export let isSomething: Pattern = definePattern((value: any) =>
-  value !== null && value !== undefined && value !== isNothing
-);
 
 /*
  * Basic dynamic matcher to support the `like` operator.

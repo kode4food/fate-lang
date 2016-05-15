@@ -19,8 +19,11 @@ def relational(test)
 
   10 * 99 > 900                  | isTrue
   100 / 5 >= 30                  | isFalse
+  100 ÷ 5 >= 30                  | isFalse
   99 mod 6 >= 3                  | isTrue
+  99 mod 6 ≥ 3                   | isTrue
   33 * 3 mod 6 <= 2              | isFalse
+  33 • 3 mod 6 ≤ 2               | isFalse
   data1.people[0].age * 2 > 99   | isTrue
   data1.people[0].age / 2 < 24   | isFalse
   100 / data1.people[0].age >= 2 | isTrue
@@ -32,9 +35,13 @@ def equality(test)
   let { isFalse, isTrue } = wrap(test)
 
   10 * 99 = 990                  | isTrue
+  10 • 99 = 990                  | isTrue
   100 / 5 != 19                  | isTrue
+  100 ÷ 5 ≠ 19                   | isTrue
+  100 ÷ 5 = 20                   | isTrue
   99 mod 6 = 3                   | isTrue
   33 * 3 mod 6 != 2              | isTrue
+  33 • 3 mod 6 ≠ 2               | isTrue
   data1.people[0].age * 2 = 99   | isFalse
   data1.people[0].age / 2 != 25  | isFalse
   100 / data1.people[0].age = 2  | isTrue

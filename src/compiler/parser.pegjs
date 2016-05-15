@@ -671,7 +671,7 @@ objectAssignmentSelect
     }
 
 lambda
-  = params:lambdaParams? __ "->" __
+  = params:lambdaParams? __ Arrow __
     stmts:lambdaStatements {
       return node('lambda',
         node('signature', null, params || []),
@@ -927,21 +927,24 @@ IfUnless
   = If
   / Unless
 
-EQ  = "="  { return 'eq'; }
-NEQ = "!=" { return 'neq'; }
-LT  = "<"  { return 'lt'; }
-GT  = ">"  { return 'gt'; }
-LTE = "<=" { return 'lte'; }
-GTE = ">=" { return 'gte'; }
+EQ  = "=" { return 'eq'; }
+LT  = "<" { return 'lt'; }
+GT  = ">" { return 'gt'; }
 
-Add = "+"  { return 'add'; }
-Sub = "-"  { return 'sub'; }
+NEQ = ("!=" / "≠") { return 'neq'; }
+LTE = ("<=" / "≤") { return 'lte'; }
+GTE = (">=" / "≥") { return 'gte'; }
 
-Mul = "*"  { return 'mul'; }
-Div = "/"  { return 'div'; }
+Add = "+" { return 'add'; }
+Sub = "-" { return 'sub'; }
 
-Neg = "-"  { return 'neg'; }
-Pos = "+"  { return 'pos'; }
+Mul = ( "*" / "•" ) { return 'mul'; }
+Div = ( "/" / "÷" ) { return 'div'; }
+
+Neg = "-" { return 'neg'; }
+Pos = "+" { return 'pos'; }
+
+Arrow = ( "->" / "→" )
 
 Equality = Like / NEQ / EQ / NotLike
 Relational = GTE / LTE / LT / GT / In / NotIn
