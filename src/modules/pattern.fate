@@ -23,7 +23,7 @@ export let NonEmptyString = ~(
 export
 let Number = ~isA(self, 'number')
   , PositiveNumber = ~(self > 0 and isA(self, 'number'))
-  , NonNegativeNumber = ~(self >= 0 and isA(self, 'number'))
+  , NonNegativeNumber = ~(self ≥ 0 and isA(self, 'number'))
   , NegativeNumber = ~(self < 0 and isA(self, 'number'))
   , Integer = ~(self mod 1 = 0 and isA(self, 'number'))
 
@@ -32,7 +32,7 @@ export let PositiveInteger = ~(
 )
 
 export let NonNegativeInteger = ~(
-  self >= 0 and self mod 1 = 0 and isA(self, 'number')
+  self ≥ 0 and self mod 1 = 0 and isA(self, 'number')
 )
 
 export let NegativeInteger = ~(
@@ -48,7 +48,7 @@ let Array = definePattern(isArray)
   , Function = ~isA(self, 'function')
 
 export def ArrayOf(elementPattern)
-  let checker = definePattern(value ->
+  let checker = definePattern(value →
     return false unless isArray(value)
     [
       for item in value
@@ -57,13 +57,13 @@ export def ArrayOf(elementPattern)
   )
 
   def decorate(pattern)
-    setProperty(pattern, 'MinLength', minLength -> (value ->
-      return false unless isArray(value) and value.length >= minLength
+    setProperty(pattern, 'MinLength', minLength → (value →
+      return false unless isArray(value) and value.length ≥ minLength
       pattern(value)
     ) | definePattern | decorate)
 
-    setProperty(pattern, 'MaxLength', maxLength -> (value ->
-      return false unless isArray(value) and value.length <= maxLength
+    setProperty(pattern, 'MaxLength', maxLength → (value →
+      return false unless isArray(value) and value.length ≤ maxLength
       pattern(value)
     ) | definePattern | decorate)
 

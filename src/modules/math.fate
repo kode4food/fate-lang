@@ -8,7 +8,7 @@ from pattern import Array, Number, ArrayOf
 
 export from '../generator' import createRangeGenerator as range
 
-let numberSort = (left, right -> left - right)
+let numberSort = (left, right → left - right)
 let NumberArray = ArrayOf(Number).MinLength(1)
 
 export def sum(NumberArray as values)
@@ -18,7 +18,7 @@ export def sum(NumberArray as values)
 end
 
 export def avg(values)
-  sum(values) / values.length
+  sum(values) ÷ values.length
 end
 
 export def max(NumberArray as values)
@@ -28,10 +28,10 @@ end
 export def median(NumberArray as values)
   let temp = values.slice(0).sort(numberSort)
   let len = temp.length
-  return temp[((len + 1) / 2) - 1] if len mod 2 != 0
+  return temp[((len + 1) ÷ 2) - 1] if len mod 2 != 0
 
-  let mid = len / 2
-  (temp[mid - 1] + temp[mid]) / 2
+  let mid = len ÷ 2
+  (temp[mid - 1] + temp[mid]) ÷ 2
 end
 
 export def min(NumberArray as values)
@@ -76,7 +76,7 @@ export let floor = Math.floor | NumberFunc
 export let log = Math.log | NumberFunc
 # `pow(x,y)` returns x raised to the power of y
 export let pow = Math.pow | NumberFunc2
-# `random()` returns a random number (0 <= x < 1)
+# `random()` returns a random number (0 ≤ x < 1)
 export let random = Math.random | NumberFunc
 # `round(value)` rounds up or down to the closest integer
 export let round = Math.round | NumberFunc
