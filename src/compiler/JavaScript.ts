@@ -159,7 +159,7 @@ export function createModule() {
     if ( id ) {
       return id;
     }
-    id = generatedLiterals[canonical] = nextId('l');
+    id = generatedLiterals[canonical] = nextId('lit_');
 
     globalVars.push(`${id}=${canonical}`);
     return id;
@@ -170,7 +170,7 @@ export function createModule() {
     if ( id ) {
       return id;
     }
-    id = generatedImports[funcName] = nextId('r');
+    id = generatedImports[funcName] = nextIdForName(funcName);
     globalVars.push(
       [id, "=r.", funcName].join('')
     );
@@ -184,7 +184,7 @@ export function createModule() {
     if ( id ) {
       return id;
     }
-    id = generatedBuilders[key] = nextId('b');
+    id = generatedBuilders[key] = nextIdForName(funcName);
     globalVars.push(
       `${ id }=${ funcId }(${ literalIds.join(',') })`
     );
@@ -234,6 +234,13 @@ export function createModule() {
     usesScratch = tmpScratch;
   }
 
+  function nextIdForName(name: Name) {
+    if ( typeof name !== 'string' ) {
+      return nextId('_' + name + '$');
+    }
+    return nextId(name + '$');
+  }
+
   function localForWrite(name: Name) {
     if ( isAnonymous(name) ) {
       return names[name][0];
@@ -242,7 +249,7 @@ export function createModule() {
       scopeInfo.firstAccess[name] = FirstAccess.Write;
     }
     let ids = names[name] || (names[name] = []);
-    ids.push(nextId('v'));
+    ids.push(nextIdForName(name));
     return lastItem(ids);
   }
 
@@ -250,7 +257,7 @@ export function createModule() {
     if ( !scopeInfo.firstAccess[name] ) {
       scopeInfo.firstAccess[name] = FirstAccess.Read;
     }
-    let ids = names[name] || (names[name] = [nextId('v')]);
+    let ids = names[name] || (names[name] = [nextIdForName(name)]);
     return lastItem(ids);
   }
 
@@ -291,7 +298,7 @@ export function createModule() {
   }
 
   function createAnonymous() {
-    let id = nextId('h');
+    let id = nextId('anon_');
     let name = ' ' + id;
     names[name] = [id];
     return name;
@@ -536,7 +543,7 @@ export function createModule() {
     });
 
     if ( itemName ) {
-      let wrapper = nextId('i');
+      let wrapper = nextId('iter_');
       write('for(let ', wrapper, ' of ', iteratorContent, '){');
       write('let ', argNames[0], '=', wrapper, '[0],');
       write(argNames[1], '=', wrapper, '[1];');
@@ -644,12 +651,17 @@ export function createModule() {
     });
 
     if ( undefinedVars.length ) {
-      write('let ', undefinedVars.join(','), ';');
+      write('let ', undefinedVars.sort(compareVarNames).join(','), ';');
     }
 
     function isArgument(localName: Name) {
       return argNames.indexOf(localName) !== -1;
     }
+  }
+
+  function compareVarNames(left: string, right: string) {
+    let leftU = left.toUpperCase(), rightU = right.toUpperCase();
+    return leftU < rightU ? -1 : leftU > rightU ? 1 : 0;
   }
 
   function waitFor(resolver: Resolver, expression: BodyEntry) {
