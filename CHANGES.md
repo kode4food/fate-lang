@@ -1,5 +1,18 @@
 # Change History
 
+## Version 0.6.2 - Operator Alternatives
+The following operators can now, alternatively, be represented using more math-friendly symbols.
+
+  | Operator | Alternative | Description              |
+  |:--------:|:-----------:|--------------------------|
+  | <=       | ≤           | Less than or equal to    |
+  | >=       | ≥           | Greater than or equal to |
+  | ->       | →           | Lambda function          |
+  | *        | •           | Multiplication           |
+  | /        | ÷           | Division                 |
+
+Most of the alternatives can be entered using standard key combinations, with the exception of the arrow.  The Fate extension for VSCode now supports snippets for creating lambdas that use the arrow symbol.
+
 ## Version 0.6.1 - Awaiting Right Calls
 Three new operators have been introduced at the same level of associativity as the right call (`|`) operator.  They are designed to await the resolution of the left expression before passing it into the function on the right. They are: `.|` (await), `:|` (await all) and `?|` (await any).  Example:
 
