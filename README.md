@@ -48,7 +48,7 @@ Or, if you're lazy, you can skip the compile and execute steps, and just call `e
 
 ```javascript
 var fate = require('fatejs');
-var resultingLambda = fate.evaluate('x -> x * 100');
+var resultingLambda = fate.evaluate('x → x • 100');
 console.log(resultingLambda(4));
 ```
 

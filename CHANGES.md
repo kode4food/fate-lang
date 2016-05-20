@@ -3,13 +3,13 @@
 ## Version 0.6.2 - Operator Alternatives
 The following operators can now, alternatively, be represented using more math-friendly symbols.
 
-  | Operator | Alternative | Description              |
-  |:--------:|:-----------:|--------------------------|
-  | <=       | ≤           | Less than or equal to    |
-  | >=       | ≥           | Greater than or equal to |
-  | ->       | →           | Lambda function          |
-  | *        | •           | Multiplication           |
-  | /        | ÷           | Division                 |
+| Operator | Alternative | Description              |
+|:--------:|:-----------:|--------------------------|
+| <=       | ≤           | Less than or equal to    |
+| >=       | ≥           | Greater than or equal to |
+| ->       | →           | Lambda function          |
+| *        | •           | Multiplication           |
+| /        | ÷           | Division                 |
 
 Most of the alternatives can be entered using standard key combinations, with the exception of the arrow.  The Fate extension for VSCode now supports snippets for creating lambdas that use the arrow symbol.
 
