@@ -1009,20 +1009,13 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     generate.call(definePattern, [
       () => {
         generate.func({
-          internalArgs: [generate.exportsName],
+          internalArgs: [getAnnotation(node, 'pattern/local')],
           body: patternBody
         });
       }
     ]);
 
     function patternBody() {
-      let localName = getAnnotation(node, 'pattern/local');
-      localName = generate.registerAnonymous(localName);
-
-      generate.statement(() => {
-        generate.assignAnonymous(localName, generate.exportsName);
-      });
-
       generate.returnStatement(() => {
         createPatternTemplate(node.left);
       });
