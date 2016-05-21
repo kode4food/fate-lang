@@ -1,5 +1,8 @@
 # Change History
 
+## Version 0.6.3 - Function and Pattern Composition
+Functions and Patterns can be combined using the `and|` and `or|` operators.  The result of these operators will be a new Function that combines the behaviors of its operands.
+
 ## Version 0.6.2 - Operator Alternatives
 The following operators can now, alternatively, be represented using more math-friendly symbols.
 

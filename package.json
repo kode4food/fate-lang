@@ -2,7 +2,7 @@
   "name": "fatejs",
   "description": "Patterns & Guards & Joins, Oh My!",
   "author": "Thomas S. Bradford",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "license": "MIT",
   "homepage": "http://www.fate-lang.org/",
   "main": "dist/Fate.js",
