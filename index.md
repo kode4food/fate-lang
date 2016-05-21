@@ -131,14 +131,12 @@ let deidentified = {
 ### Patterns and Destructuring
 
 ```ruby
-# More Advanced Patterns
-let Shape = ~(self in ['square', 'circle', 'triangle'])
+# Combining Patterns
+let Shape = ~{ type: self in ['square', 'circle', 'triangle'] },
+    Orange = ~{ colors: 'orange' in self },
+    Large = ~{ size: self > 50 }
 
-let LargeOrangeShape = ~{
-  type: Shape,
-  colors: 'orange' in self,
-  size: self > 50
-}
+let LargeOrangeShape = Large and| Orange and| Shape
 
 # Instead of multiple statements with an 'end', you
 # can just use a colon to evaluate a single statement
@@ -163,6 +161,8 @@ let [ first, second, third ] = numbers
 ### Concurrency Expressions
 
 ```ruby
+from io import print, timeout
+
 # A basic 'do' expression
 let name = do
   'World'
@@ -186,13 +186,12 @@ let eventualResult = do
 end
 
 # Chained and Awaiting Function calls
-import io
 let numbers = [100, 150, 400]
 do
   # will eventually print '[ 200, 300, 800 ]'
-  numbers | (arr -> [for x in arr select x | io.timeout])
+  numbers | (arr -> [for x in arr select x | timeout])
          :| (x -> x * 2)
-          | io.print
+          | print
 end
 ```
 
