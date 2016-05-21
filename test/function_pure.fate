@@ -63,9 +63,17 @@ def noArguments(test)
   test.done()
 end
 
+def badCompose(test)
+  let { throws } = wrap(test)
+  (-> "hello" and| ~{ name: 'Lionel' }) | throws
+  test.done()
+end
+
+
 export let tests = nodeunit.testCase({
   "Functions with Guards Only": guardOnly,
   "Functions with Guard and Default": guardAndDefault,
   "Functions with Anonymous Patterns": anonymousPatternArgument,
-  "Functions with No Arguments": noArguments
+  "Functions with No Arguments": noArguments,
+  "Functions that don't Compose": badCompose
 })

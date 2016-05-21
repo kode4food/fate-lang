@@ -391,8 +391,8 @@ expr
   = rightCall
 
 rightCall
-  = args:conditional
-    calls:( __ op:rightCallOperator __ c:conditional { return [op, c]; } )* {
+  = args:composeOr
+    calls:( __ op:rightCallOperator __ c:composeOr { return [op, c]; } )* {
       if ( !calls || !calls.length ) {
         return args;
       }
@@ -419,6 +419,24 @@ rightCallOperator
   / ":" __ "|" { return Syntax.Resolver.All; }
   / "." __ "|" { return Syntax.Resolver.Value; }
   / "|"        { return null; }
+
+composeOr
+  = head:composeAnd
+    tail:( __ Or __ "|" __ c:composeAnd { return c; } )* {
+      if ( !tail || !tail.length ) {
+        return head;
+      }
+      return node('composeOr', [head].concat(tail));
+    }
+
+composeAnd
+  = head:conditional
+    tail:( __ And __ "|" __ c:conditional { return c; } )* {
+      if ( !tail || !tail.length ) {
+        return head;
+      }
+      return node('composeAnd', [head].concat(tail));
+    }
 
 conditional
   = tval:or _ op:IfUnless __ cond:or __ Else __ fval:conditional {

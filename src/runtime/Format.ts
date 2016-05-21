@@ -4,6 +4,7 @@ type Component = [number, string|number];
 
 interface FormatFunction {
   (data: any | any[]): string;
+  __fate: string;
   __fateIndexes: (string | number)[];
 }
 
@@ -72,6 +73,7 @@ export function buildFormatter(formatStr: string): FormatFunction {
 
   let returnFunction = <FormatFunction>formatFunction;
   returnFunction.toString = toString;
+  returnFunction.__fate = 'format';
   returnFunction.__fateIndexes = requiredIndexes;
   return returnFunction;
 

@@ -170,7 +170,7 @@ export function createModule() {
     if ( id ) {
       return id;
     }
-    id = generatedImports[funcName] = nextIdForName(funcName);
+    id = generatedImports[funcName] = nextId(funcName);
     globalVars.push(
       [id, "=r.", funcName].join('')
     );
@@ -184,7 +184,7 @@ export function createModule() {
     if ( id ) {
       return id;
     }
-    id = generatedBuilders[key] = nextIdForName(funcName);
+    id = generatedBuilders[key] = nextId(funcName);
     globalVars.push(
       `${ id }=${ funcId }(${ literalIds.join(',') })`
     );

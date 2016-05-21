@@ -1,6 +1,13 @@
 "use strict";
 
+import { isTrue, isFalse } from '../Types';
+
 type ArgTemplate = { [index: number]: any };
+
+export interface FateFunction {
+  (...args: any[]): any;
+  __fate?: string;
+}
 
 const slice = Array.prototype.slice;
 
@@ -37,4 +44,42 @@ export function bindFunction(func: Function, args: ArgTemplate) {
     }
     return func.apply(this, funcArgs);
   }
+}
+
+export function composeOr(funcs: FateFunction[]) {
+  let orWrapper: FateFunction = createWrapper(funcs, isTrue);
+  (<FateFunction>orWrapper).__fate = checkComposition(funcs);
+  return orWrapper;
+}
+
+export function composeAnd(funcs: FateFunction[]) {
+  let orWrapper: FateFunction = createWrapper(funcs, isFalse);
+  (<FateFunction>orWrapper).__fate = checkComposition(funcs);
+  return orWrapper;
+}
+
+function checkComposition(funcs: FateFunction[]) {
+  let fateType: string;
+
+  for ( let i = 0; i < funcs.length; i++ ) {
+    let func = funcs[i];
+    if ( typeof func !== 'function' ) {
+      throw new Error("Cannot compose values that are not functions");
+    }
+    fateType = fateType || func.__fate;
+  }
+
+  return fateType;
+}
+
+function createWrapper(funcs: FateFunction[], check: Function) {
+  return function wrapper() {
+    for ( let i = 0; i < funcs.length - 1; i++ ) {
+      let result = funcs[i].apply(null, arguments);
+      if ( check(result) ) {
+        return result;
+      }
+    }
+    return funcs[funcs.length - 1].apply(null, arguments);
+  };
 }

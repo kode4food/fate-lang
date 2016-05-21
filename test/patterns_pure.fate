@@ -163,6 +163,87 @@ def arrayPatterns(test)
   test.done()
 end
 
+def combinedPatterns(test)
+  let { isTrue, isFalse } = wrap(test)
+
+  let Primate = ~{ kingdom: 'Animalia', class: 'Mammalia', order: 'Primate' },
+      Monkey = ~{ infraorder: 'Simiiformes' } and| Primate,
+      Tarsier = ~{ infraorder: 'Tarsiiformes' } and| Primate,
+      MonkeyOrTarsier = Monkey or| Tarsier,
+      FourAsses = ~{ asses: 4 },
+      MonkeyWithFourAsses = Monkey and| FourAsses
+
+  let monkey1 = {
+    kingdom: 'Animalia',
+    class: 'Mammalia',
+    order: 'Primate',
+    infraorder: 'Simiiformes',
+    asses: 1
+  }
+
+  let monkey2 = {
+    kingdom: 'Animalia',
+    class: 'Mammalia',
+    order: 'Primate',
+    infraorder: 'Simiiformes',
+    asses: 4
+  }
+
+  let tarsier1 = {
+    kingdom: 'Animalia',
+    class: 'Mammalia',
+    order: 'Primate',
+    infraorder: 'Tarsiiformes',
+    asses: 1
+  }
+
+  let tarsier2 = {
+    kingdom: 'Animalia',
+    class: 'Mammalia',
+    order: 'Primate',
+    infraorder: 'Tarsiiformes',
+    asses: 4
+  }
+
+  monkey1 like Primate              | isTrue
+  monkey2 like Primate              | isTrue
+  tarsier1 like Primate             | isTrue
+  tarsier2 like Primate             | isTrue
+  "fred" like Primate               | isFalse
+
+  monkey1 like Monkey               | isTrue
+  monkey2 like Monkey               | isTrue
+  tarsier1 like Monkey              | isFalse
+  tarsier2 like Monkey              | isFalse
+  "fred" like Monkey                | isFalse
+
+  monkey1 like Tarsier              | isFalse
+  monkey2 like Tarsier              | isFalse
+  tarsier1 like Tarsier             | isTrue
+  tarsier2 like Tarsier             | isTrue
+  "fred" like Tarsier               | isFalse
+
+  monkey1 like FourAsses            | isFalse
+  monkey2 like FourAsses            | isTrue
+  tarsier1 like FourAsses           | isFalse
+  tarsier2 like FourAsses           | isTrue
+  "fred" like FourAsses             | isFalse
+
+  monkey1 like MonkeyWithFourAsses  | isFalse
+  monkey2 like MonkeyWithFourAsses  | isTrue
+  tarsier1 like MonkeyWithFourAsses | isFalse
+  tarsier2 like MonkeyWithFourAsses | isFalse
+  "fred" like MonkeyWithFourAsses   | isFalse
+
+  monkey1 like MonkeyOrTarsier      | isTrue
+  monkey2 like MonkeyOrTarsier      | isTrue
+  tarsier1 like MonkeyOrTarsier     | isTrue
+  tarsier2 like MonkeyOrTarsier     | isTrue
+  "fred" like MonkeyOrTarsier       | isFalse
+
+  test.done()
+end
+
 def matchExpression(test)
   let { equalTo, throws } = wrap(test)
 
@@ -195,11 +276,12 @@ def matchExpression(test)
 end
 
 export let tests = nodeunit.testCase({
-	"Numbers": numberPatterns,
-  "Strings": stringPatterns,
-  "Boolean": booleanPatterns,
-  "Objects": objectPatterns,
-  "Defined": definedPatterns,
-  "Arrays": arrayPatterns,
-  "Match": matchExpression
+	"Numbers":  numberPatterns,
+  "Strings":  stringPatterns,
+  "Boolean":  booleanPatterns,
+  "Objects":  objectPatterns,
+  "Defined":  definedPatterns,
+  "Arrays":   arrayPatterns,
+  "Combined": combinedPatterns,
+  "Match":    matchExpression
 })

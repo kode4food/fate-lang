@@ -24,12 +24,12 @@ type AnyMap = { [index: string]: any };
 
 export interface Pattern {
   (obj: any): boolean;
-  __fatePattern?: boolean;
+  __fate?: string;
   native?: RegExp;
 }
 
 export function isPattern(value: any) {
-  return typeof value === 'function' && value.__fatePattern;
+  return typeof value === 'function' && value.__fate === 'pattern';
 }
 
 export let isNothing: Pattern = definePattern((value: any) =>
@@ -57,7 +57,7 @@ function coerceBooleanResult(pattern: Pattern) {
 
 export function definePattern(pattern: Pattern) {
   let wrapped = coerceBooleanResult(pattern);
-  (<Pattern>wrapped).__fatePattern = true;
+  (<Pattern>wrapped).__fate = 'pattern';
   return wrapped;
 }
 
@@ -67,7 +67,7 @@ const CachedFalse = "false";
 export function defineCachedPattern(pattern: Pattern) {
   let wrapped = coerceBooleanResult(pattern);
   let cache = new WeakMap<Object, string>();
-  (<Pattern>caching).__fatePattern = true;
+  (<Pattern>caching).__fate = 'pattern';
   return caching;
 
   function caching(value: any): boolean {
@@ -87,7 +87,7 @@ export function defineCachedPattern(pattern: Pattern) {
 }
 
 export function defineRegexPattern(regex: RegExp) {
-  (<Pattern>wrapped).__fatePattern = true;
+  (<Pattern>wrapped).__fate = 'pattern';
   (<Pattern>wrapped).native = regex;
   return wrapped;
 
