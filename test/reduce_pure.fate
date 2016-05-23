@@ -67,8 +67,9 @@ def reduceStatementsInLambda(test)
     end
   )
 
-  sum([1,2,3])   | equalTo(6)
-  multi([1,2,3]) | deepEqualTo([6, 12])
+  [1, 2, 3] | sum   | equalTo(6)
+  [1, 2, 3] | multi | deepEqualTo([6, 12])
+
   test.done()
 end
 
@@ -86,8 +87,8 @@ end
 def reduceExpressionExplicit(test)
   let { equalTo } = wrap(test)
 
-  let result = reduce a = 0 for x in [1,2,3] select a + x
-  reduce b = 0 for x in [4,5,6] select b + x
+  let result = reduce a = 0 for x in [1, 2, 3] select a + x
+  reduce b = 0 for x in [4, 5, 6] select b + x
 
   result | equalTo(6)
   test.done()

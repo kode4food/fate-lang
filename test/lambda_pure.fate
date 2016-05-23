@@ -5,8 +5,8 @@ from test import wrap
 def lambdas(test)
   let { equalTo, deepEqualTo } = wrap(test)
 
-  let lambda1 = (x, y -> x + y)
-  let lambda2 = (x -> x * 2)
+  let lambda1 = (x, y → x + y)
+  let lambda2 = (x → x • 2)
   let lambda3 = (x -> [for y in x where y > 50 select y * 3])
 
   lambda1(70, 80)           | equalTo(150)
