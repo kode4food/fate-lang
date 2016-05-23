@@ -57,7 +57,8 @@ exports.cli = nodeunit.testCase({
       test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(cons.contains("Warnings"));
-      test.ok(cons.contains("will replace the previous definition(s)"));
+      test.ok(cons.contains("unguarded Function 'query' will replace " +
+                            "the previous definition(s)"));
       test.ok(cons.contains("sure you wanted to immediately reassign 'a'?"));
       test.ok(cons.contains("sure you wanted to immediately reassign 'b'?"));
       test.ok(!cons.contains("Failures"));
@@ -73,6 +74,7 @@ exports.cli = nodeunit.testCase({
       test.ok(!cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
       test.ok(cons.contains("Failures"));
+      test.ok(cons.contains("Unexpected 'a'"));
       test.done();
     });
   },
