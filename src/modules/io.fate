@@ -16,7 +16,7 @@ export let streamConsumer = (resolve → stream →
 )
 
 export def timeout(delay)
-  make(Promise, (resolve) →
+  make(Promise, resolve →
     doTimeout(→ resolve(delay), delay)
   )
 end

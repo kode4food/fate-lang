@@ -28,7 +28,7 @@ let RequestOptions = ~{
 }
 
 def request(RequestOptions as options, content)
-  make(Promise, (resolve) →
+  make(Promise, resolve →
     let req = http.request(options, resolve | streamConsumer)
     req.on('error', err → ['', err] | resolve)
     req.write(content) if content like Something

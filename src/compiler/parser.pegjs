@@ -689,8 +689,13 @@ objectAssignmentSelect
     }
 
 lambda
-  = params:lambdaParams? __ Arrow __
-    stmts:lambdaStatements {
+  = "(" __ params:idParamList? __  Arrow __ stmts:lambdaStatements __ ")" {
+      return node('lambda',
+        node('signature', null, params || []),
+        node('statements', stmts)
+      );
+    }
+  / params:lambdaParams? __ Arrow __ stmts:lambdaStatements {
       return node('lambda',
         node('signature', null, params || []),
         node('statements', stmts)
@@ -699,13 +704,11 @@ lambda
   / doExpression
 
 lambdaParams
-  = "(" __ params:idParamList? __ ")" { return params; }
-  / idParamList
-
-lambdaStatements
-  = head:blockStatement
-    tail:( NL s:blockStatement { return s; } )* {
-      return [head].concat(tail);
+  = "(" __ params:idParamList? __ ")" {
+      return params;
+    }
+  / param:idParam {
+      return [param];
     }
 
 idParamList
@@ -717,6 +720,12 @@ idParamList
 idParam
   = id:Identifier cardinality:paramCardinality? {
       return id.template('idParam', id, cardinality);
+    }
+
+lambdaStatements
+  = head:blockStatement
+    tail:( NL s:blockStatement { return s; } )* {
+      return [head].concat(tail);
     }
 
 doExpression
