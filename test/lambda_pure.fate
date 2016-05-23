@@ -5,13 +5,13 @@ from test import wrap
 def lambdas(test)
   let { equalTo, deepEqualTo } = wrap(test)
 
-  let lambda1 = (x, y → x + y)
-  let lambda2 = (x → x • 2)
-  let lambda3 = (x -> [for y in x where y > 50 select y * 3])
+  let lambda1 = x -> [for y in x where y > 50 select y * 3],
+      lambda2 = x → x • 2,
+      lambda3 = (x, y → x + y)
 
-  lambda1(70, 80)           | equalTo(150)
+  lambda1([5, 25, 70, 200]) | deepEqualTo([210, 600])
   lambda2(100) 	            | equalTo(200)
-  lambda3([5, 25, 70, 200]) | deepEqualTo([210, 600])
+  lambda3(70, 80)           | equalTo(150)
 
   test.done()
 end
