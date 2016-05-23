@@ -134,7 +134,7 @@ export default class Visitor {
   // Iterates over a set of statements and presents adjacent groups
   // to the callback function for replacement
   public statementGroups(visitor: StatementsVisitor, matcher: NodeMatcher,
-                         minGroupSize = 2) {
+                         minGroupSize: number) {
     return this.statements(groupProcessor);
 
     function groupProcessor(statements: Syntax.Statement[]) {

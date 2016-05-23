@@ -69,7 +69,6 @@ def badCompose(test)
   test.done()
 end
 
-
 export let tests = nodeunit.testCase({
   "Functions with Guards Only": guardOnly,
   "Functions with Guard and Default": guardAndDefault,

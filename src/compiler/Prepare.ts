@@ -25,7 +25,7 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(annotateWhenReferences, whenReference),
     visit.matching(groupWhenAssignments, visit.tags('do')),
     visit.statementGroups(validateAssignments, visit.tags('let'), 1),
-    visit.statementGroups(warnFunctionShadowing, visit.tags('function'))
+    visit.statements(warnFunctionShadowing)
   ];
 
   function rollUpParens(node: Syntax.Parens) {
@@ -236,23 +236,25 @@ export default function createTreeProcessors(visit: Visitor) {
     ).length !== 0;
   }
 
-  function warnFunctionShadowing(statements: Syntax.FunctionDeclaration[]) {
+  function warnFunctionShadowing(statements: Syntax.Statement[]) {
     let namesSeen: NameSet = {};
     let lastName: string;
 
     statements.forEach(statement => {
-      let signature = statement.signature;
-      let name = signature.id.value;
+      if ( statement instanceof Syntax.FunctionDeclaration ) {
+        let signature = statement.signature;
+        let name = signature.id.value;
 
-      if ( !isGuarded(signature) && namesSeen[name] ) {
-        visit.issueWarning(statement,
-          `The unguarded Function '${name}' will replace ` +
-          `the previous definition(s)`
-        );
+        if ( !isGuarded(signature) && namesSeen[name] ) {
+          visit.issueWarning(statement,
+            `The unguarded Function '${name}' will replace ` +
+            `the previous definition(s)`
+          );
+        }
+
+        namesSeen[name] = true;
+        lastName = name;
       }
-
-      namesSeen[name] = true;
-      lastName = name;
     });
     return statements;
   }
