@@ -57,15 +57,13 @@ export def ArrayOf(elementPattern)
   )
 
   def decorate(pattern)
-    setProperty(pattern, 'MinLength', minLength → (value →
-      return false unless isArray(value) and value.length ≥ minLength
-      pattern(value)
-    ) | definePattern | decorate)
+    setProperty(pattern, 'MinLength', minLength →
+      (pattern and| value → value.length ≥ minLength) | decorate
+    )
 
-    setProperty(pattern, 'MaxLength', maxLength → (value →
-      return false unless isArray(value) and value.length ≤ maxLength
-      pattern(value)
-    ) | definePattern | decorate)
+    setProperty(pattern, 'MaxLength', maxLength →
+      (pattern and| value → value.length ≤ maxLength) | decorate
+    )
 
     pattern
   end
