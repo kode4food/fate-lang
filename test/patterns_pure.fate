@@ -160,6 +160,14 @@ def arrayPatterns(test)
   [] like BadArray     | isTrue
   'hi' like BadArray   | isFalse
 
+  let limitedArray = ArrayOf(Integer).MinLength(1).MaxLength(5)
+
+  []                 like limitedArray | isFalse
+  [1, 2, 3]          like limitedArray | isTrue
+  [1, 2, 3, 4, 5]    like limitedArray | isTrue
+  [1, 2, 3, 4, 5, 6] like limitedArray | isFalse
+  [1, 2, 3, 4.4, 5]  like limitedArray | isFalse
+
   test.done()
 end
 
