@@ -1,5 +1,8 @@
 # Change History
 
+## Version 0.6.4 - Lambda Parsing Clarified
+Lambdas with multiple arguments now require parentheses either around the arguments or around the entire lambda.  Lambdas with a single argument no longer require parentheses around the argument.
+
 ## Version 0.6.3 - Function and Pattern Composition
 Functions and Patterns can be combined using the `and|` and `or|` operators.  The result of these operators will be a new Function that combines the behaviors of its operands.
 
