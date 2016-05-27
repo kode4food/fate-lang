@@ -1,6 +1,7 @@
 from pattern import Something, String
 
-export from '../runtime/Format' import buildFormatter as build
+export from '../runtime/Format'
+import buildFormatter as build
 
 # Warning: this module assumes JavaScript-specific methods
 #

@@ -1,6 +1,6 @@
 from 'node:welsh' import Promise
 
-from './support' import make, mutable, timeout as doTimeout
+from './support' import make, timeout as doTimeout
 
 export from './support' import print
 
@@ -9,10 +9,14 @@ export from './support' import print
 #   The Welsh promise module
 
 export let streamConsumer = (resolve → stream →
-  let content = mutable('') # oh, no, a mutable!
-  stream.on('data',  data → content.value + data | content.set)
-        .on('end',        → [content.value]      | resolve)
-        .on('error', err  → [content.value, err] | resolve)
+  def waitOn(stream, content)
+    stream.removeAllListeners()
+    stream.on('data',  data → waitOn(stream, content + data))
+          .on('end',        → [content]      | resolve)
+          .on('error', err  → [content, err] | resolve)
+  end
+
+  waitOn(stream, '')
 )
 
 export def timeout(delay)

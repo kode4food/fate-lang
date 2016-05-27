@@ -28,22 +28,8 @@ function print() {
   console.log.apply(console, arguments);
 }
 
-function mutable(value: any) {
-  let result = {
-    value: value,
-    set: setMutable
-  };
-
-  return result;
-
-  function setMutable(newValue: any) {
-    result.value = newValue;
-    return newValue;
-  }
-}
-
 export {
   math as Math, object as Object, string as String,
   number as Number, timeout, make, isA, setProperty,
-  print, mutable, Undefined as undefined, Null as null
+  print, Undefined as undefined, Null as null
 };
