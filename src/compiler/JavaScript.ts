@@ -5,6 +5,8 @@ import { GeneratedCode } from './Compiler';
 import { Resolver } from './Syntax';
 
 const jsonStringify = JSON.stringify;
+const jsStringIdRegex = /^(["'])([$_a-zA-Z][$_a-zA-Z0-9]*)\1$/;
+const anonIdRegex = /^ anon_[a-zA-Z0-9]+$/;
 
 type StringMap = { [index: string]: string };
 
@@ -279,7 +281,16 @@ export function createModule() {
   }
 
   function member(object: BodyEntry, property: BodyEntry) {
-    write(object, '[', property, ']');
+    write(object, () => {
+      let propertyCode = code(property);
+      let idMatch = jsStringIdRegex.exec(propertyCode);
+      if ( idMatch ) {
+        write('.', idMatch[2]);
+      }
+      else {
+        write('[', propertyCode, ']');
+      }
+    });
   }
 
   function retrieveAnonymous(name: Name) {
@@ -305,7 +316,7 @@ export function createModule() {
   }
 
   function isAnonymous(name: Name) {
-    return (/ [a-z][0-9]*/).test(name);
+    return anonIdRegex.test(name);
   }
 
   function assignResult(value: BodyEntry) {
@@ -763,10 +774,6 @@ export function createModule() {
   }
 
   function code(value?: BodyEntry|BodyEntries): string {
-    if ( value === undefined ) {
-      return code(body);
-    }
-
     if ( typeof value === 'function' ) {
       pushWriter();
       (<Function>value)();
@@ -784,7 +791,7 @@ export function createModule() {
     let buffer: string[] = [];
 
     // can't know all globals until body content is generated
-    let bodyContent = code();
+    let bodyContent = code(body);
 
     if ( globalVars.length ) {
       buffer.push(`const ${ globalVars.join(',') };`);
