@@ -14,7 +14,7 @@ When it comes to decoupled systems, particularly those types of systems that are
 
 * Dynamic languages can generally proceed with the duck typing approach, but validation still has to take place in order to maintain the integrity of the system, meaning that the programmer must perform quite a bit of extra work in traversals and checks.  But programmers are lazy.  In this respect, many dynamic languages would prefer a more static approach to dealing with data on the wire.
 
-## Enter Fate
+## Enter Patterns
 So the goal of Fate's design is to take the benefits of a dynamic, functional language, and extend them with a terse but powerful pattern system that can be leveraged to both validate and route arbitrary JSON graphs through a system.  Complementing this is a rather elegant concurrency model.
 
 As an example, let's create a pattern:
@@ -136,7 +136,7 @@ end
 
 This example is leveraging the function combination operator `and|` to generate a new pattern that combines the `Duck` and `Person` patterns into a new one.
 
-## Putting it together
+## Pulling it all together
 Now let's introduce one of our concurrency features to contextualize what we've just learned.
 
 ```ruby
