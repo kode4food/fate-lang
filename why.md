@@ -40,11 +40,11 @@ end
 The function `inTheForest` takes one parameter named `duck`.  That parameter has a pattern attached to it.  What's important to understand here is that even though it *looks* like a static type annotation, it isn't.  What Fate will do with this is generate guard code for the function's prologue that will like something like this:
 
 ```javascript
-function Duck(value) {
+let Duck = definePattern(function (value) {
   return isObject(value) && 
          /.+/.test(value.quack) && 
          /.+/.test(value.feathers); 
-}
+});
 
 function inTheForest$0(duck) {
   if ( !Duck(duck) ) {
@@ -103,11 +103,11 @@ end
 Now both Ducks and Persons can be handled.  The generated code will look something like this:
 
 ```javascript
-function Person(value) {
+let Person = definePattern(function (value) {
   return isObject(value) && 
          /.+/.test(value.quack) && 
          /.+/.test(value.skin); 
-}
+});
 
 function inTheForest$1(person) {
   if ( !Person(person) ) {
