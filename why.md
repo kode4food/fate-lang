@@ -2,7 +2,7 @@
 layout: fate_title
 title: Why Did I Design The Fate?
 ---
-The thing about statically typed languages is that one class of error, type mismatch, is eliminated during the compilation step.  That is, unless you're using some sort of IoC mechanism, and if you're programming in Java, you probably are.  But in any case, data structures being passed internally around a statically typed language can generally be assumed safe --- until they can't be.
+The thing about statically typed languages is that one class of error, type mismatch, is eliminated during the compilation step.  That is, unless you're using some sort of IoC mechanism, which is more than happy to reintroduce those errors at Runtime.  But in any case, data structures being passed internally around a statically typed language can generally be assumed safe --- until they can't be.
 
 Dynamic languages are a different ball of wax.  You can't catch type mismatches at the compile step, because there generally isn't one.  But you don't program dynamic languages the same way that you would a statically typed language.  'Duck typing' is the typical way to look at data structures in a dynamic language.  Meaning, if it looks like a duck, swims like a duck, and quacks like a duck, then it probably is a duck --- unless it's not.
 
