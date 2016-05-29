@@ -86,7 +86,7 @@ let fred = {
 inTheForest(fred)
 ```
 
-Well, then your program will explode.  With "Error: Function invocation not exhaustive" because no version of inTheForest can handle non-Ducks.  You can correct this though:
+Well, then your program will explode with "Error: Function invocation not exhaustive" because no version of `inTheForest()` can handle non-Ducks.  You can correct this though:
 
 ```ruby
 let Person = ~{
@@ -100,4 +100,12 @@ def inTheForest(Person as person)
 end
 ```
 
-Now both Ducks and Persons can be handled.
+Now both Ducks and Persons can be handled.  You can even write a function that will handle Wereducks.
+
+```ruby
+let Wereduck = Duck and| Person
+
+def inTheForest(Wereduck as scary)
+  "the moon is full, beware the Wereduck" | print
+end
+```
