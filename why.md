@@ -24,7 +24,7 @@ let Duck = ~{
 }
 ```
 
-Defining a pattern is a simple as using the tilde (`~`) operator before an expression.  In this case we're compiling a pattern out of an object literal.  The regular expressions are requiring that `quack` and `feathers` are non-empty strings, though there are is also a predefined pattern called `NonEmptyString` that does the same thing.
+Defining a pattern is simple as using the tilde (`~`) operator before an expression.  In this case we're compiling a pattern out of an object literal.  The regular expressions are requiring that `quack` and `feathers` are non-empty strings, though there is also a predefined pattern called `NonEmptyString` that does the same thing.
 
 Now let's create a function that applies that pattern:
 
@@ -46,7 +46,7 @@ function Duck(value) {
          /.+/.test(value.feathers); 
 }
 
-function inTheForest(duck) {
+function inTheForest$0(duck) {
   if ( !Duck(duck) ) {
     return notExhaustive.apply(null, arguments);
   }
@@ -100,7 +100,25 @@ def inTheForest(Person as person)
 end
 ```
 
-Now both Ducks and Persons can be handled.  You can even write a function that will handle Wereducks.
+Now both Ducks and Persons can be handled.  The generated code will look something like this:
+
+```javascript
+function Person(value) {
+  return isObject(value) && 
+         /.+/.test(value.quack) && 
+         /.+/.test(value.skin); 
+}
+
+function inTheForest$1(person) {
+  if ( !Person(person) ) {
+    return inTheForest$0.apply(null, arguments);
+  }
+  print(person.quack);
+  print(person.skin);
+}
+```
+
+You can even write a function that will handle Wereducks.
 
 ```ruby
 let Wereduck = Duck and| Person
@@ -109,3 +127,5 @@ def inTheForest(Wereduck as scary)
   "the moon is full, beware the Wereduck" | print
 end
 ```
+
+This example is leveraging the function combination operator `and|` to generate a new pattern that combines the `Duck` and `Person` patterns into a new one.
