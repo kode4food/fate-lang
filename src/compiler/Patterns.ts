@@ -4,10 +4,23 @@ import Visitor from './Visitor';
 import * as Syntax from './Syntax';
 import { annotate, getAnnotation, hasAnnotation } from './Annotations';
 
+interface NumberMap {
+  [index: string]: number;
+}
+
 const hasTag = Syntax.hasTag;
 const selfPatternLocal = 'p';
 
 const patternNodeParent = ['index', 'objectAssignment', 'object', 'array'];
+
+const patternNodeComplexity: NumberMap = {
+  'match': 5,
+  'object': 4,
+  'array': 4,
+  'call': 3,
+  'regex': 2,
+  'like': 2
+};
 
 export default function createTreeProcessors(visit: Visitor) {
   let selfPatternNumbering = 0;
@@ -119,7 +132,8 @@ export default function createTreeProcessors(visit: Visitor) {
     let anchor = visit.findAncestor('pattern');
     if ( anchor ) {
       let complexity = getAnnotation(anchor, 'pattern/complexity') || 0;
-      annotate(anchor, 'pattern/complexity', complexity + 1);
+      let delta = patternNodeComplexity[node.tag] || 1;
+      annotate(anchor, 'pattern/complexity', complexity + delta);
     }
     return node;
   }

@@ -9,14 +9,14 @@ export from './support' import print
 #   The Welsh promise module
 
 export let streamConsumer = (resolve → stream →
-  def waitOn(stream, content)
+  def waitFor(stream, content)
     stream.removeAllListeners()
-    stream.on('data',  data → waitOn(stream, content + data))
+    stream.on('data',  data → waitFor(stream, content + data))
           .on('end',        → [content]      | resolve)
           .on('error', err  → [content, err] | resolve)
   end
 
-  waitOn(stream, '')
+  waitFor(stream, '')
 )
 
 export def timeout(delay)
