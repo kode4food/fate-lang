@@ -1,0 +1,3 @@
+from './support' import JSON
+
+export let parse = JSON.parse, stringify = JSON.stringify

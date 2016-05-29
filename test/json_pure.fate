@@ -1,0 +1,29 @@
+import nodeunit
+import json
+
+from test import wrap
+
+def parse(test)
+  let { deepEqualTo } = wrap(test)
+
+  let arrStr = "[1,2,3]"
+  arrStr | json.parse | deepEqualTo([1, 2, 3])
+
+  test.done()
+end
+
+def stringify(test)
+  let { equalTo } = wrap(test)
+
+  let arr = [1, 2, 3]
+  arr | json.stringify | equalTo("[1,2,3]")
+
+  test.done()
+end
+
+export let tests = nodeunit.testCase({
+  "Parsing": parse,
+  "Stringification": stringify
+})
+
+export tests

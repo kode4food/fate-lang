@@ -5,6 +5,7 @@ const object = Object;
 const string = String;
 const number = Number;
 const timeout = setTimeout;
+const json = JSON;
 
 const Undefined: any = undefined;
 const Null: any = null;
@@ -29,7 +30,7 @@ function print() {
 }
 
 export {
-  math as Math, object as Object, string as String,
-  number as Number, timeout, make, isA, setProperty,
-  print, Undefined as undefined, Null as null
+  math as Math, object as Object, string as String, number as Number,
+  json as JSON, timeout, make, isA, setProperty, print,
+  Undefined as undefined, Null as null
 };

@@ -11,6 +11,7 @@ exports["Pure Fate 'Do' Blocks"] = require('./do_pure').tests;
 exports["Pure Fate Functions"] = require('./function_pure').tests;
 exports["Pure Fate Imports"] = require('./import_pure').tests;
 exports["Pure Fate Exports"] = require('./export_pure').tests;
+exports["Pure Fate JSON"] = require('./json_pure').tests;
 exports["Pure Fate Lambdas"] = require('./lambda_pure').tests;
 exports["Pure Fate Assignment"] = require('./assign_pure').tests;
 exports["Pure Fate Scopes"] = require('./scope_pure').tests;
