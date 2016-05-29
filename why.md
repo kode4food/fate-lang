@@ -55,7 +55,9 @@ function inTheForest$0(duck) {
 }
 ```
 
-    *Note* that Fate compiles down to Static Single Assignment (SSA) Form, so the identifiers in generated code will always have a `$<n>` suffix that uniquely identifies them.  This means that if you re-assign a variable, the original version(s) will not be mutated.
+It's important to note:
+
+    Fate compiles down to Static Single Assignment (SSA) Form, so the identifiers in generated code will always have a `$<n>` suffix that uniquely identifies them.  This means that if you re-assign a variable, the original version(s) will not be mutated.
 
 Of course, that was a rather simple case, but you can probably see where this is going.  One thing to note is that `notExhaustive()` is the function that is called if your pattern-guarded function is *not* augmenting an existing function by that name.
 
