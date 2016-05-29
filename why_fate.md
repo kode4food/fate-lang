@@ -16,7 +16,7 @@ When it comes to decoupled systems, particularly those types of systems that are
 * Dynamic languages can generally proceed with the duck typing approach, but validation still has to take place in order to maintain the integrity of the system, meaning that the programmer must perform quite a bit of extra work in traversals and checks.  But programmers are lazy.  In this respect, many dynamic languages would prefer a more static approach to dealing with data on the wire.
 
 ## Enter Patterns
-So the goal of Fate's design is to take the benefits of a dynamic, functional language, and extend them with a terse but powerful pattern system that can be leveraged to both validate and route arbitrary JSON graphs through a system.  Complementing this is a rather elegant concurrency model.
+So the goal of [Fate](http://www.fate-lang.org)'s design is to take the benefits of a dynamic, functional language, and extend them with a terse but powerful pattern system that can be leveraged to both validate and route arbitrary JSON graphs through a system.  Complementing this is a rather elegant concurrency model.
 
 As an example, let's create a pattern:
 
@@ -57,10 +57,6 @@ function inTheForest$0(duck) {
   print(duck.feathers);
 }
 ```
-
-It's important to note:
-
-    Fate compiles down to Static Single Assignment (SSA) Form, so the identifiers in generated code will always have a '$<n>' suffix that uniquely identifies them.  This means that if you re-assign a variable, the original version(s) will not be mutated.
 
 Of course, that was a rather simple case, but you can probably see where this is going.  In the generated code, `notExhaustive()` is the internal function that is called if your guard-criteria is not met and your function is *not* augmenting an existing function by that name.
 
@@ -149,3 +145,8 @@ end
 ```
 
 `do` kicks off an asynchronous block.  The code within that block will be performed when the assignments for the block have finally been resolved, specifically the result of the `http.get` request.  It is at that point when the content of the result will be piped through the JSON parser and finally into our `inTheForest()` function, where the proper variant of the function is executed depending on the JSON content.
+
+## Static Single Assignment Form
+One thing you'll notice about the generated code above is that there are names that end with `$0` and `$1`.  The reason for this is that Fate compiles down to something called [Static Single Assignment (SSA) Form](https://en.wikipedia.org/wiki/Static_single_assignment_form).
+
+As a result, the identifiers in generated code will always have a '$<n>' suffix that uniquely isolates them within their module.  This means that if you re-assign a variable, the original version(s) will not be mutated, making Fate a language that is inherently resistant to side-effects.
