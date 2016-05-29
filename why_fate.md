@@ -27,7 +27,7 @@ let Duck = ~{
 }
 ```
 
-Defining a pattern is simple as using the tilde (`~`) operator before an expression.  In this case we're compiling a pattern out of an object literal.  The regular expressions are requiring that `quack` and `feathers` are non-empty strings, though there is also a predefined pattern called `NonEmptyString` that does the same thing.
+Defining a pattern is as simple as using the tilde (`~`) operator before an expression.  In this case we're compiling a pattern out of an object literal.  The regular expressions are requiring that `quack` and `feathers` are non-empty strings, though there is also a predefined pattern called `NonEmptyString` that does the same thing.
 
 Now let's create a function that applies that pattern:
 
