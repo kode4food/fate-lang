@@ -11,7 +11,7 @@ Dynamic languages are a different ball of wax.  You can't catch type mismatches 
 
 When it comes to decoupled systems, particularly those types of systems that are passing JSON around, both programming approaches have failings:
 
-* Statically typed languages will still need to perform quite a bit of work mapping between arbitrary JSON structures and statically typed classes, otherwise the programmer will have to jump through major hoops in order to extract and massage the data from the JSON graph into their own system.  In this respect, many statically typed languages would prefer a more dynamic approach to dealing with data on the wire.
+* Statically typed languages will still need to perform quite a bit of work to map between arbitrary JSON structures and statically typed classes.  Otherwise the programmer has to jump through major hoops in order to extract and massage the data from the JSON graph into their own system.  In this respect, many statically typed languages would prefer a more dynamic approach to dealing with data on the wire.
 
 * Dynamic languages can generally proceed with the duck typing approach, but validation still has to take place in order to maintain the integrity of the system, meaning that the programmer must perform quite a bit of extra work in traversals and checks.  But programmers are lazy.  In this respect, many dynamic languages would prefer a more static approach to dealing with data on the wire.
 
@@ -62,7 +62,7 @@ It's important to note:
 
     Fate compiles down to Static Single Assignment (SSA) Form, so the identifiers in generated code will always have a '$<n>' suffix that uniquely identifies them.  This means that if you re-assign a variable, the original version(s) will not be mutated.
 
-Of course, that was a rather simple case, but you can probably see where this is going.  In the generated code, `notExhaustive()` is the function that is called if your guard-criteria is not met and your function is *not* augmenting an existing function by that name.
+Of course, that was a rather simple case, but you can probably see where this is going.  In the generated code, `notExhaustive()` is the internal function that is called if your guard-criteria is not met and your function is *not* augmenting an existing function by that name.
 
 So now, if you call `inTheForest()`:
 
@@ -93,7 +93,7 @@ let fred = {
 inTheForest(fred)
 ```
 
-Well, then your program will explode with "Error: Function invocation not exhaustive" because no version of `inTheForest()` can handle non-Ducks.  You can correct this though:
+In this case your program will explode with "Error: Function invocation not exhaustive" because no version of `inTheForest()` can handle non-Ducks.  You can correct this though:
 
 ```ruby
 let Person = ~{
