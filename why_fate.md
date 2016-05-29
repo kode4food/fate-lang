@@ -39,7 +39,7 @@ def inTheForest(Duck as duck)
 end
 ```
 
-The function `inTheForest` takes one parameter named `duck`.  That parameter has a pattern attached to it.  What's important to understand here is that even though it *looks* like a static type annotation, it isn't.  What Fate will do with this is generate guard code for the function's prologue that will like something like this:
+The function `inTheForest()` takes one parameter named `duck`.  That parameter has a pattern attached to it.  What's important to understand here is that even though it *looks* like a static type annotation, it isn't.  What Fate will do with this is generate guard code for the function's prologue that will like something like this:
 
 ```javascript
 let Duck = definePattern(function (value) {
@@ -146,3 +146,5 @@ do when [content, err] = http.get('http://localhost:8000/ducks/1')
   content | json.parse | inTheForest
 end
 ```
+
+`do` kicks off an asynchronous block.  The code within that block will be performed when the assignments for the block have finally been resolved.  Specifically, the result of the `http.get` request.  It is at this point when the content of the result is piped through the JSON parser and finally into our `inTheForest()` function, where the proper variant of the function is executed depending on the JSON content.
