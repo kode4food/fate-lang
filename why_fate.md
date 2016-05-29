@@ -135,3 +135,14 @@ end
 ```
 
 This example is leveraging the function combination operator `and|` to generate a new pattern that combines the `Duck` and `Person` patterns into a new one.
+
+## Putting it together
+Now let's introduce one of our concurrency features to contextualize what we've just learned.
+
+```ruby
+import http, json
+
+do when [content, err] = http.get('http://localhost:8000/ducks/1')
+  content | json.parse | inTheForest
+end
+```
