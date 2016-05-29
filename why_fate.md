@@ -32,11 +32,11 @@ Defining a pattern is simple as using the tilde (`~`) operator before an express
 Now let's create a function that applies that pattern:
 
 ```ruby
-from io import print
+import io
 
 def inTheForest(Duck as duck)
-  duck.quack | print
-  duck.feathers | print
+  duck.quack | io.print
+  duck.feathers | io.print
 end
 ```
 
@@ -53,8 +53,8 @@ function inTheForest$0(duck) {
   if ( !Duck(duck) ) {
     return notExhaustive.apply(null, arguments);
   }
-  print(duck.quack);
-  print(duck.feathers);
+  io.print(duck.quack);
+  io.print(duck.feathers);
 }
 ```
 
@@ -98,8 +98,8 @@ let Person = ~{
 }
 
 def inTheForest(Person as person)
-  person.quack | print
-  person.skin | print
+  person.quack | io.print
+  person.skin | io.print
 end
 ```
 
@@ -116,8 +116,8 @@ function inTheForest$1(person) {
   if ( !Person(person) ) {
     return inTheForest$0.apply(null, arguments);
   }
-  print(person.quack);
-  print(person.skin);
+  io.print(person.quack);
+  io.print(person.skin);
 }
 ```
 
@@ -127,7 +127,7 @@ You can even write a function that will handle Wereducks.
 let Wereduck = Duck and| Person
 
 def inTheForest(Wereduck as scary)
-  "the moon is full, beware the Wereduck" | print
+  "the moon is full, beware the Wereduck" | io.print
 end
 ```
 
