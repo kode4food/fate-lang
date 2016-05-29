@@ -1,6 +1,6 @@
 ---
 layout: fate_title
-title: Why Did I Design The Fate?
+title: Why Did I Design Fate?
 ---
 The thing about statically typed languages is that one class of error, type mismatch, is eliminated during the compilation step.  That is, unless you're using some sort of IoC mechanism, which is more than happy to reintroduce those errors at Runtime.  But in any case, data structures being passed internally around a statically typed language can generally be assumed safe --- until they can't be.
 
