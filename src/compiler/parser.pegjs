@@ -494,10 +494,66 @@ awaitModifier
   / _ All { return Syntax.Resolver.All; }
 
 pattern
-  = "~" _ expr:unary {
+  = "~" _ expr:patternExpression {
       return expr.template('pattern', expr);
     }
   / match
+
+patternExpression
+  = nestedPattern
+  / unary
+
+nestedPattern
+  = objectPattern
+  / arrayPattern
+
+objectPattern
+  = "{" __ elems:objectPatternItems __ "}" {
+      return node('objectPattern', elems || []);
+    }
+  / "{" __ "}" {
+      return node('objectPattern', []);
+    }
+
+objectPatternItems
+  = head:objectPatternItem
+    tail:( LIST_SEP e:objectPatternItem { return e; })*  {
+      return [head].concat(tail)
+    }
+
+objectPatternItem
+  = nestedPattern
+  / objectPatternAssignment
+  / expr
+
+objectPatternAssignment
+  = name:Name PROP_SEP value:patternValue {
+      return node('patternElement', literalName(name), value);
+    }
+  / name:expr PROP_SEP value:patternValue {
+      return node('patternElement', name, value);
+    }
+
+patternValue
+  = nestedPattern
+  / expr
+
+arrayPattern
+  = "[" __ elems:arrayPatternElements? __ "]" {
+      return node('arrayPattern', elems);
+    }
+  / "[" __ "]" {
+      return node('arrayPattern', []);
+    }
+
+arrayPatternElements
+  = head:patternValue
+    tail:( LIST_SEP e:patternValue { return e; })*  {
+      return [head].concat(tail).map(function (element, idx) {
+        let indexNode = element.template('literal', idx);
+        return node('patternElement', indexNode, element);
+      });
+    }
 
 match
   = op:Match value:matchValue matches:matchClauses
@@ -664,12 +720,7 @@ objectAssignment
       return node('objectAssignment', name, value);
     }
   / name:Name {
-      var nameValue = literalName(name);
-      if ( name.value === 'self' ) {
-        return node('objectAssignment', nameValue, name.template('self'));
-      }
-      return node('objectAssignment', nameValue, name);
-
+      return node('objectAssignment', literalName(name), name);
     }
   / name:expr {
       return node('objectAssignment', name, name);

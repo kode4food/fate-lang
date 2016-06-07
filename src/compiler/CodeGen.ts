@@ -79,7 +79,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'regex': createRegex,
     'self': createSelfEvaluator,
     'global': createGlobalEvaluator,
-    'pattern': createPatternEvaluator
+    'pattern': createPatternEvaluator,
+    'objectPattern': createNestedPatternEvaluator,
+    'arrayPattern': createNestedPatternEvaluator
   };
 
   let AssignmentEvaluators: FunctionMap = {
@@ -959,18 +961,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createArrayEvaluator(node: Syntax.ArrayConstructor) {
-    if ( hasAnnotation(node, 'pattern/node') ) {
-      createPatternTemplate(node);
-      return;
-    }
     generate.array(node.elements.map(defer));
   }
 
   function createObjectEvaluator(node: Syntax.ObjectConstructor) {
-    if ( hasAnnotation(node, 'pattern/node') ) {
-      createPatternTemplate(node);
-      return;
-    }
     let elems = node.elements.map(elem => {
       let name: BodyEntry;
       if ( elem.id instanceof Syntax.Literal ) {
@@ -1040,15 +1034,15 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
   function createPatternTemplate(node: Syntax.Node) {
     switch ( node.tag ) {
-      case 'object':
-      case 'array':
-        createPatternElements(<Syntax.ElementsConstructor>node);
+      case 'objectPattern':
+      case 'arrayPattern':
+        createNestedPatternEvaluator(<Syntax.CollectionPattern>node);
         break;
       case 'self':
         generate.write(generate.literal(true));
         break;
       default:
-        if ( canGenerateEquality(node) ) {
+        if ( hasAnnotation(node, 'pattern/equality') ) {
           createLikeComparison(
             () => {
               let localName = getAnnotation(node, 'pattern/local');
@@ -1063,17 +1057,11 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     }
   }
 
-  function canGenerateEquality(elementValue: Syntax.Node) {
-    return !hasAnnotation(elementValue, 'pattern/self') &&
-           !(elementValue instanceof Syntax.RelationalOperator) &&
-           !(elementValue instanceof Syntax.ElementsConstructor);
-  }
-
-  function createPatternElements(node: Syntax.ElementsConstructor) {
-    let parentLocal = getAnnotation(node, 'pattern/local');
+  function createNestedPatternEvaluator(node: Syntax.CollectionPattern) {
+    let parentLocal = getAnnotation(node, 'pattern/parent');
     parentLocal = generate.registerAnonymous(parentLocal);
 
-    let isObject = node.tag === 'object';
+    let isObject = node instanceof Syntax.ObjectPattern;
     let containerCheckName = isObject ? 'isObject' : 'isArray';
 
     let expressions: Function[] = [];
@@ -1084,30 +1072,22 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       }]);
     });
 
-    if ( isObject ) {
-      node.elements.forEach((assign: Syntax.ObjectAssignment) => {
-        pushElement(assign, assign.value, defer(assign.id));
-      });
-    }
-    else {
-      node.elements.forEach((expr, idx) => {
-        pushElement(expr, expr, generate.literal(idx));
-      });
-    }
+    node.elements.forEach(pushElement);
     generate.writeAndGroup(expressions);
 
-    function pushElement(element: Syntax.Node, elementValue: Syntax.Node,
-                         elementIndex: BodyEntry) {
-      if ( elementValue.tag === 'self' ) {
+    function pushElement(element: Syntax.PatternElement) {
+      if ( element.value instanceof Syntax.Self ) {
         return;
       }
 
-      if ( canGenerateEquality(elementValue) ) {
-        expressions.push(generateEquality(elementValue, elementIndex));
+      if ( hasAnnotation(element.value, 'pattern/equality') ) {
+        expressions.push(generateEquality(element.value, defer(element.id)));
         return;
       }
 
-      expressions.push(generateNested(element, elementValue, elementIndex));
+      expressions.push(
+        generateNested(element, element.value, defer(element.id))
+      );
     }
 
     function generateEquality(elementValue: Syntax.Node,
