@@ -3,7 +3,7 @@
 import Visitor from './Visitor';
 import * as Syntax from './Syntax';
 import { isTrue, isFalse, isIn } from '../Types';
-import { annotate, hasAnnotation } from './Annotations';
+import { annotate } from './Annotations';
 
 const hasTag = Syntax.hasTag;
 const isLiteral = Syntax.isLiteral;
@@ -126,9 +126,6 @@ export default function createTreeProcessors(visit: Visitor) {
   // if all the elements of an Array or Array are literals, then we can
   // convert it to a literal
   function rollUpObjectsAndArrays(node: Syntax.ElementsConstructor) {
-    if ( hasAnnotation(node, 'pattern/node') ) {
-      return node;
-    }
     if ( node.tag === 'array' ) {
       return rollUpArray(<Syntax.ArrayConstructor>node);
     }

@@ -71,19 +71,6 @@ export default function createTreeProcessors(visit: Visitor) {
         "'self' keyword must appear within a Function or Pattern"
       );
     }
-
-    let ancestors = visit.hasAncestorTags('objectAssignment', 'pattern');
-    if ( ancestors ) {
-      let parent = <Syntax.ObjectAssignment>ancestors[0];
-      let parentIndex = visit.nodeStack.indexOf(parent);
-      if ( parent.id === visit.nodeStack[parentIndex + 1] ||
-           parent.id === node ) {
-        visit.issueError(node,
-          "'self' keyword cannot appear in a Pattern's Property Names"
-        );
-      }
-    }
-
     return node;
   }
 

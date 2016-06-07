@@ -854,7 +854,10 @@ regex
     }
 
 reference
-  = id:Identifier {
+  = "." _ elem:Name {
+      return node('member', node('self'), literalName(elem));
+    }
+  / id:Identifier {
       return reference(id);
     }
 

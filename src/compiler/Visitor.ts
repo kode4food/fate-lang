@@ -16,9 +16,6 @@ export default class Visitor {
 
   public getParent(node: Syntax.Node) {
     let idx = this.nodeStack.indexOf(node);
-    if ( idx === -1 ) {
-      return undefined;
-    }
     return this.nodeStack[idx - 1];
   }
 
