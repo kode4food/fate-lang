@@ -21,7 +21,7 @@ def guardAndDefault(test)
     x * 5
   end
 
-  def testFunc(self > 5 as x) where x > 10
+  def testFunc(it > 5 as x) where x > 10
     x * 10
   end
 
@@ -37,7 +37,7 @@ def anonymousPatternArgument(test)
     x * 5
   end
 
-  def testFunc(self > 5)
+  def testFunc(it > 5)
     "hello"
   end
 

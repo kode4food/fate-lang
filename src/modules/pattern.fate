@@ -13,39 +13,39 @@ from './support' import isA, setProperty
 #
 #   Array.prototype.length
 
-export let String = ~isA(self, 'string')
+export let String = ~isA(it, 'string')
 export let EmptyString = ~''
 
 export let NonEmptyString = ~(
-  isA(self, 'string') and self.length > 0
+  isA(it, 'string') and it.length > 0
 )
 
 export
-let Number = ~isA(self, 'number')
-  , PositiveNumber = ~(self > 0 and isA(self, 'number'))
-  , NonNegativeNumber = ~(self ≥ 0 and isA(self, 'number'))
-  , NegativeNumber = ~(self < 0 and isA(self, 'number'))
-  , Integer = ~(self mod 1 = 0 and isA(self, 'number'))
+let Number = ~isA(it, 'number')
+  , PositiveNumber = ~(it > 0 and isA(it, 'number'))
+  , NonNegativeNumber = ~(it ≥ 0 and isA(it, 'number'))
+  , NegativeNumber = ~(it < 0 and isA(it, 'number'))
+  , Integer = ~(it mod 1 = 0 and isA(it, 'number'))
 
 export let PositiveInteger = ~(
-  self > 0 and self mod 1 = 0 and isA(self, 'number')
+  it > 0 and it mod 1 = 0 and isA(it, 'number')
 )
 
 export let NonNegativeInteger = ~(
-  self ≥ 0 and self mod 1 = 0 and isA(self, 'number')
+  it ≥ 0 and it mod 1 = 0 and isA(it, 'number')
 )
 
 export let NegativeInteger = ~(
-  self < 0 and self mod 1 = 0 and isA(self, 'number')
+  it < 0 and it mod 1 = 0 and isA(it, 'number')
 )
 
 export
 let Array = definePattern(isArray)
-  , EmptyArray = ~(isArray(self) and self.length = 0)
-  , NonEmptyArray = ~(isArray(self) and self.length > 0)
+  , EmptyArray = ~(isArray(it) and it.length = 0)
+  , NonEmptyArray = ~(isArray(it) and it.length > 0)
   , Object = definePattern(isObject)
-  , Boolean = ~isA(self, 'boolean')
-  , Function = ~isA(self, 'function')
+  , Boolean = ~isA(it, 'boolean')
+  , Function = ~isA(it, 'function')
 
 export def ArrayOf(elementPattern)
   let checker = definePattern(value →

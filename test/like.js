@@ -6,7 +6,7 @@ const evaluate = fate.evaluate;
 
 exports.like = nodeunit.testCase({
   "Guard Patterns": function (test) {
-    let script1 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
+    let script1 = "let p = ~{ name: it != 'Thom', age: it != 43 }\n" +
                   "def func(person)\n" +
                   "  'normal person: ' + person.name\n" +
                   "end\n" +
@@ -20,13 +20,13 @@ exports.like = nodeunit.testCase({
   },
 
   "Object Patterns": function (test) {
-    let script1 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
+    let script1 = "let p = ~{ name: it != 'Thom', age: it != 43 }\n" +
                   "{ name: 'Bill', age: 27 } like p";
 
-    let script2 = "let p = ~[self, { name: 'Thom', age: self > 20 }, 99]\n" +
+    let script2 = "let p = ~[it, { name: 'Thom', age: it > 20 }, 99]\n" +
                   "['crap', { name: 'Thom', age: 30 }, 99] like p";
 
-    let script3 = "let p = ~{ name: self != 'Thom', age: self != 43 }\n" +
+    let script3 = "let p = ~{ name: it != 'Thom', age: it != 43 }\n" +
                   "{ name: 'Thom', age: 27 } like p";
 
     let script4 = "let p = ~{name: 'Thom', address: ~{ city: 'Boston' }}\n" +
@@ -40,22 +40,22 @@ exports.like = nodeunit.testCase({
   },
 
   "Array Patterns": function (test) {
-    let script1 = "let p = ~(self > 50 and self < 100)\n" +
+    let script1 = "let p = ~(it > 50 and it < 100)\n" +
                   "p(75)";
 
-    let script2 = "let p = ~(self > 50 and self < 100)\n" +
+    let script2 = "let p = ~(it > 50 and it < 100)\n" +
                   "75 like p";
 
-    let script3 = "let p = ~[12, self, 99]\n" +
+    let script3 = "let p = ~[12, it, 99]\n" +
                   "[12, 88, 99] like p";
 
-    let script4 = "let p = ~([12, self, 99] and self[1]=88)\n" +
+    let script4 = "let p = ~([12, it, 99] and it[1]=88)\n" +
                   "[12, 88, 99] like p";
 
-    let script5 = "let p = ~[12, [1, self, 3]]\n" +
+    let script5 = "let p = ~[12, [1, it, 3]]\n" +
                   "[12, [1, 5, 3], 24] like p";
 
-    let script6 = "'hello' like ~(self)";
+    let script6 = "'hello' like ~(it)";
 
     test.equal(evaluate(script1), true);
     test.equal(evaluate(script2), true);

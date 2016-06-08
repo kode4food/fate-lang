@@ -77,6 +77,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'id': createIdEvaluator,
     'literal': createLiteral,
     'regex': createRegex,
+    'context': createContextEvaluator,
     'self': createSelfEvaluator,
     'global': createGlobalEvaluator,
     'pattern': createPatternEvaluator,
@@ -993,14 +994,18 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     generate.write(regex);
   }
 
-  function createSelfEvaluator(node: Syntax.Self) {
-    let selfPatternName = getAnnotation(node, 'pattern/local');
-    if ( !selfPatternName ) {
-      generate.self();
-      return;
+  function createContextEvaluator(node: Syntax.Context) {
+    let contextName = getAnnotation(node, 'pattern/local');
+    /* istanbul ignore next: shouldn't happen */
+    if ( !contextName ) {
+      throw new Error("Stupid Coder: Where's the context pattern name?");
     }
-    selfPatternName = generate.registerAnonymous(selfPatternName);
-    generate.retrieveAnonymous(selfPatternName);
+    contextName = generate.registerAnonymous(contextName);
+    generate.retrieveAnonymous(contextName);
+  }
+
+  function createSelfEvaluator(node: Syntax.Self) {
+    generate.self();
   }
 
   function createGlobalEvaluator(node: Syntax.Global) {
@@ -1038,7 +1043,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       case 'arrayPattern':
         createNestedPatternEvaluator(<Syntax.CollectionPattern>node);
         break;
-      case 'self':
+      case 'context':
         generate.write(generate.literal(true));
         break;
       default:
@@ -1058,7 +1063,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
   }
 
   function createNestedPatternEvaluator(node: Syntax.CollectionPattern) {
-    let parentLocal = getAnnotation(node, 'pattern/parent');
+    let parentLocal = getAnnotation(node, 'pattern/local');
     parentLocal = generate.registerAnonymous(parentLocal);
 
     let isObject = node instanceof Syntax.ObjectPattern;
@@ -1072,11 +1077,18 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       }]);
     });
 
-    node.elements.forEach(pushElement);
+    node.elements.forEach(element => {
+      if ( element instanceof Syntax.PatternElement ) {
+        pushElement(element);
+      }
+      else {
+        expressions.push(defer(element));
+      }
+    });
     generate.writeAndGroup(expressions);
 
     function pushElement(element: Syntax.PatternElement) {
-      if ( element.value instanceof Syntax.Self ) {
+      if ( element.value instanceof Syntax.Context ) {
         return;
       }
 

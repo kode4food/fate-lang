@@ -362,6 +362,7 @@ export class Identifier extends Symbol {
   constructor(public value: string) { super(); }
 }
 
+export class Context extends Identifier {}
 export class Self extends Identifier {}
 export class Global extends Identifier {}
 
@@ -573,6 +574,7 @@ let tagToConstructor: FunctionMap = {
   'array': ArrayConstructor,
   'object': ObjectConstructor,
   'id': Identifier,
+  'context': Context,
   'self': Self,
   'global': Global,
   'literal': Literal,

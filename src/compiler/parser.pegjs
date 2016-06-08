@@ -835,6 +835,7 @@ literal
   / string
   / regex
   / boolean
+  / context
   / self
   / global
   / reference
@@ -855,7 +856,7 @@ regex
 
 reference
   = "." _ elem:Name {
-      return node('member', node('self'), literalName(elem));
+      return node('member', node('context'), literalName(elem));
     }
   / id:Identifier {
       return reference(id);
@@ -864,6 +865,7 @@ reference
 boolean = True / False
 identifier = Identifier
 number = Number
+context = Context
 self = Self
 global = Global
 wildcard = Wildcard
@@ -888,6 +890,7 @@ Mod     = "mod"      !NameContinue { return 'mod'; }
 Not     = "not"      !NameContinue { return 'not'; }
 In      = "in"       !NameContinue { return 'in'; }
 Return  = "return"   !NameContinue { return 'return'; }
+Context = "it"       !NameContinue { return node('context'); }
 Self    = "self"     !NameContinue { return node('self'); }
 Global  = "global"   !NameContinue { return node('global'); }
 True    = "true"     !NameContinue { return node('literal', true); }
@@ -910,8 +913,8 @@ NotIn   = Not _ In   { return 'notIn'; }
 ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or /
       Like / Mod / Not / If / Unless / True / False / As / In /
-      Return / Self / Else / End / Where / Select / Reduce / Await /
-      Any / All / When / Case / Match / Global )
+      Return / Else / End / Where / Select / Reduce / Await /
+      Any / All / When / Case / Match / Context / Self / Global )
 
 Identifier "identifier"
   = !ReservedWord name:Name {

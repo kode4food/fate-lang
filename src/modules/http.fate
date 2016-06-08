@@ -19,7 +19,7 @@ let URL = NonEmptyString,
     HostName = NonEmptyString
 
 let HttpMethod = ~(
-  self in ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+  it in ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 )
 
 let RequestOptions = ~{

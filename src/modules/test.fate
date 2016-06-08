@@ -11,10 +11,10 @@ let ModuleKeys = [
 ]
 
 let AssertModule = ~(
-  (self like Function or self like Object) and
+  (it like Function or it like Object) and
   length([
     for key in ModuleKeys
-    where self[key] not like Function
+    where it[key] not like Function
   ]) = 0
 )
 

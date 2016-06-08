@@ -8,13 +8,10 @@ interface NumberMap {
   [index: string]: number;
 }
 
-const collectionAnchorTags = [
-  'objectPattern', 'arrayPattern', 'patternElement'
-];
+const collectionTags = ['objectPattern', 'arrayPattern'];
+const patternParentTags = ['pattern', 'patternElement'];
 
-const patternAnchorTags = collectionAnchorTags.concat(['pattern']);
-
-const selfPatternLocal = 'p';
+const contextPatternLocal = 'p';
 
 const patternNodeComplexity: NumberMap = {
   'match': 5,
@@ -27,17 +24,17 @@ const patternNodeComplexity: NumberMap = {
 };
 
 export default function createTreeProcessors(visit: Visitor) {
-  let selfPatternNumbering = 0;
+  let contextPatternNumbering = 0;
 
   let nestedPattern = visit.ancestorTags('pattern', 'pattern');
-  let nestedSelf = visit.ancestorTags('self', 'pattern');
-  let collectionAnchors = visit.ancestorTags(collectionAnchorTags, 'pattern');
+  let nestedContext = visit.ancestorTags('context', 'pattern');
+  let collections = visit.ancestorTags(collectionTags, 'pattern');
 
   return [
     visit.matching(rollUpPatterns, nestedPattern),
     visit.matching(annotatePattern, visit.tags('pattern')),
-    visit.breadthMatching(annotateCollectionAnchors, collectionAnchors),
-    visit.breadthMatching(annotateSelf, nestedSelf),
+    visit.breadthMatching(annotateCollection, collections),
+    visit.breadthMatching(annotateContext, nestedContext),
     visit.matching(annotateComplexity, visit.isNode),
     visit.matching(buildPatternGuards, visit.tags('signature')),
     visit.matching(annotatePatternEquality, visit.tags('pattern')),
@@ -47,45 +44,45 @@ export default function createTreeProcessors(visit: Visitor) {
   // patterns don't always have to exist within Patterns
   function rollUpPatterns(node: Syntax.Pattern) {
     let parent = <Syntax.Node>visit.getParent(node);
-    if ( !Syntax.hasTag(parent, patternAnchorTags) ) {
+    if ( !Syntax.hasTag(parent, patternParentTags) ) {
       return node;
     }
     return node.left;
   }
 
   function annotatePattern(node: Syntax.Pattern) {
-    annotate(node, 'pattern/local', selfPatternLocal);
-    annotate(node.left, 'pattern/local', selfPatternLocal);
+    annotate(node, 'pattern/local', contextPatternLocal);
+    annotate(node.left, 'pattern/local', contextPatternLocal);
     return node;
   }
 
-  function getPatternAnchorParent() {
-    let matches = visit.hasAncestorTags(patternAnchorTags);
+  function getPatternParent() {
+    let matches = visit.hasAncestorTags(patternParentTags);
     return matches ? matches[0] : null;
   }
 
-  function annotateCollectionAnchors(node: Syntax.Node) {
-    let parent = getPatternAnchorParent();
-
-    /* istanbul ignore next */
-    if ( !parent ) {
-      throw new Error("Stupid Coder: A collection pattern with no parent");
-    }
-
-    let parentLocal = getAnnotation(parent, 'pattern/local');
-    annotate(node, 'pattern/parent', parentLocal);
-
-    let localId = selfPatternLocal + (selfPatternNumbering++);
-    annotate(node, 'pattern/local', localId);
-    return node;
-  }
-
-  function annotateSelf(node: Syntax.Self) {
-    let parent = getPatternAnchorParent();
+  function annotateCollection(node: Syntax.CollectionPattern) {
+    let parent = getPatternParent();
     let parentLocal = getAnnotation(parent, 'pattern/local');
     annotate(node, 'pattern/parent', parentLocal);
     annotate(node, 'pattern/local', parentLocal);
-    visit.upTreeUntilMatch(visit.tags(patternAnchorTags), annotateNode);
+
+    node.elements.forEach(function (element) {
+      if ( element instanceof Syntax.PatternElement ) {
+        let localId = contextPatternLocal + (contextPatternNumbering++);
+        annotate(element, 'pattern/parent', parentLocal);
+        annotate(element, 'pattern/local', localId);
+      }
+    });
+    return node;
+  }
+
+  function annotateContext(node: Syntax.Context) {
+    let parent = getPatternParent();
+    let parentLocal = getAnnotation(parent, 'pattern/local');
+    annotate(node, 'pattern/parent', parentLocal);
+    annotate(node, 'pattern/local', parentLocal);
+    visit.upTreeUntilMatch(visit.tags(patternParentTags), annotateNode);
     return node;
 
     function annotateNode(nodeToAnnotate: Syntax.Node) {
