@@ -64,7 +64,6 @@ export default function createTreeProcessors(visit: Visitor) {
   function annotateCollection(node: Syntax.CollectionPattern) {
     let parent = getPatternParent();
     let parentLocal = getAnnotation(parent, 'pattern/local');
-    annotate(node, 'pattern/parent', parentLocal);
     annotate(node, 'pattern/local', parentLocal);
 
     node.elements.forEach(function (element) {
@@ -80,7 +79,6 @@ export default function createTreeProcessors(visit: Visitor) {
   function annotateContext(node: Syntax.Context) {
     let parent = getPatternParent();
     let parentLocal = getAnnotation(parent, 'pattern/local');
-    annotate(node, 'pattern/parent', parentLocal);
     annotate(node, 'pattern/local', parentLocal);
     visit.upTreeUntilMatch(visit.tags(patternParentTags), annotateNode);
     return node;
