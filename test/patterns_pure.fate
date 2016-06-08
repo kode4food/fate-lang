@@ -349,6 +349,59 @@ def matchExpression(test)
 
   test.done()
 end
+def rollUpPatterns(test)
+  let { isTrue, isFalse } = wrap(test)
+
+  let p = ~{
+    city: ~(it != 'Boston')
+  }
+
+  let good = {
+    name: 'Bill',
+    city: 'Phoenix'
+  }
+
+  let bad = {
+    name: 'Bill',
+    city: 'Boston'
+  }
+
+  good like p | isTrue
+  bad like p  | isFalse
+  test.done()
+end
+
+def doNotRollUpPatterns(test)
+  let { isTrue, isFalse } = wrap(test)
+
+  let p = ~{
+    .name like NonEmptyString,
+
+    address: {
+      city: it like ~(it != 'Boston')
+    }
+  }
+
+  let good = {
+    name: 'Bill',
+    address: {
+      street: '123 Main',
+      city: 'Phoenix'
+    }
+  }
+
+  let bad = {
+    name: 'Bill',
+    address: {
+      street: '123 Main',
+      city: 'Boston'
+    }
+  }
+
+  good like p | isTrue
+  bad like p  | isFalse
+  test.done()
+end
 
 export let tests = nodeunit.testCase({
 	"Numbers":  numberPatterns,
@@ -359,5 +412,7 @@ export let tests = nodeunit.testCase({
   "Arrays":   arrayPatterns,
   "Combined": combinedPatterns,
   "Terse":    tersePatterns,
-  "Match":    matchExpression
+  "Match":    matchExpression,
+  "Roll-Up", rollUpPatterns,
+  "No Roll-Up":  doNotRollUpPatterns
 })

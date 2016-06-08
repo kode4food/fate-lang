@@ -14,11 +14,6 @@ export default class Visitor {
 
   constructor(public warnings: CompileErrors) {}
 
-  public getParent(node: Syntax.Node) {
-    let idx = this.nodeStack.indexOf(node);
-    return this.nodeStack[idx - 1];
-  }
-
   public ancestorTags(...tags: Syntax.TagOrTags[]) {
     return this.ancestry.apply(this, tags.map(this.tags));
   }

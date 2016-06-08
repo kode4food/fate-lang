@@ -41,9 +41,14 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(annotateElementEquality, visit.tags('patternElement'))
   ];
 
+  function getParent() {
+    let nodeStack = visit.nodeStack;
+    return nodeStack[nodeStack.length - 1];
+  }
+
   // patterns don't always have to exist within Patterns
   function rollUpPatterns(node: Syntax.Pattern) {
-    let parent = <Syntax.Node>visit.getParent(node);
+    let parent = <Syntax.Node>getParent();
     if ( !Syntax.hasTag(parent, patternParentTags) ) {
       return node;
     }
@@ -64,6 +69,7 @@ export default function createTreeProcessors(visit: Visitor) {
   function annotateCollection(node: Syntax.CollectionPattern) {
     let parent = getPatternParent();
     let parentLocal = getAnnotation(parent, 'pattern/local');
+    annotate(node, 'pattern/parent', parentLocal);
     annotate(node, 'pattern/local', parentLocal);
 
     node.elements.forEach(function (element) {
@@ -79,6 +85,7 @@ export default function createTreeProcessors(visit: Visitor) {
   function annotateContext(node: Syntax.Context) {
     let parent = getPatternParent();
     let parentLocal = getAnnotation(parent, 'pattern/local');
+    annotate(node, 'pattern/context', parentLocal);
     annotate(node, 'pattern/local', parentLocal);
     visit.upTreeUntilMatch(visit.tags(patternParentTags), annotateNode);
     return node;
