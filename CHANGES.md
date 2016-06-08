@@ -1,5 +1,31 @@
 # Change History
 
+## Version 0.7.0 - Patterns Revisited
+The `self` keyword was overloaded and meant two different things depending on whether or not it was used in a function or a pattern.  Now the `self` keyword is only used to refer to the current function (for recursion), and the `it` keyword is used to refer to the current context of a pattern.
+
+Object patterns also allow for a more terse syntax in addressing the properties of the current context.  This also allows for cross-property checks.
+
+```ruby
+let ValidUserData = ~{
+  .fullName = .firstName + ' ' + .lastName
+}
+
+let user1 = {
+  fullName: 'Bob Barker',
+  firstName: 'Bob',
+  lastName: 'Barker'
+}
+
+let user2 = {
+  fullNName: 'Bob Barker',
+  firstName: 'Bob',
+  lastName: 'Green'
+}
+
+user1 like ValidUserData # true
+user2 like ValidUserData # false
+```
+
 ## Version 0.6.4 - Lambda Parsing Clarified
 Lambdas with multiple arguments now require parentheses either around the arguments or around the entire lambda.  Lambdas with a single argument no longer require parentheses around the argument.
 
