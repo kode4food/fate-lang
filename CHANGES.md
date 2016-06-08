@@ -17,7 +17,7 @@ let user1 = {
 }
 
 let user2 = {
-  fullNName: 'Bob Barker',
+  fullName: 'Bob Barker',
   firstName: 'Bob',
   lastName: 'Green'
 }
