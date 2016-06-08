@@ -350,9 +350,19 @@ directAssignment
     }
 
 arrayDestructure
-  = "[" __ ids:idList __ "]" __ "=" __ expr:expr {
+  = "[" __ ids:arrayDestructureIds __ "]" __ "=" __ expr:expr {
       return node('arrayDestructure', ids, expr);
     }
+
+arrayDestructureIds
+  = head:arrayDestructureId
+    tail:( LIST_SEP id:arrayDestructureId { return id; } )* {
+      return [head].concat(tail);
+    }
+
+arrayDestructureId
+  = wildcard
+  / Identifier
 
 objectDestructure
   = "{" __ items:objectDestructureItems __ "}" __ "=" __ expr:expr {
@@ -535,7 +545,8 @@ objectPatternAssignment
     }
 
 patternValue
-  = nestedPattern
+  = wildcard
+  / nestedPattern
   / expr
 
 arrayPattern
@@ -652,10 +663,14 @@ bindArgs
     }
 
 bindElements
-  = head:expr
-    tail:( LIST_SEP e:expr { return e; } )* {
+  = head:bindElement
+    tail:( LIST_SEP e:bindElement { return e; } )* {
       return [head].concat(tail);
     }
+
+bindElement
+  = wildcard
+  / expr
 
 list
   = listNoParens
@@ -839,7 +854,6 @@ literal
   / self
   / global
   / reference
-  / wildcard
 
 string
   = value:(MultiLineString / SimpleString) {
@@ -911,10 +925,10 @@ NotLike = Not _ Like { return 'notLike'; }
 NotIn   = Not _ In   { return 'notIn'; }
 
 ReservedWord "reserved word"
-  = ( For / Def / Do / From / Import / Export / Let / And / Or /
-      Like / Mod / Not / If / Unless / True / False / As / In /
-      Return / Else / End / Where / Select / Reduce / Await /
-      Any / All / When / Case / Match / Context / Self / Global )
+  = ( For / Def / Do / From / Import / Export / Let / And / Or / Like / Mod /
+      Not / If / Unless / True / False / As / In / Return / Else / End /
+      Where / Select / Reduce / Await / Any / All / When / Case / Match /
+      Context / Self / Global / Wildcard )
 
 Identifier "identifier"
   = !ReservedWord name:Name {
@@ -1087,9 +1101,7 @@ Comment "comment"
   = "#" (!LFOrEOF Char)*
 
 Wildcard "wildcard"
-  = "?" {
-      return node('wildcard');
-    }
+  = "?" { return node('wildcard'); }
 
 NL "line terminator"
   = ( WS / Comment )* LFOrEOF ( WS / Comment / LF )*

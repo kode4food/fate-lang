@@ -23,7 +23,7 @@ exports.like = nodeunit.testCase({
     let script1 = "let p = ~{ name: it != 'Thom', age: it != 43 }\n" +
                   "{ name: 'Bill', age: 27 } like p";
 
-    let script2 = "let p = ~[it, { name: 'Thom', age: it > 20 }, 99]\n" +
+    let script2 = "let p = ~[?, { name: 'Thom', age: it > 20 }, 99]\n" +
                   "['crap', { name: 'Thom', age: 30 }, 99] like p";
 
     let script3 = "let p = ~{ name: it != 'Thom', age: it != 43 }\n" +
@@ -46,13 +46,13 @@ exports.like = nodeunit.testCase({
     let script2 = "let p = ~(it > 50 and it < 100)\n" +
                   "75 like p";
 
-    let script3 = "let p = ~[12, it, 99]\n" +
+    let script3 = "let p = ~[12, ?, 99]\n" +
                   "[12, 88, 99] like p";
 
-    let script4 = "let p = ~([12, it, 99] and it[1]=88)\n" +
+    let script4 = "let p = ~(it like ~[12, ?, 99] and it[1]=88)\n" +
                   "[12, 88, 99] like p";
 
-    let script5 = "let p = ~[12, [1, it, 3]]\n" +
+    let script5 = "let p = ~[12, [1, ?, 3]]\n" +
                   "[12, [1, 5, 3], 24] like p";
 
     let script6 = "'hello' like ~(it)";

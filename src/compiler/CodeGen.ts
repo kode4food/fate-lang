@@ -585,6 +585,9 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     });
 
     node.getIdentifiers().forEach((id, index) => {
+      if ( id instanceof Syntax.Wildcard ) {
+        return;
+      }
       generate.assignment(id.value, () => {
         generate.member(
           () => { generate.retrieveAnonymous(result); },
@@ -1088,7 +1091,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     generate.writeAndGroup(expressions);
 
     function pushElement(element: Syntax.PatternElement) {
-      if ( element.value instanceof Syntax.Context ) {
+      if ( element.value instanceof Syntax.Wildcard ) {
         return;
       }
 

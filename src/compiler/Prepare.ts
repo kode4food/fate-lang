@@ -18,7 +18,6 @@ export default function createTreeProcessors(visit: Visitor) {
   return [
     visit.matching(rollUpParens, visit.tags('parens')),
     visit.matching(validateAwaits, visit.tags('await')),
-    visit.matching(validateWildcards, visit.tags('wildcard')),
     visit.matching(validateSelfReferences, visit.tags('self')),
     visit.matching(validateFunctionArgs, visit.tags(['function', 'lambda'])),
     visit.matching(annotateSelfFunctions, selfFunction),
@@ -53,14 +52,6 @@ export default function createTreeProcessors(visit: Visitor) {
       visit.issueError(node,
         "awaited expression must not appear in a nested function"
       );
-    }
-    return node;
-  }
-
-  // a Wildcard can only exist in a call binder
-  function validateWildcards(node: Syntax.Wildcard) {
-    if ( !visit.hasAncestorTags('bind') ) {
-      visit.issueError(node, "Unexpected Wildcard");
     }
     return node;
   }
