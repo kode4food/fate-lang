@@ -36,7 +36,7 @@ def calculateVehicleEmissions(car)
   car.emissions
 end
 
-def calculateVehicleEmissions({ wheelsInMotion: self <= 2 } as car)
+def calculateVehicleEmissions({ wheelsInMotion: it <= 2 } as car)
   car.emissions / 40
 end
 ```
@@ -49,7 +49,7 @@ def calculateVehicleEmissions(car)
   car.emissions
 end
 
-let VehicleUnderTest = ~{ wheelsInMotion: self <= 2 }
+let VehicleUnderTest = ~{ wheelsInMotion: it <= 2 }
 
 def calculateVehicleEmissions(VehicleUnderTest as car)
   car.emissions / 40
@@ -132,9 +132,9 @@ let deidentified = {
 
 ```ruby
 # Combining Patterns
-let Shape = ~{ type: self in ['square', 'circle', 'triangle'] },
-    Orange = ~{ colors: 'orange' in self },
-    Large = ~{ size: self > 50 }
+let Shape = ~{ type: it in ['square', 'circle', 'triangle'] },
+    Orange = ~{ colors: 'orange' in it },
+    Large = ~{ size: it > 50 }
 
 let LargeOrangeShape = Large and| Orange and| Shape
 
