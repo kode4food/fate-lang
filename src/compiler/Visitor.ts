@@ -9,11 +9,6 @@ type NodeVisitor = (node: Syntax.NodeOrNodes) => any;
 type StatementsVisitor = (node: Syntax.Statement[]) => any;
 type NodeMatcher = (node: Syntax.NodeOrNodes) => boolean;
 
-class Index extends Syntax.Node {
-  public tag = 'index';
-  constructor(public value: number) { super(); }
-}
-
 export default class Visitor {
   public nodeStack: (Syntax.Node|Syntax.Nodes)[] = [];
 
@@ -92,9 +87,7 @@ export default class Visitor {
     if ( Array.isArray(node) ) {
       let arrNode = <Syntax.Nodes>node;
       for ( let i = 0, len = arrNode.length; i < len; i++ ) {
-        nodeStack.push(new Index(i));
         arrNode[i] = <Syntax.Node>visitor(arrNode[i]);
-        nodeStack.pop();
       }
     }
     else {
@@ -175,17 +168,6 @@ export default class Visitor {
     function matcher(node: Syntax.Node) {
       return Syntax.hasTag(node, tags);
     }
-  }
-
-  public currentElement() {
-    let ancestors = this.hasAncestorTags(['object', 'array'], 'pattern');
-    if ( !ancestors ) {
-      return null;
-    }
-    let collectionIndex = this.nodeStack.indexOf(ancestors[0]);
-    let collection = <Syntax.Nodes>this.nodeStack[collectionIndex + 1];
-    let index = <Index>(this.nodeStack[collectionIndex + 2]);
-    return collection[index.value];
   }
 
   public upTreeUntilMatch(matcher: NodeMatcher,

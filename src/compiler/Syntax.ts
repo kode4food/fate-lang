@@ -16,9 +16,13 @@ export type Assignments = Assignment[];
 export type ImportModuleItems = ImportModuleItem[];
 export type ExportModuleItems = ExportModuleItem[];
 export type ModuleSpecifiers = ModuleSpecifier[];
-export type ArrayElement = Expression|Pattern;
 export type ArrayElements = ArrayElement[];
+export type ArrayElement = Expression;
 export type ObjectElements = ObjectAssignment[];
+
+export type IndexedPatternElements = PatternElement[];
+export type ObjectPatternElements = ObjectPatternElement[];
+export type ObjectPatternElement = Expression|PatternElement;
 
 type FunctionMap = { [index: string]: Function };
 type StringFunction = (value: string) => any;
@@ -358,6 +362,7 @@ export class Identifier extends Symbol {
   constructor(public value: string) { super(); }
 }
 
+export class Context extends Identifier {}
 export class Self extends Identifier {}
 export class Global extends Identifier {}
 
@@ -378,6 +383,29 @@ export class Regex extends PatternSymbol {
     super();
     this.value = new RegExp(pattern, flags);
   }
+}
+
+export class CollectionPattern extends PatternSymbol {
+  constructor(public elements: ObjectPatternElements|IndexedPatternElements) {
+    super();
+  }
+}
+
+export class ObjectPattern extends CollectionPattern {
+  constructor(elements: ObjectPatternElements) {
+    super(elements);
+  }
+}
+
+export class ArrayPattern extends CollectionPattern {
+  constructor(elements: IndexedPatternElements) {
+    super(elements);
+  }
+}
+
+export class PatternElement extends PatternSymbol {
+  constructor(public id: Expression,
+              public value: CollectionPattern|Expression) { super(); }
 }
 
 // Supporting Nodes *********************************************************
@@ -546,11 +574,15 @@ let tagToConstructor: FunctionMap = {
   'array': ArrayConstructor,
   'object': ObjectConstructor,
   'id': Identifier,
+  'context': Context,
   'self': Self,
   'global': Global,
   'literal': Literal,
   'pattern': Pattern,
   'regex': Regex,
+  'objectPattern': ObjectPattern,
+  'arrayPattern': ArrayPattern,
+  'patternElement': PatternElement,
   'wildcard': Wildcard,
   'statements': Statements,
   'range': Range,

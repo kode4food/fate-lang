@@ -8,124 +8,92 @@ interface NumberMap {
   [index: string]: number;
 }
 
-const hasTag = Syntax.hasTag;
-const selfPatternLocal = 'p';
+const collectionTags = ['objectPattern', 'arrayPattern'];
+const patternParentTags = ['pattern', 'patternElement'];
 
-const patternNodeParent = ['index', 'objectAssignment', 'object', 'array'];
+const contextPatternLocal = 'p';
 
 const patternNodeComplexity: NumberMap = {
   'match': 5,
-  'object': 4,
-  'array': 4,
+  'objectPattern': 4,
+  'arrayPattern': 4,
+  'patternElement': 2,
   'call': 3,
   'regex': 2,
   'like': 2
 };
 
 export default function createTreeProcessors(visit: Visitor) {
-  let selfPatternNumbering = 0;
+  let contextPatternNumbering = 0;
 
   let nestedPattern = visit.ancestorTags('pattern', 'pattern');
-  let patternCollection = visit.ancestorTags(['object', 'array'], 'pattern');
-  let selfPattern = visit.ancestorTags('self', 'pattern');
-  let patternNodes = visit.ancestorTags(['object', 'array'], 'pattern');
+  let nestedContext = visit.ancestorTags('context', 'pattern');
+  let collections = visit.ancestorTags(collectionTags, 'pattern');
 
   return [
     visit.matching(rollUpPatterns, nestedPattern),
-    visit.matching(rollUpPatternSymbols, visit.tags('pattern')),
-    visit.matching(namePatterns, visit.tags('pattern')),
-    visit.matching(nameSelfPatternAnchors, patternCollection),
-    visit.matching(nameAndAnnotateSelfPatterns, selfPattern),
-    visit.matching(annotatePatternNode, patternNodes),
+    visit.matching(annotatePattern, visit.tags('pattern')),
+    visit.breadthMatching(annotateCollection, collections),
+    visit.breadthMatching(annotateContext, nestedContext),
     visit.matching(annotateComplexity, visit.isNode),
-    visit.matching(buildPatternGuards, visit.tags('signature'))
+    visit.matching(buildPatternGuards, visit.tags('signature')),
+    visit.matching(annotatePatternEquality, visit.tags('pattern')),
+    visit.matching(annotateElementEquality, visit.tags('patternElement'))
   ];
 
-  // patterns don't have to exist within Patterns
+  function getParent() {
+    let nodeStack = visit.nodeStack;
+    return nodeStack[nodeStack.length - 1];
+  }
+
+  // patterns don't always have to exist within Patterns
   function rollUpPatterns(node: Syntax.Pattern) {
+    let parent = <Syntax.Node>getParent();
+    if ( !Syntax.hasTag(parent, patternParentTags) ) {
+      return node;
+    }
     return node.left;
   }
 
-  function rollUpPatternSymbols(node: Syntax.Pattern) {
-    if ( node.left instanceof Syntax.PatternSymbol ) {
-      return node.left;
-    }
+  function annotatePattern(node: Syntax.Pattern) {
+    annotate(node, 'pattern/local', contextPatternLocal);
+    annotate(node.left, 'pattern/local', contextPatternLocal);
     return node;
   }
 
-  function getAnchorName() {
-    let anchor = visit.currentElement();
-    if ( !anchor ) {
-      anchor = visit.hasAncestorTags('pattern')[0];
-    }
-    let anchorName = getAnnotation(anchor, 'pattern/local');
-    if ( !anchorName ) {
-      anchorName = selfPatternLocal + (selfPatternNumbering++);
-      annotate(anchor, 'pattern/local', anchorName);
-    }
-    return anchorName;
+  function getPatternParent() {
+    let matches = visit.hasAncestorTags(patternParentTags);
+    return matches ? matches[0] : null;
   }
 
-  function namePatterns(node: Syntax.Pattern) {
-    if ( !hasAnnotation(node, 'pattern/local') ) {
-      annotate(node, 'pattern/local', selfPatternLocal);
-    }
-    let contained = node.left;
-    if ( !hasTag(contained, ['object', 'array']) &&
-         !hasAnnotation(contained, 'pattern/local') ) {
-      annotate(contained, 'pattern/local', selfPatternLocal);
-    }
-    return node;
-  }
+  function annotateCollection(node: Syntax.CollectionPattern) {
+    let parent = getPatternParent();
+    let parentLocal = getAnnotation(parent, 'pattern/local');
+    annotate(node, 'pattern/parent', parentLocal);
+    annotate(node, 'pattern/local', parentLocal);
 
-  function nameSelfPatternAnchors(node: Syntax.ElementsConstructor) {
-    annotate(node, 'pattern/local', getAnchorName());
-    node.elements.forEach(element => {
-      if ( hasAnnotation(element, 'pattern/local') ) {
-        return;
+    node.elements.forEach(function (element) {
+      if ( element instanceof Syntax.PatternElement ) {
+        let localId = contextPatternLocal + (contextPatternNumbering++);
+        annotate(element, 'pattern/parent', parentLocal);
+        annotate(element, 'pattern/local', localId);
       }
-      let elementName = selfPatternLocal + (selfPatternNumbering++);
-      annotate(element, 'pattern/local', elementName);
     });
     return node;
   }
 
-  // pattern names must correspond to their element in an object or array
-  function nameAndAnnotateSelfPatterns(node: Syntax.Self) {
-    if ( !hasAnnotation(node, 'pattern/local') ) {
-      annotate(node, 'pattern/local', getAnchorName());
-    }
-    visit.upTreeUntilMatch(visit.tags('pattern'), annotateSelfPattern);
+  function annotateContext(node: Syntax.Context) {
+    let parent = getPatternParent();
+    let parentLocal = getAnnotation(parent, 'pattern/local');
+    annotate(node, 'pattern/context', parentLocal);
+    annotate(node, 'pattern/local', parentLocal);
+    visit.upTreeUntilMatch(visit.tags(patternParentTags), annotateNode);
     return node;
 
-    function annotateSelfPattern(nodeToAnnotate: Syntax.Node) {
-      annotate(nodeToAnnotate, 'pattern/self');
+    function annotateNode(nodeToAnnotate: Syntax.Node) {
+      annotate(nodeToAnnotate, 'pattern/parent', parentLocal);
       return nodeToAnnotate;
     }
-  }
-
-  // all top-level Objects/Arrays inside of a Pattern should be annotated
-  // as such, so that the Code Generator can branch appropriately
-  function annotatePatternNode(node: Syntax.Node) {
-    let nodeStack = visit.nodeStack.slice().reverse();
-    for ( let i = 0; i < nodeStack.length; i++ ) {
-      if ( !(nodeStack[i] instanceof Syntax.Node) ) {
-        continue;
-      }
-
-      let parent = <Syntax.Node>nodeStack[i];
-      if ( parent.tag === 'pattern' ) {
-        annotate(node, 'pattern/node');
-        return node;
-      }
-
-      if ( !hasTag(parent, patternNodeParent) ) {
-        // Not going to work
-        return node;
-      }
-    }
-    /* istanbul ignore next: should be properly matched */
-    throw new Error("Stupid Coder: Didn't stop at Pattern Node");
   }
 
   function annotateComplexity(node: Syntax.Node) {
@@ -163,6 +131,21 @@ export default function createTreeProcessors(visit: Visitor) {
       });
     }
 
+    return node;
+  }
+
+  function canGenerateEquality(elementValue: Syntax.Node) {
+    return !hasAnnotation(elementValue, 'pattern/parent') &&
+           !(elementValue instanceof Syntax.RelationalOperator);
+  }
+
+  function annotatePatternEquality(node: Syntax.Pattern) {
+    annotate(node.left, 'pattern/equality', canGenerateEquality(node.left));
+    return node;
+  }
+
+  function annotateElementEquality(node: Syntax.PatternElement) {
+    annotate(node.value, 'pattern/equality', canGenerateEquality(node.value));
     return node;
   }
 }

@@ -97,7 +97,7 @@ end
 def definedPatterns(test)
   let { isFalse, isTrue } = wrap(test)
 
-  let Color = ~(self in ['red', 'green', 'blue'])
+  let Color = ~(it in ['red', 'green', 'blue'])
 
   let Person = ~{
     firstName: NonEmptyString,
@@ -252,14 +252,81 @@ def combinedPatterns(test)
   test.done()
 end
 
+def tersePatterns(test)
+  let { isTrue, isFalse } = wrap(test)
+
+  let Primate = ~{ .kingdom='Animalia', .class='Mammalia', .order='Primate' },
+      Monkey = ~{ it like Primate and .infraorder='Simiiformes' },
+      FourAsses = ~{ asses: 4 },
+      MonkeyWithFourAsses = ~{ it like Monkey, it like FourAsses }
+
+  let monkey1 = {
+    kingdom: 'Animalia',
+    class: 'Mammalia',
+    order: 'Primate',
+    infraorder: 'Simiiformes',
+    asses: 1
+  }
+
+  let monkey2 = {
+    kingdom: 'Animalia',
+    class: 'Mammalia',
+    order: 'Primate',
+    infraorder: 'Simiiformes',
+    asses: 4
+  }
+
+  let tarsier1 = {
+    kingdom: 'Animalia',
+    class: 'Mammalia',
+    order: 'Primate',
+    infraorder: 'Tarsiiformes',
+    asses: 1
+  }
+
+  let tarsier2 = {
+    kingdom: 'Animalia',
+    class: 'Mammalia',
+    order: 'Primate',
+    infraorder: 'Tarsiiformes',
+    asses: 4
+  }
+
+  monkey1 like Primate              | isTrue
+  monkey2 like Primate              | isTrue
+  tarsier1 like Primate             | isTrue
+  tarsier2 like Primate             | isTrue
+  "fred" like Primate               | isFalse
+
+  monkey1 like Monkey               | isTrue
+  monkey2 like Monkey               | isTrue
+  tarsier1 like Monkey              | isFalse
+  tarsier2 like Monkey              | isFalse
+  "fred" like Monkey                | isFalse
+
+  monkey1 like FourAsses            | isFalse
+  monkey2 like FourAsses            | isTrue
+  tarsier1 like FourAsses           | isFalse
+  tarsier2 like FourAsses           | isTrue
+  "fred" like FourAsses             | isFalse
+
+  monkey1 like MonkeyWithFourAsses  | isFalse
+  monkey2 like MonkeyWithFourAsses  | isTrue
+  tarsier1 like MonkeyWithFourAsses | isFalse
+  tarsier2 like MonkeyWithFourAsses | isFalse
+  "fred" like MonkeyWithFourAsses   | isFalse
+
+  test.done()
+end
+
 def matchExpression(test)
   let { equalTo, throws } = wrap(test)
 
   let result = match 42
-    self > 50  : "over 50"
-    self < 40  : "under 40"
-    42         : "42 exactly"
-    self >= 40 : "over 40"
+    it > 50  : "over 50"
+    it < 40  : "under 40"
+    42       : "42 exactly"
+    it >= 40 : "over 40"
   end
 
   result | equalTo("42 exactly")
@@ -282,6 +349,59 @@ def matchExpression(test)
 
   test.done()
 end
+def rollUpPatterns(test)
+  let { isTrue, isFalse } = wrap(test)
+
+  let p = ~{
+    city: ~(it != 'Boston')
+  }
+
+  let good = {
+    name: 'Bill',
+    city: 'Phoenix'
+  }
+
+  let bad = {
+    name: 'Bill',
+    city: 'Boston'
+  }
+
+  good like p | isTrue
+  bad like p  | isFalse
+  test.done()
+end
+
+def doNotRollUpPatterns(test)
+  let { isTrue, isFalse } = wrap(test)
+
+  let p = ~{
+    .name like NonEmptyString,
+
+    address: {
+      city: it like ~(it != 'Boston')
+    }
+  }
+
+  let good = {
+    name: 'Bill',
+    address: {
+      street: '123 Main',
+      city: 'Phoenix'
+    }
+  }
+
+  let bad = {
+    name: 'Bill',
+    address: {
+      street: '123 Main',
+      city: 'Boston'
+    }
+  }
+
+  good like p | isTrue
+  bad like p  | isFalse
+  test.done()
+end
 
 export let tests = nodeunit.testCase({
 	"Numbers":  numberPatterns,
@@ -291,5 +411,8 @@ export let tests = nodeunit.testCase({
   "Defined":  definedPatterns,
   "Arrays":   arrayPatterns,
   "Combined": combinedPatterns,
-  "Match":    matchExpression
+  "Terse":    tersePatterns,
+  "Match":    matchExpression,
+  "Roll-Up", rollUpPatterns,
+  "No Roll-Up":  doNotRollUpPatterns
 })

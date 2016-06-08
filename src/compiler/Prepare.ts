@@ -66,24 +66,11 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function validateSelfReferences(node: Syntax.Self) {
-    if ( !visit.hasAncestorTags(['function', 'lambda', 'pattern']) ) {
+    if ( !visit.hasAncestorTags(['function', 'lambda']) ) {
       visit.issueError(node,
-        "'self' keyword must appear within a Function or Pattern"
+        "'self' keyword must appear within a Function"
       );
     }
-
-    let ancestors = visit.hasAncestorTags('objectAssignment', 'pattern');
-    if ( ancestors ) {
-      let parent = <Syntax.ObjectAssignment>ancestors[0];
-      let parentIndex = visit.nodeStack.indexOf(parent);
-      if ( parent.id === visit.nodeStack[parentIndex + 1] ||
-           parent.id === node ) {
-        visit.issueError(node,
-          "'self' keyword cannot appear in a Pattern's Property Names"
-        );
-      }
-    }
-
     return node;
   }
 
@@ -148,9 +135,6 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function annotateSelfFunctions(node: Syntax.Self) {
-    if ( visit.hasAncestorTags('pattern') ) {
-      return node;
-    }
     let func = visit.hasAncestorTags(['function', 'lambda'])[0];
     annotate(func, 'function/self');
     return node;

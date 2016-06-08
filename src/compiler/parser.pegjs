@@ -494,10 +494,66 @@ awaitModifier
   / _ All { return Syntax.Resolver.All; }
 
 pattern
-  = "~" _ expr:unary {
+  = "~" _ expr:patternExpression {
       return expr.template('pattern', expr);
     }
   / match
+
+patternExpression
+  = nestedPattern
+  / unary
+
+nestedPattern
+  = objectPattern
+  / arrayPattern
+
+objectPattern
+  = "{" __ elems:objectPatternItems __ "}" {
+      return node('objectPattern', elems || []);
+    }
+  / "{" __ "}" {
+      return node('objectPattern', []);
+    }
+
+objectPatternItems
+  = head:objectPatternItem
+    tail:( LIST_SEP e:objectPatternItem { return e; })*  {
+      return [head].concat(tail)
+    }
+
+objectPatternItem
+  = nestedPattern
+  / objectPatternAssignment
+  / expr
+
+objectPatternAssignment
+  = name:Name PROP_SEP value:patternValue {
+      return node('patternElement', literalName(name), value);
+    }
+  / name:expr PROP_SEP value:patternValue {
+      return node('patternElement', name, value);
+    }
+
+patternValue
+  = nestedPattern
+  / expr
+
+arrayPattern
+  = "[" __ elems:arrayPatternElements? __ "]" {
+      return node('arrayPattern', elems);
+    }
+  / "[" __ "]" {
+      return node('arrayPattern', []);
+    }
+
+arrayPatternElements
+  = head:patternValue
+    tail:( LIST_SEP e:patternValue { return e; })*  {
+      return [head].concat(tail).map(function (element, idx) {
+        let indexNode = element.template('literal', idx);
+        return node('patternElement', indexNode, element);
+      });
+    }
 
 match
   = op:Match value:matchValue matches:matchClauses
@@ -664,12 +720,7 @@ objectAssignment
       return node('objectAssignment', name, value);
     }
   / name:Name {
-      var nameValue = literalName(name);
-      if ( name.value === 'self' ) {
-        return node('objectAssignment', nameValue, name.template('self'));
-      }
-      return node('objectAssignment', nameValue, name);
-
+      return node('objectAssignment', literalName(name), name);
     }
   / name:expr {
       return node('objectAssignment', name, name);
@@ -784,6 +835,7 @@ literal
   / string
   / regex
   / boolean
+  / context
   / self
   / global
   / reference
@@ -803,13 +855,17 @@ regex
     }
 
 reference
-  = id:Identifier {
+  = "." _ elem:Name {
+      return node('member', node('context'), literalName(elem));
+    }
+  / id:Identifier {
       return reference(id);
     }
 
 boolean = True / False
 identifier = Identifier
 number = Number
+context = Context
 self = Self
 global = Global
 wildcard = Wildcard
@@ -834,6 +890,7 @@ Mod     = "mod"      !NameContinue { return 'mod'; }
 Not     = "not"      !NameContinue { return 'not'; }
 In      = "in"       !NameContinue { return 'in'; }
 Return  = "return"   !NameContinue { return 'return'; }
+Context = "it"       !NameContinue { return node('context'); }
 Self    = "self"     !NameContinue { return node('self'); }
 Global  = "global"   !NameContinue { return node('global'); }
 True    = "true"     !NameContinue { return node('literal', true); }
@@ -856,8 +913,8 @@ NotIn   = Not _ In   { return 'notIn'; }
 ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or /
       Like / Mod / Not / If / Unless / True / False / As / In /
-      Return / Self / Else / End / Where / Select / Reduce / Await /
-      Any / All / When / Case / Match / Global )
+      Return / Else / End / Where / Select / Reduce / Await /
+      Any / All / When / Case / Match / Context / Self / Global )
 
 Identifier "identifier"
   = !ReservedWord name:Name {

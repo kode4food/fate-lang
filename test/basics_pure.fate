@@ -305,8 +305,8 @@ def regularExpressions(test)
   let objectPattern2 = ~{ name: ~/^Tho/ }
   let objectPattern3 = ~{
     name: ~/White$/,
-    age: self > 50,
-    colors: ['red', 'green', self]
+    age: it > 50,
+    colors: ['red', 'green', it]
   }
 
   let testObject1 = {
