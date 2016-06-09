@@ -177,7 +177,7 @@ let eventualResult = do
     print("name resolved first")
     name
 
-  # the underscore `_` means the resulting element will be ignored
+  # `_` (wildcard) means the resulting element will be ignored
   case [content, _] = http.get("http://www.example.org/")
     print("http content resolved first")
     content
