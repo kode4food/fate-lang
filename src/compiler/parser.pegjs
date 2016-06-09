@@ -1101,7 +1101,7 @@ Comment "comment"
   = "#" (!LFOrEOF Char)*
 
 Wildcard "wildcard"
-  = "?" { return node('wildcard'); }
+  = "_" { return node('wildcard'); }
 
 NL "line terminator"
   = ( WS / Comment )* LFOrEOF ( WS / Comment / LF )*

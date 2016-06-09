@@ -149,7 +149,7 @@ exports.imports = nodeunit.testCase({
     "Bound System Import": function (test) {
       let script = "from array import join\n" +
                    "let a = ['this', 'is', 'an', 'array']\n" +
-                   "let j = join(?, '///')\n" +
+                   "let j = join(_, '///')\n" +
                    "a | j";
 
       test.equal(evaluate(script), "this///is///an///array");

@@ -1,5 +1,13 @@
 # Change History
 
+## Version 0.7.1 - Wildcard Revisited
+The wildcard is now the underscore symbol (`_`) and can be used in the following scenarios:
+
+* The element of an array pattern (ex: `~[1, _, 3]`)
+* The value of an object pattern (ex: `{ name: _ }`)
+* In an array destructuring assignment (ex: `let [_, err] = doSomething()`)
+* In a function call binder (ex: `let dashJoin = join(_, ' --- ')`)
+
 ## Version 0.7.0 - Patterns Revisited
 The `self` keyword was overloaded and meant two different things depending on whether or not it was used in a function or a pattern.  Now the `self` keyword is only used to refer to the current function (for recursion), and the `it` keyword is used to refer to the current context of a pattern.
 

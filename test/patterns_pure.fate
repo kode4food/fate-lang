@@ -82,6 +82,9 @@ end
 def objectPatterns(test)
   let { isFalse, isTrue } = wrap(test)
 
+  { name: 'Bill', age: 30 } like ~{ name: String, age: _ } | isTrue
+  { name: 'Bill' } like ~{ name: String, age: _ }          | isFalse
+
   true like Object    | isFalse
   false like Object   | isFalse
   "" like Object      | isFalse
@@ -130,6 +133,11 @@ end
 
 def arrayPatterns(test)
   let { isFalse, isTrue } = wrap(test)
+
+  [1, 2, 3, 4] like ~[1, 2, 3] | isTrue
+  [1, 2, 3] like ~[1, 2, 3, 4] | isFalse
+  [1, 2, 3] like ~[1, 2, 3, _] | isFalse
+  [1, 2, 3] like ~[1, _, 3]    | isTrue
 
   true like Array    | isFalse
   false like Array   | isFalse

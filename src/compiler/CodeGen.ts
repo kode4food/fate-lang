@@ -1092,6 +1092,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
     function pushElement(element: Syntax.PatternElement) {
       if ( element.value instanceof Syntax.Wildcard ) {
+        expressions.push(generatePropertyCheck(element));
         return;
       }
 
@@ -1103,6 +1104,17 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
       expressions.push(
         generateNested(element, element.value, defer(element.id))
       );
+    }
+
+    function generatePropertyCheck(element: Syntax.PatternElement) {
+      return () => {
+        generate.call(() => {
+          generate.member(
+            () => { generate.retrieveAnonymous(parentLocal); },
+            generate.literal('hasOwnProperty')
+          );
+        }, [defer(element.id)]);
+      };
     }
 
     function generateEquality(elementValue: Syntax.Node,

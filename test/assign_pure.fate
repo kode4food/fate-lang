@@ -64,7 +64,7 @@ def testArrayDestructuring(test)
   a | equalTo(1)
   b | equalTo(2)
 
-  let [?, d, ?, e] = [1, 2, 3, 4]
+  let [_, d, _, e] = [1, 2, 3, 4]
   d | equalTo(2)
   e | equalTo(4)
 

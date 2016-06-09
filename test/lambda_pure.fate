@@ -28,8 +28,8 @@ def rolledUpLoops(test)
     end
   )
 
-  let filtered = maybe_filtered(true, ?)
-  let unfiltered = maybe_filtered(false, ?)
+  let filtered = maybe_filtered(true, _)
+  let unfiltered = maybe_filtered(false, _)
 
   let sum = (values ->
     reduce result = 0
@@ -65,15 +65,15 @@ def curryTest(test)
   let { equalTo } = wrap(test)
 
 	let lambda1 = (x, y -> x + y)
-	let curry = lambda1(5, ?)
+	let curry = lambda1(5, _)
 	curry(5) | equalTo(10)
 
 	let lambda2 = (a, b, c -> a + b + c)
 
-	let curry1 = lambda2(1, ?, ?)
+	let curry1 = lambda2(1, _, _)
 	curry1(2, 3) | equalTo(6)
 
-	let  curry2 = curry1(2, ?)
+	let  curry2 = curry1(2, _)
 	curry2(3) | equalTo(6)
 
 	test.done()

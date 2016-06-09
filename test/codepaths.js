@@ -165,7 +165,7 @@ exports.codepaths = nodeunit.testCase({
 
   "Wildcard outside Binding": function (test) {
     test.throws(function () {
-      evaluate("? < 99");
+      evaluate("_ < 99");
     }, "Wildcard used outside of a binding");
     test.done();
   },
