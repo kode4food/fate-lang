@@ -66,13 +66,14 @@ def arrayBasics(test)
 end
 
 def arrayFunctions(test)
-  let { equalTo, deepEqualTo, isFalse, isTrue } = wrap(test)
+  let { equalTo, isFalse, isTrue } = wrap(test)
 
   let thisIsFate = ['this','is','fate']
   let oneTwoThree = [1,2,3]
 
-  thisIsFate | array.join | deepEqualTo('this is fate')
-  array.join(thisIsFate, '-=-') | deepEqualTo('this-=-is-=-fate')
+  thisIsFate | array.join | equalTo('this is fate')
+  thisIsFate | array.join(_, '-=-') | equalTo('this-=-is-=-fate')
+  array.join(thisIsFate, '-=-') | equalTo('this-=-is-=-fate')
 
   oneTwoThree | array.last | equalTo(3)
   oneTwoThree | array.first | equalTo(1)
