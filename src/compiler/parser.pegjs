@@ -527,7 +527,7 @@ objectPattern
 
 objectPatternItems
   = head:objectPatternItem
-    tail:( LIST_SEP e:objectPatternItem { return e; })*  {
+    tail:( LIST_SEP e:objectPatternItem { return e; })* {
       return [head].concat(tail)
     }
 
@@ -559,7 +559,7 @@ arrayPattern
 
 arrayPatternElements
   = head:patternValue
-    tail:( LIST_SEP e:patternValue { return e; })*  {
+    tail:( LIST_SEP e:patternValue { return e; })* {
       return [head].concat(tail).map(function (element, idx) {
         let indexNode = element.template('literal', idx);
         return node('patternElement', indexNode, element);
@@ -761,13 +761,21 @@ lambda
         node('statements', stmts)
       );
     }
-  / params:lambdaParams? __ Arrow __ stmts:lambdaStatements {
+  / params:lambdaParams? __ stmts:lambdaTail {
       return node('lambda',
         node('signature', null, params || []),
         node('statements', stmts)
       );
     }
   / doExpression
+
+lambdaTail
+  = Arrow NL stmts:lambdaStatements {
+      return stmts;
+    }
+  / Arrow __ stmt:blockStatement {
+      return [stmt];
+    }
 
 lambdaParams
   = "(" __ params:idParamList? __ ")" {

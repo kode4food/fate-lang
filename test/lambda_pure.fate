@@ -7,7 +7,7 @@ def lambdas(test)
 
   let lambda1 = x -> [for y in x where y > 50 select y * 3],
       lambda2 = x → x • 2,
-      lambda3 = (x, y → x + y)
+      lambda3 = (x, y) → x + y
 
   lambda1([5, 25, 70, 200]) | deepEqualTo([210, 600])
   lambda2(100) 	            | equalTo(200)
@@ -52,8 +52,9 @@ def fatLambdas(test)
     r * x * y)
 
   let lambda2 = (
-    x, y -> let r = x + y
-    r * x * y
+    x, y ->
+      let r = x + y
+      r * x * y
   )
 
   lambda1(70, 80) | equalTo(840000)
