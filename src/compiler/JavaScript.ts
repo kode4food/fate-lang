@@ -91,6 +91,7 @@ waiterMap[Resolver.All] = 'awaitAll';
 
 // various names
 const selfName = 's';
+const thisOrSelf = 'this||' + selfName;
 const contextName = 'c';
 const exportsName = 'x';
 const valueName = 'v';
@@ -264,7 +265,7 @@ export function createModule() {
   }
 
   function self() {
-    write(selfName);
+    write('(', thisOrSelf, ')');
   }
 
   function currentDirectory() {
@@ -698,7 +699,7 @@ export function createModule() {
   function call(funcId: Id|BodyEntry, args?: BodyEntries) {
     if ( !args ) {
       // pass through local arguments (for function chaining)
-      write(funcId, '.apply(null,arguments)');
+      write(funcId, '.apply(', thisOrSelf, ',arguments)');
       return;
     }
     write(funcId, '(');

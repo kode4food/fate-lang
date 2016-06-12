@@ -1,5 +1,22 @@
 # Change History
 
+## Version 0.7.2 - The Semantics of 'self'
+When `self` is called, it now refers to the invoked version of the Function, not the one that currently has control.  In the following code, the call to `self` will invoke the guarded version of the Function.
+
+```ruby
+import io
+
+def testFunc(val)
+  self("Hello, " + val + "!")
+end
+
+def testFunc("Hello, World!" as val)
+  'success: ' + val
+end
+
+testFunc("World") | io.print
+```
+
 ## Version 0.7.1 - Wildcard Revisited
 The wildcard is now the underscore symbol (`_`) and can be used in the following scenarios:
 

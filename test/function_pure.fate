@@ -69,10 +69,26 @@ def badCompose(test)
   test.done()
 end
 
+def properSelfTreatment(test)
+  let { equalTo } = wrap(test)
+
+  def testFunc(val)
+    self("Hello, " + val + "!")
+  end
+
+  def testFunc("Hello, World!" as val)
+    'success: ' + val
+  end
+
+  testFunc("World") | equalTo("success: Hello, World!")
+  test.done()
+end
+
 export let tests = nodeunit.testCase({
   "Functions with Guards Only": guardOnly,
   "Functions with Guard and Default": guardAndDefault,
   "Functions with Anonymous Patterns": anonymousPatternArgument,
   "Functions with No Arguments": noArguments,
-  "Functions that don't Compose": badCompose
+  "Functions that don't Compose": badCompose,
+  "Proper 'self' treatment": properSelfTreatment
 })

@@ -213,9 +213,10 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     generate.exports(exports);
   }
 
-  function getFuncOrLambdaInternalId(node: Syntax.Node) {
+  function getFuncOrLambdaInternalId(node: Syntax.FunctionOrLambda) {
     let hasSelf = hasAnnotation(node, 'function/self');
-    return hasSelf ? generate.selfName : undefined;
+    let hasGuard = node.signature.guard;
+    return hasSelf || hasGuard  ? generate.selfName : undefined;
   }
 
   function createFunctionEvaluator(node: Syntax.FunctionDeclaration) {

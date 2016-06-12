@@ -137,7 +137,13 @@ export class BindOperator extends Operator {
               public right: (Expression|Wildcard)[]) { super(); }
 }
 
-export class LambdaExpression extends Expression {
+export interface FunctionOrLambda extends Annotated {
+  signature: Signature;
+  statements: Statements;
+}
+
+export class LambdaExpression extends Expression
+                              implements FunctionOrLambda {
   constructor(public signature: Signature,
               public statements: Statements) { super(); }
 }
@@ -327,7 +333,8 @@ export class ImportStatement extends ExportableStatement {
   }
 }
 
-export class FunctionDeclaration extends ExportableStatement {
+export class FunctionDeclaration extends ExportableStatement
+                                 implements FunctionOrLambda  {
   constructor(public signature: Signature,
               public statements: Statements) { super(); }
 
