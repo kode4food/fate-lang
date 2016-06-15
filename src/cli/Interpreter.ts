@@ -18,7 +18,7 @@ export function commandLine(inputArgs: string[], console: Console,
 
   let args = <ParsedArguments>minimist(inputArgs, {
     boolean: ['help'],
-    unknown: (value) => {
+    unknown: value => {
       let invalidFlag = /^--.+/.test(value);
       badArg = badArg || invalidFlag;
       return !invalidFlag;

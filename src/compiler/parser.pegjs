@@ -569,7 +569,7 @@ arrayPattern
 arrayPatternElements
   = head:patternValue
     tail:( LIST_SEP e:patternValue { return e; })* {
-      return [head].concat(tail).map(function (element, idx) {
+      return [head].concat(tail).map((element, idx) => {
         let indexNode = element.template('literal', idx);
         return node('patternElement', indexNode, element);
       });
