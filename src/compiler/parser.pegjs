@@ -432,7 +432,7 @@ rightCallOperator
 
 compose
   = head:composeOr
-    tail:( __ "|" __ ">" __ c:composeOr { return c; } )* {
+    tail:( __ ">" __ ">" __ c:composeOr { return c; } )* {
       if ( !tail || !tail.length ) {
         return head;
       }

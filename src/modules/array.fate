@@ -1,4 +1,4 @@
-from pattern import Array, String
+from pattern import Array, String, Function
 
 from '../Types' import isArray
 
@@ -17,6 +17,18 @@ end
 
 export def join(Array as value, String as delim)
   value.join(delim)
+end
+
+export def sort(Array as value)
+  value.sort()
+end
+
+export def sort(Array as value, Function as sortFunc)
+  value.sort(sortFunc)
+end
+
+export def reverse(Array as value)
+  value.reverse()
 end
 
 export def last(Array as value)
