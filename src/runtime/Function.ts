@@ -60,15 +60,26 @@ export function compose(funcs: FateFunction[]) {
 }
 
 export function composeOr(funcs: FateFunction[]) {
-  let orWrapper: FateFunction = createWrapper(funcs, isTrue);
-  (<FateFunction>orWrapper).__fate = checkComposition(funcs);
-  return orWrapper;
+  return createWrapper(funcs, isTrue);
 }
 
 export function composeAnd(funcs: FateFunction[]) {
-  let orWrapper: FateFunction = createWrapper(funcs, isFalse);
-  (<FateFunction>orWrapper).__fate = checkComposition(funcs);
-  return orWrapper;
+  return createWrapper(funcs, isFalse);
+}
+
+function createWrapper(funcs: FateFunction[], check: Function) {
+  (<FateFunction>wrapper).__fate = checkComposition(funcs);
+  return wrapper;
+
+  function wrapper() {
+    for ( let i = 0; i < funcs.length - 1; i++ ) {
+      let result = funcs[i].apply(null, arguments);
+      if ( check(result) ) {
+        return result;
+      }
+    }
+    return funcs[funcs.length - 1].apply(null, arguments);
+  }
 }
 
 function checkComposition(funcs: FateFunction[]) {
@@ -83,16 +94,4 @@ function checkComposition(funcs: FateFunction[]) {
   }
 
   return fateType;
-}
-
-function createWrapper(funcs: FateFunction[], check: Function) {
-  return function wrapper() {
-    for ( let i = 0; i < funcs.length - 1; i++ ) {
-      let result = funcs[i].apply(null, arguments);
-      if ( check(result) ) {
-        return result;
-      }
-    }
-    return funcs[funcs.length - 1].apply(null, arguments);
-  };
 }
