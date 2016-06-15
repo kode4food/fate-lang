@@ -19,7 +19,7 @@ export def join(Array as value, String as delim)
   value.join(delim)
 end
 
-let standardSort = (x, y) → 1 if x > y else -1 if x < y else 0
+let standardSort = (l, r) → 1 if l > r else -1 if l < r else 0
 
 export def sort(Array as value)
   value.sort(standardSort)
