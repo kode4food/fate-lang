@@ -46,6 +46,19 @@ export function bindFunction(func: Function, args: ArgTemplate) {
   }
 }
 
+export function compose(funcs: FateFunction[]) {
+  (<FateFunction>wrapper).__fate = checkComposition(funcs);
+  return wrapper;
+
+  function wrapper() {
+    let result = funcs[0].apply(null, arguments);
+    for ( let i = 1; i < funcs.length; i++ ) {
+      result = funcs[i](result);
+    }
+    return result;
+  }
+}
+
 export function composeOr(funcs: FateFunction[]) {
   let orWrapper: FateFunction = createWrapper(funcs, isTrue);
   (<FateFunction>orWrapper).__fate = checkComposition(funcs);

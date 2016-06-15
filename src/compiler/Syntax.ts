@@ -148,13 +148,12 @@ export class LambdaExpression extends Expression
               public statements: Statements) { super(); }
 }
 
-export class ComposeOrExpression extends Expression {
+export class ComposeExpression extends Expression {
   constructor(public expressions: Expressions) { super(); }
 }
 
-export class ComposeAndExpression extends Expression {
-  constructor(public expressions: Expressions) { super(); }
-}
+export class ComposeOrExpression extends ComposeExpression {}
+export class ComposeAndExpression extends ComposeExpression {}
 
 export class ReduceExpression extends Expression {
   constructor(public assignment: DirectAssignment,
@@ -536,6 +535,7 @@ let tagToConstructor: FunctionMap = {
   'export': ExportStatement,
   'function': FunctionDeclaration,
   'lambda': LambdaExpression,
+  'compose': ComposeExpression,
   'composeOr': ComposeOrExpression,
   'composeAnd': ComposeAndExpression,
   'reduce': ReduceExpression,

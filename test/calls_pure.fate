@@ -39,6 +39,19 @@ def rightCalls(test)
   test.done()
 end
 
+def composedCalls(test)
+  let { equalTo } = wrap(test)
+
+  let addOne = x -> x + 1,
+      mulTen = x -> x * 10,
+      prefixHello = x -> 'Hello ' + x
+
+  let composed = addOne |> mulTen |> prefixHello
+
+  2 | composed | equalTo('Hello 30')
+  test.done()
+end
+
 def awaitCalls(test)
   let { equalTo, deepEqualTo } = wrap(test)
 
@@ -92,6 +105,7 @@ end
 export let tests = nodeunit.testCase({
   "Left Function Calls": leftCalls,
   "Right Piped Calls": rightCalls,
+  "Composed Calls": composedCalls,
   "Awaiting Calls": awaitCalls,
   "Recursive Calls": recursiveCalls
 })

@@ -29,6 +29,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     'export': createExportEvaluator,
     'function': createFunctionEvaluator,
     'lambda': createLambdaEvaluator,
+    'compose': createComposeEvaluator,
     'composeOr': createComposeOrEvaluator,
     'composeAnd': createComposeAndEvaluator,
     'reduce': createReduceEvaluator,
@@ -333,6 +334,13 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
         () => { generate.args(fixedCount); }
       );
     });
+  }
+
+  function createComposeEvaluator(node: Syntax.ComposeExpression) {
+    generate.call(
+      generate.runtimeImport('compose'),
+      [() => { generate.array(node.expressions.map(defer)); }]
+    );
   }
 
   function createComposeOrEvaluator(node: Syntax.ComposeOrExpression) {

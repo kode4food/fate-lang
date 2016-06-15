@@ -1,5 +1,10 @@
 # Change History
 
+## Version 0.7.3 - More Better Composition Operators
+The composition operators have changed, and a new one has been introduced.  Since the lambda operator is a `->`, composition operators now take on a similar appearance.
+
+ANDed Functions will now use the `and>` operator, while ORed Functions will now use the `or>` operator.  Pure composition can now be performed using the `>>` operator, similar to the F# language.
+
 ## Version 0.7.2 - The Semantics of 'self'
 When `self` is called, it now refers to the invoked version of the Function, not the one that currently has control.  In the following code, the call to `self` will invoke the guarded version of the Function.
 

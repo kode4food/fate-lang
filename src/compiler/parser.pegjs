@@ -401,8 +401,8 @@ expr
   = rightCall
 
 rightCall
-  = args:composeOr
-    calls:( __ op:rightCallOperator __ c:composeOr { return [op, c]; } )* {
+  = args:compose
+    calls:( __ op:rightCallOperator __ c:compose { return [op, c]; } )* {
       if ( !calls || !calls.length ) {
         return args;
       }
@@ -430,9 +430,18 @@ rightCallOperator
   / "." __ "|" { return Syntax.Resolver.Value; }
   / "|"        { return null; }
 
+compose
+  = head:composeOr
+    tail:( __ "|" __ ">" __ c:composeOr { return c; } )* {
+      if ( !tail || !tail.length ) {
+        return head;
+      }
+      return node('compose', [head].concat(tail));
+    }
+
 composeOr
   = head:composeAnd
-    tail:( __ Or __ "|" __ c:composeAnd { return c; } )* {
+    tail:( __ Or __ ">" __ c:composeAnd { return c; } )* {
       if ( !tail || !tail.length ) {
         return head;
       }
@@ -441,7 +450,7 @@ composeOr
 
 composeAnd
   = head:conditional
-    tail:( __ And __ "|" __ c:conditional { return c; } )* {
+    tail:( __ And __ ">" __ c:conditional { return c; } )* {
       if ( !tail || !tail.length ) {
         return head;
       }
