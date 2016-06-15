@@ -46,7 +46,7 @@ def composedCalls(test)
       mulTen = x -> x * 10,
       prefixHello = x -> 'Hello ' + x
 
-  let composed = addOne >> mulTen >> prefixHello
+  let composed = addOne ∘ mulTen o prefixHello
 
   2 | composed | equalTo('Hello 30')
   test.done()

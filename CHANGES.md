@@ -1,16 +1,16 @@
 # Change History
 
 ## Version 0.7.3 - Function Composition
-The combination operators have changed, and a new operator for composition has been introduced.  Since the lambda operator is a `->`, combination and composition operators now take on a similar appearance.
+The combination operators have changed, and a new operator for composition has been introduced.
 
-ANDed Functions will now use the `and>` operator, while ORed Functions will now use the `or>` operator.
+Since the lambda operator is a `->`, combination operators now take on a similar appearance.  ANDed Functions will now use the `and>` operator, while ORed Functions will now use the `or>` operator.
 
-Pure composition can now be performed using the `>>` operator, similar to the F# language.
+Pure composition can now be performed using the `o` operator, which one might recognize from SML (or `∘`).
 
 ```ruby
 from array import sort, reverse
 
-let reversedSort = sort >> reverse
+let reversedSort = sort o reverse
 
 [5, 3, 10, 7, 1] | reversedSort # [10, 7, 5, 3, 1]
 ```

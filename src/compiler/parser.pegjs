@@ -432,7 +432,7 @@ rightCallOperator
 
 compose
   = head:composeOr
-    tail:( __ ">" __ ">" __ c:composeOr { return c; } )* {
+    tail:( __ Compose __ c:composeOr { return c; } )* {
       if ( !tail || !tail.length ) {
         return head;
       }
@@ -938,6 +938,9 @@ Where   = "where"    !NameContinue
 Select  = "select"   !NameContinue
 When    = "when"     !NameContinue
 
+Arrow =   "->" / "→"
+Compose = "o" !NameContinue / "∘"
+
 NotLike = Not _ Like { return 'notLike'; }
 NotIn   = Not _ In   { return 'notIn'; }
 
@@ -945,7 +948,7 @@ ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or / Like / Mod /
       Not / If / Unless / True / False / As / In / Return / Else / End /
       Where / Select / Reduce / Await / Any / All / When / Case / Match /
-      Context / Self / Global / Wildcard )
+      Context / Self / Global / Wildcard / Compose )
 
 Identifier "identifier"
   = !ReservedWord name:Name {
@@ -1058,8 +1061,6 @@ Div = ( "/" / "÷" ) { return 'div'; }
 
 Neg = "-" { return 'neg'; }
 Pos = "+" { return 'pos'; }
-
-Arrow = ( "->" / "→" )
 
 Equality = Like / NEQ / EQ / NotLike
 Relational = GTE / LTE / LT / GT / In / NotIn
