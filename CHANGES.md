@@ -1,6 +1,6 @@
 # Change History
 
-## Version 0.7.3 - More Better Composition Operators
+## Version 0.7.3 - Function Composition
 The composition operators have changed, and a new one has been introduced.  Since the lambda operator is a `->`, composition operators now take on a similar appearance.
 
 ANDed Functions will now use the `and>` operator, while ORed Functions will now use the `or>` operator.  Pure composition can now be performed using the `>>` operator, similar to the F# language.
@@ -59,8 +59,8 @@ user2 like ValidUserData # false
 ## Version 0.6.4 - Lambda Parsing Clarified
 Lambdas with multiple arguments now require parentheses either around the arguments or around the entire lambda.  Lambdas with a single argument no longer require parentheses around the argument.
 
-## Version 0.6.3 - Function and Pattern Composition
-Functions and Patterns can be combined using the `and|` and `or|` operators.  The result of these operators will be a new Function that combines the behaviors of its operands.
+## Version 0.6.3 - Function and Pattern Combination
+Functions and Patterns can be combined using the `and>` and `or>` operators.  The result of these operators will be a new Function that combines the behaviors of its operands.
 
 ## Version 0.6.2 - Operator Alternatives
 The following operators can now, alternatively, be represented using more math-friendly symbols.
