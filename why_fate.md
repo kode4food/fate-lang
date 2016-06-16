@@ -124,7 +124,7 @@ function inTheForest$1(person) {
 You can even write a function that will handle Wereducks.
 
 ```ruby
-let Wereduck = Duck and| Person
+let Wereduck = Duck and> Person
 
 def inTheForest(Wereduck as scary)
   "the moon is full, beware the Wereduck" | io.print
