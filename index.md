@@ -86,6 +86,12 @@ end
 
 # Branching Expressions
 let result = 'green' unless turnedOff else 'red'
+
+# Function Composition
+from io import print
+from array import sort, reverse
+let reverseSort = sort o reverse
+[9, 15, 35, 2, 17, 6] | reverseSort | print
 ```
 
 ### Iteration And Reducing
