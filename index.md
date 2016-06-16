@@ -86,12 +86,6 @@ end
 
 # Branching Expressions
 let result = 'green' unless turnedOff else 'red'
-
-# Function Composition
-from io import print
-from array import sort, reverse
-let reverseSort = sort o reverse
-[9, 15, 35, 2, 17, 6] | reverseSort | print
 ```
 
 ### Iteration And Reducing
@@ -143,6 +137,11 @@ let Shape = ~{ .type in ['square', 'circle', 'triangle'] },
     Large = ~{ .size: > 50 }
 
 let LargeOrangeShape = Large and> Orange and> Shape
+
+# Function Composition
+from array import sort, reverse
+let reverseSort = sort o reverse
+[9, 15, 35, 2, 17, 6] | reverseSort | print
 
 # Instead of multiple statements with an 'end', you
 # can just use a colon to evaluate a single statement
