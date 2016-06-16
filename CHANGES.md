@@ -5,12 +5,13 @@ The combination operators have changed, and a new operator for composition has b
 
 Since the lambda operator is a `->`, combination operators now take on a similar appearance.  ANDed Functions will now use the `and>` operator, while ORed Functions will now use the `or>` operator.
 
-Pure composition can now be performed using the `o` operator, which one might recognize from SML (or `∘`).
+Pure composition can now be performed using the `o` operator, which one might recognize from SML (or `∘`).  But unlike SML, the executing of the functions is reversed, in keeping with the pipeline principle that Fate tends to leverage.
 
 ```ruby
 from array import sort, reverse
 
 let reversedSort = sort o reverse
+#        same as   x -> reverse(sort(x))
 
 [5, 3, 10, 7, 1] | reversedSort # [10, 7, 5, 3, 1]
 ```
