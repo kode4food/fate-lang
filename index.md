@@ -172,6 +172,10 @@ do
   {name: await name} | "Hello, %name!" | print
 end
 
+do when [content, _] = http.get("http://www.example.org/")
+  content | print
+end
+
 let eventualResult = do
   case name
     print("name resolved first")
