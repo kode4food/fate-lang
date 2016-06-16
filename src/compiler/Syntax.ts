@@ -611,6 +611,6 @@ export function node(tag: Tag, ...args: any[]) {
   let constructor = tagToConstructor[tag];
   let instance = Object.create(constructor.prototype);
   instance.tag = tag;
-  let result = constructor.apply(instance, args);
-  return result !== undefined ? result : instance;
+  constructor.apply(instance, args);
+  return instance;
 }

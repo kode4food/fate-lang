@@ -10,6 +10,7 @@ var istanbul = require('gulp-istanbul');
 var enforcer = require('gulp-istanbul-enforcer');
 var pegjs = require('gulp-peg');
 var rename = require('gulp-rename');
+var replace = require('gulp-replace');
 var copy = require('gulp-copy');
 var tslint = require('gulp-tslint');
 var del = require('del');
@@ -22,6 +23,10 @@ var coverageFiles = ['./test/**/*.js', './dist/**/*.js',
 var parserFile = ['./src/compiler/parser.pegjs'];
 var parserOutput = 'parser.js';
 
+var extendSignature = 'var __extends =';
+var exportSignature = 'function __export(m)';
+var ignoreNext = '/* istanbul ignore next */\n';
+
 var tsProject = typescript.createProject('./src/tsconfig.json');
 
 var nodeUnitConfig = {
@@ -33,8 +38,8 @@ var nodeUnitConfig = {
 
 var enforcerConfig = {
   thresholds: {
-    statements: 99.92,
-    branches: 97.27,
+    statements: 100,
+    branches: 100,
     functions: 100,
     lines: 100
   },
@@ -76,6 +81,8 @@ gulp.task('compile', ['parser'], function() {
   return gulp.src(tsFiles)
              .pipe(typescript(tsProject))
              .js
+             .pipe(replace(extendSignature, ignoreNext + extendSignature))
+             .pipe(replace(exportSignature, ignoreNext + exportSignature))
              .pipe(gulp.dest(buildDir()));
 });
 

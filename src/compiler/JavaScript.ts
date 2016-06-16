@@ -272,7 +272,7 @@ export function createModule() {
     return literal('__dirname');
   }
 
-  function args(startAt = 0) {
+  function args(startAt: number) {
     let slice = runtimeImport('sliceArray');
     write(slice, '(arguments,', '' + startAt, ')');
   }
@@ -722,8 +722,7 @@ export function createModule() {
     let expressions: ObjectAssignmentItems = [];
 
     items.forEach(item => {
-      item[2] = typeof item[0] === 'function';
-      let target = item[2] ? expressions : literals;
+      let target = typeof item[0] === 'function' ? expressions : literals;
       target.push(item);
     });
 
@@ -737,8 +736,7 @@ export function createModule() {
 
       expressions.forEach(item => {
         components.push(() => {
-          let name = item[2] ? item[0] : literal(item[0]);
-          member(dictVar, name);
+          member(dictVar, item[0]);
           write('=', item[1]);
         });
       });

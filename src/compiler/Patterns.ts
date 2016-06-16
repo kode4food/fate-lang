@@ -63,7 +63,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function getPatternParent() {
     let matches = visit.hasAncestorTags(patternParentTags);
-    return matches ? matches[0] : null;
+    return matches && matches[0];
   }
 
   function annotateCollection(node: Syntax.CollectionPattern) {

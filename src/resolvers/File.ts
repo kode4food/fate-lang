@@ -15,10 +15,15 @@ const pathSuffixes = ['.fate', '/index.fate'];
  */
 export function createFileResolver(options: Options) {
   let cache: { [index: string]: Module } = {};
+  /* istanbul ignore next: fallback directory */
   let defaultBasePath: DirPath = options.path || process.cwd();
   return { resolve };
 
-  function resolve(name: ModuleName, basePath = defaultBasePath) {
+  function resolve(name: ModuleName, basePath?: DirPath) {
+    /* istanbul ignore else: there isn't one */
+    if ( !basePath ) {
+      basePath = defaultBasePath;
+    }
     let cacheKey = `${basePath}//${name}`;
     let result = cache[cacheKey];
     if ( result ) {

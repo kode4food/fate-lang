@@ -171,6 +171,7 @@ export default function createTreeProcessors(visit: Visitor) {
         let thisGroup = getAnnotation(assignment, 'when/group') || 0;
         let prevGroup = getAnnotation(prevAssignment, 'when/group') || 0;
 
+        /* istanbul ignore else: there isn't one */
         if ( thisGroup <= prevGroup ) {
           annotate(assignment, 'when/group', thisGroup = prevGroup + 1);
         }

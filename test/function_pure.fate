@@ -30,6 +30,20 @@ def guardAndDefault(test)
   test.done()
 end
 
+def guardNonFunction(test)
+  let { equalTo, throws } = wrap(test)
+
+  let testFunc = "not a function"
+
+  def testFunc("hello")
+    'worked'
+  end
+
+  'hello' | testFunc | equalTo('worked')
+  (-> 'not hello' | testFunc ) | throws
+  test.done()
+end
+
 def anonymousPatternArgument(test)
   let { equalTo } = wrap(test)
 
@@ -87,6 +101,7 @@ end
 export let tests = nodeunit.testCase({
   "Functions with Guards Only": guardOnly,
   "Functions with Guard and Default": guardAndDefault,
+  "Functions that Guard non-Functions": guardNonFunction,
   "Functions with Anonymous Patterns": anonymousPatternArgument,
   "Functions with No Arguments": noArguments,
   "Functions that don't Compose": badCompose,

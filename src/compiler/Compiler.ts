@@ -83,6 +83,7 @@ function generateFunctionCode(generatedCode: GeneratedCode) {
 
 export function wrapCompileError(err: Error, filePath?: FilePath): Error {
   if ( err instanceof CompileError ) {
+    /* istanbul ignore else: there isn't one */
     if ( filePath ) {
       err.filePath = filePath;
     }
@@ -90,6 +91,7 @@ export function wrapCompileError(err: Error, filePath?: FilePath): Error {
     return err;
   }
 
+  /* istanbul ignore else: there isn't one */
   if ( err instanceof SyntaxError ) {
     return formatSyntaxError(<PEG.SyntaxError>err, filePath);
   }
@@ -102,6 +104,7 @@ function formatCompileError(err: CompileError, filePath?: FilePath) {
   let lineInfo = `:${err.line}:${err.column}`;
   let message = err.message;
 
+  /* istanbul ignore next: string fallback logic */
   filePath = filePath || err.filePath || 'string';
   return `${filePath}${lineInfo}: ${message}`;
 }
@@ -113,9 +116,12 @@ function formatSyntaxError(err: PEG.SyntaxError,
   let line = err.location.start.line;
   let column = err.location.start.column;
 
+  /* istanbul ignore next: string fallback logic */
   let unexpected = found ? `'${found}'` : "end of file";
   let errString = `Unexpected ${unexpected}`;
   let lineInfo = `:${line}:${column}`;
+
+  /* istanbul ignore next: string fallback logic */
   let message = `${filePath || 'string'}${lineInfo}: ${errString}`;
 
   return new CompileError(message, line, column, filePath);
