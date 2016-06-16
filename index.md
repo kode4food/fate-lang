@@ -140,7 +140,7 @@ let LargeOrangeShape = Large and> Orange and> Shape
 
 # Function Composition
 from array import sort, reverse
-let reverseSort = sort o reverse
+let reverseSort = sort o reverse  # x -> reverse(sort(x))
 [9, 15, 35, 2, 17, 6] | reverseSort | print
 
 # Instead of multiple statements with an 'end', you
