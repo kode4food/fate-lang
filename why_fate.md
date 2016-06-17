@@ -124,14 +124,14 @@ function inTheForest$1(person) {
 You can even write a function that will handle Wereducks.
 
 ```ruby
-let Wereduck = Duck and> Person
+let Wereduck = Duck && Person
 
 def inTheForest(Wereduck as scary)
   "the moon is full, beware the Wereduck" | io.print
 end
 ```
 
-This example is leveraging the function combination operator `and|` to generate a new pattern that combines the `Duck` and `Person` patterns into a new one.
+This example is leveraging the function combination operator `&&` to generate a new pattern that combines the `Duck` and `Person` patterns into a new one.
 
 ## Pulling It All Together
 Now let's introduce one of our concurrency features to contextualize what we've just learned.
