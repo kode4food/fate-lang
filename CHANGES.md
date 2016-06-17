@@ -1,11 +1,10 @@
 # Change History
 
+## Version 0.7.4 - Function Combination Operators
+The Function combination operators have changed.  ANDed Functions will now use the `&&` operator, while ORed Functions will now use the `||` operator.
+
 ## Version 0.7.3 - Function Composition
-The combination operators have changed, and a new operator for composition has been introduced.
-
-Since the lambda operator is a `->`, combination operators now take on a similar appearance.  ANDed Functions will now use the `and>` operator, while ORed Functions will now use the `or>` operator.
-
-Pure composition can now be performed using the `o` operator, which one might recognize from SML (or `∘`).  But unlike SML, the executing of the functions is reversed, in keeping with the pipeline principle that Fate tends to leverage.
+Function composition can now be performed using the `o` operator, which one might recognize from SML (or `∘`).  But unlike SML, the executing of the functions is reversed, in keeping with the pipeline principle that Fate tends to leverage.
 
 ```ruby
 from array import sort, reverse
@@ -71,7 +70,7 @@ user2 like ValidUserData # false
 Lambdas with multiple arguments now require parentheses either around the arguments or around the entire lambda.  Lambdas with a single argument no longer require parentheses around the argument.
 
 ## Version 0.6.3 - Function and Pattern Combination
-Functions and Patterns can be combined using the `and>` and `or>` operators.  The result of these operators will be a new Function that combines the behaviors of its operands.
+Functions and Patterns can be combined using the `&&` and `||` operators.  The result of these operators will be a new Function that combines the behaviors of its operands.
 
 ## Version 0.6.2 - Operator Alternatives
 The following operators can now, alternatively, be represented using more math-friendly symbols.

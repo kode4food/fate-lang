@@ -79,7 +79,7 @@ end
 
 def badCompose(test)
   let { throws } = wrap(test)
-  (-> "hello" and> ~{ name: 'Lionel' }) | throws
+  (-> "hello" && ~{ name: 'Lionel' }) | throws
   test.done()
 end
 

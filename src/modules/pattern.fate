@@ -58,11 +58,11 @@ export def ArrayOf(elementPattern)
 
   def decorate(pattern)
     setProperty(pattern, 'MinLength', minLength →
-      (pattern and> value → value.length ≥ minLength) | decorate
+      (pattern && value → value.length ≥ minLength) | decorate
     )
 
     setProperty(pattern, 'MaxLength', maxLength →
-      (pattern and> value → value.length ≤ maxLength) | decorate
+      (pattern && value → value.length ≤ maxLength) | decorate
     )
 
     pattern

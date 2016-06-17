@@ -183,11 +183,11 @@ def combinedPatterns(test)
   let { isTrue, isFalse } = wrap(test)
 
   let Primate = ~{ kingdom: 'Animalia', class: 'Mammalia', order: 'Primate' },
-      Monkey = ~{ infraorder: 'Simiiformes' } and> Primate,
-      Tarsier = ~{ infraorder: 'Tarsiiformes' } and> Primate,
-      MonkeyOrTarsier = Monkey or> Tarsier,
+      Monkey = ~{ infraorder: 'Simiiformes' } && Primate,
+      Tarsier = ~{ infraorder: 'Tarsiiformes' } && Primate,
+      MonkeyOrTarsier = Monkey || Tarsier,
       FourAsses = ~{ asses: 4 },
-      MonkeyWithFourAsses = Monkey and> FourAsses
+      MonkeyWithFourAsses = Monkey && FourAsses
 
   let monkey1 = {
     kingdom: 'Animalia',

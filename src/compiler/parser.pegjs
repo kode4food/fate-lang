@@ -425,10 +425,10 @@ rightCall
     }
 
 rightCallOperator
-  = "?" __ "|" { return Syntax.Resolver.Any; }
-  / ":" __ "|" { return Syntax.Resolver.All; }
-  / "." __ "|" { return Syntax.Resolver.Value; }
-  / "|"        { return null; }
+  = RightCallAny   { return Syntax.Resolver.Any; }
+  / RightCallAll   { return Syntax.Resolver.All; }
+  / RightCallValue { return Syntax.Resolver.Value; }
+  / RightCall      { return null; }
 
 compose
   = head:composeOr
@@ -441,7 +441,7 @@ compose
 
 composeOr
   = head:composeAnd
-    tail:( __ Or __ ">" __ c:composeAnd { return c; } )* {
+    tail:( __ ComposeOr __ c:composeAnd { return c; } )* {
       if ( !tail || !tail.length ) {
         return head;
       }
@@ -450,7 +450,7 @@ composeOr
 
 composeAnd
   = head:conditional
-    tail:( __ And __ ">" __ c:conditional { return c; } )* {
+    tail:( __ ComposeAnd __ c:conditional { return c; } )* {
       if ( !tail || !tail.length ) {
         return head;
       }
@@ -938,11 +938,19 @@ Where   = "where"    !NameContinue
 Select  = "select"   !NameContinue
 When    = "when"     !NameContinue
 
-Arrow =   "->" / "→"
-Compose = "o" !NameContinue / "∘"
+Arrow      = "->" / "→"
 
-NotLike = Not _ Like { return 'notLike'; }
-NotIn   = Not _ In   { return 'notIn'; }
+Compose    = "o" !NameContinue / "∘"
+ComposeOr  = "|" __ "|"
+ComposeAnd = "&" __ "&"
+
+RightCallAny   = "?" __ "|"
+RightCallAll   = ":" __ "|"
+RightCallValue = "." __ "|"
+RightCall      = "|"
+
+NotLike = Not __ Like { return 'notLike'; }
+NotIn   = Not __ In   { return 'notIn'; }
 
 ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or / Like / Mod /
