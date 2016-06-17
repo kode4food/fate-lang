@@ -136,7 +136,7 @@ let Shape = ~{ .type in ['square', 'circle', 'triangle'] },
     Orange = ~{ 'orange' in .colors },
     Large = ~{ .size: > 50 }
 
-let LargeOrangeShape = Large and> Orange and> Shape
+let LargeOrangeShape = Large && Orange && Shape
 
 # Function Composition
 from array import sort, reverse
