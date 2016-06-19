@@ -10,7 +10,7 @@
 
 /* istanbul ignore next: Used to fetch constructor */
 function* dummy() {}
-var GeneratorConstructor = dummy().constructor;
+const GeneratorConstructor = dummy().constructor;
 
 function isGenerator(value) {
   if ( value === null || typeof value !== 'object' ) {
@@ -20,9 +20,9 @@ function isGenerator(value) {
 }
 
 function* createRangeGenerator(start, end) {
-  var current = start = Math.floor(start);
+  let current = start = Math.floor(start);
   end = Math.floor(end);
-  var increment = end > start ? 1 : -1;
+  let increment = end > start ? 1 : -1;
 
   yield current;
   while ( current !== end ) {
@@ -32,8 +32,8 @@ function* createRangeGenerator(start, end) {
 }
 
 function* generateIndexedSet(generator) {
-  var index = 0;
-  for ( var value of generator ) {
+  let index = 0;
+  for ( let value of generator ) {
     yield [value, index++];
   }
 }
