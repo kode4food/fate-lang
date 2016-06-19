@@ -1,4 +1,4 @@
-# Fate (A Programming Language)
+# Fate
 [![Build Status](https://travis-ci.org/kode4food/fate-lang.svg?branch=master)](https://travis-ci.org/kode4food/fate-lang)
 
 Fate is a programming language that targets the V8 JavaScript VM.  It is a mostly functional language that provides first-class patterns, invocation guards, list comprehensions, flexible function application, and awesome concurrency.
