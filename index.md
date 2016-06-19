@@ -2,7 +2,6 @@
 layout: fate_title
 title: Fate Programming
 ---
-## Patterns & Guards & Joins, Oh My!
 Fate is a programming language that targets the V8 JavaScript VM.  It is a mostly functional language that provides first-class patterns, invocation guards, list comprehensions, flexible function application, and awesome concurrency.
 
 That's a lot to take in, so maybe it's better to just demonstrate.  Let's say you needed to calculate the NOx emissions for an OBD II reporting module.  You could do it the obvious way:
