@@ -61,9 +61,7 @@ function coerceBooleanResult(pattern: Pattern) {
 
   function wrapped(value: any): boolean {
     let result: any = pattern(value);
-    return result !== false && result !== null &&
-           result !== undefined && result !== 0 &&
-           result !== isNothing;
+    return result !== false && result !== null && result !== undefined;
   }
 }
 
