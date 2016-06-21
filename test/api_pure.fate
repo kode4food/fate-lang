@@ -4,29 +4,30 @@ from pattern import Nothing, Something
 from test import wrap
 from value import null, undefined
 
-import '../dist/Types' as types
 import '../dist/Runtime' as runtime
 
 def trueFalse(test)
   let { isFalse, isTrue } = wrap(test)
 
-  types.isTrue(Nothing)           | isFalse
-  types.isTrue(Something)         | isTrue
-  types.isTrue(null)              | isFalse
-  types.isTrue(undefined)         | isFalse
-  types.isTrue()                  | isFalse
-  types.isTrue([])                | isTrue
-  types.isTrue({})                | isTrue
-  types.isTrue({ name: 'fate' })  | isTrue
-  types.isTrue("hello")           | isTrue
-  types.isTrue([1])               | isTrue
-  types.isFalse(Nothing)          | isTrue
-  types.isFalse()                 | isTrue
-  types.isFalse([])               | isFalse
-  types.isFalse({})               | isFalse
-  types.isFalse({ name: 'fate' }) | isFalse
-  types.isFalse("hello")          | isFalse
-  types.isFalse([1])              | isFalse
+  runtime.isTrue(Nothing)           | isTrue
+  runtime.isTrue(Something)         | isTrue
+  runtime.isTrue(null)              | isFalse
+  runtime.isTrue(undefined)         | isFalse
+  runtime.isTrue()                  | isFalse
+  runtime.isTrue([])                | isTrue
+  runtime.isTrue({})                | isTrue
+  runtime.isTrue(0)                 | isTrue
+  runtime.isTrue({ name: 'fate' })  | isTrue
+  runtime.isTrue("hello")           | isTrue
+  runtime.isTrue([1])               | isTrue
+  runtime.isFalse(Nothing)          | isFalse
+  runtime.isFalse()                 | isTrue
+  runtime.isFalse([])               | isFalse
+  runtime.isFalse({})               | isFalse
+  runtime.isFalse(0)                | isFalse
+  runtime.isFalse({ name: 'fate' }) | isFalse
+  runtime.isFalse("hello")          | isFalse
+  runtime.isFalse([1])              | isFalse
   test.done()
 end
 

@@ -5,7 +5,7 @@
 import minimist = require("minimist");
 
 import { VERSION, runScript } from '../Fate';
-import { createModule } from '../Types';
+import { createModule } from '../Module';
 
 interface ParsedArguments {
   'help'?: boolean;

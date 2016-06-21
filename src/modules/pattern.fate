@@ -1,11 +1,12 @@
-from '../Types' import isObject, isArray
+from '../Runtime' import isPattern, definePattern
 
-from '../runtime/Pattern'
-import isPattern, definePattern
-
-export from '../runtime/Pattern'
-import isNothing as Nothing
+export from '../Runtime'
+import isFalse as False
+     , isTrue as True
+     , isNothing as Nothing
      , isSomething as Something
+     , isObject as Object
+     , isArray as Array
 
 from './support' import isA, setProperty
 
@@ -40,16 +41,14 @@ export let NegativeInteger = ~(
 )
 
 export
-let Array = definePattern(isArray)
-  , EmptyArray = ~(isArray(it) and it.length = 0)
-  , NonEmptyArray = ~(isArray(it) and it.length > 0)
-  , Object = definePattern(isObject)
+let EmptyArray = ~(Array(it) and it.length = 0)
+  , NonEmptyArray = ~(Array(it) and it.length > 0)
   , Boolean = ~isA(it, 'boolean')
   , Function = ~isA(it, 'function')
 
 export def ArrayOf(elementPattern)
   let checker = definePattern(value →
-    return false unless isArray(value)
+    return false unless Array(value)
     [
       for item in value
       where not elementPattern(item)

@@ -1,6 +1,6 @@
 from pattern import Array, String, Function
 
-from '../Types' import isArray
+from '../Runtime' import isArray
 
 # Warning: this module assumes JavaScript-specific methods
 #

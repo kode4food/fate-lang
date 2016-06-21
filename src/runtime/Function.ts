@@ -1,6 +1,6 @@
 "use strict";
 
-import { isTrue, isFalse } from '../Types';
+import { isTrue, isFalse } from './Pattern';
 
 type ArgTemplate = { [index: number]: any };
 

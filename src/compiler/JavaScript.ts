@@ -1,6 +1,6 @@
 "use strict";
 
-import { mixin } from '../Util';
+import { mixin } from '../Runtime';
 import { GeneratedCode } from './Compiler';
 import { Resolver } from './Syntax';
 

@@ -1,8 +1,13 @@
 "use strict";
 
-const isArray = Array.isArray;
-
 type MixinObject = { [index: string]: any };
+
+const isArray = Array.isArray;
+const slice = Array.prototype.slice;
+
+export function sliceArray(array: any[], startAt: number) {
+  return slice.call(array, startAt);
+}
 
 export function mixin(target: MixinObject, ...source: any[]) {
   for ( let i = 0; i < source.length; i++ ) {
@@ -17,4 +22,14 @@ export function mixin(target: MixinObject, ...source: any[]) {
     }
   }
   return target;
+}
+
+export function isIn(value: any, list: any) {
+  if ( isArray(list) ) {
+    return list.indexOf(value) !== -1;
+  }
+  if ( typeof list === 'object' && list !== null ) {
+    return list.hasOwnProperty(value);
+  }
+  return false;
 }

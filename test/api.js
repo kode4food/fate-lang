@@ -1,30 +1,31 @@
 "use strict";
 
 const nodeunit = require('nodeunit');
-const types = require('../dist/Types');
 const runtime = require('../dist/Runtime');
 const support = require('../dist/modules/support');
 
 exports.api = nodeunit.testCase({
 
   "True / False": function (test) {
-    test.equal(types.isTrue(runtime.isNothing), false);
-    test.equal(types.isTrue(runtime.isSomething), true);
-    test.equal(types.isTrue(null), false);
-    test.equal(types.isTrue(undefined), false);
-    test.equal(types.isTrue(), false);
-    test.equal(types.isTrue([]), true);
-    test.equal(types.isTrue({}), true);
-    test.equal(types.isTrue({ name: 'fate' }), true);
-    test.equal(types.isTrue("hello"), true);
-    test.equal(types.isTrue([1]), true);
-    test.equal(types.isFalse(null), true);
-    test.equal(types.isFalse(), true);
-    test.equal(types.isFalse([]), false);
-    test.equal(types.isFalse({}), false);
-    test.equal(types.isFalse({ name: 'fate' }), false);
-    test.equal(types.isFalse("hello"), false);
-    test.equal(types.isFalse([1]), false);
+    test.equal(runtime.isTrue(runtime.isNothing), true);
+    test.equal(runtime.isTrue(runtime.isSomething), true);
+    test.equal(runtime.isTrue(null), false);
+    test.equal(runtime.isTrue(undefined), false);
+    test.equal(runtime.isTrue(), false);
+    test.equal(runtime.isTrue([]), true);
+    test.equal(runtime.isTrue({}), true);
+    test.equal(runtime.isTrue(0), true);
+    test.equal(runtime.isTrue({ name: 'fate' }), true);
+    test.equal(runtime.isTrue("hello"), true);
+    test.equal(runtime.isTrue([1]), true);
+    test.equal(runtime.isFalse(null), true);
+    test.equal(runtime.isFalse(), true);
+    test.equal(runtime.isFalse([]), false);
+    test.equal(runtime.isFalse({}), false);
+    test.equal(runtime.isFalse(0), false);
+    test.equal(runtime.isFalse({ name: 'fate' }), false);
+    test.equal(runtime.isFalse("hello"), false);
+    test.equal(runtime.isFalse([1]), false);
     test.done();
   },
 

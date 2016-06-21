@@ -9,8 +9,7 @@ import {
   compileModule, generateFunction, ScriptContent
 } from './compiler/Compiler';
 
-import { isObject } from './Types';
-import { mixin } from './Util';
+import { isObject, mixin } from './Runtime';
 
 const pkg = require('../package.json');
 export const VERSION = pkg.version;

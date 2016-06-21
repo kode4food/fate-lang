@@ -110,7 +110,7 @@ exports.basics = nodeunit.testCase({
     test.equal(evaluate("-1"), -1);
     test.equal(evaluate("not false"), true);
     test.equal(evaluate("not true"), false);
-    test.equal(evaluate("not (----10 - 10)"), true);
+    test.equal(evaluate("not (----10 - 10)"), false);
     test.equal(evaluate("-global.people[0].age", this.data), -50);
     test.equal(evaluate("-global.people[0].age + 10", this.data), -40);
     test.equal(evaluate("not (global.people[0].age = 25)", this.data), true);

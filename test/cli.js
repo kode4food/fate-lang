@@ -9,7 +9,7 @@ const helpers = require('./helpers');
 const createConsole = helpers.createConsole;
 
 const fate = require('../dist/Fate');
-const isObject = require('../dist/Types').isObject;
+const runtime = require('../dist/Runtime');
 
 exports.cli = nodeunit.testCase({
   "Command Line Help": function (test) {
@@ -41,7 +41,7 @@ exports.cli = nodeunit.testCase({
       });
 
       let compiled = require('./cli_success/test1.js');
-      test.ok(isObject(compiled));
+      test.ok(runtime.isObject(compiled));
 
       // cleanup
       fs.unlinkSync("./test/cli_success/test1.js");

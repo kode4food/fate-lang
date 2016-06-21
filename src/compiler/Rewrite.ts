@@ -2,7 +2,7 @@
 
 import Visitor from './Visitor';
 import * as Syntax from './Syntax';
-import { isTrue, isFalse, isIn } from '../Types';
+import { isTrue, isFalse, isIn } from '../Runtime';
 import { annotate } from './Annotations';
 
 const hasTag = Syntax.hasTag;

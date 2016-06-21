@@ -1,7 +1,5 @@
 "use strict";
 
-const isArray = Array.isArray;
-
 // Partially borrowed from the ES6 Typings ************************************
 
 interface WeakMap<K, V> {
@@ -31,6 +29,20 @@ export interface Pattern {
 export function isPattern(value: any) {
   return typeof value === 'function' && value.__fate === 'pattern';
 }
+
+export const isArray: Pattern = definePattern(Array.isArray);
+
+export const isObject: Pattern = definePattern((value: any) =>
+  typeof value === 'object' && value !== null && !isArray(value)
+);
+
+export const isFalse: Pattern = definePattern((value: any) =>
+  value === false || value === null || value === undefined
+);
+
+export const isTrue: Pattern = definePattern((value: any) =>
+  value !== false && value !== null && value !== undefined
+);
 
 export let isNothing: Pattern = definePattern((value: any) =>
   value === null || value === undefined || value === isNothing

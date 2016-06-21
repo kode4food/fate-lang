@@ -1,6 +1,6 @@
 "use strict";
 
-const mixin = require('../dist/Util').mixin;
+const mixin = require('../dist/Runtime').mixin;
 
 mixin(exports,
   require('./slow'),
