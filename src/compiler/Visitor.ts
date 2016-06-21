@@ -3,6 +3,7 @@
 import * as Syntax from './Syntax';
 import { CompileError, CompileErrors } from './Compiler';
 
+const isArray = Array.isArray;
 const slice = Array.prototype.slice;
 
 type NodeVisitor = (node: Syntax.NodeOrNodes) => any;
@@ -66,7 +67,7 @@ export default class Visitor {
     return visitNode(startNode);
 
     function visitNode(node: Syntax.NodeOrNodes): Syntax.NodeOrNodes {
-      if ( !(node instanceof Syntax.Node) && !Array.isArray(node) ) {
+      if ( !(node instanceof Syntax.Node) && !isArray(node) ) {
         return node;
       }
 
@@ -84,7 +85,7 @@ export default class Visitor {
   public recurseInto(node: Syntax.NodeOrNodes, visitor: NodeVisitor) {
     let nodeStack = this.nodeStack;
     nodeStack.push(node);
-    if ( Array.isArray(node) ) {
+    if ( isArray(node) ) {
       let arrNode = <Syntax.Nodes>node;
       for ( let i = 0, len = arrNode.length; i < len; i++ ) {
         arrNode[i] = <Syntax.Node>visitor(arrNode[i]);
@@ -160,7 +161,7 @@ export default class Visitor {
   }
 
   public tags(tags: Syntax.TagOrTags) {
-    if ( !Array.isArray(tags) ) {
+    if ( !isArray(tags) ) {
       tags = slice.call(arguments, 0);
     }
     return matcher;

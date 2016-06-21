@@ -9,6 +9,7 @@ interface Visitors {
   [index: string]: Function;
 }
 
+const isArray = Array.isArray;
 const scopeContainers = ['function', 'lambda', 'reduce', 'for', 'do'];
 
 export default function createTreeProcessors(visit: Visitor) {
@@ -46,7 +47,7 @@ export default function createTreeProcessors(visit: Visitor) {
       let node = nodeStack[i];
       if ( node instanceof Syntax.Node && isScopeContainer(node) ) {
         let ids = getAnnotation(node, 'scope/declarations');
-        if ( Array.isArray(ids) && ids.indexOf(id.value) !== -1 ) {
+        if ( isArray(ids) && ids.indexOf(id.value) !== -1 ) {
           return true;
         }
       }

@@ -4,6 +4,7 @@ import { mixin } from '../Runtime';
 import { GeneratedCode } from './Compiler';
 import { Resolver } from './Syntax';
 
+const isArray = Array.isArray;
 const jsonStringify = JSON.stringify;
 const jsStringIdRegex = /^(["'])([$_a-zA-Z][$_a-zA-Z0-9]*)\1$/;
 const anonIdRegex = /^ anon_[a-zA-Z0-9]+$/;
@@ -779,7 +780,7 @@ export function createModule() {
       return popWriter();
     }
 
-    if ( Array.isArray(value) ) {
+    if ( isArray(value) ) {
       return (<(any)[]>value).map(code).join('');
     }
 

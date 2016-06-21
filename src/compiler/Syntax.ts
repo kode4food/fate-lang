@@ -2,6 +2,8 @@
 
 import { Annotated, Annotations } from './Annotations';
 
+const isArray = Array.isArray;
+
 export type Tag = string;
 export type Tags = Tag[];
 export type TagOrTags = Tag|Tags;
@@ -55,7 +57,7 @@ export function hasTag(node: Node, tags?: TagOrTags): any {
     return node.tag;
   }
 
-  if ( Array.isArray(tags) ) {
+  if ( isArray(tags) ) {
     let idx = tags.indexOf(node.tag);
     if (idx === -1) {
       return false;
@@ -349,7 +351,7 @@ export class ExportStatement extends Statement {
   constructor(exportable: ExportableStatement|ExportModuleItems) {
     super();
 
-    if ( Array.isArray(exportable) ) {
+    if ( isArray(exportable) ) {
       this.exportItems = exportable;
     }
     else {
