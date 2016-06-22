@@ -8,8 +8,8 @@
  * and breaks the world.
  */
 
-/* istanbul ignore next: Used to fetch constructor */
-function* dummy() {}
+/* istanbul ignore next: Used to fetch constructor. Is never run */
+function* dummy() { }
 const GeneratorConstructor = dummy().constructor;
 
 function isGenerator(value) {

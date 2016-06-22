@@ -91,13 +91,13 @@ export function wrapCompileError(err: Error, filePath?: FilePath): Error {
     return err;
   }
 
-  /* istanbul ignore else: there isn't one */
+  /* istanbul ignore else: CompileError and SyntaxError are all we have */
   if ( err instanceof SyntaxError ) {
     return formatSyntaxError(<PEG.SyntaxError>err, filePath);
   }
-
-  /* istanbul ignore next: CompileError and SyntaxError are all we have */
-  return err;
+  else {
+    return err;
+  }
 }
 
 function formatCompileError(err: CompileError, filePath?: FilePath) {

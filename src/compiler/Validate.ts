@@ -68,7 +68,7 @@ export default function createTreeProcessors(visit: Visitor) {
         return;
       }
     }
-    /* istanbul ignore next: we should always find the root */
+    /* istanbul ignore next: the visitor shouldn't have come here */
     throw new Error("Stupid Coder: No root to declare an Identifier?");
   }
 

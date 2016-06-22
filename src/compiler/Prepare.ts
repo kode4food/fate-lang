@@ -118,7 +118,7 @@ export default function createTreeProcessors(visit: Visitor) {
           state = 1;
           break;
 
-        /* istanbul ignore next */
+        /* istanbul ignore next: Required and ZeroToMany are all we support */
         default:
           throw new Error("Stupid Coder: Bad Cardinality Value");
       }

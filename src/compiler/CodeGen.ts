@@ -123,7 +123,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
    * Called recursively, this is the busiest function in the code generator
    */
   function createEvaluator(node: Syntax.Node) {
-    /* istanbul ignore if: untestable */
+    /* istanbul ignore next: everything in the syntax tree is a node */
     if ( !(node instanceof Syntax.Node) ) {
       throw new Error("Stupid Coder: createEvaluator called without a Node");
     }
@@ -131,7 +131,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
     let nodeType = node.tag;
     let createFunction = Evaluators[nodeType];
 
-    /* istanbul ignore if: untestable */
+    /* istanbul ignore if: the tags should map properly to an evaluator */
     if ( !createFunction ) {
       throw new Error(`Stupid Coder: Invalid tag in Node: ${nodeType}`);
     }
@@ -324,7 +324,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
     let nonFixed = params.slice(fixedCount);
     nonFixed.forEach((param, idx) => {
-      /* istanbul ignore if: untestable */
+      /* istanbul ignore next: Required and ZeroToMany are all we support */
       if ( param.cardinality !== Syntax.Cardinality.ZeroToMany ) {
         throw new Error("Stupid Coder: Unexpected cardinality");
       }
@@ -1008,7 +1008,7 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 
   function createContextEvaluator(node: Syntax.Context) {
     let contextName = getAnnotation(node, 'pattern/local');
-    /* istanbul ignore next: shouldn't happen */
+    /* istanbul ignore next: the context pattern name is assigned already */
     if ( !contextName ) {
       throw new Error("Stupid Coder: Where's the context pattern name?");
     }
