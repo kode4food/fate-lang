@@ -129,6 +129,11 @@ let deidentified = {
 
 ### Patterns and Destructuring
 
+# Function Composition
+from array import sort, reverse
+let reverseSort = sort o reverse  # x -> reverse(sort(x))
+[9, 15, 35, 2, 17, 6] | reverseSort | print
+
 ```ruby
 # Combining Patterns
 let Shape = ~{ .type in ['square', 'circle', 'triangle'] },
@@ -136,11 +141,6 @@ let Shape = ~{ .type in ['square', 'circle', 'triangle'] },
     Large = ~{ .size: > 50 }
 
 let LargeOrangeShape = Large && Orange && Shape
-
-# Function Composition
-from array import sort, reverse
-let reverseSort = sort o reverse  # x -> reverse(sort(x))
-[9, 15, 35, 2, 17, 6] | reverseSort | print
 
 # Instead of multiple statements with an 'end', you
 # can just use a colon to evaluate a single statement
