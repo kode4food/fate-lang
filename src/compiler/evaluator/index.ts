@@ -33,19 +33,21 @@ export class DispatchEvaluator extends Evaluator {
     super(null, coder);
 
     evaluatorModules.forEach((module: AnyMap) => {
-      Object.keys(module).forEach(key => {
-        let EvaluatorClass = module[key];
-        /* istanbul ignore else: we only care about qualifying constructors */
-        if ( typeof EvaluatorClass === 'function' &&
-             EvaluatorClass.hasOwnProperty('tags') ) {
-          let instance = new EvaluatorClass(this, coder);
-          let tags = EvaluatorClass.tags;
-          tags.forEach((tag: string) => {
-            this.evaluators[tag] = instance;
-          });
-        }
-      });
+      Object.keys(module)
+            .map(key => module[key])
+            .filter(isEvaluatorModule)
+            .forEach(EvaluatorClass => {
+              let instance = new EvaluatorClass(this, coder);
+              let tags = EvaluatorClass.tags;
+              tags.forEach((tag: string) => {
+                this.evaluators[tag] = instance;
+              });
+            });
     });
+
+    function isEvaluatorModule(module: any) {
+      return typeof module === 'function' && module.hasOwnProperty('tags');
+    }
   }
 
   public evaluate(node: Syntax.Node) {
