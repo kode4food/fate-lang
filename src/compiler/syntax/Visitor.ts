@@ -1,7 +1,7 @@
 "use strict";
 
-import * as Syntax from './Syntax';
-import { CompileError, CompileErrors } from './Compiler';
+import * as Syntax from './index';
+import { CompileError, CompileErrors } from '../index';
 
 const isArray = Array.isArray;
 const slice = Array.prototype.slice;
@@ -10,7 +10,7 @@ type NodeVisitor = (node: Syntax.NodeOrNodes) => any;
 type StatementsVisitor = (node: Syntax.Statement[]) => any;
 type NodeMatcher = (node: Syntax.NodeOrNodes) => boolean;
 
-export default class Visitor {
+export class Visitor {
   public nodeStack: (Syntax.Node|Syntax.Nodes)[] = [];
 
   constructor(public warnings: CompileErrors) {}

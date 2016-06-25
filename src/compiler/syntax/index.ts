@@ -1,6 +1,9 @@
 "use strict";
 
-import { Annotated, Annotations } from './Annotations';
+export * from './Annotation';
+export * from './Visitor';
+
+import { Annotated, Annotations } from './Annotation';
 
 const isArray = Array.isArray;
 
@@ -153,9 +156,6 @@ export class LambdaExpression extends Expression
 export class ComposeExpression extends Expression {
   constructor(public expressions: Expressions) { super(); }
 }
-
-export class ComposeOrExpression extends ComposeExpression {}
-export class ComposeAndExpression extends ComposeExpression {}
 
 export class ReduceExpression extends Expression {
   constructor(public assignment: DirectAssignment,
@@ -538,8 +538,8 @@ let tagToConstructor: FunctionMap = {
   'function': FunctionDeclaration,
   'lambda': LambdaExpression,
   'compose': ComposeExpression,
-  'composeOr': ComposeOrExpression,
-  'composeAnd': ComposeAndExpression,
+  'composeOr': ComposeExpression,
+  'composeAnd': ComposeExpression,
   'reduce': ReduceExpression,
   'do': DoExpression,
   'case': CaseExpression,

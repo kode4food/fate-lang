@@ -1,7 +1,7 @@
 "use strict";
 
 import { resolve as resolvePath } from 'path';
-import { createModule, ModuleName, DirPath } from '../Module';
+import { createModule, ModuleName, DirPath } from '../Fate';
 
 const nodeModuleRegex = /^node:(.*)$/;
 const relativePathRegex = /^\.|\../;

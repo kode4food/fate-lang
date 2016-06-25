@@ -2,7 +2,7 @@
 
 import * as Resolvers from '../resolvers';
 
-import { DirPath, ModuleName, ModuleExports } from '../Module';
+import { DirPath, ModuleName, ModuleExports } from '../Fate';
 
 // Register the default resolvers
 const nodeResolver = Resolvers.createNodeResolver();

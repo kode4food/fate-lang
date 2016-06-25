@@ -12,10 +12,8 @@ import {
   readFileSync, writeFileSync, unlinkSync, existsSync
 } from 'fs';
 
-import {
-  compileModule, wrapCompileError, GeneratedCode
-} from "../compiler/Compiler";
-
+import { compileModule, wrapCompileError } from "../compiler";
+import { GeneratedCode } from '../compiler/target';
 import { VERSION } from '../Fate';
 
 const defaultPattern = '*.fate';

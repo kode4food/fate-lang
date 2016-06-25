@@ -7,8 +7,7 @@ const fate = require('../dist/Fate');
 const compile = fate.compile;
 const evaluate = fate.evaluate;
 const globals = fate.globals;
-
-const createModule = require('../dist/Module').createModule;
+const createModule = fate.createModule;
 
 const resolvers = require('../dist/resolvers');
 const createMemoryResolver = resolvers.createMemoryResolver;

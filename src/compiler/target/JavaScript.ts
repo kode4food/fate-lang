@@ -1,8 +1,8 @@
 "use strict";
 
-import { mixin } from '../Runtime';
-import { GeneratedCode } from './Compiler';
-import { Resolver } from './Syntax';
+import * as Target from './index';
+import { mixin } from '../../runtime';
+import { Resolver } from '../syntax';
 
 const isArray = Array.isArray;
 const jsonStringify = JSON.stringify;
@@ -11,25 +11,11 @@ const anonIdRegex = /^ anon_[a-zA-Z0-9]+$/;
 
 type StringMap = { [index: string]: string };
 
-type Name = string;
-type Names = Name[];
-type Alias = Name;
-type Id = string;
-type Ids = Id[];
-type GlobalId = Id;
-type BodyEntries = BodyEntry[];
-type NameIdsMap = { [index: string]: Ids };
+type GlobalId = Target.Id;
+type NameIdsMap = { [index: string]: Target.Ids };
 type Modifications = Modification[];
 type NameModificationsMap = { [index: string]: Modifications };
 type FunctionNameMap = { [index: string]: string };
-
-export type BodyEntry = string|Function;
-export type AssignmentItem = [Name, BodyEntry];
-export type AssignmentItems = AssignmentItem[];
-export type ModuleItem = [Name, Alias];
-export type ModuleItems = ModuleItem[];
-export type ObjectAssignmentItem = [Name|BodyEntry, BodyEntry, boolean];
-export type ObjectAssignmentItems = ObjectAssignmentItem[];
 
 enum FirstAccess {
   Unknown = 0, Read = 1, Write = 2
@@ -46,24 +32,8 @@ interface ScopeInfo {
   snapshot: Function;
 }
 
-interface LoopOptions {
-  name?: Name;
-  value: Name;
-  collection: BodyEntry;
-  guard: BodyEntry;
-  body: BodyEntry;
-}
-
-interface FunctionOptions {
-  internalId?: string;
-  internalArgs?: Name[];
-  contextArgs?: Name[];
-  generator?: boolean;
-  body: BodyEntry;
-}
-
 interface Modification {
-  ids: Ids;
+  ids: Target.Ids;
   created: boolean;
 }
 
@@ -104,7 +74,7 @@ function lastItem(arr: any[]) {
   return arr[arr.length - 1];
 }
 
-export function createModule() {
+export function createCoder(): Target.Coder {
   let idCounters: { [index: string]: number } = {}; // prefix -> nextId
 
   let generatedLiterals: { [index: string]: GlobalId } = {};
@@ -118,8 +88,8 @@ export function createModule() {
   let nameStack: NameInfo[] = [];
   let usesScratch = false;
 
-  let writerStack: BodyEntries[] = [];
-  let body: BodyEntries = [];
+  let writerStack: Target.BodyEntries[] = [];
+  let body: Target.BodyEntries = [];
 
   return {
     selfName, contextName, exportsName, valueName,
@@ -181,7 +151,7 @@ export function createModule() {
     return id;
   }
 
-  function builder(funcName: string, ...literalIds: Ids) {
+  function builder(funcName: string, ...literalIds: Target.Ids) {
     let funcId = runtimeImport(funcName);
     let key = `${funcId}/${literalIds.join('/')}`;
     let id = generatedBuilders[key];
@@ -238,14 +208,14 @@ export function createModule() {
     usesScratch = tmpScratch;
   }
 
-  function nextIdForName(name: Name) {
+  function nextIdForName(name: Target.Name) {
     if ( typeof name !== 'string' ) {
       return nextId('_' + name + '$');
     }
     return nextId(name + '$');
   }
 
-  function localForWrite(name: Name) {
+  function localForWrite(name: Target.Name) {
     if ( isAnonymous(name) ) {
       return names[name][0];
     }
@@ -257,7 +227,7 @@ export function createModule() {
     return lastItem(ids);
   }
 
-  function localForRead(name: Name) {
+  function localForRead(name: Target.Name) {
     if ( !scopeInfo.firstAccess[name] ) {
       scopeInfo.firstAccess[name] = FirstAccess.Read;
     }
@@ -282,7 +252,7 @@ export function createModule() {
     write(contextName);
   }
 
-  function member(object: BodyEntry, property: BodyEntry) {
+  function member(object: Target.BodyEntry, property: Target.BodyEntry) {
     write(object, () => {
       let propertyCode = code(property);
       let idMatch = jsStringIdRegex.exec(propertyCode);
@@ -295,11 +265,11 @@ export function createModule() {
     });
   }
 
-  function retrieveAnonymous(name: Name) {
+  function retrieveAnonymous(name: Target.Name) {
     write(lastItem(names[name]));
   }
 
-  function assignAnonymous(name: Name, value: BodyEntry) {
+  function assignAnonymous(name: Target.Name, value: Target.BodyEntry) {
     retrieveAnonymous(name);
     write('=', value);
   }
@@ -317,11 +287,11 @@ export function createModule() {
     return name;
   }
 
-  function isAnonymous(name: Name) {
+  function isAnonymous(name: Target.Name) {
     return anonIdRegex.test(name);
   }
 
-  function assignResult(value: BodyEntry) {
+  function assignResult(value: Target.BodyEntry) {
     usesScratch = true;
     write('_', '=', value);
   }
@@ -331,7 +301,7 @@ export function createModule() {
     body = [];
   }
 
-  function popWriter(): GeneratedCode {
+  function popWriter(): Target.GeneratedCode {
     let result = body;
     body = writerStack.pop();
     return code(result);
@@ -364,13 +334,13 @@ export function createModule() {
     });
   }
 
-  function writeAndGroup(items: BodyEntries) {
+  function writeAndGroup(items: Target.BodyEntries) {
     write('(');
     writeDelimited(items, '&&');
     write(')');
   }
 
-  function writeDelimited(items: BodyEntries, delimiter?: string) {
+  function writeDelimited(items: Target.BodyEntries, delimiter?: string) {
     if ( delimiter === undefined ) {
       delimiter = ',';
     }
@@ -382,7 +352,7 @@ export function createModule() {
     });
   }
 
-  function generate(value: BodyEntry) {
+  function generate(value: Target.BodyEntry) {
     if ( typeof value !== 'function' ) {
       write(value);
       return;
@@ -390,15 +360,15 @@ export function createModule() {
     (<Function>value)();
   }
 
-  function getter(name: Name) {
+  function getter(name: Target.Name) {
     write(localForRead(name));
   }
 
-  function assignment(name: Name, bodyEntry: BodyEntry) {
+  function assignment(name: Target.Name, bodyEntry: Target.BodyEntry) {
     assignments([[name, bodyEntry]]);
   }
 
-  function assignments(items: AssignmentItems) {
+  function assignments(items: Target.AssignmentItems) {
     items.forEach(item => {
       let name = item[0];
       let value = code(item[1]);
@@ -408,7 +378,7 @@ export function createModule() {
     });
   }
 
-  function exports(items: ModuleItems) {
+  function exports(items: Target.ModuleItems) {
     items.forEach(item => {
       let name = item[0];
       let alias = item[1];
@@ -419,17 +389,18 @@ export function createModule() {
     });
   }
 
-  function unaryOperator(operator: string, operand: BodyEntry) {
+  function unaryOperator(operator: string, operand: Target.BodyEntry) {
     write('(', operatorMap[operator], '(', code(operand), '))');
   }
 
-  function binaryOperator(operator: string, left: BodyEntry,
-                          right: BodyEntry) {
+  function binaryOperator(operator: string, left: Target.BodyEntry,
+                          right: Target.BodyEntry) {
     write('(', code(left), operatorMap[operator], code(right), ')');
   }
 
-  function conditionalOperator(condition: BodyEntry, trueVal: BodyEntry,
-                                falseVal: BodyEntry) {
+  function conditionalOperator(condition: Target.BodyEntry,
+                               trueVal: Target.BodyEntry,
+                               falseVal: Target.BodyEntry) {
     let isTrue = runtimeImport('isTrue');
     let condCode = code(condition);
     let trueCode = code(trueVal);
@@ -437,12 +408,13 @@ export function createModule() {
     write('(', isTrue, '(', condCode, ')?', trueCode, ':', falseCode, ')');
   }
 
-  function statement(bodyCallback: BodyEntry) {
+  function statement(bodyCallback: Target.BodyEntry) {
     write(code(bodyCallback), ';');
   }
 
-  function ifStatement(condition: BodyEntry, thenBranch: BodyEntry,
-                       elseBranch: BodyEntry) {
+  function ifStatement(condition: Target.BodyEntry,
+                       thenBranch: Target.BodyEntry,
+                       elseBranch: Target.BodyEntry) {
     let condWrapperName = 'isTrue';
     if ( !thenBranch ) {
       condWrapperName = 'isFalse';
@@ -466,7 +438,7 @@ export function createModule() {
   }
 
   // code branches using static single assignment
-  function codeBranches(...branches: BodyEntry[]) {
+  function codeBranches(...branches: Target.BodyEntry[]) {
     let branchContent: string[] = [];
 
     // step 1: Code the branches, gathering the assignments
@@ -496,7 +468,7 @@ export function createModule() {
     Object.keys(modificationSets).forEach(key => {
       let parentIds = names[key] || [];
       let passthruId = parentIds.length ? lastItem(parentIds) : null;
-      let sourceIds: Ids = [];
+      let sourceIds: Target.Ids = [];
       let modificationSet = modificationSets[key];
 
       for ( let i = 0; i < branches.length; i++ ) {
@@ -525,7 +497,7 @@ export function createModule() {
     return branchContent;
   }
 
-  function loopExpression(options: LoopOptions) {
+  function loopExpression(options: Target.LoopOptions) {
     let itemValue = options.value;
     let itemName = options.name;
     let collection = options.collection;
@@ -577,7 +549,8 @@ export function createModule() {
     write('continue;');
   }
 
-  function funcDeclaration(name: Name, options: FunctionOptions) {
+  function funcDeclaration(name: Target.Name,
+                           options: Target.FunctionOptions) {
     statement(() => {
       assignResult(() => {
         let functionId = localForWrite(name);
@@ -587,7 +560,7 @@ export function createModule() {
     });
   }
 
-  function iife(funcBody: BodyEntry) {
+  function iife(funcBody: Target.BodyEntry) {
     parens(() => {
       call(() => {
         func({ body: funcBody });
@@ -595,7 +568,7 @@ export function createModule() {
     });
   }
 
-  function scope(scopeBody: BodyEntry) {
+  function scope(scopeBody: Target.BodyEntry) {
     let parentNames = names;
     pushLocalScope();
 
@@ -608,7 +581,7 @@ export function createModule() {
     popLocalScopeWithScratch();
   }
 
-  function func(options: FunctionOptions) {
+  function func(options: Target.FunctionOptions) {
     let internalId = options.internalId;
     let internalArgs = options.internalArgs || [];
     let contextArgs = options.contextArgs || [];
@@ -647,8 +620,9 @@ export function createModule() {
     popLocalScope();
   }
 
-  function writeLocalVariables(parentNames: NameIdsMap, argNames: Names) {
-    let undefinedVars: Names = [];
+  function writeLocalVariables(parentNames: NameIdsMap,
+                               argNames: Target.Names) {
+    let undefinedVars: Target.Names = [];
     Object.keys(names).forEach(name => {
       let localNameIds = names[name];
       let localNameId = localNameIds[0];
@@ -667,7 +641,7 @@ export function createModule() {
       write('let ', undefinedVars.sort(compareVarNames).join(','), ';');
     }
 
-    function isArgument(localName: Name) {
+    function isArgument(localName: Target.Name) {
       return argNames.indexOf(localName) !== -1;
     }
   }
@@ -677,13 +651,13 @@ export function createModule() {
     return leftU < rightU ? -1 : leftU > rightU ? 1 : 0;
   }
 
-  function waitFor(resolver: Resolver, expression: BodyEntry) {
+  function waitFor(resolver: Resolver, expression: Target.BodyEntry) {
     let resolverFuncName = waiterMap[resolver || Resolver.Value];
     let resolverFunc = runtimeImport(resolverFuncName);
     write('(yield [', resolverFunc, ',', expression, '])');
   }
 
-  function compoundExpression(expressions: BodyEntries) {
+  function compoundExpression(expressions: Target.BodyEntries) {
     write('(');
     writeDelimited(expressions);
     write(')');
@@ -697,7 +671,8 @@ export function createModule() {
     write('return', (usesScratch ? ' _;' : ';'));
   }
 
-  function call(funcId: Id|BodyEntry, args?: BodyEntries) {
+  function call(funcId: Target.Id|Target.BodyEntry,
+                args?: Target.BodyEntries) {
     if ( !args ) {
       // pass through local arguments (for function chaining)
       write(funcId, '.apply(', thisOrSelf, ',arguments)');
@@ -708,19 +683,19 @@ export function createModule() {
     write(')');
   }
 
-  function array(items: BodyEntries) {
+  function array(items: Target.BodyEntries) {
     write('[');
     writeDelimited(items);
     write(']');
   }
 
-  function arrayAppend(array: Id, value: BodyEntry) {
+  function arrayAppend(array: Target.Id, value: Target.BodyEntry) {
     write(array, '.push(', value, ')');
   }
 
-  function object(items: ObjectAssignmentItems) {
-    let literals: ObjectAssignmentItems = [];
-    let expressions: ObjectAssignmentItems = [];
+  function object(items: Target.ObjectAssignmentItems) {
+    let literals: Target.ObjectAssignmentItems = [];
+    let expressions: Target.ObjectAssignmentItems = [];
 
     items.forEach(item => {
       let target = typeof item[0] === 'function' ? expressions : literals;
@@ -729,7 +704,7 @@ export function createModule() {
 
     if ( expressions.length ) {
       let dictVar = createAnonymous();
-      let components: BodyEntries = [];
+      let components: Target.BodyEntries = [];
 
       components.push(() => {
         assignAnonymous(dictVar, writeLiterals);
@@ -764,16 +739,17 @@ export function createModule() {
     }
   }
 
-  function objectAssign(dict: Id, name: BodyEntry, value: BodyEntry) {
+  function objectAssign(dict: Target.Id, name: Target.BodyEntry,
+                        value: Target.BodyEntry) {
     member(dict, name);
     write('=', value);
   }
 
-  function parens(expr: BodyEntry) {
+  function parens(expr: Target.BodyEntry) {
     write('(', expr, ')');
   }
 
-  function code(value?: BodyEntry|BodyEntries): string {
+  function code(value?: Target.BodyEntry|Target.BodyEntries): string {
     if ( typeof value === 'function' ) {
       pushWriter();
       (<Function>value)();

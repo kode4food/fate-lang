@@ -1,6 +1,6 @@
 "use strict";
 
-import { ModuleName, DirPath, Module } from '../Module';
+import { ModuleName, DirPath, Module } from '../Fate';
 
 export interface Resolver {
   resolve(name: ModuleName, basePath?: DirPath): Module;

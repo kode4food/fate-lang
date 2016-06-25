@@ -1,8 +1,7 @@
 "use strict";
 
-import Visitor from './Visitor';
-import * as Syntax from './Syntax';
-import { annotate, hasAnnotation, getAnnotation } from './Annotations';
+import * as Syntax from '../syntax';
+import { Visitor, annotate, hasAnnotation, getAnnotation } from '../syntax';
 
 type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
 type AssignmentMap = { [index: string]: Syntax.Assignment };

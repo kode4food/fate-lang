@@ -1,11 +1,10 @@
 "use strict";
 
-import { compile, globals } from '../Fate';
-import { isObject } from '../Runtime';
+import { isObject } from '../runtime';
 
 import {
-  Module, isFateModule, createModule, ModuleName, ModuleExports
-} from '../Module';
+  compile, globals, Module, isFateModule, createModule, ModuleName, ModuleExports
+} from '../Fate';
 
 type AnyMap = { [index: string]: any };
 

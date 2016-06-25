@@ -5,17 +5,27 @@
 import { readFileSync } from 'fs';
 import { dirname } from 'path';
 
-import {
-  compileModule, generateFunction, ScriptContent
-} from './compiler/Compiler';
-
-import { isObject, mixin } from './Runtime';
+import { compileModule, generateFunction, ScriptContent } from './compiler';
+import { isObject, mixin } from './runtime';
 
 const pkg = require('../package.json');
 export const VERSION = pkg.version;
 
-import * as RuntimeExports from './Runtime';
+import * as RuntimeExports from './runtime';
 export let Runtime = RuntimeExports;
+
+export type DirPath = string;
+export type ModuleName = string;
+
+export interface Module {
+  __fateModule?: boolean;
+  result?: any;
+  exports: ModuleExports;
+}
+
+export interface ModuleExports {
+  [index: string]: any;
+}
 
 type Globals = { [index: string]: any };
 
@@ -23,18 +33,6 @@ const DefaultGlobals: Globals = {
   '__filename': undefined,
   '__dirname': undefined
 };
-
-export function globals(extensions?: Globals) {
-  if ( isObject(extensions) ) {
-    let result = Object.create(DefaultGlobals);
-    mixin(result, extensions);
-    if ( !result.__dirname && result.__filename ) {
-      result.__dirname = dirname(result.__filename);
-    }
-    return result;
-  }
-  return DefaultGlobals;
-}
 
 /*
  * Fate compiler entry point.  Takes a script and returns a closure
@@ -68,6 +66,30 @@ export function runScript(filename: string, exports: Object) {
   let compiledOutput = compileModule(content).scriptBody;
   let generatedModule = generateFunction(compiledOutput);
   generatedModule(globals({ __filename: filename }), exports);
+}
+
+export function globals(extensions?: Globals) {
+  if ( isObject(extensions) ) {
+    let result = Object.create(DefaultGlobals);
+    mixin(result, extensions);
+    if ( !result.__dirname && result.__filename ) {
+      result.__dirname = dirname(result.__filename);
+    }
+    return result;
+  }
+  return DefaultGlobals;
+}
+
+export function createModule(moduleExports?: ModuleExports) {
+  return {
+    __fateModule: true,
+    exports: moduleExports || {}
+  };
+}
+
+export function isFateModule(module: any) {
+  return ( typeof module === 'function' || isObject(module) ) &&
+    module.__fateModule;
 }
 
 /*

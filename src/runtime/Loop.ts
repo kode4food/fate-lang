@@ -1,6 +1,6 @@
 "use strict";
 
-import { isArray, isObject } from '../Runtime';
+import { isArray, isObject } from './index';
 
 const generator = require('../generator');
 const isGenerator = generator.isGenerator;

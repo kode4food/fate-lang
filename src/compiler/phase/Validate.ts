@@ -1,9 +1,7 @@
 "use strict";
 
-import Visitor from './Visitor';
-import * as Syntax from './Syntax';
-
-import { annotate, getAnnotation, hasAnnotation } from './Annotations';
+import * as Syntax from '../syntax';
+import { Visitor, annotate, getAnnotation, hasAnnotation } from '../syntax';
 
 interface Visitors {
   [index: string]: Function;

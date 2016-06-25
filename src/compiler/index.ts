@@ -2,39 +2,22 @@
 
 "use strict";
 
-import Visitor from './Visitor';
-import Prepare from './Prepare';
-import Patterns from './Patterns';
-import Rewrite from './Rewrite';
-import Validate from './Validate';
+import * as Runtime from '../runtime';
+import * as Target from './target';
+import compilerPhases from './phase';
 
-import * as Runtime from '../Runtime';
+import { Visitor } from './syntax';
 
 import { createContext, runInContext } from 'vm';
-import { generateScriptBody } from './CodeGen';
 import { globals } from '../Fate';
 
 const generatedParser = require('./parser');
 const SyntaxError = generatedParser.SyntaxError;
 
 export type ScriptContent = string;
-export type GeneratedCode = string;
 export type FilePath = string;
 
-export class CompileError implements Error {
-  public name: string = "CompileError";
-
-  constructor(public message: string, public line: number,
-              public column: number, public filePath?: FilePath) {}
-
-  public toString() {
-    return this.message;
-  }
-}
-
 export type CompileErrors = CompileError[];
-
-const compilerPipeline = [Prepare, Patterns, Rewrite, Validate];
 
 export function compileModule(script: ScriptContent) {
   let syntaxTree = generatedParser.parse(script);
@@ -42,7 +25,7 @@ export function compileModule(script: ScriptContent) {
   let warnings: CompileErrors = [];
   let visitor = new Visitor(warnings);
 
-  compilerPipeline.forEach(createTreeProcessors => {
+  compilerPhases.forEach(createTreeProcessors => {
     let processors = createTreeProcessors(visitor);
 
     processors.forEach(processor => {
@@ -51,12 +34,12 @@ export function compileModule(script: ScriptContent) {
   });
 
   return {
-    scriptBody: generateScriptBody(syntaxTree),
+    scriptBody: Target.generateScriptBody(syntaxTree),
     err: warnings
   };
 }
 
-export function generateFunction(generatedCode: GeneratedCode) {
+export function generateFunction(generatedCode: Target.GeneratedCode) {
   interface FateContext {
     g: any;
     r: any;
@@ -73,12 +56,23 @@ export function generateFunction(generatedCode: GeneratedCode) {
   return context.module.exports;
 }
 
-function generateFunctionCode(generatedCode: GeneratedCode) {
+function generateFunctionCode(generatedCode: Target.GeneratedCode) {
   let buffer: string[] = [];
   buffer.push('"use strict";');
   buffer.push(generatedCode);
   buffer.push("module.exports=s;");
   return buffer.join('');
+}
+
+export class CompileError implements Error {
+  public name: string = "CompileError";
+
+  constructor(public message: string, public line: number,
+              public column: number, public filePath?: FilePath) {}
+
+  public toString() {
+    return this.message;
+  }
 }
 
 export function wrapCompileError(err: Error, filePath?: FilePath): Error {
@@ -96,6 +90,7 @@ export function wrapCompileError(err: Error, filePath?: FilePath): Error {
     return formatSyntaxError(<PEG.SyntaxError>err, filePath);
   }
   else {
+    console.log(err);
     return err;
   }
 }

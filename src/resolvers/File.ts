@@ -2,7 +2,7 @@
 
 import { resolve as resolvePath } from 'path';
 
-import { DirPath, createModule, Module, ModuleName } from '../Module';
+import { DirPath, createModule, Module, ModuleName } from '../Fate';
 
 interface Options {
   path: string;

@@ -1,9 +1,8 @@
 "use strict";
 
-import Visitor from './Visitor';
-import * as Syntax from './Syntax';
-import { isTrue, isFalse, isIn } from '../Runtime';
-import { annotate } from './Annotations';
+import * as Syntax from '../syntax';
+import { Visitor, annotate } from '../syntax';
+import { isTrue, isFalse, isIn } from '../../runtime';
 
 const hasTag = Syntax.hasTag;
 const isLiteral = Syntax.isLiteral;
