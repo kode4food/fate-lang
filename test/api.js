@@ -1,7 +1,7 @@
 "use strict";
 
 const nodeunit = require('nodeunit');
-const runtime = require('../dist/Runtime');
+const runtime = require('../dist/runtime');
 const support = require('../dist/modules/support');
 
 exports.api = nodeunit.testCase({

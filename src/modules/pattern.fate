@@ -1,6 +1,6 @@
-from '../Runtime' import isPattern, definePattern
+from '../runtime' import isPattern, definePattern
 
-export from '../Runtime'
+export from '../runtime'
 import isFalse as False
      , isTrue as True
      , isNothing as Nothing

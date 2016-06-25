@@ -13,7 +13,7 @@ const resolvers = require('../dist/resolvers');
 const createMemoryResolver = resolvers.createMemoryResolver;
 const createFileResolver = resolvers.createFileResolver;
 
-const runtime = require('../dist/Runtime');
+const runtime = require('../dist/runtime');
 
 exports.imports = nodeunit.testCase({
 

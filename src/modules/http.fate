@@ -4,7 +4,7 @@ from 'node:url' import parse as parseURL
 from 'node:welsh' import Promise
 
 from './support' import make
-from '../Runtime' import mixin
+from '../runtime' import mixin
 
 from pattern import Something, NonEmptyString
 from io import streamConsumer

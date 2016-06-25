@@ -5,7 +5,7 @@ const path = require('path');
 const glob = require('glob');
 
 const evaluate = require('../dist/Fate').evaluate;
-const mixin = require('../dist/Runtime').mixin;
+const mixin = require('../dist/runtime').mixin;
 
 const usesFate = /(['"])fate\-compiler:[0-9.]+\1;/g;
 

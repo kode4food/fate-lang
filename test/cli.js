@@ -9,7 +9,7 @@ const helpers = require('./helpers');
 const createConsole = helpers.createConsole;
 
 const fate = require('../dist/Fate');
-const runtime = require('../dist/Runtime');
+const runtime = require('../dist/runtime');
 
 exports.cli = nodeunit.testCase({
   "Command Line Help": function (test) {
