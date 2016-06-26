@@ -1,7 +1,7 @@
 "use strict";
 
 import * as Syntax from '../syntax';
-import { Evaluator } from './Evaluator';
+import { Evaluator, NodeEvaluator } from './Evaluator';
 import { Coder } from '../target';
 
 import * as AssignmentEvaluators from './AssignmentEvaluator';
@@ -18,7 +18,7 @@ interface AnyMap {
 }
 
 interface EvaluatorMap {
-  [index: string]: Evaluator;
+  [index: string]: NodeEvaluator;
 }
 
 const evaluatorModules = [
@@ -30,7 +30,7 @@ export class DispatchEvaluator extends Evaluator {
   private evaluators: EvaluatorMap = {};
 
   constructor(public coder: Coder) {
-    super(null, coder);
+    super();
 
     evaluatorModules.forEach((module: AnyMap) => {
       Object.keys(module)
@@ -65,5 +65,9 @@ export class DispatchEvaluator extends Evaluator {
     }
 
     evaluator.evaluate(node);
+  }
+
+  public getRootEvaluator() {
+    return this;
   }
 }

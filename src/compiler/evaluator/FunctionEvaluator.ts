@@ -4,14 +4,14 @@ import * as Target from '../target';
 import * as Syntax from '../syntax';
 
 import { BodyEntry } from '../target';
-import { Evaluator } from './Evaluator';
+import { NodeEvaluator } from './Evaluator';
 import { StatementsEvaluator } from './BasicEvaluator';
 
 interface StringMap {
   [index: string]: string;
 }
 
-export class CallEvaluator extends Evaluator {
+export class CallEvaluator extends NodeEvaluator {
   public static tags = ['call'];
 
   public evaluate(node: Syntax.CallOperator) {
@@ -22,7 +22,7 @@ export class CallEvaluator extends Evaluator {
   }
 }
 
-export class BindEvaluator extends Evaluator {
+export class BindEvaluator extends NodeEvaluator {
   public static tags = ['bind'];
 
   public evaluate(node: Syntax.BindOperator) {
@@ -44,7 +44,7 @@ export class BindEvaluator extends Evaluator {
   }
 }
 
-export class ReturnEvaluator extends Evaluator {
+export class ReturnEvaluator extends NodeEvaluator {
   public static tags = ['return'];
 
   public evaluate(node: Syntax.ReturnStatement) {
@@ -52,7 +52,7 @@ export class ReturnEvaluator extends Evaluator {
   }
 }
 
-abstract class FuncOrLambdaEvaluator extends Evaluator {
+abstract class FuncOrLambdaEvaluator extends NodeEvaluator {
   protected getFuncOrLambdaInternalId(node: Syntax.FunctionOrLambda) {
     let hasSelf = Syntax.hasAnnotation(node, 'function/self');
     let hasGuard = node.signature.guard;
@@ -194,7 +194,7 @@ const composeImportMap: StringMap = {
   'composeAnd': 'composeAnd'
 };
 
-export class ComposeEvaluator extends Evaluator {
+export class ComposeEvaluator extends NodeEvaluator {
   public static tags = Object.keys(composeImportMap);
 
   public evaluate(node: Syntax.ComposeExpression) {

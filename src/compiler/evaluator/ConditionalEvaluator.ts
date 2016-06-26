@@ -1,11 +1,11 @@
 "use strict";
 
 import * as Syntax from '../syntax';
-import { Evaluator } from './Evaluator';
+import { NodeEvaluator } from './Evaluator';
 import { LetEvaluator } from './AssignmentEvaluator';
 import { StatementsEvaluator } from './BasicEvaluator';
 
-export class ConditionalEvaluator extends Evaluator {
+export class ConditionalEvaluator extends NodeEvaluator {
   public static tags = ['conditional'];
 
   public evaluate(node: Syntax.ConditionalOperator) {
@@ -17,7 +17,7 @@ export class ConditionalEvaluator extends Evaluator {
   }
 }
 
-abstract class IfGeneratingEvaluator extends Evaluator {
+abstract class IfGeneratingEvaluator extends NodeEvaluator {
   protected generateIf(condition: Function,
                        thenStatements: Syntax.Statements,
                        elseStatements: Syntax.Statements) {

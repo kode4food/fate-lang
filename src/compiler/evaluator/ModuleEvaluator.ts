@@ -2,9 +2,9 @@
 
 import * as Target from '../target';
 import * as Syntax from '../syntax';
-import { Evaluator } from './Evaluator';
+import { NodeEvaluator } from './Evaluator';
 
-abstract class ImportExportEvaluator extends Evaluator {
+abstract class ImportExportEvaluator extends NodeEvaluator {
   public createImporterArguments() {
     this.coder.member(
       () => { this.coder.globalObject(); },

@@ -2,9 +2,9 @@
 
 import * as Target from '../target';
 import * as Syntax from '../syntax';
-import { Evaluator } from './Evaluator';
+import { NodeEvaluator } from './Evaluator';
 
-export class BinaryEvaluator extends Evaluator {
+export class BinaryEvaluator extends NodeEvaluator {
   public static tags = [
     'eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'add', 'sub', 'mul', 'div', 'mod'
   ];
@@ -18,7 +18,7 @@ export class BinaryEvaluator extends Evaluator {
   }
 }
 
-export class StatementsEvaluator extends Evaluator {
+export class StatementsEvaluator extends NodeEvaluator {
   public static tags = ['statements'];
 
   public evaluate(node: Syntax.Statements) {
@@ -30,7 +30,7 @@ export class StatementsEvaluator extends Evaluator {
 
 // generate an evaluator that assigns the result of an expression
 // to the last result scratch variable
-export class ExpressionEvaluator extends Evaluator {
+export class ExpressionEvaluator extends NodeEvaluator {
   public static tags = ['expression'];
 
   public evaluate(node: Syntax.ExpressionStatement) {
@@ -40,7 +40,7 @@ export class ExpressionEvaluator extends Evaluator {
   }
 }
 
-export class OrEvaluator extends Evaluator {
+export class OrEvaluator extends NodeEvaluator {
   public static tags = ['or'];
 
   public evaluate(node: Syntax.OrOperator) {
@@ -60,7 +60,7 @@ export class OrEvaluator extends Evaluator {
   }
 }
 
-export class AndEvaluator extends Evaluator {
+export class AndEvaluator extends NodeEvaluator {
   public static tags = ['and'];
 
   public evaluate(node: Syntax.AndOperator) {
@@ -80,7 +80,7 @@ export class AndEvaluator extends Evaluator {
   }
 }
 
-export class InEvaluator extends Evaluator {
+export class InEvaluator extends NodeEvaluator {
   public static tags = ['in'];
 
   public evaluate(node: Syntax.InOperator) {
@@ -89,7 +89,7 @@ export class InEvaluator extends Evaluator {
   }
 }
 
-export class NotInEvaluator extends Evaluator {
+export class NotInEvaluator extends NodeEvaluator {
   public static tags = ['notIn'];
 
   public evaluate(node: Syntax.NotInOperator) {
@@ -100,7 +100,7 @@ export class NotInEvaluator extends Evaluator {
   }
 }
 
-export class NotEvaluator extends Evaluator {
+export class NotEvaluator extends NodeEvaluator {
   public static tags = ['not'];
 
   public evaluate(node: Syntax.NotOperator) {
@@ -111,7 +111,7 @@ export class NotEvaluator extends Evaluator {
   }
 }
 
-export class UnaryEvaluator extends Evaluator {
+export class UnaryEvaluator extends NodeEvaluator {
   public static tags = ['neg', 'pos'];
 
   public evaluate(node: Syntax.NegativeOperator) {
@@ -119,7 +119,7 @@ export class UnaryEvaluator extends Evaluator {
   }
 }
 
-export class FormatEvaluator extends Evaluator {
+export class FormatEvaluator extends NodeEvaluator {
   public static tags = ['format'];
 
   public evaluate(node: Syntax.FormatOperator) {
@@ -129,7 +129,7 @@ export class FormatEvaluator extends Evaluator {
   }
 }
 
-export class MemberEvaluator extends Evaluator {
+export class MemberEvaluator extends NodeEvaluator {
   public static tags = ['member'];
 
   public evaluate(node: Syntax.MemberOperator) {
@@ -137,7 +137,7 @@ export class MemberEvaluator extends Evaluator {
   }
 }
 
-export class ArrayEvaluator extends Evaluator {
+export class ArrayEvaluator extends NodeEvaluator {
   public static tags = ['array'];
 
   public evaluate(node: Syntax.ArrayConstructor) {
@@ -147,7 +147,7 @@ export class ArrayEvaluator extends Evaluator {
   }
 }
 
-export class ObjectEvaluator extends Evaluator {
+export class ObjectEvaluator extends NodeEvaluator {
   public static tags = ['object'];
 
   public evaluate(node: Syntax.ObjectConstructor) {
@@ -165,7 +165,7 @@ export class ObjectEvaluator extends Evaluator {
   }
 }
 
-export class IdEvaluator extends Evaluator {
+export class IdEvaluator extends NodeEvaluator {
   public static tags = ['id'];
 
   public evaluate(id: Syntax.Identifier) {
@@ -173,7 +173,7 @@ export class IdEvaluator extends Evaluator {
   }
 }
 
-export class LiteralEvaluator extends Evaluator {
+export class LiteralEvaluator extends NodeEvaluator {
   public static tags = ['literal'];
 
   public evaluate(node: Syntax.Literal) {
@@ -182,7 +182,7 @@ export class LiteralEvaluator extends Evaluator {
   }
 }
 
-export class ContextEvaluator extends Evaluator {
+export class ContextEvaluator extends NodeEvaluator {
   public static tags = ['context'];
 
   public evaluate(node: Syntax.Context) {
@@ -196,7 +196,7 @@ export class ContextEvaluator extends Evaluator {
   }
 }
 
-export class SelfEvaluator extends Evaluator {
+export class SelfEvaluator extends NodeEvaluator {
   public static tags = ['self'];
 
   public evaluate(node: Syntax.Self) {
@@ -204,7 +204,7 @@ export class SelfEvaluator extends Evaluator {
   }
 }
 
-export class GlobalEvaluator extends Evaluator {
+export class GlobalEvaluator extends NodeEvaluator {
   public static tags = ['global'];
 
   public evaluate(node: Syntax.Self) {

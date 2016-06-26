@@ -1,11 +1,11 @@
 "use strict";
 
 import * as Syntax from '../syntax';
-import { Evaluator } from './Evaluator';
+import { NodeEvaluator } from './Evaluator';
 import { AssignmentEvaluator } from './AssignmentEvaluator';
 import { StatementsEvaluator } from './BasicEvaluator';
 
-export class AwaitEvaluator extends Evaluator {
+export class AwaitEvaluator extends NodeEvaluator {
   public static tags = ['await'];
 
   public evaluate(node: Syntax.AwaitOperator) {
@@ -13,7 +13,7 @@ export class AwaitEvaluator extends Evaluator {
   }
 }
 
-export class DoEvaluator extends Evaluator {
+export class DoEvaluator extends NodeEvaluator {
   public static tags = ['do'];
 
   public evaluate(node: Syntax.DoExpression, caseGuard?: Function) {
@@ -91,7 +91,7 @@ export class DoEvaluator extends Evaluator {
   }
 }
 
-export class CaseEvaluator extends Evaluator {
+export class CaseEvaluator extends NodeEvaluator {
   public static tags = ['case'];
 
   public evaluate(node: Syntax.CaseExpression) {

@@ -1,12 +1,12 @@
 "use strict";
 
 import * as Syntax from '../syntax';
-import { Evaluator } from './Evaluator';
+import { NodeEvaluator } from './Evaluator';
 import { StatementsEvaluator } from './BasicEvaluator';
 
 type IdMapping = { id: string, anon: string };
 
-export class ReduceEvaluator extends Evaluator {
+export class ReduceEvaluator extends NodeEvaluator {
   public static tags = ['reduce'];
 
   public evaluate(node: Syntax.ReduceExpression) {
@@ -28,7 +28,7 @@ export class ReduceEvaluator extends Evaluator {
   }
 }
 
-abstract class LoopEvaluator extends Evaluator {
+abstract class LoopEvaluator extends NodeEvaluator {
   protected createLoop(ranges: Syntax.Ranges, createBody: Function,
                        successVar?: string) {
     let self = this;

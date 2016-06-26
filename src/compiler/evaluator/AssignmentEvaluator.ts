@@ -1,11 +1,11 @@
 "use strict";
 
 import * as Syntax from '../syntax';
-import { Evaluator } from './Evaluator';
+import { NodeEvaluator } from './Evaluator';
 
 type FunctionMap = { [index: string]: Function };
 
-export class LetEvaluator extends Evaluator {
+export class LetEvaluator extends NodeEvaluator {
   public static tags = ['let'];
 
   public evaluate(node: Syntax.LetStatement) {
@@ -15,7 +15,7 @@ export class LetEvaluator extends Evaluator {
   }
 }
 
-export class AssignmentEvaluator extends Evaluator {
+export class AssignmentEvaluator extends NodeEvaluator {
   public static tags = ['assignment', 'arrayDestructure', 'objectDestructure'];
 
   public evaluate(node: Syntax.Assignment, getValue?: Function) {

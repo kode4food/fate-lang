@@ -2,7 +2,7 @@
 
 import * as Target from '../target';
 import * as Syntax from '../syntax';
-import { Evaluator } from './Evaluator';
+import { NodeEvaluator } from './Evaluator';
 import { StatementsEvaluator } from './BasicEvaluator';
 
 const likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
@@ -10,7 +10,7 @@ const cachedPatternThreshold = 8;
 
 type FunctionMap = { [index: string]: Function };
 
-export class RegexEvaluator extends Evaluator {
+export class RegexEvaluator extends NodeEvaluator {
   public static tags = ['regex'];
 
   public evaluate(node: Syntax.Regex) {
@@ -20,7 +20,7 @@ export class RegexEvaluator extends Evaluator {
   }
 }
 
-abstract class LikeComparisonEvaluator extends Evaluator {
+abstract class LikeComparisonEvaluator extends NodeEvaluator {
   protected createLikeComparison(leftNode: Syntax.Node|Function,
                                  rightNode: Syntax.Node|Function) {
     let left = this.deferIfNotAlready(leftNode);
