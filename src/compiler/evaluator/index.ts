@@ -4,14 +4,14 @@ import * as Syntax from '../syntax';
 import { Evaluator, NodeEvaluator } from './Evaluator';
 import { Coder } from '../target';
 
-import * as AssignmentEvaluators from './AssignmentEvaluator';
-import * as BasicEvaluators from './BasicEvaluator';
-import * as ConditionalEvaluators from './ConditionalEvaluator';
-import * as DoEvaluators from './DoEvaluator';
-import * as FunctionEvaluators from './FunctionEvaluator';
-import * as LoopEvaluators from './LoopEvaluator';
-import * as ModuleEvaluators from './ModuleEvaluator';
-import * as PatternEvaluators from './PatternEvaluator';
+import * as AssignmentEvaluators from './Assignment';
+import * as BasicEvaluators from './Basic';
+import * as ConcurrencyEvaluators from './Concurrency';
+import * as ConditionalEvaluators from './Conditional';
+import * as FunctionEvaluators from './Function';
+import * as LoopEvaluators from './Looping';
+import * as ModuleEvaluators from './Module';
+import * as PatternEvaluators from './Pattern';
 
 interface AnyMap {
   [index: string]: any;
@@ -22,8 +22,9 @@ interface NodeEvaluatorConstructorMap {
 }
 
 const evaluatorModules = [
-  AssignmentEvaluators, BasicEvaluators, ConditionalEvaluators, DoEvaluators,
-  FunctionEvaluators, LoopEvaluators, ModuleEvaluators, PatternEvaluators
+  AssignmentEvaluators, BasicEvaluators, ConditionalEvaluators,
+  ConcurrencyEvaluators, FunctionEvaluators, LoopEvaluators,
+  ModuleEvaluators, PatternEvaluators
 ];
 
 export class DispatchEvaluator extends Evaluator {

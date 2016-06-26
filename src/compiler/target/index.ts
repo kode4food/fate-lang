@@ -4,7 +4,6 @@ import * as Syntax from '../syntax';
 import * as JavaScript from './JavaScript';
 
 import { DispatchEvaluator } from '../evaluator';
-import { StatementsEvaluator } from '../evaluator/BasicEvaluator';
 
 export type Id = string;
 export type Ids = Id[];
@@ -109,8 +108,7 @@ function createScriptFunction(statements: Syntax.Statements) {
     internalId: coder.selfName,
     internalArgs: [coder.globalObjectName, coder.exportsName],
     body: () => {
-      let dispatcher = new DispatchEvaluator(coder);
-      new StatementsEvaluator(dispatcher, statements).evaluate();
+      new DispatchEvaluator(coder).evaluate(statements);
     }
   });
   return coder.toString();
