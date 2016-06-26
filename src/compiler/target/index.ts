@@ -1,9 +1,8 @@
 "use strict";
 
 import * as Syntax from '../syntax';
+import * as Evaluator from '../evaluator';
 import * as JavaScript from './JavaScript';
-
-import { DispatchEvaluator } from '../evaluator';
 
 export type Id = string;
 export type Ids = Id[];
@@ -108,7 +107,7 @@ function createScriptFunction(statements: Syntax.Statements) {
     internalId: coder.selfName,
     internalArgs: [coder.globalObjectName, coder.exportsName],
     body: () => {
-      new DispatchEvaluator(coder).evaluate(statements);
+      new Evaluator.DispatchEvaluator(coder).evaluate(statements);
     }
   });
   return coder.toString();
