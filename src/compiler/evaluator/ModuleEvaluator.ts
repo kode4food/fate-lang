@@ -15,10 +15,11 @@ abstract class ImportExportEvaluator extends NodeEvaluator {
 
 export class ImportEvaluator extends ImportExportEvaluator {
   public static tags = ['import'];
+  public node: Syntax.ImportStatement;
 
-  public evaluate(node: Syntax.ImportStatement) {
+  public evaluate() {
     let assigns: Target.AssignmentItems = [];
-    node.modules.forEach(module => {
+    this.node.modules.forEach(module => {
       let moduleName = module.path.value;
       let moduleAlias = module.alias.value;
 
@@ -38,10 +39,11 @@ export class ImportEvaluator extends ImportExportEvaluator {
 
 export class FromEvaluator extends ImportExportEvaluator {
   public static tags = ['from'];
+  public node: Syntax.FromStatement;
 
-  public evaluate(node: Syntax.FromStatement) {
+  public evaluate() {
     let assigns: any[] = [];
-    let modulePath = node.path.value;
+    let modulePath = this.node.path.value;
     let modulePathId = this.coder.literal(modulePath);
     let importer = this.coder.builder('importer', modulePathId);
 
@@ -53,7 +55,7 @@ export class FromEvaluator extends ImportExportEvaluator {
       }
     ]);
 
-    node.importList.forEach(item => {
+    this.node.importList.forEach(item => {
       assigns.push([
         item.id.value,
         () => {
@@ -73,9 +75,10 @@ export class FromEvaluator extends ImportExportEvaluator {
 
 export class ExportEvaluator extends ImportExportEvaluator {
   public static tags = ['export'];
+  public node: Syntax.ExportStatement;
 
-  public evaluate(node: Syntax.ExportStatement) {
-    let exports = node.exportItems.map(item => {
+  public evaluate() {
+    let exports = this.node.exportItems.map(item => {
       let name = item.id.value;
       let alias = item.moduleKey.value;
       return <Target.ModuleItem>[name, alias];

@@ -3,7 +3,6 @@
 import * as Target from '../target';
 import * as Syntax from '../syntax';
 
-import { BodyEntry } from '../target';
 import { NodeEvaluator } from './Evaluator';
 import { StatementsEvaluator } from './BasicEvaluator';
 
@@ -13,24 +12,26 @@ interface StringMap {
 
 export class CallEvaluator extends NodeEvaluator {
   public static tags = ['call'];
+  public node: Syntax.CallOperator;
 
-  public evaluate(node: Syntax.CallOperator) {
+  public evaluate() {
     this.coder.call(
-      this.defer(node.left),
-      node.right.map(argNode => this.defer(argNode))
+      this.defer(this.node.left),
+      this.node.right.map(argNode => this.defer(argNode))
     );
   }
 }
 
 export class BindEvaluator extends NodeEvaluator {
   public static tags = ['bind'];
+  public node: Syntax.BindOperator;
 
-  public evaluate(node: Syntax.BindOperator) {
+  public evaluate() {
     this.coder.call(this.coder.runtimeImport('bindFunction'), [
-      this.defer(node.left),
+      this.defer(this.node.left),
       () => {
         let elems: Target.ObjectAssignmentItems = [];
-        node.right.forEach((argNode, index) => {
+        this.node.right.forEach((argNode, index) => {
           if ( argNode instanceof Syntax.Wildcard ) {
             return;
           }
@@ -46,16 +47,19 @@ export class BindEvaluator extends NodeEvaluator {
 
 export class ReturnEvaluator extends NodeEvaluator {
   public static tags = ['return'];
+  public node: Syntax.ReturnStatement;
 
-  public evaluate(node: Syntax.ReturnStatement) {
-    this.coder.returnStatement(this.defer(node.result));
+  public evaluate() {
+    this.coder.returnStatement(this.defer(this.node.result));
   }
 }
 
 abstract class FuncOrLambdaEvaluator extends NodeEvaluator {
-  protected getFuncOrLambdaInternalId(node: Syntax.FunctionOrLambda) {
-    let hasSelf = Syntax.hasAnnotation(node, 'function/self');
-    let hasGuard = node.signature.guard;
+  public node: Syntax.FunctionDeclaration|Syntax.LambdaExpression;
+
+  protected getFuncOrLambdaInternalId() {
+    let hasSelf = Syntax.hasAnnotation(this.node, 'function/self');
+    let hasGuard = this.node.signature.guard;
     return hasSelf || hasGuard  ? this.coder.selfName : undefined;
   }
 
@@ -90,39 +94,39 @@ abstract class FuncOrLambdaEvaluator extends NodeEvaluator {
 
 export class FunctionEvaluator extends FuncOrLambdaEvaluator {
   public static tags = ['function'];
+  public node: Syntax.FunctionDeclaration;
 
-  public evaluate(node: Syntax.FunctionDeclaration) {
-    let signature = node.signature;
+  public evaluate() {
+    let signature = this.node.signature;
     let create = signature.guard ? this.createGuarded : this.createUnguarded;
-    create.call(this, node);
+    create.call(this);
   }
 
-  private createUnguarded(node: Syntax.FunctionDeclaration) {
-    let signature = node.signature;
+  private createUnguarded() {
+    let signature = this.node.signature;
     let functionName = signature.id;
     let params = signature.params;
     let paramNames = this.getFixedParamNames(params);
 
     this.coder.funcDeclaration(functionName.value, {
-      internalId: this.getFuncOrLambdaInternalId(node),
+      internalId: this.getFuncOrLambdaInternalId(),
       contextArgs: paramNames,
       body: () => {
         this.generateParamProcessor(params);
-        let evaluator = new StatementsEvaluator(this);
-        evaluator.evaluate(node.statements);
+        new StatementsEvaluator(this, this.node.statements).evaluate();
       }
     });
   }
 
-  private createGuarded(node: Syntax.FunctionDeclaration) {
-    let signature = node.signature;
+  private createGuarded() {
+    let signature = this.node.signature;
     let functionName = signature.id;
     let params = signature.params;
     let paramNames = this.getFixedParamNames(params);
-    let ensured = this.generateEnsured(node);
+    let ensured = this.generateEnsured();
 
     this.coder.funcDeclaration(functionName.value, {
-      internalId: this.getFuncOrLambdaInternalId(node),
+      internalId: this.getFuncOrLambdaInternalId(),
       contextArgs: paramNames,
       body: () => {
         this.generateParamProcessor(params);
@@ -135,17 +139,16 @@ export class FunctionEvaluator extends FuncOrLambdaEvaluator {
             });
           }
         );
-        let evaluator = new StatementsEvaluator(this);
-        evaluator.evaluate(node.statements);
+        new StatementsEvaluator(this, this.node.statements).evaluate();
       }
     });
   }
 
-  private generateEnsured(node: Syntax.FunctionDeclaration): BodyEntry {
-    let signature = node.signature;
+  private generateEnsured(): Target.BodyEntry {
+    let signature = this.node.signature;
     let functionName = signature.id;
 
-    if ( !Syntax.hasAnnotation(node, 'function/shadow') ) {
+    if ( !Syntax.hasAnnotation(this.node, 'function/shadow') ) {
       return this.coder.runtimeImport('functionNotExhaustive');
     }
 
@@ -168,20 +171,20 @@ export class FunctionEvaluator extends FuncOrLambdaEvaluator {
 
 export class LambdaEvaluator extends FuncOrLambdaEvaluator {
   public static tags = ['lambda'];
+  public node: Syntax.LambdaExpression;
 
-  public evaluate(node: Syntax.LambdaExpression) {
-    let signature = node.signature;
+  public evaluate() {
+    let signature = this.node.signature;
     let params = signature.params;
     let paramNames = this.getFixedParamNames(params);
 
     this.coder.parens(() => {
       this.coder.func({
-        internalId: this.getFuncOrLambdaInternalId(node),
+        internalId: this.getFuncOrLambdaInternalId(),
         contextArgs: paramNames,
         body: () => {
           this.generateParamProcessor(params);
-          let evaluator = new StatementsEvaluator(this);
-          evaluator.evaluate(node.statements);
+          new StatementsEvaluator(this, this.node.statements).evaluate();
         }
       });
     });
@@ -196,13 +199,14 @@ const composeImportMap: StringMap = {
 
 export class ComposeEvaluator extends NodeEvaluator {
   public static tags = Object.keys(composeImportMap);
+  public node: Syntax.ComposeExpression;
 
-  public evaluate(node: Syntax.ComposeExpression) {
+  public evaluate() {
     this.coder.call(
-      this.coder.runtimeImport(composeImportMap[node.tag]),
+      this.coder.runtimeImport(composeImportMap[this.node.tag]),
       [() => {
         this.coder.array(
-          node.expressions.map(expression => this.defer(expression))
+          this.node.expressions.map(expression => this.defer(expression))
         );
       }]
     );

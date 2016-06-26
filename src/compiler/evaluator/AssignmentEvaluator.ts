@@ -7,9 +7,10 @@ type FunctionMap = { [index: string]: Function };
 
 export class LetEvaluator extends NodeEvaluator {
   public static tags = ['let'];
+  public node: Syntax.LetStatement;
 
-  public evaluate(node: Syntax.LetStatement) {
-    node.assignments.forEach(assignment => {
+  public evaluate() {
+    this.node.assignments.forEach(assignment => {
       this.getRootEvaluator().evaluate(assignment);
     });
   }
@@ -17,8 +18,9 @@ export class LetEvaluator extends NodeEvaluator {
 
 export class AssignmentEvaluator extends NodeEvaluator {
   public static tags = ['assignment', 'arrayDestructure', 'objectDestructure'];
+  public node: Syntax.Assignment;
 
-  public evaluate(node: Syntax.Assignment, getValue?: Function) {
+  public evaluate(getValue?: Function) {
     if ( !getValue ) {
       getValue = this.getAssignmentValue.bind(this);
     }
@@ -29,28 +31,28 @@ export class AssignmentEvaluator extends NodeEvaluator {
       'objectDestructure': this.createObjectDestructureEvaluator
     };
 
-    let assignmentEvaluator = AssignmentEvaluators[node.tag];
-    return assignmentEvaluator.call(this, node, getValue);
+    let assignmentEvaluator = AssignmentEvaluators[this.node.tag];
+    return assignmentEvaluator.call(this, getValue);
   }
 
-  private getAssignmentValue(node: Syntax.Assignment) {
-    return this.defer(node.value);
+  private getAssignmentValue() {
+    return this.defer(this.node.value);
   }
 
-  private createDirectAssignmentEvaluator(node: Syntax.DirectAssignment,
-                                          getValue: Function) {
-    this.coder.assignment(node.id.value, getValue(node));
+  private createDirectAssignmentEvaluator(getValue: Function) {
+    let thisNode = <Syntax.DirectAssignment>this.node;
+    this.coder.assignment(thisNode.id.value, getValue());
   }
 
-  private createArrayDestructureEvaluator(node: Syntax.ArrayDestructure,
-                                          getValue: Function) {
+  private createArrayDestructureEvaluator(getValue: Function) {
+    let thisNode = <Syntax.ArrayDestructure>this.node;
     let result = this.coder.createAnonymous();
 
     this.coder.statement(() => {
-      this.coder.assignAnonymous(result, getValue(node));
+      this.coder.assignAnonymous(result, getValue(thisNode));
     });
 
-    node.getIdentifiers().forEach((id, index) => {
+    thisNode.getIdentifiers().forEach((id, index) => {
       if ( id instanceof Syntax.Wildcard ) {
         return;
       }
@@ -63,15 +65,15 @@ export class AssignmentEvaluator extends NodeEvaluator {
     });
   }
 
-  private createObjectDestructureEvaluator(node: Syntax.ObjectDestructure,
-                                           getValue: Function) {
+  private createObjectDestructureEvaluator(getValue: Function) {
+    let thisNode = <Syntax.ObjectDestructure>this.node;
     let result = this.coder.createAnonymous();
 
     this.coder.statement(() => {
-      this.coder.assignAnonymous(result, getValue(node));
+      this.coder.assignAnonymous(result, getValue(thisNode));
     });
 
-    node.items.forEach(item => {
+    thisNode.items.forEach(item => {
       this.coder.assignment(item.id.value, () => {
         this.coder.member(
           () => { this.coder.retrieveAnonymous(result); },

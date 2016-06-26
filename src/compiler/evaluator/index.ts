@@ -17,8 +17,8 @@ interface AnyMap {
   [index: string]: any;
 }
 
-interface EvaluatorMap {
-  [index: string]: NodeEvaluator;
+interface NodeEvaluatorConstructorMap {
+  [index: string]: new (parent: Evaluator, node: Syntax.Node) => NodeEvaluator;
 }
 
 const evaluatorModules = [
@@ -27,7 +27,7 @@ const evaluatorModules = [
 ];
 
 export class DispatchEvaluator extends Evaluator {
-  private evaluators: EvaluatorMap = {};
+  private constructors: NodeEvaluatorConstructorMap = {};
 
   constructor(public coder: Coder) {
     super();
@@ -35,17 +35,16 @@ export class DispatchEvaluator extends Evaluator {
     evaluatorModules.forEach((module: AnyMap) => {
       Object.keys(module)
             .map(key => module[key])
-            .filter(isEvaluatorModule)
-            .forEach(EvaluatorClass => {
-              let instance = new EvaluatorClass(this, coder);
-              let tags = EvaluatorClass.tags;
+            .filter(isNodeEvaluator)
+            .forEach(constructorFunction => {
+              let tags = constructorFunction.tags;
               tags.forEach((tag: string) => {
-                this.evaluators[tag] = instance;
+                this.constructors[tag] = constructorFunction;
               });
             });
     });
 
-    function isEvaluatorModule(module: any) {
+    function isNodeEvaluator(module: any) {
       return typeof module === 'function' && module.hasOwnProperty('tags');
     }
   }
@@ -57,14 +56,15 @@ export class DispatchEvaluator extends Evaluator {
     }
 
     let nodeType = node.tag;
-    let evaluator = this.evaluators[nodeType];
+    let EvaluatorConstructor = this.constructors[nodeType];
 
     /* istanbul ignore if: the tags should map properly to an evaluator */
-    if ( !evaluator ) {
+    if ( !EvaluatorConstructor ) {
       throw new Error(`Stupid Coder: Invalid tag in Node: ${nodeType}`);
     }
 
-    evaluator.evaluate(node);
+    let instance = new EvaluatorConstructor(this, node);
+    instance.evaluate.apply(instance);
   }
 
   public getRootEvaluator() {

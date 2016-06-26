@@ -7,12 +7,13 @@ import { StatementsEvaluator } from './BasicEvaluator';
 
 export class ConditionalEvaluator extends NodeEvaluator {
   public static tags = ['conditional'];
+  public node: Syntax.ConditionalOperator;
 
-  public evaluate(node: Syntax.ConditionalOperator) {
+  public evaluate() {
     this.coder.conditionalOperator(
-      this.defer(node.condition),
-      this.defer(node.trueResult),
-      this.defer(node.falseResult)
+      this.defer(this.node.condition),
+      this.defer(this.node.trueResult),
+      this.defer(this.node.falseResult)
     );
   }
 }
@@ -26,37 +27,33 @@ abstract class IfGeneratingEvaluator extends NodeEvaluator {
 
     this.coder.ifStatement(
       condition,
-      thens ? () => {
-        let evaluator = new StatementsEvaluator(this);
-        evaluator.evaluate(thens);
-      } : null,
-      elses ? () => {
-        let evaluator = new StatementsEvaluator(this);
-        evaluator.evaluate(elses);
-      } : null
+      thens ? () => new StatementsEvaluator(this, thens).evaluate() : null,
+      elses ? () => new StatementsEvaluator(this, elses).evaluate() : null
     );
   }
 }
 
 export class IfEvaluator extends IfGeneratingEvaluator {
   public static tags = ['if'];
+  public node: Syntax.IfStatement;
 
-  public evaluate(node: Syntax.IfStatement) {
+  public evaluate() {
     this.generateIf(
-      this.defer(node.condition),
-      node.thenStatements,
-      node.elseStatements
+      this.defer(this.node.condition),
+      this.node.thenStatements,
+      this.node.elseStatements
     );
   }
 }
 
 export class IfLetEvaluator extends IfGeneratingEvaluator {
   public static tags = ['ifLet'];
+  public node: Syntax.IfLetStatement;
 
-  public evaluate(node: Syntax.IfLetStatement) {
+  public evaluate() {
     let some = this.coder.runtimeImport('isSomething');
-    let letStatement = node.condition;
-    new LetEvaluator(this).evaluate(letStatement);
+    let letStatement = this.node.condition;
+    new LetEvaluator(this, letStatement).evaluate();
 
     let assignments = letStatement.assignments;
     let conditions: string[] = [];
@@ -72,8 +69,8 @@ export class IfLetEvaluator extends IfGeneratingEvaluator {
 
     this.generateIf(
       () => { this.coder.writeAndGroup(conditions); },
-      node.thenStatements,
-      node.elseStatements
+      this.node.thenStatements,
+      this.node.elseStatements
     );
   }
 }

@@ -110,7 +110,7 @@ function createScriptFunction(statements: Syntax.Statements) {
     internalArgs: [coder.globalObjectName, coder.exportsName],
     body: () => {
       let dispatcher = new DispatchEvaluator(coder);
-      new StatementsEvaluator(dispatcher).evaluate(statements);
+      new StatementsEvaluator(dispatcher, statements).evaluate();
     }
   });
   return coder.toString();

@@ -12,10 +12,12 @@ type FunctionMap = { [index: string]: Function };
 
 export class RegexEvaluator extends NodeEvaluator {
   public static tags = ['regex'];
+  public node: Syntax.Regex;
 
-  public evaluate(node: Syntax.Regex) {
-    let regex = this.coder.builder('defineRegexPattern',
-                                   this.coder.literal(node.value));
+  public evaluate() {
+    let regex = this.coder.builder(
+      'defineRegexPattern', this.coder.literal(this.node.value)
+    );
     this.coder.write(regex);
   }
 }
@@ -53,34 +55,36 @@ abstract class LikeComparisonEvaluator extends NodeEvaluator {
 
 export class LikeEvaluator extends LikeComparisonEvaluator {
   public static tags = ['like'];
+  public node: Syntax.LikeOperator;
 
-  public evaluate(node: Syntax.LikeOperator) {
-    this.createLikeComparison(node.left, node.right);
+  public evaluate() {
+    this.createLikeComparison(this.node.left, this.node.right);
   }
 }
 
 export class NotLikeEvaluator extends LikeComparisonEvaluator {
   public static tags = ['notLike'];
+  public node: Syntax.NotLikeOperator;
 
-  public evaluate(node: Syntax.NotLikeOperator) {
+  public evaluate() {
     this.coder.unaryOperator('not', () => {
-      this.createLikeComparison(node.left, node.right);
+      this.createLikeComparison(this.node.left, this.node.right);
     });
   }
 }
 
 export class MatchEvaluator extends LikeComparisonEvaluator {
   public static tags = ['match'];
+  public node: Syntax.MatchExpression;
 
-  public evaluate(node: Syntax.MatchExpression) {
+  public evaluate() {
     let self = this;
-    let generator = node.value ? generateExpression
-                               : generateFunction;
+    let generator = self.node.value ? generateExpression : generateFunction;
     generator();
 
     function generateExpression() {
       self.coder.iife(() => {
-        generateBody(self.defer(node.value));
+        generateBody(self.defer(self.node.value));
       });
     }
 
@@ -101,7 +105,7 @@ export class MatchEvaluator extends LikeComparisonEvaluator {
         self.coder.assignAnonymous(value, valueGenerator);
       });
 
-      node.matches.forEach(match => {
+      self.node.matches.forEach(match => {
         self.coder.ifStatement(
           () => {
             self.createLikeComparison(
@@ -110,15 +114,14 @@ export class MatchEvaluator extends LikeComparisonEvaluator {
             );
           },
           () => {
-            let evaluator = new StatementsEvaluator(self);
-            evaluator.evaluate(match.statements);
+            new StatementsEvaluator(self, match.statements).evaluate();
             self.coder.returnStatement();
           },
           null
         );
       });
 
-      if ( node.elseStatements.isEmpty() ) {
+      if ( self.node.elseStatements.isEmpty() ) {
         let exploder = self.coder.runtimeImport('matchNotExhaustive');
         self.coder.statement(() => {
           self.coder.call(exploder, []);
@@ -126,8 +129,7 @@ export class MatchEvaluator extends LikeComparisonEvaluator {
         return;
       }
 
-      let evaluator = new StatementsEvaluator(self);
-      evaluator.evaluate(node.elseStatements);
+      new StatementsEvaluator(self, self.node.elseStatements).evaluate();
     }
   }
 }
@@ -137,8 +139,7 @@ abstract class BasePatternEvaluator extends LikeComparisonEvaluator {
     switch ( node.tag ) {
       case 'objectPattern':
       case 'arrayPattern':
-        let evaluator = new NestedPatternEvaluator(this);
-        evaluator.evaluate(<Syntax.CollectionPattern>node);
+        new NestedPatternEvaluator(this, node).evaluate();
         break;
       case 'context':
         this.coder.write(this.coder.literal(true));
@@ -162,17 +163,18 @@ abstract class BasePatternEvaluator extends LikeComparisonEvaluator {
 
 export class PatternEvaluator extends BasePatternEvaluator {
   public static tags = ['pattern'];
+  public node: Syntax.Pattern;
 
-  public evaluate(node: Syntax.Pattern) {
-    let defineName = this.getPatternDefineMethodName(node);
+  public evaluate() {
+    let defineName = this.getPatternDefineMethodName(this.node);
     let definePattern = this.coder.runtimeImport(defineName);
     this.coder.call(definePattern, [
       () => {
         this.coder.func({
-          internalArgs: [Syntax.getAnnotation(node, 'pattern/local')],
+          internalArgs: [Syntax.getAnnotation(this.node, 'pattern/local')],
           body: () => {
             this.coder.returnStatement(() => {
-              this.createPatternTemplate(node.left);
+              this.createPatternTemplate(this.node.left);
             });
           }
         });
@@ -189,13 +191,14 @@ export class PatternEvaluator extends BasePatternEvaluator {
 
 export class NestedPatternEvaluator extends BasePatternEvaluator {
   public static tags = ['objectPattern', 'arrayPattern'];
+  public node: Syntax.CollectionPattern;
 
-  public evaluate(node: Syntax.CollectionPattern) {
+  public evaluate() {
     let self = this;
-    let parentLocal = Syntax.getAnnotation(node, 'pattern/local');
+    let parentLocal = Syntax.getAnnotation(this.node, 'pattern/local');
     parentLocal = self.coder.registerAnonymous(parentLocal);
 
-    let isObject = node instanceof Syntax.ObjectPattern;
+    let isObject = this.node instanceof Syntax.ObjectPattern;
     let containerCheckName = isObject ? 'isObject' : 'isArray';
 
     let expressions: Function[] = [];
@@ -206,7 +209,7 @@ export class NestedPatternEvaluator extends BasePatternEvaluator {
       }]);
     });
 
-    node.elements.forEach(element => {
+    this.node.elements.forEach(element => {
       if ( element instanceof Syntax.PatternElement ) {
         pushElement(element);
       }

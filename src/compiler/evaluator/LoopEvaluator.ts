@@ -8,22 +8,25 @@ type IdMapping = { id: string, anon: string };
 
 export class ReduceEvaluator extends NodeEvaluator {
   public static tags = ['reduce'];
+  public node: Syntax.ReduceExpression;
 
-  public evaluate(node: Syntax.ReduceExpression) {
-    let statements = node.template('statements', [
-      node.template('assignment', node.assignment.id, node.select)
+  public evaluate() {
+    let statements = this.node.template('statements', [
+      this.node.template(
+        'assignment', this.node.assignment.id, this.node.select
+      )
     ]);
-    let forNode = node.template('for',
-      node.ranges,
+    let forNode = this.node.template('for',
+      this.node.ranges,
       statements,
-      node.template('statements', []),
-      [node.assignment]
+      this.node.template('statements', []),
+      [this.node.assignment]
     );
 
-    let isSingle = Syntax.hasAnnotation(node, 'function/single_expression');
-    let bodyGenerator = isSingle ? this.coder.scope : this.coder.iife;
+    let single = Syntax.hasAnnotation(this.node, 'function/single_expression');
+    let bodyGenerator = single ? this.coder.scope : this.coder.iife;
     bodyGenerator(() => {
-      new ForEvaluator(this).evaluate(forNode);
+      new ForEvaluator(this, forNode).evaluate();
     });
   }
 }
@@ -85,13 +88,14 @@ abstract class LoopEvaluator extends NodeEvaluator {
 
 export class ForEvaluator extends LoopEvaluator {
   public static tags = ['for'];
+  public node: Syntax.ForStatement;
 
-  public evaluate(node: Syntax.ForStatement) {
+  public evaluate() {
     let self = this;
 
     let generateLoop: Function, generateBody: Function;
     let idMappings: IdMapping[];
-    let reduceAssignments = node.reduceAssignments;
+    let reduceAssignments = self.node.reduceAssignments;
 
     if ( reduceAssignments ) {
       generateLoop = generateReduceLoop;
@@ -108,7 +112,7 @@ export class ForEvaluator extends LoopEvaluator {
     }
 
     function generateStatements() {
-      let elseStatements = node.elseStatements;
+      let elseStatements = self.node.elseStatements;
       if ( elseStatements.isEmpty() ) {
         return generateLoop();
       }
@@ -120,8 +124,7 @@ export class ForEvaluator extends LoopEvaluator {
         () => { self.coder.retrieveAnonymous(successVar); },
         null,
         () => {
-          let evaluator = new StatementsEvaluator(self);
-          evaluator.evaluate(elseStatements);
+          new StatementsEvaluator(self, elseStatements).evaluate();
         }
       );
     }
@@ -129,7 +132,7 @@ export class ForEvaluator extends LoopEvaluator {
     function generateReduceResult() {
       self.coder.statement(() => {
         self.coder.assignResult(() => {
-          let ids = node.getReduceIdentifiers();
+          let ids = self.node.getReduceIdentifiers();
           if ( ids.length === 1 ) {
             self.coder.getter(ids[0].value);
             return;
@@ -148,7 +151,7 @@ export class ForEvaluator extends LoopEvaluator {
     }
 
     function createAnonymousCounters() {
-      idMappings = node.getReduceIdentifiers().map(id => {
+      idMappings = self.node.getReduceIdentifiers().map(id => {
         return {
           id: id.value,
           anon: self.coder.createAnonymous()
@@ -184,7 +187,7 @@ export class ForEvaluator extends LoopEvaluator {
 
     function generateForLoop(successVar?: string) {
       self.coder.statement(() => {
-        self.createLoop(node.ranges, generateBody, successVar);
+        self.createLoop(self.node.ranges, generateBody, successVar);
       });
     }
 
@@ -195,23 +198,23 @@ export class ForEvaluator extends LoopEvaluator {
     }
 
     function generateForBody() {
-      let evaluator = new StatementsEvaluator(self);
-      evaluator.evaluate(node.loopStatements);
+      new StatementsEvaluator(self, self.node.loopStatements).evaluate();
     }
   }
 }
 
 export class ListCompEvaluator extends LoopEvaluator {
   public static tags = ['arrayComp', 'objectComp'];
+  public node: Syntax.ListComprehension;
 
-  public evaluate(node: Syntax.ListComprehension) {
+  public evaluate() {
     let self = this;
-    let isSingle = Syntax.hasAnnotation(node, 'function/single_expression');
-    let bodyGenerator = isSingle ? this.coder.scope : this.coder.iife;
+    let single = Syntax.hasAnnotation(self.node, 'function/single_expression');
+    let bodyGenerator = single ? this.coder.scope : this.coder.iife;
     bodyGenerator(functionWrapperBody);
 
     function functionWrapperBody() {
-      let isObject = node instanceof Syntax.ObjectComprehension;
+      let isObject = self.node instanceof Syntax.ObjectComprehension;
       let genContainer = isObject ? self.coder.object : self.coder.array;
       let createBody = isObject ? createNameValueBody : createValueBody;
       let result = self.coder.createAnonymous();
@@ -222,7 +225,7 @@ export class ListCompEvaluator extends LoopEvaluator {
         });
       });
 
-      self.createLoop(node.ranges, createBody);
+      self.createLoop(self.node.ranges, createBody);
       self.coder.statement(() => {
         self.coder.assignResult(() => {
           self.coder.retrieveAnonymous(result);
@@ -230,14 +233,14 @@ export class ListCompEvaluator extends LoopEvaluator {
       });
 
       function createValueBody() {
-        let arrayCompNode = <Syntax.ArrayComprehension>node;
+        let arrayCompNode = <Syntax.ArrayComprehension>self.node;
         self.coder.statement(() => {
           self.coder.arrayAppend(result, self.defer(arrayCompNode.value));
         });
       }
 
       function createNameValueBody() {
-        let objectCompNode = <Syntax.ObjectComprehension>node;
+        let objectCompNode = <Syntax.ObjectComprehension>self.node;
         let assign = objectCompNode.assignment;
         self.coder.statement(() => {
           self.coder.objectAssign(

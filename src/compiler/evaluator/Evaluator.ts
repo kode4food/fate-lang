@@ -6,14 +6,14 @@ import { Coder } from '../target';
 export abstract class Evaluator {
   public coder: Coder;
 
-  public abstract evaluate(node: Syntax.Node): void;
+  public abstract evaluate(...args: any[]): void;
   public abstract getRootEvaluator(): Evaluator;
 }
 
 export abstract class NodeEvaluator extends Evaluator {
   public static tags: string[] = [];
 
-  constructor(public parent: Evaluator) {
+  constructor(public parent: Evaluator, public node: Syntax.Node) {
     super();
     this.coder = parent.coder;
   }

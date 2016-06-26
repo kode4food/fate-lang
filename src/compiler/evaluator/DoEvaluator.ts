@@ -7,36 +7,37 @@ import { StatementsEvaluator } from './BasicEvaluator';
 
 export class AwaitEvaluator extends NodeEvaluator {
   public static tags = ['await'];
+  public node: Syntax.AwaitOperator;
 
-  public evaluate(node: Syntax.AwaitOperator) {
-    this.coder.waitFor(node.resolver, this.defer(node.left));
+  public evaluate() {
+    this.coder.waitFor(this.node.resolver, this.defer(this.node.left));
   }
 }
 
 export class DoEvaluator extends NodeEvaluator {
   public static tags = ['do'];
+  public node: Syntax.DoExpression;
 
-  public evaluate(node: Syntax.DoExpression, caseGuard?: Function) {
+  public evaluate(caseGuard?: Function) {
     this.coder.call(this.coder.runtimeImport('createDoBlock'), [
       () => {
         this.coder.func({
           generator: true,
           body: () => {
-            if ( node.whenClause instanceof Syntax.LetStatement ) {
-              let whenClause = <Syntax.LetStatement>node.whenClause;
+            if ( this.node.whenClause instanceof Syntax.LetStatement ) {
+              let whenClause = <Syntax.LetStatement>this.node.whenClause;
               let groups = this.getAssignmentGroups(whenClause.assignments);
               groups.forEach(group => this.generateAssignment(group));
             }
-            else if ( node.whenClause ) {
-              this.generateExpression(node.whenClause);
+            else if ( this.node.whenClause ) {
+              this.generateExpression(this.node.whenClause);
             }
 
             if ( caseGuard ) {
               caseGuard();
             }
 
-            let evaluator = new StatementsEvaluator(this);
-            evaluator.evaluate(node.statements);
+            new StatementsEvaluator(this, this.node.statements).evaluate();
           }
         });
       }
@@ -78,8 +79,7 @@ export class DoEvaluator extends NodeEvaluator {
     });
 
     group.forEach((assignment, index) => {
-      let evaluator = new AssignmentEvaluator(this);
-      evaluator.evaluate(assignment, () => {
+      new AssignmentEvaluator(this, assignment).evaluate(() => {
         return () => {
           this.coder.member(
             () => { this.coder.retrieveAnonymous(anon); },
@@ -93,8 +93,9 @@ export class DoEvaluator extends NodeEvaluator {
 
 export class CaseEvaluator extends NodeEvaluator {
   public static tags = ['case'];
+  public node: Syntax.CaseExpression;
 
-  public evaluate(node: Syntax.CaseExpression) {
+  public evaluate() {
     this.coder.call(this.coder.runtimeImport('createDoBlock'), [
       () => {
         this.coder.func({
@@ -104,10 +105,9 @@ export class CaseEvaluator extends NodeEvaluator {
 
             this.coder.returnStatement(() => {
               this.coder.waitFor(Syntax.Resolver.Any, () => {
-                this.coder.array(node.cases.map(
+                this.coder.array(this.node.cases.map(
                   doCase => () => {
-                    let evaluator = new DoEvaluator(this);
-                    evaluator.evaluate(doCase, () => {
+                    new DoEvaluator(this, doCase).evaluate(() => {
                       this.coder.ifStatement(
                         () => { this.coder.retrieveAnonymous(triggered); },
                         () => { this.coder.returnStatement(); },
