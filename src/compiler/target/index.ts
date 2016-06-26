@@ -44,7 +44,7 @@ export interface FunctionOptions {
 
 export interface Coder {
   selfName: string;
-  contextName: string;
+  globalObjectName: string;
   exportsName: string;
   valueName: string;
   literal(literalValue: any): Literal;
@@ -53,7 +53,7 @@ export interface Coder {
   self(): void;
   currentDirectory(): Literal;
   args(startAt: number): void;
-  context(): void;
+  globalObject(): void;
   member(object: BodyEntry, property: BodyEntry): void;
   retrieveAnonymous(name: Name): void;
   assignAnonymous(name: Name, value: BodyEntry): void;
@@ -107,7 +107,7 @@ function createScriptFunction(statements: Syntax.Statements) {
 
   coder.func({
     internalId: coder.selfName,
-    internalArgs: [coder.contextName, coder.exportsName],
+    internalArgs: [coder.globalObjectName, coder.exportsName],
     body: () => {
       let dispatcher = new DispatchEvaluator(coder);
       new StatementsEvaluator(dispatcher).evaluate(statements);

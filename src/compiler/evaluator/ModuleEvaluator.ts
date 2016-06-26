@@ -7,7 +7,7 @@ import { Evaluator } from './Evaluator';
 abstract class ImportExportEvaluator extends Evaluator {
   public createImporterArguments() {
     this.coder.member(
-      () => { this.coder.context(); },
+      () => { this.coder.globalObject(); },
       this.coder.currentDirectory()
     );
   }

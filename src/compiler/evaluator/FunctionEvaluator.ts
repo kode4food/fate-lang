@@ -92,71 +92,77 @@ export class FunctionEvaluator extends FuncOrLambdaEvaluator {
   public static tags = ['function'];
 
   public evaluate(node: Syntax.FunctionDeclaration) {
-    let self = this;
     let signature = node.signature;
+    let create = signature.guard ? this.createGuarded : this.createUnguarded;
+    create.call(this, node);
+  }
+
+  private createUnguarded(node: Syntax.FunctionDeclaration) {
+    let signature = node.signature;
+    let functionName = signature.id;
     let params = signature.params;
     let paramNames = this.getFixedParamNames(params);
 
-    let create = signature.guard ? createGuarded : createUnguarded;
-    create();
-
-    function createUnguarded() {
-      let functionName = node.signature.id;
-      self.coder.funcDeclaration(functionName.value, {
-        internalId: self.getFuncOrLambdaInternalId(node),
-        contextArgs: paramNames,
-        body: () => {
-          self.generateParamProcessor(params);
-          let evaluator = new StatementsEvaluator(self);
-          evaluator.evaluate(node.statements);
-        }
-      });
-    }
-
-    function createGuarded() {
-      let functionName = node.signature.id;
-      let ensured = generateEnsured(functionName);
-
-      self.coder.funcDeclaration(functionName.value, {
-        internalId: self.getFuncOrLambdaInternalId(node),
-        contextArgs: paramNames,
-        body: () => {
-          self.generateParamProcessor(params);
-          self.coder.ifStatement(
-            self.defer(signature.guard),
-            null,  // self is an 'else' case
-            () => {
-              self.coder.returnStatement(() => {
-                self.coder.call(ensured);
-              });
-            }
-          );
-          let evaluator = new StatementsEvaluator(self);
-          evaluator.evaluate(node.statements);
-        }
-      });
-    }
-
-    function generateEnsured(functionName: Syntax.Identifier): BodyEntry {
-      if ( !Syntax.hasAnnotation(node, 'function/shadow') ) {
-        return self.coder.runtimeImport('functionNotExhaustive');
+    this.coder.funcDeclaration(functionName.value, {
+      internalId: this.getFuncOrLambdaInternalId(node),
+      contextArgs: paramNames,
+      body: () => {
+        this.generateParamProcessor(params);
+        let evaluator = new StatementsEvaluator(this);
+        evaluator.evaluate(node.statements);
       }
+    });
+  }
 
-      let ensure = self.coder.runtimeImport('ensureFunction');
-      let ensuredId = self.coder.createAnonymous();
+  private createGuarded(node: Syntax.FunctionDeclaration) {
+    let signature = node.signature;
+    let functionName = signature.id;
+    let params = signature.params;
+    let paramNames = this.getFixedParamNames(params);
+    let ensured = this.generateEnsured(node);
 
-      self.coder.statement(() => {
-        self.coder.assignAnonymous(ensuredId, () => {
-          self.coder.call(ensure, [() => {
-            self.coder.getter(functionName.value);
-          }]);
-        });
-      });
+    this.coder.funcDeclaration(functionName.value, {
+      internalId: this.getFuncOrLambdaInternalId(node),
+      contextArgs: paramNames,
+      body: () => {
+        this.generateParamProcessor(params);
+        this.coder.ifStatement(
+          this.defer(signature.guard),
+          null,  // this is an 'else' case
+          () => {
+            this.coder.returnStatement(() => {
+              this.coder.call(ensured);
+            });
+          }
+        );
+        let evaluator = new StatementsEvaluator(this);
+        evaluator.evaluate(node.statements);
+      }
+    });
+  }
 
-      return () => {
-        self.coder.retrieveAnonymous(ensuredId);
-      };
+  private generateEnsured(node: Syntax.FunctionDeclaration): BodyEntry {
+    let signature = node.signature;
+    let functionName = signature.id;
+
+    if ( !Syntax.hasAnnotation(node, 'function/shadow') ) {
+      return this.coder.runtimeImport('functionNotExhaustive');
     }
+
+    let ensure = this.coder.runtimeImport('ensureFunction');
+    let ensuredId = this.coder.createAnonymous();
+
+    this.coder.statement(() => {
+      this.coder.assignAnonymous(ensuredId, () => {
+        this.coder.call(ensure, [() => {
+          this.coder.getter(functionName.value);
+        }]);
+      });
+    });
+
+    return () => {
+      this.coder.retrieveAnonymous(ensuredId);
+    };
   }
 }
 

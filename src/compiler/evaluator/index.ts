@@ -13,11 +13,6 @@ import * as LoopEvaluators from './LoopEvaluator';
 import * as ModuleEvaluators from './ModuleEvaluator';
 import * as PatternEvaluators from './PatternEvaluator';
 
-const evaluatorModules = [
-  AssignmentEvaluators, BasicEvaluators, ConditionalEvaluators, DoEvaluators,
-  FunctionEvaluators, LoopEvaluators, ModuleEvaluators, PatternEvaluators
-];
-
 interface AnyMap {
   [index: string]: any;
 }
@@ -25,6 +20,11 @@ interface AnyMap {
 interface EvaluatorMap {
   [index: string]: Evaluator;
 }
+
+const evaluatorModules = [
+  AssignmentEvaluators, BasicEvaluators, ConditionalEvaluators, DoEvaluators,
+  FunctionEvaluators, LoopEvaluators, ModuleEvaluators, PatternEvaluators
+];
 
 export class DispatchEvaluator extends Evaluator {
   private evaluators: EvaluatorMap = {};

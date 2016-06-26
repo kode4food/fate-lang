@@ -63,7 +63,7 @@ waiterMap[Resolver.All] = 'awaitAll';
 // various names
 const selfName = 's';
 const thisOrSelf = 'this||' + selfName;
-const contextName = 'c';
+const globalObjectName = 'c';
 const exportsName = 'x';
 const valueName = 'v';
 
@@ -92,10 +92,10 @@ export function createCoder(): Target.Coder {
   let body: Target.BodyEntries = [];
 
   return {
-    selfName, contextName, exportsName, valueName,
+    selfName, globalObjectName, exportsName, valueName,
     literal, runtimeImport, builder, registerAnonymous,
     createAnonymous, assignAnonymous, retrieveAnonymous,
-    assignResult, self, currentDirectory, args, context,
+    assignResult, self, currentDirectory, args, globalObject,
     member, write, writeAndGroup, getter, assignment,
     assignments, exports, unaryOperator, binaryOperator,
     conditionalOperator, statement, ifStatement,
@@ -248,8 +248,8 @@ export function createCoder(): Target.Coder {
     write(slice, '(arguments,', '' + startAt, ')');
   }
 
-  function context() {
-    write(contextName);
+  function globalObject() {
+    write(globalObjectName);
   }
 
   function member(object: Target.BodyEntry, property: Target.BodyEntry) {

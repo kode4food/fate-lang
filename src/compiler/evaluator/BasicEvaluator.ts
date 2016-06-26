@@ -208,6 +208,6 @@ export class GlobalEvaluator extends Evaluator {
   public static tags = ['global'];
 
   public evaluate(node: Syntax.Self) {
-    this.coder.context();
+    this.coder.globalObject();
   }
 }
