@@ -2,8 +2,6 @@
 
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './Evaluator';
-import { LetEvaluator } from './AssignmentEvaluator';
-import { StatementsEvaluator } from './BasicEvaluator';
 
 export class ConditionalEvaluator extends NodeEvaluator {
   public static tags = ['conditional'];
@@ -27,8 +25,8 @@ abstract class IfGeneratingEvaluator extends NodeEvaluator {
 
     this.coder.ifStatement(
       condition,
-      thens ? () => new StatementsEvaluator(this, thens).evaluate() : null,
-      elses ? () => new StatementsEvaluator(this, elses).evaluate() : null
+      thens ? () => { this.getRootEvaluator().evaluate(thens); } : null,
+      elses ? () => { this.getRootEvaluator().evaluate(elses); } : null
     );
   }
 }
@@ -53,7 +51,7 @@ export class IfLetEvaluator extends IfGeneratingEvaluator {
   public evaluate() {
     let some = this.coder.runtimeImport('isSomething');
     let letStatement = this.node.condition;
-    new LetEvaluator(this, letStatement).evaluate();
+    this.getRootEvaluator().evaluate(letStatement);
 
     let assignments = letStatement.assignments;
     let conditions: string[] = [];

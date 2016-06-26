@@ -2,7 +2,6 @@
 
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './Evaluator';
-import { StatementsEvaluator } from './BasicEvaluator';
 
 type IdMapping = { id: string, anon: string };
 
@@ -123,9 +122,7 @@ export class ForEvaluator extends LoopEvaluator {
       self.coder.ifStatement(
         () => { self.coder.retrieveAnonymous(successVar); },
         null,
-        () => {
-          new StatementsEvaluator(self, elseStatements).evaluate();
-        }
+        () => { self.getRootEvaluator().evaluate(elseStatements); }
       );
     }
 
@@ -198,7 +195,7 @@ export class ForEvaluator extends LoopEvaluator {
     }
 
     function generateForBody() {
-      new StatementsEvaluator(self, self.node.loopStatements).evaluate();
+      self.getRootEvaluator().evaluate(self.node.loopStatements);
     }
   }
 }

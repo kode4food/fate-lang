@@ -3,7 +3,6 @@
 import * as Target from '../target';
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './Evaluator';
-import { StatementsEvaluator } from './BasicEvaluator';
 
 const likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
 const cachedPatternThreshold = 8;
@@ -114,7 +113,7 @@ export class MatchEvaluator extends LikeComparisonEvaluator {
             );
           },
           () => {
-            new StatementsEvaluator(self, match.statements).evaluate();
+            self.getRootEvaluator().evaluate(match.statements);
             self.coder.returnStatement();
           },
           null
@@ -129,7 +128,7 @@ export class MatchEvaluator extends LikeComparisonEvaluator {
         return;
       }
 
-      new StatementsEvaluator(self, self.node.elseStatements).evaluate();
+      self.getRootEvaluator().evaluate(self.node.elseStatements);
     }
   }
 }

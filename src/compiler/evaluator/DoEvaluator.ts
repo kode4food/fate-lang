@@ -2,8 +2,6 @@
 
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './Evaluator';
-import { AssignmentEvaluator } from './AssignmentEvaluator';
-import { StatementsEvaluator } from './BasicEvaluator';
 
 export class AwaitEvaluator extends NodeEvaluator {
   public static tags = ['await'];
@@ -37,7 +35,7 @@ export class DoEvaluator extends NodeEvaluator {
               caseGuard();
             }
 
-            new StatementsEvaluator(this, this.node.statements).evaluate();
+            this.getRootEvaluator().evaluate(this.node.statements);
           }
         });
       }
@@ -79,7 +77,7 @@ export class DoEvaluator extends NodeEvaluator {
     });
 
     group.forEach((assignment, index) => {
-      new AssignmentEvaluator(this, assignment).evaluate(() => {
+      this.getRootEvaluator().evaluate(assignment, () => {
         return () => {
           this.coder.member(
             () => { this.coder.retrieveAnonymous(anon); },

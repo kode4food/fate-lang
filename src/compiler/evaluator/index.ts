@@ -49,7 +49,7 @@ export class DispatchEvaluator extends Evaluator {
     }
   }
 
-  public evaluate(node: Syntax.Node) {
+  public evaluate(node: Syntax.Node, ...args: any[]) {
     /* istanbul ignore next: everything in the syntax tree is a node */
     if ( !(node instanceof Syntax.Node) ) {
       throw new Error("Stupid Coder: createEvaluator called without a Node");
@@ -64,7 +64,7 @@ export class DispatchEvaluator extends Evaluator {
     }
 
     let instance = new EvaluatorConstructor(this, node);
-    instance.evaluate.apply(instance);
+    instance.evaluate.apply(instance, args);
   }
 
   public getRootEvaluator() {

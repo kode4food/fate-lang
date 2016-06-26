@@ -4,7 +4,6 @@ import * as Target from '../target';
 import * as Syntax from '../syntax';
 
 import { NodeEvaluator } from './Evaluator';
-import { StatementsEvaluator } from './BasicEvaluator';
 
 interface StringMap {
   [index: string]: string;
@@ -113,7 +112,7 @@ export class FunctionEvaluator extends FuncOrLambdaEvaluator {
       contextArgs: paramNames,
       body: () => {
         this.generateParamProcessor(params);
-        new StatementsEvaluator(this, this.node.statements).evaluate();
+        this.getRootEvaluator().evaluate(this.node.statements);
       }
     });
   }
@@ -139,7 +138,7 @@ export class FunctionEvaluator extends FuncOrLambdaEvaluator {
             });
           }
         );
-        new StatementsEvaluator(this, this.node.statements).evaluate();
+        this.getRootEvaluator().evaluate(this.node.statements);
       }
     });
   }
@@ -184,7 +183,7 @@ export class LambdaEvaluator extends FuncOrLambdaEvaluator {
         contextArgs: paramNames,
         body: () => {
           this.generateParamProcessor(params);
-          new StatementsEvaluator(this, this.node.statements).evaluate();
+          this.getRootEvaluator().evaluate(this.node.statements);
         }
       });
     });
