@@ -7,23 +7,27 @@ export abstract class Evaluator {
   public coder: Coder;
 
   public abstract evaluate(...args: any[]): void;
-  public abstract getRootEvaluator(): Evaluator;
+  public abstract getDispatchEvaluator(): Evaluator;
 }
 
 export abstract class NodeEvaluator extends Evaluator {
-  public static tags: string[] = [];
+  public static tags: Syntax.Tags = [];
 
   constructor(public parent: Evaluator, public node: Syntax.Node) {
     super();
     this.coder = parent.coder;
   }
 
-  public getRootEvaluator(): Evaluator {
-    return this.parent.getRootEvaluator();
+  public getDispatchEvaluator(): Evaluator {
+    return this.parent.getDispatchEvaluator();
+  }
+
+  public dispatch(node: Syntax.Node, ...args: any[]) {
+    let dispatcher = this.getDispatchEvaluator();
+    dispatcher.evaluate.apply(dispatcher, arguments);
   }
 
   public defer(...args: any[]) {
-    let root = this.getRootEvaluator();
-    return () => root.evaluate.apply(root, args);
+    return () => this.dispatch.apply(this, args);
   }
 }

@@ -11,7 +11,7 @@ export class LetEvaluator extends NodeEvaluator {
 
   public evaluate() {
     this.node.assignments.forEach(assignment => {
-      this.getRootEvaluator().evaluate(assignment);
+      this.dispatch(assignment);
     });
   }
 }

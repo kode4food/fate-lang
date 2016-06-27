@@ -122,7 +122,7 @@ export class ForEvaluator extends LoopEvaluator {
       self.coder.ifStatement(
         () => { self.coder.retrieveAnonymous(successVar); },
         null,
-        () => { self.getRootEvaluator().evaluate(elseStatements); }
+        () => { self.dispatch(elseStatements); }
       );
     }
 
@@ -143,7 +143,7 @@ export class ForEvaluator extends LoopEvaluator {
 
     function generateReduceInitializers() {
       reduceAssignments.forEach(reduceAssignment => {
-        self.getRootEvaluator().evaluate(reduceAssignment);
+        self.dispatch(reduceAssignment);
       });
     }
 
@@ -195,7 +195,7 @@ export class ForEvaluator extends LoopEvaluator {
     }
 
     function generateForBody() {
-      self.getRootEvaluator().evaluate(self.node.loopStatements);
+      self.dispatch(self.node.loopStatements);
     }
   }
 }

@@ -68,7 +68,7 @@ export class DispatchEvaluator extends Evaluator {
     instance.evaluate.apply(instance, args);
   }
 
-  public getRootEvaluator() {
+  public getDispatchEvaluator() {
     return this;
   }
 }

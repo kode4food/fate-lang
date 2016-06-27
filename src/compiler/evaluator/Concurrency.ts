@@ -35,7 +35,7 @@ export class DoEvaluator extends NodeEvaluator {
               caseGuard();
             }
 
-            this.getRootEvaluator().evaluate(this.node.statements);
+            this.dispatch(this.node.statements);
           }
         });
       }
@@ -46,7 +46,7 @@ export class DoEvaluator extends NodeEvaluator {
     this.coder.statement(() => {
       this.coder.assignResult(() => {
         this.coder.waitFor(Syntax.Resolver.Value, () => {
-          this.getRootEvaluator().evaluate(expression);
+          this.dispatch(expression);
         });
       });
     });
@@ -77,7 +77,7 @@ export class DoEvaluator extends NodeEvaluator {
     });
 
     group.forEach((assignment, index) => {
-      this.getRootEvaluator().evaluate(assignment, () => {
+      this.dispatch(assignment, () => {
         return () => {
           this.coder.member(
             () => { this.coder.retrieveAnonymous(anon); },

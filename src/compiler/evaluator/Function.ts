@@ -112,7 +112,7 @@ export class FunctionEvaluator extends FuncOrLambdaEvaluator {
       contextArgs: paramNames,
       body: () => {
         this.generateParamProcessor(params);
-        this.getRootEvaluator().evaluate(this.node.statements);
+        this.dispatch(this.node.statements);
       }
     });
   }
@@ -138,7 +138,7 @@ export class FunctionEvaluator extends FuncOrLambdaEvaluator {
             });
           }
         );
-        this.getRootEvaluator().evaluate(this.node.statements);
+        this.dispatch(this.node.statements);
       }
     });
   }
@@ -183,7 +183,7 @@ export class LambdaEvaluator extends FuncOrLambdaEvaluator {
         contextArgs: paramNames,
         body: () => {
           this.generateParamProcessor(params);
-          this.getRootEvaluator().evaluate(this.node.statements);
+          this.dispatch(this.node.statements);
         }
       });
     });

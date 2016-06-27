@@ -113,7 +113,7 @@ export class MatchEvaluator extends LikeComparisonEvaluator {
             );
           },
           () => {
-            self.getRootEvaluator().evaluate(match.statements);
+            self.dispatch(match.statements);
             self.coder.returnStatement();
           },
           null
@@ -128,7 +128,7 @@ export class MatchEvaluator extends LikeComparisonEvaluator {
         return;
       }
 
-      self.getRootEvaluator().evaluate(self.node.elseStatements);
+      self.dispatch(self.node.elseStatements);
     }
   }
 }

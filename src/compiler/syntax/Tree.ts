@@ -1,12 +1,10 @@
 "use strict";
 
 import { Annotated, Annotations } from './Annotation';
+import { node, Tag, TagOrTags } from './index';
 
 const isArray = Array.isArray;
 
-export type Tag = string;
-export type Tags = Tag[];
-export type TagOrTags = Tag|Tags;
 export type Nodes = Node[];
 export type NodeOrNodes = Node|Nodes;
 export type Ranges = Range[];
@@ -25,9 +23,6 @@ export type ObjectElements = ObjectAssignment[];
 export type IndexedPatternElements = PatternElement[];
 export type ObjectPatternElements = ObjectPatternElement[];
 export type ObjectPatternElement = Expression|PatternElement;
-
-type FunctionMap = { [index: string]: Function };
-type StringFunction = (value: string) => any;
 
 export class Node implements Annotated {
   [index: string]: any;
@@ -524,92 +519,4 @@ export class ObjectDestructureItem extends Node {
 export class ObjectAssignment extends Node {
   constructor(public id: Expression,
               public value: Expression) { super(); }
-}
-
-// Tag to Constructor Mapping ***********************************************
-
-let tagToConstructor: FunctionMap = {
-  'from': FromStatement,
-  'import': ImportStatement,
-  'export': ExportStatement,
-  'function': FunctionDeclaration,
-  'lambda': LambdaExpression,
-  'compose': ComposeExpression,
-  'composeOr': ComposeExpression,
-  'composeAnd': ComposeExpression,
-  'reduce': ReduceExpression,
-  'do': DoExpression,
-  'case': CaseExpression,
-  'match': MatchExpression,
-  'matchClause': MatchClause,
-  'call': CallOperator,
-  'bind': BindOperator,
-  'let': LetStatement,
-  'return': ReturnStatement,
-  'expression': ExpressionStatement,
-  'arrayComp': ArrayComprehension,
-  'objectComp': ObjectComprehension,
-  'for': ForStatement,
-  'conditional': ConditionalOperator,
-  'if': IfStatement,
-  'ifLet': IfLetStatement,
-  'or': OrOperator,
-  'and': AndOperator,
-  'like': LikeOperator,
-  'notLike': NotLikeOperator,
-  'eq': EqualOperator,
-  'neq': NotEqualOperator,
-  'in': InOperator,
-  'notIn': NotInOperator,
-  'gt': GreaterOperator,
-  'lt': LessThanOperator,
-  'gte': GreaterOrEqualOperator,
-  'lte': LessOrEqualOperator,
-  'add': AddOperator,
-  'sub': SubtractOperator,
-  'mul': MultiplyOperator,
-  'div': DivideOperator,
-  'mod': ModuloOperator,
-  'not': NotOperator,
-  'neg': NegativeOperator,
-  'pos': PositiveOperator,
-  'await': AwaitOperator,
-  'parens': Parens,
-  'format': FormatOperator,
-  'member': MemberOperator,
-  'array': ArrayConstructor,
-  'object': ObjectConstructor,
-  'id': Identifier,
-  'context': Context,
-  'self': Self,
-  'global': Global,
-  'literal': Literal,
-  'pattern': Pattern,
-  'regex': Regex,
-  'objectPattern': ObjectPattern,
-  'arrayPattern': ArrayPattern,
-  'patternElement': PatternElement,
-  'wildcard': Wildcard,
-  'statements': Statements,
-  'range': Range,
-  'signature': Signature,
-  'idParam': Parameter,
-  'patternParam': PatternParameter,
-  'importModuleItem': ImportModuleItem,
-  'exportModuleItem': ExportModuleItem,
-  'moduleSpecifier': ModuleSpecifier,
-  'modulePath': ModulePath,
-  'assignment': DirectAssignment,
-  'arrayDestructure': ArrayDestructure,
-  'objectDestructure': ObjectDestructure,
-  'objectDestructureItem': ObjectDestructureItem,
-  'objectAssignment': ObjectAssignment
-};
-
-export function node(tag: Tag, ...args: any[]) {
-  let constructor = tagToConstructor[tag];
-  let instance = Object.create(constructor.prototype);
-  instance.tag = tag;
-  constructor.apply(instance, args);
-  return instance;
 }

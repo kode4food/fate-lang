@@ -8,9 +8,7 @@ import { join, dirname } from 'path';
 import { sync as glob } from 'glob';
 import { sync as mkdirp } from 'mkdirp';
 
-import {
-  readFileSync, writeFileSync, unlinkSync, existsSync
-} from 'fs';
+import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs';
 
 import { compileModule, wrapCompileError } from "../compiler";
 import { GeneratedCode } from '../compiler/target';

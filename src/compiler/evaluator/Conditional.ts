@@ -25,8 +25,8 @@ abstract class IfGeneratingEvaluator extends NodeEvaluator {
 
     this.coder.ifStatement(
       condition,
-      thens ? () => { this.getRootEvaluator().evaluate(thens); } : null,
-      elses ? () => { this.getRootEvaluator().evaluate(elses); } : null
+      thens ? () => { this.dispatch(thens); } : null,
+      elses ? () => { this.dispatch(elses); } : null
     );
   }
 }
@@ -51,7 +51,7 @@ export class IfLetEvaluator extends IfGeneratingEvaluator {
   public evaluate() {
     let some = this.coder.runtimeImport('isSomething');
     let letStatement = this.node.condition;
-    this.getRootEvaluator().evaluate(letStatement);
+    this.dispatch(letStatement);
 
     let assignments = letStatement.assignments;
     let conditions: string[] = [];

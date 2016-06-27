@@ -25,7 +25,7 @@ export class StatementsEvaluator extends NodeEvaluator {
 
   public evaluate() {
     this.node.statements.forEach(statement => {
-      this.getRootEvaluator().evaluate(statement);
+      this.dispatch(statement);
     });
   }
 }
