@@ -190,19 +190,13 @@ export class LambdaEvaluator extends FuncOrLambdaEvaluator {
   }
 }
 
-const composeImportMap: StringMap = {
-  'compose': 'compose',
-  'composeOr': 'composeOr',
-  'composeAnd': 'composeAnd'
-};
-
 export class ComposeEvaluator extends NodeEvaluator {
-  public static tags = Object.keys(composeImportMap);
+  public static tags = ['compose', 'composeOr', 'composeAnd'];
   public node: Syntax.ComposeExpression;
 
   public evaluate() {
     this.coder.call(
-      this.coder.runtimeImport(composeImportMap[this.node.tag]),
+      this.coder.runtimeImport(this.node.tag),
       [() => {
         this.coder.array(
           this.node.expressions.map(expression => this.defer(expression))
