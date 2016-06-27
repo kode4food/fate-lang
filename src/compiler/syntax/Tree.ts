@@ -149,6 +149,9 @@ export class ComposeExpression extends Expression {
   constructor(public expressions: Expressions) { super(); }
 }
 
+export class ComposeOrExpression extends ComposeExpression {}
+export class ComposeAndExpression extends ComposeExpression {}
+
 export class ReduceExpression extends Expression {
   constructor(public assignment: DirectAssignment,
               public ranges: Ranges,

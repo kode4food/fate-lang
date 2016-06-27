@@ -1,16 +1,16 @@
 "use strict";
 
+import * as Tree from './Tree';
+
 export * from './Annotation';
 export * from './Tree';
 export * from './Visitor';
 
-import * as Tree from './Tree';
-
-type FunctionMap = { [index: string]: Function };
-
 export type Tag = string;
 export type Tags = Tag[];
 export type TagOrTags = Tag|Tags;
+
+type FunctionMap = { [index: string]: Function };
 
 let tagToConstructor: FunctionMap = {
   'from': Tree.FromStatement,
@@ -19,8 +19,8 @@ let tagToConstructor: FunctionMap = {
   'function': Tree.FunctionDeclaration,
   'lambda': Tree.LambdaExpression,
   'compose': Tree.ComposeExpression,
-  'composeOr': Tree.ComposeExpression,
-  'composeAnd': Tree.ComposeExpression,
+  'composeOr': Tree.ComposeOrExpression,
+  'composeAnd': Tree.ComposeAndExpression,
   'reduce': Tree.ReduceExpression,
   'do': Tree.DoExpression,
   'case': Tree.CaseExpression,
