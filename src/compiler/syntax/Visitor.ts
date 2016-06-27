@@ -6,12 +6,13 @@ import { CompileError, CompileErrors } from '../index';
 const isArray = Array.isArray;
 const slice = Array.prototype.slice;
 
-type NodeVisitor = (node: Syntax.NodeOrNodes) => any;
+type NodeStackElement = Syntax.NodeOrNodes;
+type NodeVisitor = (node: NodeStackElement) => any;
 type StatementsVisitor = (node: Syntax.Statement[]) => any;
-type NodeMatcher = (node: Syntax.NodeOrNodes) => boolean;
+type NodeMatcher = (node: NodeStackElement) => boolean;
 
 export class Visitor {
-  public nodeStack: (Syntax.Node|Syntax.Nodes)[] = [];
+  public nodeStack: NodeStackElement[] = [];
 
   constructor(public warnings: CompileErrors) {}
 
@@ -36,7 +37,7 @@ export class Visitor {
   public hasAncestry(...matchers: NodeMatcher[]) {
     let matcher = matchers.shift();
     let stack = this.nodeStack.slice().reverse();
-    let result: (Syntax.Node|Syntax.Nodes)[] = [];
+    let result: NodeStackElement[] = [];
     while ( stack.length ) {
       let node = stack.shift();
       if ( matcher(node) ) {
@@ -53,7 +54,7 @@ export class Visitor {
   public findAncestor(tag: Syntax.TagOrTags): Syntax.Node {
     let nodeStack = this.nodeStack;
     for ( let i = nodeStack.length - 1; i >= 0; i-- ) {
-      let node: Syntax.NodeOrNodes = nodeStack[i];
+      let node: NodeStackElement = nodeStack[i];
       if ( node instanceof Syntax.Node && Syntax.hasTag(node, tag) ) {
         return node;
       }
@@ -61,12 +62,12 @@ export class Visitor {
     return undefined;
   }
 
-  public nodes(startNode: Syntax.Node|Syntax.Nodes, matcher: NodeMatcher,
+  public nodes(startNode: NodeStackElement, matcher: NodeMatcher,
                visitor: NodeVisitor, breadthFirst = false) {
     let self = this;
     return visitNode(startNode);
 
-    function visitNode(node: Syntax.NodeOrNodes): Syntax.NodeOrNodes {
+    function visitNode(node: NodeStackElement): NodeStackElement {
       if ( !(node instanceof Syntax.Node) && !isArray(node) ) {
         return node;
       }
@@ -82,7 +83,7 @@ export class Visitor {
     }
   }
 
-  public recurseInto(node: Syntax.NodeOrNodes, visitor: NodeVisitor) {
+  public recurseInto(node: NodeStackElement, visitor: NodeVisitor) {
     let nodeStack = this.nodeStack;
     nodeStack.push(node);
     if ( isArray(node) ) {
@@ -172,10 +173,10 @@ export class Visitor {
   }
 
   public upTreeUntilMatch(matcher: NodeMatcher,
-                          visitor: NodeVisitor): Syntax.NodeOrNodes {
+                          visitor: NodeVisitor): NodeStackElement {
     let nodeStack = this.nodeStack;
     for ( let i = nodeStack.length - 1; i >= 0; i-- ) {
-      let node: Syntax.NodeOrNodes = nodeStack[i];
+      let node: NodeStackElement = nodeStack[i];
       visitor(node);
       if ( matcher(node) ) {
         return node;

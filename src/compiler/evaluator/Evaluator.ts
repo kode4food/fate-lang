@@ -5,7 +5,6 @@ import { Coder } from '../target';
 
 export abstract class Evaluator {
   public coder: Coder;
-
   public abstract evaluate(...args: any[]): void;
   public abstract getDispatchEvaluator(): Evaluator;
 }
