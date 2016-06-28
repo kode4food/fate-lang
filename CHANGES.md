@@ -1,5 +1,8 @@
 # Change History
 
+## Version 0.7.5 - Code Generator Cleaned Up
+The code generator has started to be modularized such that it will be easier to evolve the system.
+
 ## Version 0.7.4 - Function Combination Operators
 The Function combination operators have changed.  ANDed Functions will now use the `&&` operator, while ORed Functions will now use the `||` operator.
 
