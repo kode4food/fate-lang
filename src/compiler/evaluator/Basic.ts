@@ -48,19 +48,7 @@ export class OrEvaluator extends NodeEvaluator {
   public node: Syntax.OrOperator;
 
   public evaluate() {
-    let leftAnon = this.coder.createAnonymous();
-    this.coder.compoundExpression([
-      () => {
-        this.coder.assignAnonymous(leftAnon, this.defer(this.node.left));
-      },
-      () => {
-        this.coder.conditionalOperator(
-          leftAnon,
-          leftAnon,
-          this.defer(this.node.right)
-        );
-      }
-    ]);
+    this.coder.or(this.defer(this.node.left), this.defer(this.node.right));
   }
 }
 
@@ -69,19 +57,7 @@ export class AndEvaluator extends NodeEvaluator {
   public node: Syntax.AndOperator;
 
   public evaluate() {
-    let leftAnon = this.coder.createAnonymous();
-    this.coder.compoundExpression([
-      () => {
-        this.coder.assignAnonymous(leftAnon, this.defer(this.node.left));
-      },
-      () => {
-        this.coder.conditionalOperator(
-          leftAnon,
-          this.defer(this.node.right),
-          leftAnon
-        );
-      }
-    ]);
+    this.coder.and(this.defer(this.node.left), this.defer(this.node.right));
   }
 }
 
@@ -118,10 +94,7 @@ export class NotEvaluator extends NodeEvaluator {
   public node: Syntax.NotOperator;
 
   public evaluate() {
-    this.coder.unaryOperator('not', () => {
-      let isTrue = this.coder.runtimeImport('isTrue');
-      this.coder.call(isTrue, [this.defer(this.node.left)]);
-    });
+    this.coder.not(this.defer(this.node.left));
   }
 }
 

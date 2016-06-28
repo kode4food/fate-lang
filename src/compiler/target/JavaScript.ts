@@ -97,12 +97,12 @@ export function createCoder(): Target.Coder {
     createAnonymous, assignAnonymous, retrieveAnonymous,
     assignResult, self, currentDirectory, args, globalObject,
     member, write, writeAndGroup, getter, assignment,
-    assignments, exports, unaryOperator, binaryOperator,
-    conditionalOperator, statement, ifStatement,
-    loopExpression, loopContinue, funcDeclaration, iife,
-    scope, func, waitFor, compoundExpression, returnStatement,
-    call, array, arrayAppend, object, objectAssign, parens,
-    code, toString
+    assignments, exports, unaryOperator, binaryOperator, isTrue,
+    isFalse, and, or, not, conditional, statement,
+    ifStatement, loopExpression, loopContinue, funcDeclaration,
+    iife, scope, func, waitFor, compoundExpression,
+    returnStatement, call, array, arrayAppend, object,
+    objectAssign, parens, code, toString
   };
 
   function nextId(prefix: string) {
@@ -265,13 +265,16 @@ export function createCoder(): Target.Coder {
     });
   }
 
+  function getAnonymousId(name: Target.Name) {
+    return lastItem(names[name]);
+  }
+
   function retrieveAnonymous(name: Target.Name) {
-    write(lastItem(names[name]));
+    write(getAnonymousId(name));
   }
 
   function assignAnonymous(name: Target.Name, value: Target.BodyEntry) {
-    retrieveAnonymous(name);
-    write('=', value);
+    write(getAnonymousId(name), '=', value);
   }
 
   function registerAnonymous(id: string) {
@@ -398,14 +401,48 @@ export function createCoder(): Target.Coder {
     write('(', code(left), operatorMap[operator], code(right), ')');
   }
 
-  function conditionalOperator(condition: Target.BodyEntry,
-                               trueVal: Target.BodyEntry,
-                               falseVal: Target.BodyEntry) {
-    let isTrue = runtimeImport('isTrue');
+  function isTrue(expr: Target.BodyEntry) {
+    let anon = getAnonymousId(createAnonymous());
+    write('(', anon, '=', expr, ',');
+    write(anon, '!==false&&', anon, '!=null)');
+  }
+
+  function isFalse(expr: Target.BodyEntry) {
+    let anon = getAnonymousId(createAnonymous());
+    write('(', anon, '=', expr, ',');
+    write(anon, '===false||', anon, '==null)');
+  }
+
+  function and(left: Target.BodyEntry, right: Target.BodyEntry) {
+    let anon = getAnonymousId(createAnonymous());
+    write('(', anon, '=', left, ',');
+    write(anon, '!==false&&', anon, '!=null?');
+    write(right, ':', anon, ')');
+  }
+
+  function or(left: Target.BodyEntry, right: Target.BodyEntry) {
+    let anon = getAnonymousId(createAnonymous());
+    write('(', anon, '=', left, ',');
+    write(anon, '===false||', anon, '==null?');
+    write(right, ':', anon, ')');
+  }
+
+  function not(expr: Target.BodyEntry) {
+    write('(!');
+    isTrue(expr);
+    write(')');
+  }
+
+  function conditional(condition: Target.BodyEntry, trueVal: Target.BodyEntry,
+                       falseVal: Target.BodyEntry) {
     let condCode = code(condition);
     let trueCode = code(trueVal);
     let falseCode = code(falseVal);
-    write('(', isTrue, '(', condCode, ')?', trueCode, ':', falseCode, ')');
+
+    let anon = getAnonymousId(createAnonymous());
+    write('(', anon, '=', condCode, ',');
+    write(anon, '!==false&&', anon, '!=null?');
+    write(trueCode, ':', falseCode, ')');
   }
 
   function statement(bodyCallback: Target.BodyEntry) {
@@ -415,25 +452,22 @@ export function createCoder(): Target.Coder {
   function ifStatement(condition: Target.BodyEntry,
                        thenBranch: Target.BodyEntry,
                        elseBranch: Target.BodyEntry) {
-    let condWrapperName = 'isTrue';
+    let condWrapper = isTrue;
     if ( !thenBranch ) {
-      condWrapperName = 'isFalse';
+      condWrapper = isFalse;
       thenBranch = elseBranch;
       elseBranch = undefined;
     }
 
-    let condWrapper = runtimeImport(condWrapperName);
     let condCode = code(condition);
     let [thenCode, elseCode] = codeBranches(thenBranch, elseBranch);
 
-    write('if(', condWrapper, '(', condCode, ')){');
-    write(thenCode);
-    write('}');
+    write('if');
+    condWrapper(condCode);
+    write('{', thenCode, '}');
 
     if ( elseCode.length ) {
-      write('else{');
-      write(elseCode);
-      write('}');
+      write('else{', elseCode, '}');
     }
   }
 
@@ -537,8 +571,8 @@ export function createCoder(): Target.Coder {
       write('for(let ', argNames[0], ' of ', iteratorContent, '){');
     }
 
-    write(guardContent);
     writeLocalVariables(parentNames, argNames);
+    write(guardContent);
     write(bodyContent);
     write('}');
 

@@ -96,9 +96,13 @@ end
 
 def bool(test)
   let { isFalse, isTrue, equalTo } = wrap(test)
+  let zero = 0
 
   true and false                          | isFalse
   true or false                           | isTrue
+  zero and 1                              | isTrue
+  zero and true                           | isTrue
+  zero and false                          | isFalse
   data1.people[0].age * 2 = 100 and 'yep' | equalTo("yep")
   data1.people[0].age * 2 = 99 or 'nope'  | equalTo("nope")
   'yep' and data1.people[0].age * 2       | equalTo(100)

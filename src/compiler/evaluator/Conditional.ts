@@ -8,7 +8,7 @@ export class ConditionalEvaluator extends NodeEvaluator {
   public node: Syntax.ConditionalOperator;
 
   public evaluate() {
-    this.coder.conditionalOperator(
+    this.coder.conditional(
       this.defer(this.node.condition),
       this.defer(this.node.trueResult),
       this.defer(this.node.falseResult)

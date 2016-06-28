@@ -66,8 +66,13 @@ export interface Coder {
   exports(items: ModuleItems): void;
   unaryOperator(operator: string, operand: BodyEntry): void;
   binaryOperator(operator: string, left: BodyEntry, right: BodyEntry): void;
-  conditionalOperator(condition: BodyEntry, trueVal: BodyEntry,
-                                falseVal: BodyEntry): void;
+  isTrue(expr: BodyEntry): void;
+  isFalse(expr: BodyEntry): void;
+  and(left: BodyEntry, right: BodyEntry): void;
+  or(left: BodyEntry, right: BodyEntry): void;
+  not(expr: BodyEntry): void;
+  conditional(condition: BodyEntry, trueVal: BodyEntry,
+              falseVal: BodyEntry): void;
   statement(bodyCallback: BodyEntry): void;
   ifStatement(condition: BodyEntry, thenBranch: BodyEntry,
                        elseBranch: BodyEntry): void;
