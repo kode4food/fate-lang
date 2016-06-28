@@ -595,11 +595,9 @@ export function createCoder(): Target.Coder {
   }
 
   function iife(funcBody: Target.BodyEntry) {
-    parens(() => {
-      call(() => {
-        func({ body: funcBody });
-      }, []);
-    });
+    write('(');
+    func({ body: funcBody });
+    write('())');
   }
 
   function scope(scopeBody: Target.BodyEntry) {
