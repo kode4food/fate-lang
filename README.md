@@ -53,7 +53,7 @@ console.log(resultingLambda(4));
 ```
 
 ## Current Status
-The prototype functions, but not much more.  There's quite a bit left to do in the areas of validation, optimization, and runtime library support.  See the project's [GitHub Issues](https://github.com/kode4food/fate-lang/issues) page to get an idea.
+There's quite a bit left to do in the areas of optimization and runtime library support.  See the project's [GitHub Issues](https://github.com/kode4food/fate-lang/issues) page to get an idea.
 
 ## License (MIT License)
 Copyright (c) 2015, 2106 Thomas S. Bradford
