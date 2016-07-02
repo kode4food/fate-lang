@@ -15,10 +15,14 @@ export default function createTreeProcessors(visit: Visitor) {
   let whenReference = visit.ancestorTags('id', whenAssigns, 'let', 'do');
 
   return [
-    visit.matching(rollUpParens, visit.tags('parens')),
-    visit.matching(validateAwaits, visit.tags('await')),
-    visit.matching(validateSelfReferences, visit.tags('self')),
-    visit.matching(validateFunctionArgs, visit.tags(['function', 'lambda'])),
+    visit.byTag({
+      'parens': rollUpParens,
+      'await': validateAwaits,
+      'self': validateSelfReferences,
+      'function': validateFunctionArgs,
+      'lambda': validateFunctionArgs
+    }),
+
     visit.matching(annotateSelfFunctions, selfFunction),
     visit.matching(annotateWhenReferences, whenReference),
     visit.matching(groupWhenAssignments, visit.tags('do')),

@@ -29,6 +29,7 @@
     "glob": "^7.0.3",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
+    "node-uuid": "^1.4.7",
     "welsh": "^4.0.0"
   },
   "devDependencies": {

@@ -79,19 +79,21 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(foldShortCircuits, foldableShortCircuit),
     visit.matching(foldUnaryConstants, foldableUnaryConstant),
     visit.matching(foldBinaryConstants, foldableBinaryConstant),
-
     visit.matching(rollUpObjectsAndArrays, collection),
 
     visit.statements(foldIfStatements),
-    visit.matching(flipConditionals, visit.tags('conditional')),
-    visit.matching(flipEquality, visit.tags('not')),
-    visit.matching(promoteNot, visit.tags(['and', 'or'])),
-    visit.matching(rollUpForLoops, visit.tags('for')),
-    visit.matching(rollUpStandaloneLoops, visit.tags('expression')),
+
+    visit.byTag({
+      'conditional': flipConditionals,
+      'not': flipEquality,
+      'and': promoteNot,
+      'or': promoteNot,
+      'for': rollUpForLoops,
+      'expression': rollUpStandaloneLoops
+    }),
 
     visit.statementGroups(splitExportStatements, visit.tags('export'), 1)
   ];
-
 
   // or, and, conditional Folding
   function foldShortCircuits(node: Syntax.Node) {

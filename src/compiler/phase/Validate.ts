@@ -3,15 +3,11 @@
 import * as Syntax from '../syntax';
 import { Visitor, annotate, getAnnotation, hasAnnotation } from '../syntax';
 
-interface Visitors {
-  [index: string]: Function;
-}
-
 const isArray = Array.isArray;
 const scopeContainers = ['function', 'lambda', 'reduce', 'for', 'do'];
 
 export default function createTreeProcessors(visit: Visitor) {
-  let visitors: Visitors = {
+  let processNode = visit.breadthByTag({
     'function': visitFunctionDeclaration,
     'signature': visitSignature,
     'range': visitRange,
@@ -23,16 +19,9 @@ export default function createTreeProcessors(visit: Visitor) {
     'from': visitExportableStatement,
     'import': visitExportableStatement,
     'id': visitIdentifier
-  };
-
-  let nodesToVisit = visit.tags(Object.keys(visitors));
-  let processNode = visit.breadthMatching(visitNode, nodesToVisit);
+  });
 
   return [processNode];
-
-  function visitNode(node: Syntax.Node) {
-    return visitors[node.tag](node);
-  }
 
   function isScopeContainer(node: Syntax.Node) {
     return scopeContainers.indexOf(node.tag) !== -1 ||

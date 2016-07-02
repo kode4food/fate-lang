@@ -11,6 +11,10 @@ type NodeVisitor = (node: NodeStackElement) => any;
 type StatementsVisitor = (node: Syntax.Statement[]) => any;
 type NodeMatcher = (node: NodeStackElement) => boolean;
 
+interface VisitorMap {
+  [index: string]: Function;
+}
+
 export class Visitor {
   public nodeStack: NodeStackElement[] = [];
 
@@ -115,6 +119,14 @@ export class Visitor {
     };
   }
 
+  public byTag(visitorMap: VisitorMap) {
+    return this.createByTagMatcher(visitorMap, this.matching);
+  }
+
+  public breadthByTag(visitorMap: VisitorMap) {
+    return this.createByTagMatcher(visitorMap, this.breadthMatching);
+  }
+
   public statements(visitor: StatementsVisitor) {
     return (node: Syntax.Node) => {
       return this.nodes(node, Syntax.isStatements, statementsProcessor);
@@ -194,5 +206,11 @@ export class Visitor {
     this.warnings.push(
       new CompileError(message, source.line, source.column)
     );
+  }
+
+  private createByTagMatcher(visitorMap: VisitorMap, method: Function) {
+    let nodesToVisit = this.tags(Object.keys(visitorMap));
+    let visitNode = (node: Syntax.Node) => visitorMap[node.tag](node);
+    return method.call(this, visitNode, nodesToVisit);
   }
 }

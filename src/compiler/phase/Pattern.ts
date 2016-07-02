@@ -35,9 +35,12 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.breadthMatching(annotateCollection, collections),
     visit.breadthMatching(annotateContext, nestedContext),
     visit.matching(annotateComplexity, visit.isNode),
-    visit.matching(buildPatternGuards, visit.tags('signature')),
-    visit.matching(annotatePatternEquality, visit.tags('pattern')),
-    visit.matching(annotateElementEquality, visit.tags('patternElement'))
+
+    visit.byTag({
+      'signature': buildPatternGuards,
+      'pattern': annotatePatternEquality,
+      'patternElement': annotateElementEquality
+    })
   ];
 
   function getParent() {
