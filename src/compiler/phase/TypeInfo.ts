@@ -24,6 +24,13 @@ function addTypeEntry(typeKey: string, node: Syntax.Node, type: Type) {
 const addEvalType = addTypeEntry.bind(null, 'types/eval');
 const addCallType = addTypeEntry.bind(null, 'types/call');
 
+function createInstance(node: Syntax.Node, type: string) {
+  let instance = `${type}:${uuid()}`;
+  annotate(node, 'types/instance', instance);
+  addEvalType(node, instance);
+  return instance;
+}
+
 export default function createTreeProcessors(visit: Visitor) {
   return [
     visit.byTag({
@@ -40,13 +47,14 @@ export default function createTreeProcessors(visit: Visitor) {
       type = 'array';
     }
     addEvalType(node, type);
+    createInstance(node, type);
     return node;
   }
 
   function visitPattern(node: Syntax.Node) {
     addEvalType(node, 'pattern');
-    addEvalType(node, 'pattern:' + uuid());
     addCallType(node, 'boolean');
+    createInstance(node, 'pattern');
     return node;
   }
 }
