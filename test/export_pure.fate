@@ -2,10 +2,10 @@ import nodeunit
 
 from test import wrap
 
-def imports(test)
+def imports_explicit(test)
   let { equalTo } = wrap(test)
 
-  import './export_source_pure.fate' as source
+  import './exports/export_explicit.fate' as source
 
   source.val_a       | equalTo(1)
   source.val_b       | equalTo(2)
@@ -23,6 +23,26 @@ def imports(test)
   test.done()
 end
 
+def imports_all(test)
+  let { equalTo } = wrap(test)
+
+  import './exports/export_all.fate' as source
+
+  source.val_a       | equalTo(1)
+  source.val_b       | equalTo(2)
+  source.val_c       | equalTo(3)
+  source.val_d       | equalTo(4)
+  source.reduce_val  | equalTo(6)
+
+  source.nodeunit_nu | equalTo(nodeunit)
+  source.nodeunit_tc | equalTo(nodeunit.testCase)
+
+  source.func_a('Bob') | equalTo('Hello, Bob!')
+
+  test.done()
+end
+
 export let tests = nodeunit.testCase({
-  "Importing Exported Items": imports
+  "Importing Explicitly Exported Items": imports_explicit,
+  "Imported Implicitly Export Items (all)": imports_all
 })

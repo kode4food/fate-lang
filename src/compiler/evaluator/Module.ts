@@ -78,12 +78,16 @@ export class ExportEvaluator extends ImportExportEvaluator {
   public node: Syntax.ExportStatement;
 
   public evaluate() {
-    let exports = this.node.exportItems.map(item => {
+    let exportItems = this.node.exportItems;
+    if ( !exportItems.length ) {
+      this.coder.exportAll();
+      return;
+    }
+
+    this.coder.exports(exportItems.map(item => {
       let name = item.id.value;
       let alias = item.moduleKey.value;
       return <Target.ModuleItem>[name, alias];
-    });
-
-    this.coder.exports(exports);
+    }));
   }
 }

@@ -97,8 +97,8 @@ export function createCoder(): Target.Coder {
     createAnonymous, assignAnonymous, retrieveAnonymous,
     assignResult, self, currentDirectory, args, globalObject,
     member, write, writeAndGroup, getter, assignment,
-    assignments, exports, unaryOperator, binaryOperator, isTrue,
-    isFalse, and, or, not, conditional, statement,
+    assignments, exportAll, exports, unaryOperator, binaryOperator,
+    isTrue, isFalse, and, or, not, conditional, statement,
     ifStatement, loopExpression, loopContinue, funcDeclaration,
     iife, scope, func, waitFor, compoundExpression,
     returnStatement, call, array, arrayAppend, object,
@@ -378,6 +378,14 @@ export function createCoder(): Target.Coder {
 
       let localName = localForWrite(name);
       write(localName, '=', value, ";");
+    });
+  }
+
+  function exportAll() {
+    Object.keys(names).filter(name => !isAnonymous(name)).forEach(name => {
+      let localName = localForRead(name);
+      member(exportsName, literal(name));
+      write('=', localName, ';');
     });
   }
 

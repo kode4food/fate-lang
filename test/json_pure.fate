@@ -25,5 +25,3 @@ export let tests = nodeunit.testCase({
   "Parsing": parse,
   "Stringification": stringify
 })
-
-export tests

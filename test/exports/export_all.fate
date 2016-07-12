@@ -1,0 +1,14 @@
+let val_a = 1, val_b = 2, val_c = 3, val_d = 4
+
+import 'nodeunit' as nodeunit_nu
+from 'nodeunit' import testCase as nodeunit_tc
+
+def func_a(name)
+  {name} | "Hello, %name!"
+end
+
+reduce reduce_val = 0 for i in [1, 2, 3]
+  let reduce_val = reduce_val + i
+end
+
+export all
