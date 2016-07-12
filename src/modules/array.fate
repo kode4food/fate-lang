@@ -11,6 +11,10 @@ export def first(Array as value)
   value[0]
 end
 
+export def rest(Array as value)
+  value.slice(1)
+end
+
 export def join(Array as value)
   value.join(' ')
 end
