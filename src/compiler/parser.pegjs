@@ -191,7 +191,8 @@ importModuleItem
     }
 
 exportModuleItems
-  = head:exportModuleItem
+  = All { return []; }
+  / head:exportModuleItem
     tail:( LIST_SEP item:exportModuleItem { return item; } )* {
       return [head].concat(tail);
     }

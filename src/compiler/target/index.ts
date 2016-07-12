@@ -63,6 +63,7 @@ export interface Coder {
   getter(name: Name): void;
   assignment(name: Name, bodyEntry: BodyEntry): void;
   assignments(items: AssignmentItems): void;
+  exportAll(): void;
   exports(items: ModuleItems): void;
   unaryOperator(operator: string, operand: BodyEntry): void;
   binaryOperator(operator: string, left: BodyEntry, right: BodyEntry): void;
