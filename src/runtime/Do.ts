@@ -1,8 +1,6 @@
 "use strict";
 
-const welsh = require('welsh');
-const Promise = welsh.Promise;
-const Deferred = welsh.Deferred;
+const Continuation = require('./Continuation').Continuation;
 
 interface GeneratorResult {
   done: boolean;
@@ -10,7 +8,7 @@ interface GeneratorResult {
 }
 
 export function createDoBlock(generator: Function) {
-  return new Promise((resolve: Function) => {
+  return new Continuation((resolve: Function) => {
     let generating = generator.apply(null);
     step(generating.next());
 
@@ -31,13 +29,13 @@ export function createDoBlock(generator: Function) {
 }
 
 export function awaitValue(value: any) {
-  return Deferred.resolve(value);
+  return Continuation.resolve(value);
 }
 
 export function awaitAny(array: any[]) {
-  return Deferred.race(array);
+  return Continuation.race(array);
 }
 
 export function awaitAll(array: any[]) {
-  return Deferred.all(array);
+  return Continuation.all(array);
 }

@@ -1,17 +1,15 @@
 import 'node:http' as http
 
 from 'node:url' import parse as parseURL
-from 'node:welsh' import Promise
 
 from './support' import make
-from '../runtime' import mixin
+from '../runtime' import mixin, Continuation
 
 from pattern import Something, NonEmptyString
 from io import streamConsumer
 
 # Warning: this module assumes JavaScript-specific methods
 #
-#   The Welsh promise module
 #   Node's 'url' module
 #   Node's 'http' module
 

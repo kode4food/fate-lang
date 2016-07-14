@@ -1,5 +1,6 @@
 "use strict";
 
+export * from './Continuation';
 export * from './Do';
 export * from './Format';
 export * from './Function';

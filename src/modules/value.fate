@@ -1,2 +1,12 @@
+from './support' import setProperty
+
 export from './support'
 import null, undefined
+
+export def mutable(value)
+  let wrapper = { value }
+  {
+    set: value → setProperty(wrapper, 'value', value),
+    get: → wrapper.value
+  }
+end

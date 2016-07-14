@@ -1,12 +1,7 @@
-from 'node:welsh' import Promise
-
+from '../runtime' import Continuation
 from './support' import make, timeout as doTimeout
 
 export from './support' import print
-
-# Warning: this module assumes JavaScript-specific methods
-#
-#   The Welsh promise module
 
 export let streamConsumer = (resolve → stream →
   def waitFor(stream, content)
@@ -20,7 +15,7 @@ export let streamConsumer = (resolve → stream →
 )
 
 export def timeout(delay)
-  make(Promise, resolve →
+  make(Continuation, resolve →
     doTimeout(→ resolve(delay), delay)
   )
 end

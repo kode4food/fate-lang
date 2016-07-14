@@ -23,6 +23,7 @@ type Target = { [index: string]: any };
 
 function setProperty(target: Target, key: string, value: any) {
   target[key] = value;
+  return value;
 }
 
 function print() {

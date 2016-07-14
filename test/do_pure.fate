@@ -93,6 +93,16 @@ def awaitAny(test)
   end
 end
 
+def awaitAnyMixed(test)
+  let { equalTo } = wrap(test)
+
+  let arr = [timeout(50), 100, 200, timeout(75)]
+  do
+    await any arr | equalTo(100)
+    test.done()
+  end
+end
+
 def awaitAll(test)
   let { deepEqualTo } = wrap(test)
 
@@ -165,6 +175,19 @@ def caseOrdering(test)
   end
 end
 
+def multipleWaiters(test)
+  let { equalTo } = wrap(test)
+
+  let eventually = timeout(100)
+  do when a = eventually: a | equalTo(100)
+  do when b = eventually: b | equalTo(100)
+
+  do when c = eventually
+    c | equalTo(100)
+    do when timeout(10): test.done()
+  end
+end
+
 export let tests = nodeunit.testCase({
   "Basic Do Functionality": basics,
   "'Do When' (Simple)": doWhenSimple,
@@ -174,8 +197,10 @@ export let tests = nodeunit.testCase({
   "'Do When' (Await)": awaitDoWhenExpression,
   "'Do When' (Nested)": doWhenNested,
   "Await Any Functionality": awaitAny,
+  "Await Any Functionality (Mixed)": awaitAnyMixed,
   "Await All Functionality": awaitAll,
   "Case Expression": caseExpression,
   "Case Propagation": casePropagate,
-  "Case Proper Ordering": caseOrdering
+  "Case Proper Ordering": caseOrdering,
+  "Multiple Waiters": multipleWaiters
 })

@@ -3,6 +3,7 @@
 const nodeunit = require('nodeunit');
 const runtime = require('../dist/runtime');
 const support = require('../dist/modules/support');
+const Continuation = runtime.Continuation;
 
 exports.api = nodeunit.testCase({
 
@@ -30,13 +31,11 @@ exports.api = nodeunit.testCase({
   },
 
   "Support Library Calls": function (test) {
-    let Promise = require('welsh').Promise;
-
-    let p = support.make(Promise, function (resolve) {
+    let p = support.make(Continuation, function (resolve) {
       resolve('hello');
     });
 
-    test.ok(p instanceof Promise);
+    test.ok(p instanceof Continuation);
     p.then(function (value) {
       test.equal(value, 'hello');
       test.done();

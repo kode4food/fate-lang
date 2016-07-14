@@ -2,8 +2,9 @@
 #
 #   Basically everything from Node.js' assert module
 
-from pattern import Function, Object
+from pattern import Function, Object, Regex
 from array import length
+from object import keys
 
 let ModuleKeys = [
   'equal', 'notEqual', 'deepEqual', 'notDeepEqual', 'strictEqual',
@@ -38,3 +39,15 @@ export let {
   equalTo, notEqualTo, deepEqualTo, notDeepEqualTo, strictEqualTo,
   notStrictEqualTo, isFalse, isTrue, isOk, throws, doesNotThrow
 } = wrap(assert)
+
+let Module = ~{}
+
+let namePattern = /^.+(_test|Test)$/
+
+def testModule(Module as module)
+  let tests = [
+    for key in keys(module)
+    where key like namePattern and module[key] like Function
+    select { key, value: module[key] }
+  ]
+end

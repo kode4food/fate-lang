@@ -6,6 +6,7 @@ from '../runtime' import isArray
 #
 #   Array.prototype.length
 #   Array.prototype.join
+#   Array.prototype.slice
 
 export def first(Array as value)
   value[0]
