@@ -10,11 +10,11 @@ interface GeneratorResult {
 }
 
 export function createDoBlock(generator: Function) {
-  return new Continuation((resolve: Function) => {
+  return new Continuation(resolve => {
     let generating = generator.apply(null);
     step(generating.next());
 
-    function fulfilled(value: any) {
+    function fulfilled(value: Result) {
       step(generating.next(value));
     }
 
