@@ -3,7 +3,7 @@
 import { GlobalScheduler } from "./Scheduler";
 
 type PendingHandler = [Continuation, Resolve];
-type PendingHandlers = PendingHandler | PendingHandler[];
+type PendingHandlers = PendingHandler[];
 
 type Result = Continuation | any;
 type ResultOrArray = Result | any[];
