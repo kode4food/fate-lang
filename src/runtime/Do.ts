@@ -1,6 +1,8 @@
 "use strict";
 
-const Continuation = require('./Continuation').Continuation;
+import {
+  Continuation, Result, ResultOrArray, getThenFunction
+} from './Continuation';
 
 interface GeneratorResult {
   done: boolean;
@@ -28,6 +30,59 @@ export function createDoBlock(generator: Function) {
   });
 }
 
-export const awaitValue = Continuation.resolve;
-export const awaitAny = Continuation.resolveAny;
-export const awaitAll = Continuation.resolveAll;
+export function awaitValue(result: Result): Continuation {
+  if ( result instanceof Continuation ) {
+    return result;
+  }
+  return new Continuation(resolve => resolve(result));
+}
+
+export function awaitAny(resultOrArray: ResultOrArray): Continuation {
+  return new Continuation(resolve => {
+    awaitValue(resultOrArray).then((array: Result) => {
+      for ( let i = 0, len = array.length; i < len; i++ ) {
+        let value = array[i];
+        let then = getThenFunction(value);
+        if ( then ) {
+          then(resolve);
+        }
+        else {
+          resolve(value);
+        }
+      }
+    });
+  });
+}
+
+export function awaitAll(resultOrArray: ResultOrArray): Continuation {
+  return new Continuation(resolve => {
+    awaitValue(resultOrArray).then((array: Result) => {
+      let waitingFor = array.length;
+
+      for ( let i = 0, len = waitingFor; i < len; i++ ) {
+        let then = getThenFunction(array[i]);
+        if ( then ) {
+          resolveThenAtIndex(then, i);
+          continue;
+        }
+        waitingFor--;
+      }
+
+      if ( waitingFor === 0 ) {
+        resolve(array);
+      }
+
+      function resolveThenAtIndex(then: Function, index: number) {
+        then(onFulfilled);
+
+        function onFulfilled(result: Result): Result {
+          array[index] = result;
+          if ( --waitingFor === 0 ) {
+            resolve(array);
+          }
+          return result;
+        }
+      }
+    });
+  });
+}

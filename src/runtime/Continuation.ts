@@ -1,10 +1,10 @@
 "use strict";
 
-type Result = Continuation | any;
-type ResultOrArray = Result | any[];
-type Resolve = (result: Result) => void;
-type Fulfilled = (result: Result) => Result;
-type Executor = (resolve: Resolve) => void;
+export type Result = Continuation | any;
+export type ResultOrArray = Result | any[];
+export type Resolve = (result: Result) => void;
+export type Fulfilled = (result: Result) => Result;
+export type Executor = (resolve: Resolve) => void;
 
 type PendingHandler = [Continuation, Resolve];
 type PendingHandlers = PendingHandler[];
@@ -78,63 +78,6 @@ export class Continuation {
   private pendingHandler: PendingHandler;
   private pendingHandlers: PendingHandlers;
   private pendingLength: number = 0;
-
-  public static resolve(result: Result): Continuation {
-    if ( result instanceof Continuation ) {
-      return result;
-    }
-    return new Continuation(resolve => resolve(result));
-  }
-
-  public static resolveAny(resultOrArray: ResultOrArray): Continuation {
-    return new Continuation(resolve => {
-      Continuation.resolve(resultOrArray).then((array: Result) => {
-        for ( let i = 0, len = array.length; i < len; i++ ) {
-          let value = array[i];
-          let then = getThenFunction(value);
-          if ( then ) {
-            then(resolve);
-          }
-          else {
-            resolve(value);
-          }
-        }
-      });
-    });
-  }
-
-  public static resolveAll(resultOrArray: ResultOrArray): Continuation {
-    return new Continuation(resolve => {
-      Continuation.resolve(resultOrArray).then((array: Result) => {
-        let waitingFor = array.length;
-
-        for ( let i = 0, len = waitingFor; i < len; i++ ) {
-          let then = getThenFunction(array[i]);
-          if ( then ) {
-            resolveThenAtIndex(then, i);
-            continue;
-          }
-          waitingFor--;
-        }
-
-        if ( waitingFor === 0 ) {
-          resolve(array);
-        }
-
-        function resolveThenAtIndex(then: Function, index: number) {
-          then(onFulfilled);
-
-          function onFulfilled(result: Result): Result {
-            array[index] = result;
-            if ( --waitingFor === 0 ) {
-              resolve(array);
-            }
-            return result;
-          }
-        }
-      });
-    });
-  }
 
   constructor(executor: Executor) {
     if ( executor !== noOp ) {
