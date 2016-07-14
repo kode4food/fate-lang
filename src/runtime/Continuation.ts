@@ -1,13 +1,13 @@
 "use strict";
 
-type PendingHandler = [Continuation, Resolve];
-type PendingHandlers = PendingHandler[];
-
 type Result = Continuation | any;
 type ResultOrArray = Result | any[];
 type Resolve = (result: Result) => void;
 type Fulfilled = (result: Result) => Result;
 type Executor = (resolve: Resolve) => void;
+
+type PendingHandler = [Continuation, Resolve];
+type PendingHandlers = PendingHandler[];
 
 /* istanbul ignore next */
 function noOp() { "noOp"; }
