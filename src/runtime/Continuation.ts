@@ -137,11 +137,9 @@ export class Continuation {
   }
 
   constructor(executor: Executor) {
-    if ( executor === noOp ) {
-      return;
+    if ( executor !== noOp ) {
+      this.doResolve(executor);
     }
-
-    this.doResolve(executor);
   }
 
   public then(onFulfilled: Fulfilled): Continuation {
@@ -198,14 +196,13 @@ export class Continuation {
   }
 
   private doResolve(executor: Executor): void {
-    let done: boolean;
+    let done = false;
 
     executor(result => {
-      if ( done ) {
-        return;
+      if ( !done ) {
+        done = true;
+        this.resolve(result);
       }
-      done = true;
-      this.resolve(result);
     });
   }
 
