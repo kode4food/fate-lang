@@ -11,11 +11,6 @@ type Resolve = (result: Result) => void;
 type Fulfilled = (result: Result) => Result;
 type Executor = (resolve: Resolve) => void;
 
-enum State {
-  Pending = 0,
-  Fulfilled = 1
-}
-
 /* istanbul ignore next */
 function noOp() { "noOp"; }
 
@@ -27,7 +22,7 @@ export function getThenFunction(value: any) {
 }
 
 export class Continuation {
-  protected state: State = State.Pending;
+  protected isFulfilled: boolean = false;
   protected result: Result;
 
   private pendingHandler: PendingHandler;
@@ -111,7 +106,7 @@ export class Continuation {
       this.doResolve(then);
       return;
     }
-    this.state = State.Fulfilled;
+    this.isFulfilled = true;
     this.result = result;
     GlobalScheduler.queue(this.notifyPending, this);
   }
@@ -119,7 +114,7 @@ export class Continuation {
   protected addPending(target: Continuation, onFulfilled: Resolve): void {
     let pending: PendingHandler = [target, onFulfilled];
 
-    if ( this.state === State.Fulfilled ) {
+    if ( this.isFulfilled === true ) {
       GlobalScheduler.queue(() => {
         this.settlePending(pending);
       });
