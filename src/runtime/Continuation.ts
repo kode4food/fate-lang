@@ -41,42 +41,9 @@ export class Continuation {
     return new Continuation(resolve => resolve(result));
   }
 
-  public static race(resultOrArray: ResultOrArray): Continuation {
-    return Continuation.resolve(resultOrArray).race();
-  }
-
-  public static all(resultOrArray: ResultOrArray): Continuation {
-    return Continuation.resolve(resultOrArray).all();
-  }
-
-  constructor(executor: Executor) {
-    if ( executor === noOp ) {
-      return;
-    }
-
-    this.doResolve(executor);
-  }
-
-  public resolve(result: Result): void {
-    let then = getThenFunction(result);
-    if ( then ) {
-      this.doResolve(then);
-      return;
-    }
-    this.state = State.Fulfilled;
-    this.result = result;
-    GlobalScheduler.queue(this.notifyPending, this);
-  }
-
-  public then(onFulfilled: Fulfilled): Continuation {
-    let continuation = new Continuation(noOp);
-    this.addPending(continuation, onFulfilled);
-    return continuation;
-  }
-
-  public race(): Continuation {
+  public static resolveAny(resultOrArray: ResultOrArray): Continuation {
     return new Continuation(resolve => {
-      this.then((array: Result) => {
+      Continuation.resolve(resultOrArray).then((array: Result) => {
         for ( let i = 0, len = array.length; i < len; i++ ) {
           let value = array[i];
           let then = getThenFunction(value);
@@ -91,9 +58,9 @@ export class Continuation {
     });
   }
 
-  public all(): Continuation {
+  public static resolveAll(resultOrArray: ResultOrArray): Continuation {
     return new Continuation(resolve => {
-      this.then((array: Result) => {
+      Continuation.resolve(resultOrArray).then((array: Result) => {
         let waitingFor = array.length;
 
         for ( let i = 0, len = waitingFor; i < len; i++ ) {
@@ -122,6 +89,31 @@ export class Continuation {
         }
       });
     });
+  }
+
+  constructor(executor: Executor) {
+    if ( executor === noOp ) {
+      return;
+    }
+
+    this.doResolve(executor);
+  }
+
+  public then(onFulfilled: Fulfilled): Continuation {
+    let continuation = new Continuation(noOp);
+    this.addPending(continuation, onFulfilled);
+    return continuation;
+  }
+
+  protected resolve(result: Result): void {
+    let then = getThenFunction(result);
+    if ( then ) {
+      this.doResolve(then);
+      return;
+    }
+    this.state = State.Fulfilled;
+    this.result = result;
+    GlobalScheduler.queue(this.notifyPending, this);
   }
 
   protected addPending(target: Continuation, onFulfilled: Resolve): void {

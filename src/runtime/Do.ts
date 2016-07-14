@@ -28,14 +28,6 @@ export function createDoBlock(generator: Function) {
   });
 }
 
-export function awaitValue(value: any) {
-  return Continuation.resolve(value);
-}
-
-export function awaitAny(array: any[]) {
-  return Continuation.race(array);
-}
-
-export function awaitAll(array: any[]) {
-  return Continuation.all(array);
-}
+export const awaitValue = Continuation.resolve;
+export const awaitAny = Continuation.resolveAny;
+export const awaitAll = Continuation.resolveAll;
