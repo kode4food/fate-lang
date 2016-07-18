@@ -5,6 +5,7 @@ import isFalse as False
      , isTrue as True
      , isNothing as Nothing
      , isSomething as Something
+     , isPattern as Pattern
      , isObject as Object
      , isArray as Array
 
@@ -46,27 +47,20 @@ let EmptyArray = ~(Array(it) and it.length = 0)
   , Boolean = ~isA(it, 'boolean')
   , Function = ~isA(it, 'function')
 
-export def ArrayOf(elementPattern)
-  let checker = definePattern(value →
+export def ArrayOf(Pattern as elementPattern)
+  definePattern(value →
     return false unless Array(value)
     [
       for item in value
       where not elementPattern(item)
     ].length = 0
   )
+end
 
-  def decorate(pattern)
-    setProperty(pattern, 'MinLength', minLength →
-      (pattern && value → value.length ≥ minLength) | decorate
-    )
+export def MinLength(NonNegativeInteger as min)
+  ~(Array(it) and it.length ≥ min)
+end
 
-    setProperty(pattern, 'MaxLength', maxLength →
-      (pattern && value → value.length ≤ maxLength) | decorate
-    )
-
-    pattern
-  end
-
-  return decorate(Array) unless isPattern(elementPattern)
-  decorate(checker)
+export def MaxLength(NonNegativeInteger as max)
+  ~(Array(it) and it.length ≤ max)
 end

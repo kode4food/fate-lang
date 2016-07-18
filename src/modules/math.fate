@@ -1,6 +1,8 @@
-from './support' import Math, Number
+from './support' import Math
 
-from pattern import Array, Number, ArrayOf
+export from './support' import Number as number
+
+from pattern import ArrayOf, Number, MinLength
 
 # Warning: this module assumes JavaScript-specific methods
 #
@@ -9,7 +11,7 @@ from pattern import Array, Number, ArrayOf
 export from '../generator' import createRangeGenerator as range
 
 let numberSort = (left, right → left - right)
-let NumberArray = ArrayOf(Number).MinLength(1)
+let NumberArray = ArrayOf(Number) && MinLength(1)
 
 export def sum(NumberArray as values)
   reduce result = 0
@@ -52,8 +54,6 @@ def NumberFunc2(func)
   end
 end
 
-# `number(value)` convert value to a Number
-export let number = Number
 # `abs(value)` returns the absolute value
 export let abs = Math.abs | NumberFunc
 # `acos(value)` returns the arc-cosine of value (in radians)

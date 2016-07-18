@@ -2,11 +2,11 @@
 
 export type Result = Continuation | any;
 export type ResultOrArray = Result | any[];
-export type Resolve = (result: Result) => void;
-export type Fulfilled = (result: Result) => Result;
-export type Executor = (resolve: Resolve) => void;
+export type Resolver = (result: Result) => void;
+export type Executor = (resolve: Resolver) => void;
+export type Handler = (result: Result) => Result;
 
-type PendingHandler = [Continuation, Resolve];
+type PendingHandler = [Continuation, Handler];
 type PendingHandlers = PendingHandler[];
 
 /* istanbul ignore next */
@@ -72,7 +72,7 @@ export function getThenFunction(value: any) {
 }
 
 export class Continuation {
-  protected isFulfilled: boolean = false;
+  protected isResolved: boolean = false;
   protected result: Result;
 
   private pendingHandler: PendingHandler;
@@ -85,7 +85,7 @@ export class Continuation {
     }
   }
 
-  public then(onFulfilled: Fulfilled): Continuation {
+  public then(onFulfilled: Handler): Continuation {
     let continuation = new Continuation(noOp);
     this.addPending(continuation, onFulfilled);
     return continuation;
@@ -97,15 +97,15 @@ export class Continuation {
       this.doResolve(then);
       return;
     }
-    this.isFulfilled = true;
+    this.isResolved = true;
     this.result = result;
     GlobalScheduler.queue(this.notifyPending, this);
   }
 
-  protected addPending(target: Continuation, onFulfilled: Resolve): void {
+  protected addPending(target: Continuation, onFulfilled: Handler): void {
     let pending: PendingHandler = [target, onFulfilled];
 
-    if ( this.isFulfilled === true ) {
+    if ( this.isResolved === true ) {
       GlobalScheduler.queue(() => {
         this.settlePending(pending);
       });
@@ -134,7 +134,7 @@ export class Continuation {
     pending[0].resolvePending(this.result, pending[1]);
   }
 
-  protected resolvePending(result: Result, onFulfilled: Fulfilled): void {
+  protected resolvePending(result: Result, onFulfilled: Handler): void {
     this.resolve(onFulfilled(result));
   }
 

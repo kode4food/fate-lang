@@ -1,9 +1,10 @@
 import nodeunit
 
 from pattern
-import Array, Object, String, NonEmptyString, EmptyString,
-       Boolean, Number, Integer, PositiveInteger, PositiveNumber,
-       NegativeInteger, NegativeNumber, ArrayOf, Nothing
+import Array, Object, String, NonEmptyString, EmptyString, Boolean, Number,
+       Integer, PositiveInteger, PositiveNumber, NegativeInteger,
+       NegativeNumber, ArrayOf, MinLength, MaxLength, Nothing
+
 
 from test import wrap
 from value import null, undefined
@@ -132,7 +133,7 @@ def definedPatterns(test)
 end
 
 def arrayPatterns(test)
-  let { isFalse, isTrue } = wrap(test)
+  let { isFalse, isTrue, throws } = wrap(test)
 
   [1, 2, 3, 4] like ~[1, 2, 3] | isTrue
   [1, 2, 3] like ~[1, 2, 3, 4] | isFalse
@@ -148,8 +149,7 @@ def arrayPatterns(test)
   [] like Array      | isTrue
   null like Array    | isFalse
 
-  let IntegerArray = ArrayOf(Integer).MinLength(1)
-  let BadArray = ArrayOf("hello")
+  let IntegerArray = ArrayOf(Integer) && MinLength(1)
 
   [1,2,3] like IntegerArray  | isTrue
   [1.2, 3] like IntegerArray | isFalse
@@ -164,17 +164,15 @@ def arrayPatterns(test)
   []       | IntegerArray | isFalse
   'hi'     | IntegerArray | isFalse
 
-  ['hi'] like BadArray | isTrue
-  [] like BadArray     | isTrue
-  'hi' like BadArray   | isFalse
-
-  let limitedArray = ArrayOf(Integer).MinLength(1).MaxLength(5)
+  let limitedArray = ArrayOf(Integer) && MinLength(1) && MaxLength(5)
 
   []                 like limitedArray | isFalse
   [1, 2, 3]          like limitedArray | isTrue
   [1, 2, 3, 4, 5]    like limitedArray | isTrue
   [1, 2, 3, 4, 5, 6] like limitedArray | isFalse
   [1, 2, 3, 4.4, 5]  like limitedArray | isFalse
+
+  (→ ArrayOf("hello") ) | throws
 
   test.done()
 end

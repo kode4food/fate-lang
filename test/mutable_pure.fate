@@ -1,0 +1,21 @@
+import nodeunit
+
+from pattern import Something
+from value import mutable
+from test import wrap
+
+def mutableValues(test)
+  let { equalTo, isTrue } = wrap(test)
+
+  let x = mutable(99)
+  x like Something | isTrue
+  x.get() | equalTo(99)
+  x.set(100) | equalTo(100)
+  x.get() | equalTo(100)
+
+  test.done()
+end
+
+export let tests = nodeunit.testCase({
+  "Mutable Values": mutableValues
+})

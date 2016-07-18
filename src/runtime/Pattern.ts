@@ -26,9 +26,9 @@ export interface Pattern {
   native?: RegExp;
 }
 
-export function isPattern(value: any) {
-  return typeof value === 'function' && value.__fate === 'pattern';
-}
+export const isPattern = definePattern((value: any) =>
+  typeof value === 'function' && value.__fate === 'pattern'
+);
 
 export const isArray: Pattern = definePattern(Array.isArray);
 

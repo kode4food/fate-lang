@@ -10,9 +10,6 @@ interface Options {
 
 const pathSuffixes = ['.fate', '/index.fate'];
 
-/*
- * Creates a new FileResolver.
- */
 export function createFileResolver(options: Options) {
   let cache: { [index: string]: Module } = {};
   /* istanbul ignore next: fallback directory */

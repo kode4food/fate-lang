@@ -18,3 +18,4 @@ exports["Pure Fate Scopes"] = require('./scope_pure').tests;
 exports["Pure Fate Patterns"] = require('./patterns_pure').tests;
 exports["Pure Fate Reduce"] = require('./reduce_pure').tests;
 exports["Pure Fate Lists"] = require('./lists_pure').tests;
+exports["Pure Fate Mutables"] = require('./mutable_pure').tests;
