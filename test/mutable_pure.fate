@@ -7,11 +7,12 @@ from test import wrap
 def mutableValues(test)
   let { equalTo, isTrue } = wrap(test)
 
-  let x = mutable(99)
-  x like Something | isTrue
-  x.get() | equalTo(99)
-  x.set(100) | equalTo(100)
-  x.get() | equalTo(100)
+  let mut = mutable(99)
+
+  mut like Something | isTrue
+  mut.get()          | equalTo(99)
+  mut.set(100)       | equalTo(100)
+  mut.get()          | equalTo(100)
 
   test.done()
 end
