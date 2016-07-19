@@ -1,42 +1,42 @@
 "use strict";
 
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
 
-var gulp = require('gulp');
-var typescript = require('gulp-typescript');
-var nodeunit = require('gulp-nodeunit');
-var istanbul = require('gulp-istanbul');
-var enforcer = require('gulp-istanbul-enforcer');
-var pegjs = require('gulp-peg');
-var rename = require('gulp-rename');
-var replace = require('gulp-replace');
-var copy = require('gulp-copy');
-var tslint = require('gulp-tslint');
-var del = require('del');
+const gulp = require('gulp');
+const typescript = require('gulp-typescript');
+const nodeunit = require('gulp-nodeunit');
+const istanbul = require('gulp-istanbul');
+const enforcer = require('gulp-istanbul-enforcer');
+const pegjs = require('gulp-peg');
+const rename = require('gulp-rename');
+const replace = require('gulp-replace');
+const copy = require('gulp-copy');
+const tslint = require('gulp-tslint');
+const del = require('del');
 
-var supportFiles = ['src/**/*.js', 'src/**/*.fate'];
-var tsFiles = ['src/**/*.ts'];
-var testFiles = ['./test/index.js'];
-var coverageFiles = ['./test/**/*.js', './dist/**/*.js',
+const supportFiles = ['src/**/*.js', 'src/**/*.fate'];
+const tsFiles = ['src/**/*.ts'];
+const testFiles = ['./test/index.js'];
+const coverageFiles = ['./test/**/*.js', './dist/**/*.js',
                      '!./dist/compiler/parser.js'];
-var parserFile = ['./src/compiler/parser.pegjs'];
-var parserOutput = 'parser.js';
+const parserFile = ['./src/compiler/parser.pegjs'];
+const parserOutput = 'parser.js';
 
-var extendSignature = 'var __extends =';
-var exportSignature = 'function __export(m)';
-var ignoreNext = '/* istanbul ignore next */\n';
+const extendSignature = 'var __extends =';
+const exportSignature = 'function __export(m)';
+const ignoreNext = '/* istanbul ignore next */\n';
 
-var tsProject = typescript.createProject('./src/tsconfig.json');
+const tsProject = typescript.createProject('./src/tsconfig.json');
 
-var nodeUnitConfig = {
+const nodeUnitConfig = {
   reporter: 'default',
   reporterOptions: {
     output: 'test'
   }
 };
 
-var enforcerConfig = {
+const enforcerConfig = {
   thresholds: {
     statements: 100,
     branches: 100,

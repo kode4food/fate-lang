@@ -11,7 +11,7 @@ interface WeakMapConstructor {
   new <K, V>(): WeakMap<K, V>;
 }
 
-declare var WeakMap: WeakMapConstructor;
+declare let WeakMap: WeakMapConstructor;
 
 // ****************************************************************************
 

@@ -300,7 +300,7 @@ trailingIfStatement
 ifStatement
   = op:IfUnless __ condition:(letStatement / expr)
     elsable:elsableStatements {
-      var tag = condition.tag === 'let' ? 'ifLet' : 'if';
+      let tag = condition.tag === 'let' ? 'ifLet' : 'if';
       if ( !op ) {
         return node(tag, condition, elsable[1], elsable[0]);
       }

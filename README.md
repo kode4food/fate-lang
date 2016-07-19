@@ -31,14 +31,14 @@ You can also compile scripts manually by requiring the fatejs module, and callin
 
 ```javascript
 // require the Fate module
-var fate = require('fatejs');
+const fate = require('fatejs');
 
 // compile a script that returns a lambda
-var script = fate.compile('x -> x * 100');
+const script = fate.compile('x -> x * 100');
 
 // execute the compiled script,
 // will return the lambda instance
-var resultingLambda = script();
+const resultingLambda = script();
 
 // spit out the result of the lambda!
 console.log(resultingLambda(4));
@@ -47,8 +47,8 @@ console.log(resultingLambda(4));
 Or, if you're lazy, you can skip the compile and execute steps, and just call `evaluate()`:
 
 ```javascript
-var fate = require('fatejs');
-var resultingLambda = fate.evaluate('x → x • 100');
+const fate = require('fatejs');
+const resultingLambda = fate.evaluate('x → x • 100');
 console.log(resultingLambda(4));
 ```
 
