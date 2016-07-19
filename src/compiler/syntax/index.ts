@@ -12,7 +12,7 @@ export type TagOrTags = Tag|Tags;
 
 type FunctionMap = { [index: string]: Function };
 
-let tagToConstructor: FunctionMap = {
+const tagToConstructor: FunctionMap = {
   'from': Tree.FromStatement,
   'import': Tree.ImportStatement,
   'export': Tree.ExportStatement,
