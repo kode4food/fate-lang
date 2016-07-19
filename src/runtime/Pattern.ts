@@ -102,7 +102,7 @@ export function defineRegexPattern(regex: RegExp) {
   return wrapped;
 
   function wrapped(value: any): boolean {
-    return regex.test(value);
+    return typeof value === 'string' && regex.test(value);
   }
 }
 

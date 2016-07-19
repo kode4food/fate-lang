@@ -299,45 +299,6 @@ def deepPaths(test)
   test.done()
 end
 
-def regularExpressions(test)
-  let { isFalse, isTrue } = wrap(test)
-
-  let pattern1 = /dy$/
-  let pattern2 = ~/dy$/
-
-  let objectPattern1 = { name: /^Tho/ }
-  let objectPattern2 = ~{ name: ~/^Tho/ }
-  let objectPattern3 = ~{
-    name: ~/White$/,
-    age: it > 50,
-    colors: ['red', 'green', _]
-  }
-
-  let testObject1 = {
-    name: 'Fred White', age: 99,
-    colors: ['red', 'green', 'yellow']
-  }
-
-  let testObject2 = {
-    name: 'Fred Black', age: 99,
-    colors: ['red', 'green', 'blue']
-  }
-
-  "hello" like /^hell/                   | isTrue
-  "hello" like ~/^hell/                  | isTrue
-  "howdy" like pattern1                  | isTrue
-  "however" like pattern1                | isFalse
-  "howdy" like pattern2                  | isTrue
-  "however" like pattern2                | isFalse
-  { name: 'Thomas' } like objectPattern1 | isTrue
-  { name: 'Bill' } like objectPattern1   | isFalse
-  { name: 'Thomas' } like objectPattern2 | isTrue
-  { name: 'Bill' } like objectPattern2   | isFalse
-  testObject1 like objectPattern3        | isTrue
-  testObject2 like objectPattern3        | isFalse
-  test.done()
-end
-
 def assignments(test)
   let { equalTo } = wrap(test)
 
@@ -379,7 +340,6 @@ export let tests = nodeunit.testCase({
   "Object Like": objectLike,
   "Array Like": arrayLike,
   "Deep Paths": deepPaths,
-  "Regular Expressions": regularExpressions,
   "Assignments": assignments,
   "Nested Matchers": nestedMatchers
 })
