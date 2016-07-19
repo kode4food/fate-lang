@@ -1,7 +1,7 @@
 {
-  let isFormatter = require('../runtime/Format').isFormatter;
-  let Syntax = require('./syntax');
-  let annotate = Syntax.annotate;
+  const isFormatter = require('../runtime/Format').isFormatter;
+  const Syntax = require('./syntax');
+  const annotate = Syntax.annotate;
 
   function node() {
     let result = Syntax.node.apply(null, arguments);
