@@ -1,5 +1,7 @@
 "use strict";
 
+const definePattern = require('../runtime').definePattern;
+
 const math = Math;
 const object = Object;
 const string = String;
@@ -15,8 +17,8 @@ function make(constructor: Function, ...args: any[]) {
   return constructor.apply(instance, args) || instance;
 }
 
-function isA(value: any, type: string): boolean {
-  return typeof value === type;
+function isA(type: string): Function {
+  return definePattern((value: any) => typeof value === type);
 }
 
 type Target = { [index: string]: any };
