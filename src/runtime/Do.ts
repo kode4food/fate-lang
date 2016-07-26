@@ -1,5 +1,7 @@
 "use strict";
 
+const isArray = Array.isArray;
+
 import {
   Continuation, Result, ResultOrArray, getThenFunction
 } from './Continuation';
@@ -37,9 +39,21 @@ export function awaitValue(result: Result): Continuation {
   return new Continuation(resolve => resolve(result));
 }
 
+function awaitArray(resultOrArray: ResultOrArray) {
+  return awaitValue(resultOrArray).then(prepareArray);
+
+  function prepareArray(result: any) {
+    /* istanbul ignore if: TODO - need to figure out a way to test */
+    if ( !isArray(result) ) {
+      throw new TypeError("An Array is required");
+    }
+    return result.slice();
+  }
+}
+
 export function awaitAny(resultOrArray: ResultOrArray): Continuation {
-  return new Continuation(resolve => {
-    awaitValue(resultOrArray).then((array: Result) => {
+  return awaitArray(resultOrArray).then((array: Result[]) => {
+    return new Continuation(resolve => {
       for ( let i = 0, len = array.length; i < len; i++ ) {
         let value = array[i];
         let then = getThenFunction(value);
@@ -55,8 +69,8 @@ export function awaitAny(resultOrArray: ResultOrArray): Continuation {
 }
 
 export function awaitAll(resultOrArray: ResultOrArray): Continuation {
-  return new Continuation(resolve => {
-    awaitValue(resultOrArray).then((array: Result) => {
+  return awaitArray(resultOrArray).then((array: Result[]) => {
+    return new Continuation(resolve => {
       let waitingFor = array.length;
 
       for ( let i = 0, len = waitingFor; i < len; i++ ) {
