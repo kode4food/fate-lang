@@ -2,9 +2,7 @@
 
 const isArray = Array.isArray;
 
-import {
-  Continuation, Result, ResultOrArray, getThenFunction
-} from './Continuation';
+import { Continuation, Result, ResultOrArray } from './Continuation';
 
 interface GeneratorResult {
   done: boolean;
@@ -56,9 +54,8 @@ export function awaitAny(resultOrArray: ResultOrArray): Continuation {
     return new Continuation(resolve => {
       for ( let i = 0, len = array.length; i < len; i++ ) {
         let value = array[i];
-        let then = getThenFunction(value);
-        if ( then ) {
-          then(resolve);
+        if ( value instanceof Continuation ) {
+          value.then(resolve);
         }
         else {
           resolve(value);
@@ -74,9 +71,8 @@ export function awaitAll(resultOrArray: ResultOrArray): Continuation {
       let waitingFor = array.length;
 
       for ( let i = 0, len = waitingFor; i < len; i++ ) {
-        let then = getThenFunction(array[i]);
-        if ( then ) {
-          resolveThenAtIndex(then, i);
+        if ( array[i] instanceof Continuation ) {
+          array[i].then(resolveArrayAtIndex(i));
           continue;
         }
         waitingFor--;
@@ -86,16 +82,14 @@ export function awaitAll(resultOrArray: ResultOrArray): Continuation {
         resolve(array);
       }
 
-      function resolveThenAtIndex(then: Function, index: number) {
-        then(onFulfilled);
-
-        function onFulfilled(result: Result): Result {
+      function resolveArrayAtIndex(index: number) {
+        return (result: Result) => {
           array[index] = result;
           if ( --waitingFor === 0 ) {
             resolve(array);
           }
           return result;
-        }
+        };
       }
     });
   });

@@ -64,13 +64,6 @@ class Scheduler {
 
 const GlobalScheduler = new Scheduler();
 
-export function getThenFunction(value: any) {
-  if ( value instanceof Continuation ) {
-    return value.then.bind(value);
-  }
-  return null;
-}
-
 export class Continuation {
   protected isResolved: boolean = false;
   protected result: Result;
@@ -92,9 +85,8 @@ export class Continuation {
   }
 
   protected resolve(result: Result): void {
-    let then = getThenFunction(result);
-    if ( then ) {
-      this.doResolve(then);
+    if ( result instanceof Continuation ) {
+      this.doResolve(result.then.bind(result));
       return;
     }
     this.isResolved = true;
