@@ -73,9 +73,18 @@ export class Continuation {
   private pendingLength: number = 0;
 
   constructor(executor: Executor) {
-    if ( executor !== noOp ) {
-      this.doResolve(executor);
+    if ( executor === noOp ) {
+      return;
     }
+
+    let done = false;
+
+    executor(result => {
+      if ( !done ) {
+        done = true;
+        this.resolve(result);
+      }
+    });
   }
 
   public then(onFulfilled: Handler): Continuation {
@@ -86,7 +95,7 @@ export class Continuation {
 
   protected resolve(result: Result): void {
     if ( result instanceof Continuation ) {
-      this.doResolve(result.then.bind(result));
+      this.resolveContinuation(result);
       return;
     }
     this.isResolved = true;
@@ -130,14 +139,9 @@ export class Continuation {
     this.resolve(onFulfilled(result));
   }
 
-  private doResolve(executor: Executor): void {
-    let done = false;
-
-    executor(result => {
-      if ( !done ) {
-        done = true;
-        this.resolve(result);
-      }
+  private resolveContinuation(continuation: Continuation): void {
+    continuation.then(result => {
+      this.resolve(result);
     });
   }
 
