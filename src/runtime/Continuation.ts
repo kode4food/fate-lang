@@ -34,15 +34,15 @@ class Scheduler {
     let queueIndex = this.queueIndex;
     let queueLength = this.queueLength;
     let i = 0;
-    let len = queueLength - queueIndex;
-    for ( ; i < len; i++ ) {
+    let remainingLength = queueLength - queueIndex;
+    for ( ; i < remainingLength; i++ ) {
       this[i] = this[queueIndex + i];
     }
     while ( i < queueLength ) {
       this[i++] = undefined;
     }
     this.queueIndex = 0;
-    this.queueLength = len;
+    this.queueLength = remainingLength;
   }
 
   private flushQueue(): void {
