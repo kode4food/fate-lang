@@ -1,7 +1,7 @@
 "use strict";
 
-export type Result = Continuation | any;
-export type ResultOrArray = Result | any[];
+export type Result = Continuation|any;
+export type ResultOrArray = Result|any[];
 export type Resolver = (result: Result) => void;
 export type Executor = (resolve: Resolver) => void;
 export type Handler = (result: Result) => Result;

@@ -3,9 +3,9 @@
 type Component = [number, string|number];
 
 interface FormatFunction {
-  (data: any | any[]): string;
+  (data: any|any[]): string;
   __fate: string;
-  __fateIndexes: (string | number)[];
+  __fateIndexes: (string|number)[];
 }
 
 const Digits = "0|[1-9][0-9]*";
