@@ -1,20 +1,22 @@
+from pattern import NonNegativeInteger
+
 from '../runtime' import Continuation
 from './support' import make, timeout as doTimeout
 
 export from './support' import print
 
 export let streamConsumer = (resolve → stream →
-  def waitFor(stream, content)
-    stream.removeAllListeners()
-    stream.on('data',  data → waitFor(stream, content + data))
+  def waitFor(content)
+    stream.removeAllListeners() # because Node
+    stream.on('data',  data → waitFor(content + data))
           .on('end',        → [content]      | resolve)
           .on('error', err  → [content, err] | resolve)
   end
 
-  waitFor(stream, '')
+  waitFor('')
 )
 
-export def timeout(delay)
+export def timeout(NonNegativeInteger as delay)
   make(Continuation, resolve →
     doTimeout(→ resolve(delay), delay)
   )

@@ -131,7 +131,7 @@ def caseExpression(test)
       print("should not happen")
       isOk(false)
 
-    case z = timeout(5)
+    case z
       isOk(true)
       z | equalTo(5)
       test.done()

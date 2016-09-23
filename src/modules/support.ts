@@ -1,6 +1,7 @@
 "use strict";
 
-const definePattern = require('../runtime').definePattern;
+import { definePattern } from '../runtime';
+import { Readable, Writable } from 'stream';
 
 const math = Math;
 const object = Object;
@@ -34,5 +35,5 @@ function print() {
 export {
   math as Math, object as Object, string as String, number as Number,
   json as JSON, timeout, make, isA, setProperty, print,
-  Undefined as undefined, Null as null
+  Undefined as undefined, Null as null, Readable, Writable
 };
