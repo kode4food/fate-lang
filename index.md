@@ -129,12 +129,12 @@ let deidentified = {
 
 ### Patterns and Destructuring
 
+```ruby
 # Function Composition
 from array import sort, reverse
 let reverseSort = sort o reverse  # x -> reverse(sort(x))
 [9, 15, 35, 2, 17, 6] | reverseSort | print
 
-```ruby
 # Combining Patterns
 let Shape = ~{ .type in ['square', 'circle', 'triangle'] },
     Orange = ~{ 'orange' in .colors },
