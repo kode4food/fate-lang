@@ -48,7 +48,7 @@ def calculateVehicleEmissions(car)
   car.emissions
 end
 
-let VehicleUnderTest = ~{ .wheelsInMotion: <= 2 }
+let VehicleUnderTest = ~{ .wheelsInMotion <= 2 }
 
 def calculateVehicleEmissions(VehicleUnderTest as car)
   car.emissions / 40
@@ -138,7 +138,7 @@ let reverseSort = sort o reverse  # x -> reverse(sort(x))
 # Combining Patterns
 let Shape = ~{ .type in ['square', 'circle', 'triangle'] },
     Orange = ~{ 'orange' in .colors },
-    Large = ~{ .size: > 50 }
+    Large = ~{ .size > 50 }
 
 let LargeOrangeShape = Large && Orange && Shape
 
