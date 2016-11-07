@@ -20,9 +20,8 @@ export type ArrayElements = ArrayElement[];
 export type ArrayElement = Expression;
 export type ObjectElements = ObjectAssignment[];
 
-export type IndexedPatternElements = PatternElement[];
-export type ObjectPatternElements = ObjectPatternElement[];
-export type ObjectPatternElement = Expression|PatternElement;
+export type CollectionPatternElement = Expression|PatternElement;
+export type CollectionPatternElements = CollectionPatternElement[];
 
 export class Node implements Annotated {
   [index: string]: any;
@@ -389,22 +388,13 @@ export class Regex extends PatternSymbol {
 }
 
 export class CollectionPattern extends PatternSymbol {
-  constructor(public elements: ObjectPatternElements|IndexedPatternElements) {
+  constructor(public elements: CollectionPatternElements) {
     super();
   }
 }
 
-export class ObjectPattern extends CollectionPattern {
-  constructor(elements: ObjectPatternElements) {
-    super(elements);
-  }
-}
-
-export class ArrayPattern extends CollectionPattern {
-  constructor(elements: IndexedPatternElements) {
-    super(elements);
-  }
-}
+export class ObjectPattern extends CollectionPattern {}
+export class ArrayPattern extends CollectionPattern {}
 
 export class PatternElement extends PatternSymbol {
   constructor(public id: Expression,

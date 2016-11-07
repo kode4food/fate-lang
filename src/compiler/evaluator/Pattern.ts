@@ -208,9 +208,7 @@ export class NestedPatternEvaluator extends BasePatternEvaluator {
       }]);
     });
 
-    let elements = <Syntax.ObjectPatternElements>this.node.elements;
-
-    elements.forEach(element => {
+    this.node.elements.forEach(element => {
       if ( element instanceof Syntax.PatternElement ) {
         pushElement(element);
       }
