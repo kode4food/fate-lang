@@ -5,10 +5,6 @@ import * as Syntax from '../syntax';
 
 import { NodeEvaluator } from './Evaluator';
 
-interface StringMap {
-  [index: string]: string;
-}
-
 export class CallEvaluator extends NodeEvaluator {
   public static tags = ['call'];
   public node: Syntax.CallOperator;

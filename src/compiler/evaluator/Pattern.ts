@@ -7,8 +7,6 @@ import { NodeEvaluator } from './Evaluator';
 const likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
 const cachedPatternThreshold = 8;
 
-type FunctionMap = { [index: string]: Function };
-
 export class RegexEvaluator extends NodeEvaluator {
   public static tags = ['regex'];
   public node: Syntax.Regex;

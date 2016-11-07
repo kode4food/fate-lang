@@ -37,7 +37,7 @@ export function bindFunction(func: Function, args: ArgTemplate) {
   let sliceIndex = argMap.length;
   return boundFunction;
 
-  function boundFunction() {
+  function boundFunction(this: any) {
     let funcArgs = template.slice().concat(slice.call(arguments, sliceIndex));
     for ( let i = 0; i < argMap.length; i++ ) {
       funcArgs[argMap[i]] = arguments[i];

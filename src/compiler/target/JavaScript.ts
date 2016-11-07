@@ -168,7 +168,7 @@ export function createCoder(): Target.Coder {
   function createScopeInfo(): ScopeInfo {
     return {
       firstAccess: {},
-      snapshot: function () {
+      snapshot: function (this: ScopeInfo) {
         return mixin({}, this);
       }
     };

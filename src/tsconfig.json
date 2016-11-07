@@ -6,6 +6,10 @@
     "outDir": "../dist",
     "sourceMap": true,
     "noImplicitAny": true,
-    "noEmitOnError": false
+    "noEmitOnError": false,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noImplicitUseStrict": true
   }
 }
