@@ -31,7 +31,7 @@ export class BindEvaluator extends NodeEvaluator {
             return;
           }
           elems.push([
-            this.coder.literal(index), <Function>this.defer(argNode), false
+            this.coder.literal(index), this.defer(argNode), false
           ]);
         });
         this.coder.object(elems);

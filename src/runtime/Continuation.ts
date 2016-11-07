@@ -118,8 +118,7 @@ export class Continuation {
       return;
     }
 
-    let pendingHandlers = <PendingHandler[]>this.pendingHandlers;
-    pendingHandlers[this.pendingLength++] = pending;
+    this.pendingHandlers[this.pendingLength++] = pending;
   }
 
   protected settlePending(pending: PendingHandler): void {
@@ -154,15 +153,15 @@ export class Continuation {
     }
 
     if ( pendingLength === 1 ) {
-      this.settlePending(<PendingHandler>this.pendingHandler);
+      this.settlePending(this.pendingHandler);
       this.pendingLength = 0;
       this.pendingHandler = undefined;
       return;
     }
 
-    let pendingHandlers = <PendingHandler[]>this.pendingHandlers;
+    let pendingHandlers = this.pendingHandlers;
     for ( let i = 0, len = this.pendingLength; i < len; i++ ) {
-      this.settlePending((<PendingHandler[]>pendingHandlers)[i]);
+      this.settlePending(pendingHandlers[i]);
       pendingHandlers[i] = undefined;
     }
     this.pendingHandlers = undefined;
