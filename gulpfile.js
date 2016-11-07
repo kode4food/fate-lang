@@ -79,7 +79,7 @@ gulp.task('parser', ['prepare'], function () {
 
 gulp.task('compile', ['parser'], function() {
   return gulp.src(tsFiles)
-             .pipe(typescript(tsProject))
+             .pipe(tsProject())
              .js
              .pipe(replace(extendSignature, ignoreNext + extendSignature))
              .pipe(replace(exportSignature, ignoreNext + exportSignature))
@@ -92,8 +92,10 @@ gulp.task('test', ['compile'], function () {
 
 gulp.task('lint', function() {
   return gulp.src(tsFiles)
-             .pipe(tslint())
-             .pipe(tslint.report('verbose', {
+             .pipe(tslint({
+               formatter: "verbose"
+             }))
+             .pipe(tslint.report({
                summarizeFailureOutput: true
              }));
 });

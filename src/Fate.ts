@@ -27,11 +27,15 @@ export interface ModuleExports {
   [index: string]: any;
 }
 
-type Globals = { [index: string]: any };
+type Globals = {
+  [index: string]: any
+  __filename: string,
+  __dirname: string
+};
 
 const DefaultGlobals: Globals = {
-  '__filename': undefined,
-  '__dirname': undefined
+  __filename: undefined,
+  __dirname: undefined
 };
 
 /*
@@ -68,7 +72,7 @@ export function runScript(filename: string, exports: Object) {
   generatedModule(globals({ __filename: filename }), exports);
 }
 
-export function globals(extensions?: Globals) {
+export function globals(extensions?: Object) {
   if ( isObject(extensions) ) {
     let result = Object.create(DefaultGlobals);
     mixin(result, extensions);

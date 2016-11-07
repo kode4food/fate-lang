@@ -19,8 +19,26 @@ export def sum(NumberArray as values)
   select result + value
 end
 
-export def avg(values)
+export def mean(values)
   sum(values) ÷ values.length
+end
+
+export def smean(samples)
+  sum(samples) ÷ (samples.length - 1)
+end
+
+export def variance(values)
+  let avg = mean(values)
+  [for v in values select (avg - v) • (avg - v)] | mean
+end
+
+export def svariance(samples)
+  let avg = mean(samples)
+  [for v in samples select (avg - v) • (avg - v)] | smean
+end
+
+export def stdev(values)
+  values | variance | Math.sqrt
 end
 
 export def max(NumberArray as values)
@@ -105,3 +123,6 @@ export let PI = Math.PI
 export let SQRT1_2 = Math.SQRT1_2
 # `SQRT2` is the Square Root of 2
 export let SQRT2 = Math.SQRT2
+
+# Some aliases
+export mean as avg, variance as var, svariance as svar, stdev as std

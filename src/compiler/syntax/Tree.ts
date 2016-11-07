@@ -359,12 +359,12 @@ export class ExportStatement extends Statement {
 // Symbol Nodes *************************************************************
 
 export class Symbol extends Node {}
-export class Wildcard extends Symbol {}
 
 export class Identifier extends Symbol {
   constructor(public value: string) { super(); }
 }
 
+export class Wildcard extends Identifier {}
 export class Context extends Identifier {}
 export class Self extends Identifier {}
 export class Global extends Identifier {}

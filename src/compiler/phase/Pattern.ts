@@ -74,7 +74,9 @@ export default function createTreeProcessors(visit: Visitor) {
     annotate(node, 'pattern/parent', parentLocal);
     annotate(node, 'pattern/local', parentLocal);
 
-    node.elements.forEach(element => {
+    let elements = <Syntax.ObjectPatternElements>node.elements;
+
+    elements.forEach(element => {
       if ( element instanceof Syntax.PatternElement ) {
         let localId = contextPatternLocal + (contextPatternNumbering++);
         annotate(element, 'pattern/parent', parentLocal);
