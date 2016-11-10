@@ -105,9 +105,9 @@ exports.loops = nodeunit.testCase({
 
   "Indexed Loops": function (test) {
     function* colors() {
-      yield "red";
-      yield "green";
-      yield "blue";
+      yield ["red", 0];
+      yield ["green", 1];
+      yield ["blue", 2];
     }
 
     let script1 = '[for idx:brother in global.people[2].brothers ' +

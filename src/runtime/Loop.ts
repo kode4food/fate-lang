@@ -4,29 +4,22 @@ import { isArray, isObject } from './index';
 
 const generator = require('../generator');
 const isGenerator = generator.isGenerator;
-const generateIndexedSet = generator.generateIndexedSet;
+const generateArray = generator.generateArray;
+const generateObject = generator.generateObject;
 
 export type Collection = any[]|any|Function;
 
 const EmptyCollection: Collection = [];
 
 export function createIterator(collection: Collection) {
-  if ( isArray(collection) || isObject(collection) ||
-       isGenerator(collection) ) {
-    return collection;
-  }
-  return EmptyCollection;
-}
-
-export function createNamedIterator(collection: Collection) {
   if ( isArray(collection) ) {
-    return collection.map((item: any, index: number) => [item, index]);
+    return generateArray(collection);
   }
   if ( isGenerator(collection) ) {
-    return generateIndexedSet(collection);
+    return collection;
   }
   if ( isObject(collection) ) {
-    return Object.keys(collection).map(key => [collection[key], key]);
+    return generateObject(collection);
   }
   return EmptyCollection;
 }

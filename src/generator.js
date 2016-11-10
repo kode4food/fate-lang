@@ -23,21 +23,30 @@ function* createRangeGenerator(start, end) {
   let current = start = Math.floor(start);
   end = Math.floor(end);
   let increment = end > start ? 1 : -1;
+  let idx = 0;
 
-  yield current;
+  yield [current, idx++];
   while ( current !== end ) {
     current = current + increment;
-    yield current;
+    yield [current, idx++];
   }
 }
 
-function* generateIndexedSet(generator) {
-  let index = 0;
-  for ( let value of generator ) {
-    yield [value, index++];
+function* generateArray(array) {
+  for ( let i = 0; i < array.length; i++ ) {
+    yield [array[i], i];
+  }
+}
+
+function* generateObject(object) {
+  let keys = Object.keys(object);
+  for ( let i = 0; i < keys.length; i++ ) {
+    let key = keys[i];
+    yield [object[key], key];
   }
 }
 
 exports.isGenerator = isGenerator;
 exports.createRangeGenerator = createRangeGenerator;
-exports.generateIndexedSet = generateIndexedSet;
+exports.generateArray = generateArray;
+exports.generateObject = generateObject;

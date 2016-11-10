@@ -546,8 +546,7 @@ export function createCoder(): Target.Coder {
     let loopGuard = options.guard;
     let loopBody = options.body;
 
-    let iteratorName = itemName ? 'createNamedIterator' : 'createIterator';
-    let iterator = runtimeImport(iteratorName);
+    let iterator = runtimeImport('createIterator');
     let iteratorContent = code(() => {
       write(iterator, '(', collection, ')');
     });
@@ -569,15 +568,13 @@ export function createCoder(): Target.Coder {
       generate(loopGuard);
     });
 
+    let wrapper = nextId('iter_');
+    write('for(let ', wrapper, ' of ', iteratorContent, '){');
+    write('let ', argNames[0], '=', wrapper, '[0]');
     if ( itemName ) {
-      let wrapper = nextId('iter_');
-      write('for(let ', wrapper, ' of ', iteratorContent, '){');
-      write('let ', argNames[0], '=', wrapper, '[0],');
-      write(argNames[1], '=', wrapper, '[1];');
+      write(',', argNames[1], '=', wrapper, '[1]');
     }
-    else {
-      write('for(let ', argNames[0], ' of ', iteratorContent, '){');
-    }
+    write(';');
 
     writeLocalVariables(parentNames, argNames);
     write(guardContent);
