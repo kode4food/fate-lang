@@ -44,6 +44,20 @@ def listBasics(test)
   test.done()
 end
 
+def listAdvanced(test)
+  let { deepEqualTo } = wrap(test)
+
+  let colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']
+
+  let nonBlueColors = for c in colors where c != 'blue'
+  let nonOrangeColors = for c in nonBlueColors where c != 'orange'
+
+  let finalColors = [for c in nonOrangeColors]
+
+  finalColors | deepEqualTo(['red', 'yellow', 'green', 'indigo', 'violet'])
+  test.done()
+end
+
 def arrayBasics(test)
   let { equalTo } = wrap(test)
 
@@ -99,6 +113,7 @@ end
 
 let tests = nodeunit.testCase({
   "Basic List Comprehensions": listBasics,
+  "Chained List Comprehensions": listAdvanced,
   "Basic Array Handling": arrayBasics,
   "Basic Array Functions": arrayFunctions,
   "Basic Object Functions": objectFunctions

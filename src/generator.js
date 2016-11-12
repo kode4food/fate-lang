@@ -8,15 +8,12 @@
  * and breaks the world.
  */
 
-/* istanbul ignore next: Used to fetch constructor. Is never run */
-function* dummy() { }
-const GeneratorConstructor = dummy().constructor;
-
+// TODO: Must be a cleaner way to do this
 function isGenerator(value) {
   if ( value === null || typeof value !== 'object' ) {
     return false;
   }
-  return value.constructor === GeneratorConstructor;
+  return typeof value.next === 'function';
 }
 
 function* createRangeGenerator(start, end) {
