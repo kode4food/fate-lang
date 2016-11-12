@@ -260,8 +260,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function rollUpStandaloneLoops(statement: Syntax.ExpressionStatement) {
-    if ( Syntax.hasTag(statement.expression,
-                       ['arrayComp', 'objectComp', 'reduce']) ) {
+    if ( Syntax.hasTag(statement.expression, 'reduce') ) {
       annotate(statement.expression, 'function/single_expression');
       return statement.expression;
     }

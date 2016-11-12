@@ -12,7 +12,7 @@ export class ReduceEvaluator extends NodeEvaluator {
   public evaluate() {
     let statements = this.node.template('statements', [
       this.node.template(
-        'assignment', this.node.assignment.id, this.node.select
+        'assignment', this.node.assignment.id, this.node.select.value
       )
     ]);
     let forNode = this.node.template('for',
@@ -200,51 +200,58 @@ export class ForEvaluator extends LoopEvaluator {
   }
 }
 
-export class ListCompEvaluator extends LoopEvaluator {
-  public static tags = ['arrayComp', 'objectComp'];
-  public node: Syntax.ListComprehension;
+export class ForExpressionEvaluator extends LoopEvaluator {
+  public static tags = ['forExpr'];
+  public node: Syntax.ForExpression;
 
   public evaluate() {
     let self = this;
-    let single = Syntax.hasAnnotation(self.node, 'function/single_expression');
-    let bodyGenerator = single ? this.coder.scope : this.coder.iife;
-    bodyGenerator(functionWrapperBody);
+    let hasName = this.node.select.name;
+    let bodyGenerator = hasName ? namedBody : counterBody;
+    this.coder.generator(bodyGenerator);
 
-    function functionWrapperBody() {
-      let isObject = self.node instanceof Syntax.ObjectComprehension;
-      let genContainer = isObject ? self.coder.object : self.coder.array;
-      let createBody = isObject ? createNameValueBody : createValueBody;
-      let result = self.coder.createAnonymous();
-
-      self.coder.statement(() => {
-        self.coder.assignAnonymous(result, () => {
-          (<Function>genContainer)([]);
+    function counterBody() {
+      let counter = self.coder.createCounter();
+      self.createLoop(self.node.ranges, () => {
+        self.coder.emitStatement(() => {
+          self.coder.array([
+            self.defer(self.node.select.value),
+            () => { counter.next(); }
+          ]);
         });
       });
+    }
 
-      self.createLoop(self.node.ranges, createBody);
-      self.coder.statement(() => {
-        self.coder.assignResult(() => {
-          self.coder.retrieveAnonymous(result);
+    function namedBody() {
+      self.createLoop(self.node.ranges, () => {
+        self.coder.emitStatement(() => {
+          self.coder.array([
+            self.defer(self.node.select.value),
+            self.defer(self.node.select.name)
+          ]);
         });
       });
-
-      function createValueBody() {
-        let arrayCompNode = <Syntax.ArrayComprehension>self.node;
-        self.coder.statement(() => {
-          self.coder.arrayAppend(result, self.defer(arrayCompNode.value));
-        });
-      }
-
-      function createNameValueBody() {
-        let objectCompNode = <Syntax.ObjectComprehension>self.node;
-        let assign = objectCompNode.assignment;
-        self.coder.statement(() => {
-          self.coder.objectAssign(
-            result, self.defer(assign.id), self.defer(assign.value)
-          );
-        });
-      }
     }
   }
+}
+
+class ListComprehensionEvaluator extends NodeEvaluator {
+  public node: Syntax.ListComprehension;
+  public materializer: string;
+
+  public evaluate() {
+    let materialize = this.coder.runtimeImport(this.materializer);
+    this.coder.call(materialize, [
+      this.defer(this.node.forExpression)
+    ]);
+  }
+}
+export class ArrayComprehensionEvaluator extends ListComprehensionEvaluator {
+  public static tags = ['arrayComp'];
+  public materializer = 'materializeArray';
+}
+
+export class ObjectComprehensionEvaluator extends ListComprehensionEvaluator {
+  public static tags = ['objectComp'];
+  public materializer = 'materializeObject';
 }

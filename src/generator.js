@@ -39,14 +39,35 @@ function* generateArray(array) {
 }
 
 function* generateObject(object) {
-  let keys = Object.keys(object);
-  for ( let i = 0; i < keys.length; i++ ) {
-    let key = keys[i];
+  for ( let key in object ) {
+    /* istanbul ignore if: don't know where this object's been */
+    if ( !object.hasOwnProperty(key) ) {
+      continue;
+    }
     yield [object[key], key];
   }
+}
+
+function materializeArray(collection) {
+  let result = [];
+  let idx = 0;
+  for ( let item of collection ) {
+    result[idx++] = item[0];
+  }
+  return result;
+}
+
+function materializeObject(collection) {
+  let result = {};
+  for ( let item of collection ) {
+    result[item[1]] = item[0];
+  }
+  return result;
 }
 
 exports.isGenerator = isGenerator;
 exports.createRangeGenerator = createRangeGenerator;
 exports.generateArray = generateArray;
 exports.generateObject = generateObject;
+exports.materializeArray = materializeArray;
+exports.materializeObject = materializeObject;

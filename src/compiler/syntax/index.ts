@@ -22,6 +22,7 @@ const tagToConstructor: FunctionMap = {
   'composeOr': Tree.ComposeOrExpression,
   'composeAnd': Tree.ComposeAndExpression,
   'reduce': Tree.ReduceExpression,
+  'forExpr': Tree.ForExpression,
   'do': Tree.DoExpression,
   'case': Tree.CaseExpression,
   'match': Tree.MatchExpression,
@@ -87,7 +88,8 @@ const tagToConstructor: FunctionMap = {
   'arrayDestructure': Tree.ArrayDestructure,
   'objectDestructure': Tree.ObjectDestructure,
   'objectDestructureItem': Tree.ObjectDestructureItem,
-  'objectAssignment': Tree.ObjectAssignment
+  'objectAssignment': Tree.ObjectAssignment,
+  'select': Tree.Select
 };
 
 export function node(tag: Tag, ...args: any[]) {

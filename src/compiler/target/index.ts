@@ -40,6 +40,10 @@ export interface FunctionOptions {
   body: BodyEntry;
 }
 
+export interface Counter {
+  next: Function;
+}
+
 export interface Coder {
   selfName: string;
   globalObjectName: string;
@@ -57,6 +61,7 @@ export interface Coder {
   assignAnonymous(name: Name, value: BodyEntry): void;
   registerAnonymous(id: string): void;
   createAnonymous(): Name;
+  createCounter(): Counter;
   assignResult(value: BodyEntry): void;
   write(...content: any[]): void;
   writeAndGroup(items: BodyEntries): void;
@@ -76,21 +81,21 @@ export interface Coder {
               falseVal: BodyEntry): void;
   statement(bodyCallback: BodyEntry): void;
   ifStatement(condition: BodyEntry, thenBranch: BodyEntry,
-                       elseBranch: BodyEntry): void;
+              elseBranch: BodyEntry): void;
   loopExpression(options: LoopOptions): void;
   loopContinue(): void;
   funcDeclaration(name: Name, options: FunctionOptions): void;
   iife(funcBody: BodyEntry): void;
+  generator(funcBody: BodyEntry): void;
   scope(scopeBody: BodyEntry): void;
   func(options: FunctionOptions): void;
   waitFor(resolver: Syntax.Resolver, expression: BodyEntry): void;
   compoundExpression(expressions: BodyEntries): void;
-  returnStatement(bodyCallback?: Function): void;
+  returnStatement(bodyCallback?: BodyEntry): void;
+  emitStatement(bodyCallback: BodyEntry): void;
   call(funcId: Id|BodyEntry, args?: BodyEntries): void;
   array(items: BodyEntries): void;
-  arrayAppend(array: Id, value: BodyEntry): void;
   object(items: ObjectAssignmentItems): void;
-  objectAssign(dict: Id, name: BodyEntry, value: BodyEntry): void;
   parens(expr: BodyEntry): void;
   code(value?: BodyEntry|BodyEntries): string;
   toString(): string;

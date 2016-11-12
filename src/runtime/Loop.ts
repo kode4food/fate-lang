@@ -7,6 +7,9 @@ const isGenerator = generator.isGenerator;
 const generateArray = generator.generateArray;
 const generateObject = generator.generateObject;
 
+export const materializeArray = generator.materializeArray;
+export const materializeObject = generator.materializeObject;
+
 export type Collection = any[]|any|Function;
 
 const EmptyCollection: Collection = [];

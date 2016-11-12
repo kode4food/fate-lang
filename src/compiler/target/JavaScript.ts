@@ -95,14 +95,14 @@ export function createCoder(): Target.Coder {
     selfName, globalObjectName, exportsName, valueName,
     literal, runtimeImport, builder, registerAnonymous,
     createAnonymous, assignAnonymous, retrieveAnonymous,
-    assignResult, self, currentDirectory, args, globalObject,
-    member, write, writeAndGroup, getter, assignment,
+    createCounter, assignResult, self, currentDirectory, args,
+    globalObject, member, write, writeAndGroup, getter, assignment,
     assignments, exportAll, exports, unaryOperator, binaryOperator,
     isTrue, isFalse, and, or, not, conditional, statement,
     ifStatement, loopExpression, loopContinue, funcDeclaration,
-    iife, scope, func, waitFor, compoundExpression,
-    returnStatement, call, array, arrayAppend, object,
-    objectAssign, parens, code, toString
+    iife, generator, scope, func, waitFor, compoundExpression,
+    returnStatement, emitStatement, call, array, object, parens,
+    code, toString
   };
 
   function nextId(prefix: string) {
@@ -292,6 +292,14 @@ export function createCoder(): Target.Coder {
 
   function isAnonymous(name: Target.Name) {
     return anonIdRegex.test(name);
+  }
+
+  function createCounter(): Target.Counter {
+    let id = nextId('c_');
+    write('let ', id, '=0;');
+    return {
+      next: () => write(id, '++')
+    };
   }
 
   function assignResult(value: Target.BodyEntry) {
@@ -570,11 +578,10 @@ export function createCoder(): Target.Coder {
 
     let wrapper = nextId('iter_');
     write('for(let ', wrapper, ' of ', iteratorContent, '){');
-    write('let ', argNames[0], '=', wrapper, '[0]');
+    write('let ', argNames[0], '=', wrapper, '[0];');
     if ( itemName ) {
-      write(',', argNames[1], '=', wrapper, '[1]');
+      write('let ', argNames[1], '=', wrapper, '[1];');
     }
-    write(';');
 
     writeLocalVariables(parentNames, argNames);
     write(guardContent);
@@ -602,6 +609,12 @@ export function createCoder(): Target.Coder {
   function iife(funcBody: Target.BodyEntry) {
     write('(');
     func({ body: funcBody });
+    write('())');
+  }
+
+  function generator(funcBody: Target.BodyEntry) {
+    write('(');
+    func({ generator: true, body: funcBody });
     write('())');
   }
 
@@ -700,12 +713,16 @@ export function createCoder(): Target.Coder {
     write(')');
   }
 
-  function returnStatement(bodyCallback?: Function) {
+  function returnStatement(bodyCallback?: Target.BodyEntry) {
     if ( bodyCallback ) {
       write('return ', bodyCallback, ';');
       return;
     }
     write('return', (usesScratch ? ' _;' : ';'));
+  }
+
+  function emitStatement(bodyCallback: Target.BodyEntry) {
+    write('yield ', bodyCallback, ';');
   }
 
   function call(funcId: Target.Id|Target.BodyEntry,
@@ -724,10 +741,6 @@ export function createCoder(): Target.Coder {
     write('[');
     writeDelimited(items);
     write(']');
-  }
-
-  function arrayAppend(array: Target.Id, value: Target.BodyEntry) {
-    write(array, '.push(', value, ')');
   }
 
   function object(items: Target.ObjectAssignmentItems) {
@@ -774,12 +787,6 @@ export function createCoder(): Target.Coder {
       });
       write('}');
     }
-  }
-
-  function objectAssign(dict: Target.Id, name: Target.BodyEntry,
-                        value: Target.BodyEntry) {
-    member(dict, name);
-    write('=', value);
   }
 
   function parens(expr: Target.BodyEntry) {

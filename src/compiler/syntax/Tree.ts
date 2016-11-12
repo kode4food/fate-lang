@@ -53,7 +53,7 @@ export function hasTag(node: Node, tags?: TagOrTags): any {
 
   if ( isArray(tags) ) {
     let idx = tags.indexOf(node.tag);
-    if (idx === -1) {
+    if ( idx === -1 ) {
       return false;
     }
     return tags[idx];
@@ -154,7 +154,17 @@ export class ComposeAndExpression extends ComposeExpression {}
 export class ReduceExpression extends Expression {
   constructor(public assignment: DirectAssignment,
               public ranges: Ranges,
-              public select: Expression) { super(); }
+              public select: Select) { super(); }
+}
+
+export class ForExpression extends Expression {
+  constructor(public ranges: Ranges, public select: Select) {
+    super();
+    if ( !select ) {
+      let range = ranges[0];
+      this.select = range.template('select', range.valueId, range.nameId);
+    }
+  }
 }
 
 type WhenClause = LetStatement|Expression;
@@ -196,30 +206,11 @@ export class ObjectConstructor extends ElementsConstructor {
 }
 
 export class ListComprehension extends Operator {
-  constructor(public ranges: Ranges) { super(); }
+  constructor(public forExpression: ForExpression) { super(); }
 }
 
-export class ArrayComprehension extends ListComprehension {
-  constructor(ranges: Ranges, public value: Expression) {
-    super(ranges);
-    if ( !value ) {
-      this.value = ranges[0].valueId;
-    }
-  }
-}
-
-export class ObjectComprehension extends ListComprehension {
-  constructor(ranges: Ranges, public assignment: ObjectAssignment) {
-    super(ranges);
-    if ( !assignment ) {
-      let range = ranges[0];
-      this.assignment = range.template('objectAssignment',
-        range.nameId,
-        range.valueId
-      );
-    }
-  }
-}
+export class ArrayComprehension extends ListComprehension {}
+export class ObjectComprehension extends ListComprehension {}
 
 // Statement Nodes **********************************************************
 
@@ -512,4 +503,9 @@ export class ObjectDestructureItem extends Node {
 export class ObjectAssignment extends Node {
   constructor(public id: Expression,
               public value: Expression) { super(); }
+}
+
+export class Select extends Node {
+  constructor(public value: Expression,
+              public name?: Expression) { super(); }
 }

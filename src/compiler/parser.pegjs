@@ -691,8 +691,8 @@ listNoParens
   / object
 
 array
-  = "[" __ comp:arrayComprehension __ "]" {
-      return comp;
+  = "[" __ expr:embeddedForExpression __ "]" {
+      return node('arrayComp', expr);
     }
   / "[" __ elems:arrayElements __ "]" {
       return node('array', elems);
@@ -707,22 +707,9 @@ arrayElements
       return [head].concat(tail);
     }
 
-arrayComprehension
-  = For ranges:ranges expr:expressionSelect {
-      return node('arrayComp', ranges, expr);
-    }
-  / For range:arrayRange {
-      return node('arrayComp', [range]);
-    }
-
-expressionSelect
-  = __ Select __ expr:expr {
-      return expr;
-    }
-
 object
-  = "{" __ comp:objectComprehension __ "}" {
-      return comp;
+  = "{" __ expr:embeddedForExpression __ "}" {
+      return node('objectComp', expr);
     }
   / "{" __ elems:objectAssignments __ "}" {
       return node('object', elems);
@@ -749,19 +736,6 @@ objectAssignment
     }
   / name:expr {
       return node('objectAssignment', name, name);
-    }
-
-objectComprehension
-  = For ranges:ranges assign:objectAssignmentSelect {
-      return node('objectComp', ranges, assign);
-    }
-  / For range:objectRange {
-      return node('objectComp', [range]);
-    }
-
-objectAssignmentSelect
-  = __ Select __ assign:objectAssignment {
-      return assign;
     }
 
 lambda
@@ -822,7 +796,7 @@ doExpression
   / Do __ cases:caseClauses End {
       return node('case', cases);
     }
-  / reduceExpression
+  / forExpression
 
 whenTail
   = assignments:reduceAssignments stmts:statementsTail {
@@ -846,9 +820,29 @@ caseClause
       return node('do', stmts, expr);
     }
 
+forExpression
+  = embeddedForExpression
+  / reduceExpression
+
+embeddedForExpression
+  = For ranges:ranges select:forExpressionSelect {
+      return node('forExpr', ranges, select);
+    }
+  / For range:range {
+      return node('forExpr', [range]);
+    }
+
+forExpressionSelect
+  = __ Select __ name:expr PROP_SEP value:expr {
+      return node('select', value, name);
+    }
+  / __ Select __ value:expr {
+      return node('select', value);
+    }
+
 reduceExpression
   = op:Reduce __ reduceAssignment:reduceExpressionAssignment __
-    For ranges:ranges __ select:expressionSelect {
+    For ranges:ranges __ select:reduceExpressionSelect {
       return node(op, reduceAssignment, ranges, select);
     }
   / parens
@@ -856,6 +850,11 @@ reduceExpression
 reduceExpressionAssignment
   = directAssignment
   / idAssignment
+
+reduceExpressionSelect
+  = __ Select __ value:expr {
+      return node('select', value);
+    }
 
 parens
   = "(" __ expr:expr __ ")" {
