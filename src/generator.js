@@ -8,12 +8,14 @@
  * and breaks the world.
  */
 
-// TODO: Must be a cleaner way to do this
+// Checking for an already instantiated generator
 function isGenerator(value) {
   if ( value === null || typeof value !== 'object' ) {
     return false;
   }
-  return typeof value.next === 'function';
+  return typeof value.next === 'function' && value.next.length === 1 &&
+         typeof value.return === 'function' && value.return.length === 1 &&
+         typeof value.throw === 'function' && value.throw.length === 1;
 }
 
 function* createRangeGenerator(start, end) {
