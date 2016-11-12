@@ -114,10 +114,12 @@ let sum = (values ->
   select result + value
 )
 
-# List and Object Comprehensions
+# For Expression (Lazily evaluated)
+let filteredColors = for color in colors where color != 'orange'
+
+# List and Object Comprehensions materializing a For Expression
 let result = [
-  for color in colors 
-  where color != 'orange'
+  for color in filteredColors 
   select {color} | 'The color is %color'
 ]
 
