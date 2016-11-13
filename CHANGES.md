@@ -1,5 +1,22 @@
 # Change History
 
+## Version 0.7.6 - `for` Expressions
+Array and Object Comprehensions have been separated from their embedded `for` expressions, allowing the `for` expression to roam free in the language.  These expressions resolve to a lazy generator that can be passed around, further refined with additional loops, or materialized into Arrays and Objects.
+
+```ruby
+import io
+from string import title
+
+let colors = ['red', 'orange', 'yellow', 'green',
+              'blue', 'indigo', 'violet']
+
+# filtered and transformed won't be
+# evaluated until final is materialized
+let filtered = for c in colors where c != 'blue'
+let transformed = for c in filtered select title(c)
+let final = [for c in transformed]
+```
+
 ## Version 0.7.5 - Code Generator Cleaned Up
 The code generator has started to be modularized such that it will be easier to evolve the system.
 
