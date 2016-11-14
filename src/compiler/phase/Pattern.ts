@@ -32,6 +32,7 @@ export default function createTreeProcessors(visit: Visitor) {
   return [
     visit.matching(rollUpPatterns, nestedPattern),
     visit.matching(annotatePattern, visit.tags('pattern')),
+    visit.matching(validateContext, visit.tags('context')),
     visit.breadthMatching(annotateCollection, collections),
     visit.breadthMatching(annotateContext, nestedContext),
     visit.matching(annotateComplexity, visit.isNode),
@@ -81,6 +82,15 @@ export default function createTreeProcessors(visit: Visitor) {
         annotate(element, 'pattern/local', localId);
       }
     });
+    return node;
+  }
+
+  function validateContext(node: Syntax.Context) {
+    if ( !getPatternParent() ) {
+      visit.issueError(node,
+        "Relative references must appear within a Pattern"
+      );
+    }
     return node;
   }
 

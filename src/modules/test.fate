@@ -12,11 +12,13 @@ let ModuleKeys = [
 ]
 
 let AssertModule = ~(
-  (it like Function or it like Object) and
-  length([
+  (it like Function or it like Object)
+  and (
+    reduce size = 0
     for key in ModuleKeys
     where it[key] not like Function
-  ]) = 0
+    select size + 1
+  ) = 0
 )
 
 export def wrap(AssertModule as module): {
@@ -39,15 +41,3 @@ export let {
   equalTo, notEqualTo, deepEqualTo, notDeepEqualTo, strictEqualTo,
   notStrictEqualTo, isFalse, isTrue, isOk, throws, doesNotThrow
 } = wrap(assert)
-
-let Module = ~{}
-
-let namePattern = /^.+(_test|Test)$/
-
-def testModule(Module as module)
-  let tests = [
-    for key in keys(module)
-    where key like namePattern and module[key] like Function
-    select { key, value: module[key] }
-  ]
-end

@@ -469,25 +469,25 @@ conditional
 
 or
   = head:and
-    tail:( _ op:Or __ r:and { return node(op, null, r); } )* {
+    tail:( __ op:Or __ r:and { return node(op, null, r); } )* {
       return buildBinaryChain(head, tail);
     }
 
 and
   = head:equality
-    tail:( _ op:And __ r:equality { return node(op, null, r); } )* {
+    tail:( __ op:And __ r:equality { return node(op, null, r); } )* {
       return buildBinaryChain(head, tail);
     }
 
 equality
   = head:relational
-    tail:( _ op:Equality __ r:relational { return node(op, null, r); } )* {
+    tail:( __ op:Equality __ r:relational { return node(op, null, r); } )* {
       return buildBinaryChain(head, tail);
     }
 
 relational
   = head:additive
-    tail:( _ op:Relational __ r:additive { return node(op, null, r); } )* {
+    tail:( __ op:Relational __ r:additive { return node(op, null, r); } )* {
       return buildBinaryChain(head, tail);
     }
 
@@ -499,7 +499,7 @@ additive
 
 multiplicative
   = head:await
-    tail:( _ op:Multiplicative __ r:await { return node(op, null, r); } )* {
+    tail:( __ op:Multiplicative __ r:await { return node(op, null, r); } )* {
       return buildBinaryChain(head, tail);
     }
 

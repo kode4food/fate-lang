@@ -300,5 +300,13 @@ exports.codepaths = nodeunit.testCase({
     });
 
     test.done();
+  },
+
+  "Relative References": function (test) {
+    test.throws(function () {
+      evaluate(".someValue");
+    });
+
+    test.done();
   }
 });
