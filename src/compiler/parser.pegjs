@@ -514,7 +514,7 @@ awaitModifier
   / _ All { return Syntax.Resolver.All; }
 
 pattern
-  = "~" _ expr:patternExpression {
+  = "~" __ expr:patternExpression {
       return expr.template('pattern', expr);
     }
   / match
@@ -620,6 +620,9 @@ clauseTail
 
 unary
   = op:Unary _ expr:unary {
+      return node(op, expr);
+    }
+  / op:Not __ expr:unary {
       return node(op, expr);
     }
   / listInterpolation
@@ -1074,7 +1077,7 @@ Equality = Like / NEQ / EQ / NotLike
 Relational = GTE / LTE / LT / GT / In / NotIn
 Additive = Add / Sub
 Multiplicative = Mul / Div / Mod
-Unary = Neg / Pos / Not
+Unary = Neg / Pos
 
 Regex "regular expression"
   = "/" pattern:$RegexBody "/" flags:$RegexFlags {
