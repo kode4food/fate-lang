@@ -125,6 +125,9 @@ def unary(test)
   -1                             | equalTo(-1)
   not false                      | isTrue
   not true                       | isFalse
+  not                      false | isTrue
+  not
+  true                           | isFalse
   not (----10 - 10)              | isFalse # 0 is 'true' in Fate
   -data1.people[0].age           | equalTo(-50)
   -data1.people[0].age + 10      | equalTo(-40)
