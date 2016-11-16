@@ -50,10 +50,10 @@ let EmptyArray = Array && ~(it.length = 0)
 export def ArrayOf(Pattern as elementPattern)
   definePattern(value →
     return false unless Array(value)
-    [
-      for item in value
-      where not elementPattern(item)
-    ].length = 0
+    for item in value where not elementPattern(item)
+      return false
+    end
+    return true
   )
 end
 
