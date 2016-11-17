@@ -123,6 +123,8 @@ def unary(test)
   +1                             | equalTo(1)
   +a                             | equalTo(99)
   -1                             | equalTo(-1)
+  - 1                            | equalTo(-1)
+  + a                            | equalTo(99)
   not false                      | isTrue
   not true                       | isFalse
   not                      false | isTrue
@@ -130,7 +132,7 @@ def unary(test)
   true                           | isFalse
   not (----10 - 10)              | isFalse # 0 is 'true' in Fate
   -data1.people[0].age           | equalTo(-50)
-  -data1.people[0].age + 10      | equalTo(-40)
+  - data1.people[0].age + 10     | equalTo(-40)
   not (data1.people[0].age = 25) | isTrue
   test.done()
 end
