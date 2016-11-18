@@ -95,14 +95,15 @@ export function createCoder(): Target.Coder {
     selfName, globalObjectName, exportsName, valueName,
     literal, runtimeImport, builder, registerAnonymous,
     createAnonymous, assignAnonymous, retrieveAnonymous,
-    createCounter, assignResult, self, currentDirectory, args,
-    globalObject, member, write, writeAndGroup, getter, assignment,
-    assignments, exportAll, exports, unaryOperator, binaryOperator,
-    isTrue, isFalse, and, or, not, conditional, statement,
-    ifStatement, loopExpression, loopContinue, funcDeclaration,
-    iife, generator, scope, func, waitFor, compoundExpression,
-    returnStatement, emitStatement, call, array, object, parens,
-    code, toString
+    createCounter, incrementCounter, assignResult, self,
+    currentDirectory, args, globalObject, member, write,
+    writeAndGroup, getter, assignment, assignments,
+    exportAll, exports, unaryOperator, binaryOperator,
+    isTrue, isFalse, and, or, not, conditional,
+    statement, ifStatement, loopExpression, loopContinue,
+    funcDeclaration, iife, generator, scope, func, waitFor,
+    compoundExpression, returnStatement, emitStatement,
+    call, array, object, parens, code, toString
   };
 
   function nextId(prefix: string) {
@@ -277,7 +278,7 @@ export function createCoder(): Target.Coder {
     write(getAnonymousId(name), '=', value);
   }
 
-  function registerAnonymous(id: string) {
+  function registerAnonymous(id: Target.Id) {
     let name = ' ' + id;
     names[name] = [id];
     return name;
@@ -294,12 +295,12 @@ export function createCoder(): Target.Coder {
     return anonIdRegex.test(name);
   }
 
-  function createCounter(): Target.Counter {
-    let id = nextId('c_');
+  function createCounter(id: Target.Id) {
     write('let ', id, '=0;');
-    return {
-      next: () => write(id, '++')
-    };
+  }
+
+  function incrementCounter(id: Target.Id) {
+    write('(', id, '++)');
   }
 
   function assignResult(value: Target.BodyEntry) {

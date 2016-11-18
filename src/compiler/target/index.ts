@@ -40,10 +40,6 @@ export interface FunctionOptions {
   body: BodyEntry;
 }
 
-export interface Counter {
-  next: Function;
-}
-
 export interface Coder {
   selfName: string;
   globalObjectName: string;
@@ -61,7 +57,8 @@ export interface Coder {
   assignAnonymous(name: Name, value: BodyEntry): void;
   registerAnonymous(id: string): void;
   createAnonymous(): Name;
-  createCounter(): Counter;
+  createCounter(id: Id): void;
+  incrementCounter(id: Id): void;
   assignResult(value: BodyEntry): void;
   write(...content: any[]): void;
   writeAndGroup(items: BodyEntries): void;

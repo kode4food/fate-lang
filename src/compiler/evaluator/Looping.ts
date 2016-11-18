@@ -211,12 +211,12 @@ export class ForExpressionEvaluator extends LoopEvaluator {
     this.coder.generator(bodyGenerator);
 
     function counterBody() {
-      let counter = self.coder.createCounter();
+      self.coder.createCounter('idx');
       self.createLoop(self.node.ranges, () => {
         self.coder.emitStatement(() => {
           self.coder.array([
             self.defer(self.node.select.value),
-            () => { counter.next(); }
+            () => { self.coder.incrementCounter('idx'); }
           ]);
         });
       });
@@ -246,6 +246,7 @@ class ListComprehensionEvaluator extends NodeEvaluator {
     ]);
   }
 }
+
 export class ArrayComprehensionEvaluator extends ListComprehensionEvaluator {
   public static tags = ['arrayComp'];
   public materializer = 'materializeArray';
@@ -254,4 +255,30 @@ export class ArrayComprehensionEvaluator extends ListComprehensionEvaluator {
 export class ObjectComprehensionEvaluator extends ListComprehensionEvaluator {
   public static tags = ['objectComp'];
   public materializer = 'materializeObject';
+}
+
+export class GenerateEvaluator extends NodeEvaluator {
+  public static tags = ['generate'];
+  public node: Syntax.GenerateExpression;
+
+  public evaluate() {
+    this.coder.generator(() => {
+      this.coder.createCounter('idx');
+      this.dispatch(this.node.statements);
+    });
+  }
+}
+
+export class EmitEvaluator extends NodeEvaluator {
+  public static tags = ['emit'];
+  public node: Syntax.EmitStatement;
+
+  public evaluate() {
+    this.coder.emitStatement(() => {
+      this.coder.array([
+        this.defer(this.node.value),
+        () => { this.coder.incrementCounter('idx'); }
+      ]);
+    });
+  }
 }
