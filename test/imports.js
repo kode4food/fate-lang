@@ -46,11 +46,11 @@ exports.imports = nodeunit.testCase({
     },
 
     "Helper Import": function (test) {
-      let script1 = "import helpers\n" +
-                    "helpers.testHelper(1,2)";
+      let script1 = `import helpers
+                     helpers.testHelper(1,2)`;
 
-      let script2 = "from helpers import testHelper as test\n" +
-                    "test(5,6)";
+      let script2 = `from helpers import testHelper as test
+                     test(5,6)`;
 
       let exports1 = runtime.resolve('hello');
       let exports2 = runtime.resolve('helpers');
@@ -86,17 +86,20 @@ exports.imports = nodeunit.testCase({
     },
 
     "File Import": function (test) {
-      let script = "import test as t\n" +
-                   "t.renderTest('Curly')";
+      let script = `import test as t
+                    t.renderTest('Curly')`;
 
       test.equal(evaluate(script), "Hello Curly");
       test.done();
     },
 
     "File Submodule Import": function (test) {
-      let script1 = "import module1\nmodule1.test_value";
-      let script2 = "import module2\nmodule2.test_value";
-      let script3 = "import module1.index\nindex.test_value";
+      let script1 = `import module1
+                     module1.test_value`;
+      let script2 = `import module2
+                     module2.test_value`;
+      let script3 = `import module1.index
+                     index.test_value`;
 
       test.equal(evaluate(script1), "right!");
       test.equal(evaluate(script1), "right!"); // still works!
@@ -144,10 +147,10 @@ exports.imports = nodeunit.testCase({
     },
 
     "Bound System Import": function (test) {
-      let script = "from array import join\n" +
-                   "let a = ['this', 'is', 'an', 'array']\n" +
-                   "let j = join(_, '///')\n" +
-                   "a | j";
+      let script = `from array import join
+                    let a = ['this', 'is', 'an', 'array']
+                    let j = join(_, '///')
+                    a | j`;
 
       test.equal(evaluate(script), "this///is///an///array");
       test.done();

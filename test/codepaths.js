@@ -226,11 +226,17 @@ exports.codepaths = nodeunit.testCase({
 
   "Duplicated Arg Names": function (test) {
     test.throws(function () {
-      evaluate("def someFunction(arg1, arg2, arg1, arg3, arg2)\nend");
+      evaluate(`
+        def someFunction(arg1, arg2, arg1, arg3, arg2)
+        end
+      `);
     }, "Duplicated arg names in a Function should explode");
 
     test.throws(function () {
-      evaluate("when a(arg1, arg2) & b(arg3, arg2)\nend");
+      evaluate(`
+        when a(arg1, arg2) & b(arg3, arg2)
+        end
+      `);
     }, "Arg names duplicated across channels should explode");
 
     test.done();
@@ -251,8 +257,17 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "Truthy": function (test) {
-    test.equal(evaluate("if [1,2,3]\ntrue\nend"), true);
-    test.equal(evaluate("if []\ntrue\nend"), true);
+    test.equal(evaluate(`
+      if [1,2,3]
+        true
+      end
+    `), true);
+
+    test.equal(evaluate(`
+      if []
+        true
+      end
+    `), true);
     test.done();
   },
 
@@ -314,11 +329,19 @@ exports.codepaths = nodeunit.testCase({
 
   "Parameter Ordering": function (test) {
     test.throws(function () {
-      evaluate("def test(a*, b)\nb\nend");
+      evaluate(`
+        def test(a*, b)
+          b
+        end
+      `);
     }, "Parameters are out of order");
 
     test.throws(function () {
-      evaluate("def test(b*, c*, d*)\nb\nend");
+      evaluate(`
+        def test(b*, c*, d*)
+          b
+        end
+      `);
     }, "Parameters are out of order");
 
     test.done();
@@ -326,7 +349,10 @@ exports.codepaths = nodeunit.testCase({
 
   "Missing Identifiers": function (test) {
     test.throws(function () {
-      evaluate("let a = 'hello'\nexport a as b, c, d as yeah");
+      evaluate(`
+        let a = 'hello'
+        export a as b, c, d as yeah
+      `);
     });
 
     test.throws(function () {
@@ -342,7 +368,12 @@ exports.codepaths = nodeunit.testCase({
     });
 
     test.throws(function () {
-      evaluate("def hi(x)\n'hello'\nend\nx");
+      evaluate(`
+        def hi(x)
+          'hello'
+        end
+        x
+      `);
     });
 
     test.done();
@@ -350,7 +381,11 @@ exports.codepaths = nodeunit.testCase({
 
   "For not Exportable": function (test) {
     test.throws(function () {
-      evaluate("export for i in [1,2,3]\ni * 2\nend");
+      evaluate(`
+        export for i in [1,2,3]
+          i * 2
+        end
+      `);
     });
 
     test.done();

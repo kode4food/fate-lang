@@ -22,13 +22,18 @@ exports.strings = nodeunit.testCase({
   },
 
   "Functions": function (test) {
-    let script1 = "from string import lower\nlower('CAP STRING')";
-    let script2 = "from string import split\nsplit('1\\n2\\n3')[2]";
-    let script3 = "from string import split\nsplit('1-2-3', '-')[1]";
-    let script4 = "from string import upper\nupper('lc string')";
-    let script5 = "from string import build\n" +
-                  "let b=build('%name is %age')\n" +
-                  "{ name: 'Thom', age: 43 } | b";
+    let script1 = `from string import lower
+                   lower('CAP STRING')`;
+    let script2 = `from string import split
+                   split('1\\n2\\n3')[2]`;
+    let script3 = `from string import split
+                   split('1-2-3', '-')[1]`;
+    let script4 = `from string import upper
+                   upper('lc string')`;
+
+    let script5 = `from string import build
+                   let b=build('%name is %age')
+                   { name: 'Thom', age: 43 } | b`;
 
     test.equal(evaluate(script1), "cap string");
     test.equal(evaluate(script2), "3");

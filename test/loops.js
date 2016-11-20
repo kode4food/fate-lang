@@ -22,40 +22,40 @@ exports.loops = nodeunit.testCase({
   },
 
   "Basic Loops": function (test) {
-    let script1 = 'for color in ["red", "green", "blue"]\n' +
-                  'where color != "red": global.emit(color + " is a color")';
+    let script1 = `for color in ["red", "green", "blue"]
+                   where color != "red": global.emit(color + " is a color")`;
 
-    let script2 = 'for color in []\n' +
-                  '  global.emit(color + " is a color")\n' +
-                  'else\n' +
-                  '  global.emit("No Colors")\n' +
-                  'end';
+    let script2 = `for color in []
+                     global.emit(color + " is a color")
+                   else
+                     global.emit("No Colors")
+                   end`;
 
-    let script3 = 'for color in 97\n' +
-                  '  global.emit(color + " is a color")\n' +
-                  'end';
+    let script3 = `for color in 97
+                     global.emit(color + " is a color")
+                   end`;
 
-    let script4 = 'for name:value in {name:"Thom", age:42}\n' +
-                  '  global.emit({ name, value } | "%name=%value")\n' +
-                  'end';
+    let script4 = `for name:value in {name:"Thom", age:42}
+                     global.emit({ name, value } | "%name=%value")
+                   end`;
 
-    let script5 = 'for person in global.people, brother in person.brothers\n' +
-                  '  let name = person.name\n' +
-                  '  global.emit({ name, brother } | "%name-%brother")\n' +
-                  'end';
+    let script5 = `for person in global.people, brother in person.brothers
+                     let name = person.name
+                     global.emit({ name, brother } | "%name-%brother")
+                   end`;
 
-    let script6 = 'for person in global.people\n' +
-                  '  for brother in person.brothers\n' +
-                  '    global.emit(person.name + "-" + brother)\n' +
-                  '  else: global.emit("-")\n' +
-                  'end';
+    let script6 = `for person in global.people
+                     for brother in person.brothers
+                       global.emit(person.name + "-" + brother)
+                     else: global.emit("-")
+                   end`;
 
-    let script7 = 'for person in global.people\n' +
-                  '  for brother in person.brothers\n' +
-                  '    let name = person.name\n' +
-                  '    global.emit({ name, brother } | "%name-%brother")\n' +
-                  '  end\n' +
-                  'end';
+    let script7 = `for person in global.people
+                     for brother in person.brothers
+                       let name = person.name
+                       global.emit({ name, brother } | "%name-%brother")
+                     end
+                   end`;
 
     test.deepEqual(evaluateEmit(script1), ["green is a color", "blue is a color"]);
     test.deepEqual(evaluateEmit(script2), ["No Colors"]);
@@ -71,12 +71,12 @@ exports.loops = nodeunit.testCase({
   },
 
   "Shadowing Loops": function (test) {
-    let script5 = 'let name = "Bobby"\n' +
-                  'for person in global.people, brother in person.brothers\n' +
-                  '  let name = person.name\n' +
-                  '  global.emit({ name, brother } | "%name-%brother")\n' +
-                  'end\n' +
-                  'global.emit(name)';
+    let script5 = `let name = "Bobby"
+                   for person in global.people, brother in person.brothers
+                     let name = person.name
+                     global.emit({ name, brother } | "%name-%brother")
+                   end
+                   global.emit(name)`;
 
     test.deepEqual(evaluateEmit(script5, this.data),
                    ["Curly-Moe", "Curly-Shemp", "Moe-Curly", "Moe-Shemp", "Bobby"]);
@@ -85,13 +85,30 @@ exports.loops = nodeunit.testCase({
   },
 
   "Generator Loops": function (test) {
-    let script1 = "from math import range\nfor i in range(1, 10)\nglobal.emit(i)\nend";
-    let script2 = "from math import range\nfor i in range(10, 2)\nglobal.emit(i)\nend";
-    let script3 = "from math import range\nfor i in range(5, -5)\nglobal.emit(i)\nend";
-    let script4 = "from math import range\nfor i in range(0, 0)\nglobal.emit(i)\nend";
-    let script5 = "from math import range\nfor i in range(0.5, 10.1)\nglobal.emit(i)\nend";
-    let script6 = "from math import range\n[for i in range(1,10) select i * 2]";
-    let script7 = "from math import range\n[for i in range(1,10) where i < 5]";
+    let script1 = `from math import range
+                   for i in range(1, 10)
+                     global.emit(i)
+                   end`;
+    let script2 = `from math import range
+                   for i in range(10, 2)
+                     global.emit(i)
+                   end`;
+    let script3 = `from math import range
+                   for i in range(5, -5)
+                     global.emit(i)
+                   end`;
+    let script4 = `from math import range
+                   for i in range(0, 0)
+                     global.emit(i)
+                   end`;
+    let script5 = `from math import range
+                   for i in range(0.5, 10.1)
+                     global.emit(i)
+                   end`;
+    let script6 = `from math import range
+                   [for i in range(1,10) select i * 2]`;
+    let script7 = `from math import range
+                   [for i in range(1,10) where i < 5]`;
 
     test.deepEqual(evaluateEmit(script1), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     test.deepEqual(evaluateEmit(script2), [10, 9, 8, 7, 6, 5, 4, 3, 2]);
@@ -110,8 +127,8 @@ exports.loops = nodeunit.testCase({
       yield ["blue", 2];
     }
 
-    let script1 = '[for idx:brother in global.people[2].brothers ' +
-                  'select brother + ":" + idx]';
+    let script1 = `[for idx:brother in global.people[2].brothers
+                   select brother + ":" + idx]`;
 
     let script2 = '[for idx:color in global.colors() select color + ":" + idx]';
 
