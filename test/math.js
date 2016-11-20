@@ -50,69 +50,135 @@ exports.math = nodeunit.testCase({
   },
 
   "Functions": function (test) {
-    test.equal(evaluate("import math\nmath.avg([1,2,3])"), 2);
+    test.equal(evaluate(`
+      import math
+      math.avg([1,2,3])
+    `), 2);
 
     test.throws(function () {
-      evaluate("import math\nmath.avg([])")
+      evaluate(`
+        import math
+        math.avg([])
+      `);
     });
 
     test.throws(function () {
-      evaluate("import math\nmath.avg(['non_num'])");
+      evaluate(`
+        import math
+        math.avg(['non_num'])
+      `);
     });
 
     test.throws(function () {
-      evaluate("import math\nmath.avg('non_num')");
+      evaluate(`
+        import math
+        math.avg('non_num')
+      `);
     });
 
     test.throws(function () {
-      evaluate("import math\nmath.avg(1)");
+      evaluate(`
+        import math
+        math.avg(1)
+      `);
     });
 
-    test.equal(evaluate("import math\nmath.sum([1,2,3])"), 6);
+    test.equal(evaluate(`
+      import math
+      math.sum([1,2,3])
+    `), 6);
 
     test.throws(function () {
-      evaluate("import math\nmath.sum(5)");
-    });
-
-    test.throws(function () {
-      evaluate("import math\nmath.sum('non_num')");
-    });
-
-    test.equal(evaluate("import math\nmath.max([1,9,7])"), 9);
-
-    test.throws(function () {
-      evaluate("import math\nmath.max(7)");
-    });
-
-    test.throws(function () {
-      evaluate("import math\nmath.max('non_num')");
-    });
-
-    test.equal(evaluate("import math\nmath.median([1,9,7,50])"), 8);
-    test.equal(evaluate("import math\nmath.median([1,9,7,50,6])"), 7);
-    test.equal(evaluate("import math\nmath.median([9,1])"), 5);
-    test.equal(evaluate("import math\nmath.median([9])"), 9);
-
-    test.throws(function () {
-      evaluate("import math\nmath.median(7)");
+      evaluate(`
+        import math
+        math.sum(5)`
+        );
     });
 
     test.throws(function () {
-      evaluate("import math\nmath.median([])");
+      evaluate(`
+        import math
+        math.sum('non_num')`
+        );
+    });
+
+    test.equal(evaluate(`
+      import math
+      math.max([1,9,7])`
+      ), 9);
+
+    test.throws(function () {
+      evaluate(`
+        import math
+        math.max(7)`
+        );
     });
 
     test.throws(function () {
-      evaluate("import math\nmath.median('non_num')");
+      evaluate(`
+        import math
+        math.max('non_num')`
+        );
     });
 
-    test.equal(evaluate("import math\nmath.min([1,9,7])"), 1);
+    test.equal(evaluate(`
+      import math
+      math.median([1,9,7,50])
+    `), 8);
+
+    test.equal(evaluate(`
+      import math
+      math.median([1,9,7,50,6])
+    `), 7);
+
+    test.equal(evaluate(`
+      import math
+      math.median([9,1])
+    `), 5);
+
+    test.equal(evaluate(`
+      import math
+      math.median([9])
+    `), 9);
 
     test.throws(function () {
-      evaluate("import math\nmath.min(5)");
+      evaluate(`
+        import math
+        math.median(7)
+      `);
     });
 
     test.throws(function () {
-      evaluate("import math\nmath.min('non_num')");
+      evaluate(`
+        import math
+        math.median([])
+      `);
+    });
+
+    test.throws(function () {
+      evaluate(`
+        import math
+        math.median('non_num')
+      `);
+    });
+
+    test.equal(evaluate(`
+      import math
+      math.min([1,9,7])
+    `), 1);
+
+    test.throws(function () {
+      evaluate(`
+        import math
+        math.min(5)
+      `);
+    });
+
+    test.throws(function () {
+      evaluate(`
+        import math
+        math.min('non_num')
+      `);
     });
 
     test.done();

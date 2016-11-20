@@ -42,11 +42,17 @@ exports.strings = nodeunit.testCase({
     test.equal(evaluate(script5), "Thom is 43");
 
     test.throws(function () {
-      evaluate("import string\nstring.upper(99)");
+      evaluate(`
+        import string
+        string.upper(99)
+      `);
     });
 
     test.throws(function () {
-      evaluate("import string\nstring.split({obj:'boom'})");
+      evaluate(`
+        import string
+        string.split({obj:'boom'})
+      `);
     });
 
     test.done();

@@ -94,9 +94,6 @@ exports.basics = nodeunit.testCase({
   "Boolean Or/And Evaluation": function (test) {
     test.equal(evaluate("true and false"), false);
     test.equal(evaluate("true or false"), true);
-    test.equal(evaluate("let zero = 0\nzero and 1"), true);
-    test.equal(evaluate("let zero = 0\nzero and true"), true);
-    test.equal(evaluate("let zero = 0\nzero and false"), false);
     test.equal(evaluate("global.people[0].age * 2 = 100 and 'yep'", this.data), "yep");
     test.equal(evaluate("global.people[0].age * 2 = 99 or 'nope'", this.data), "nope");
     test.equal(evaluate("'yep' and global.people[0].age * 2", this.data), 100);
@@ -106,6 +103,22 @@ exports.basics = nodeunit.testCase({
     test.equal(evaluate("not(true or false)"), false);
     test.equal(evaluate("not true or not false"), true);
     test.equal(evaluate("not(true and false)"), true);
+
+    test.equal(evaluate(`
+      let zero = 0
+      zero and 1
+    `), true);
+
+    test.equal(evaluate(`
+      let zero = 0
+      zero and true
+    `), true);
+
+    test.equal(evaluate(`
+      let zero = 0
+      zero and false
+    `), false);
+
     test.done();
   },
 
@@ -190,9 +203,21 @@ exports.basics = nodeunit.testCase({
   },
 
   "Assignments": function (test) {
-    test.equal(evaluate("let a = 99\na"), 99);
-    test.equal(evaluate("let a = 99, b = 1000\na + b"), 1099);
-    test.equal(evaluate("let a = 100, b = a + 20, c = b * 2\nc"), 240);
+    test.equal(evaluate(`
+      let a = 99
+      a
+    `), 99);
+
+    test.equal(evaluate(`
+      let a = 99, b = 1000
+      a + b
+    `), 1099);
+
+    test.equal(evaluate(`
+      let a = 100, b = a + 20, c = b * 2
+      c
+    `), 240);
+
     test.done();
   },
 

@@ -120,7 +120,10 @@ exports.imports = nodeunit.testCase({
     },
 
     "System Import": function (test) {
-      test.equal(evaluate("import math\nmath.round(9.5)"), 10);
+      test.equal(evaluate(`
+        import math
+        math.round(9.5)
+      `), 10);
 
       let array = runtime.resolve('array');
 
@@ -157,8 +160,16 @@ exports.imports = nodeunit.testCase({
     },
 
     "Math Constant Import": function (test) {
-      test.equal(evaluate("import math\nmath.E"), Math.E);
-      test.equal(evaluate("import math\nmath.PI"), Math.PI);
+      test.equal(evaluate(`
+        import math
+        math.E
+      `), Math.E);
+
+      test.equal(evaluate(`
+        import math
+        math.PI
+      `), Math.PI);
+
       test.done();
     },
 
