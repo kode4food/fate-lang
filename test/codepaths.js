@@ -129,10 +129,25 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "'if' with literals": function (test) {
-    let script1 = "if true\n'was true'\nelse\n'was false'\nend";
-    let script2 = "if false\n'was true'\nelse\n'was false'\nend";
-    let script3 = "if true\n'was true'\nend";
-    let script4 = "if false\n'was true'\nend";
+    let script1 = `if true
+                     'was true'
+                   else
+                     'was false'
+                   end`;
+
+    let script2 = `if false
+                     'was true'
+                   else
+                     'was false'
+                   end`;
+
+    let script3 = `if true
+                     'was true'
+                   end`;
+
+    let script4 = `if false
+                     'was true'
+                   end`;
 
     test.equal(evaluate(script1), 'was true');
     test.equal(evaluate(script2), 'was false');
@@ -150,15 +165,54 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "'await' expressions": function (test) {
-    test.ok(evaluate("let x = 0\ndo\nawait x\nend"));
+    test.ok(evaluate(`
+      let x = 0
+      do
+        await x
+      end
+    `));
 
     test.throws(function () {
-      evaluate("let x = 0\nawait x");
+      evaluate(`
+        let x = 0
+        await x
+      `);
     }, "await called outside of a 'do' block should explode");
 
     test.throws(function () {
-      evaluate("import io\ndo\n-> await io.timeout(100)\nend");
+      evaluate(`
+        import io
+        do
+          -> await io.timeout(100)
+        end
+      `);
     }, "await called nested in func should explode");
+
+    test.done();
+  },
+
+  "'emit' statements": function (test) {
+    test.throws(function () {
+      evaluate("emit 'blah'");
+    }, "emit called outside of 'generate' block should explode");
+
+    test.throws(function () {
+      evaluate(`
+        generate
+          def blah
+            emit 'nah'
+          end
+        end
+      `);
+    }, "emit nested in a function should explode");
+
+    test.throws(function () {
+      evaluate(`
+        generate
+          let l = for x in [1,2] select emit x
+        end
+      `);
+    }, "emit nested in a 'for' loop should explode");
 
     test.done();
   },
@@ -203,26 +257,26 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "Rewrite": function (test) {
-    let script1 = "let a = 'hello'\n" +
-                  "let b = 'goodbye'\n" +
-                  "a + b";
+    let script1 = `let a = 'hello'
+                   let b = 'goodbye'
+                   a + b`;
 
-    let script2 = "let a = 5\n" +
-                  "if not (a like 10)\n" +
-                  "  'hello!'\n" +
-                  "end";
+    let script2 = `let a = 5
+                   if not (a like 10)
+                     'hello!'
+                   end`;
 
-    let script3 = "if not (global.a like 10) and not (global.b like 8)\n" +
-                  "  'yes'\n" +
-                  "else\n" +
-                  "  'no'\n" +
-                  "end";
+    let script3 = `if not (global.a like 10) and not (global.b like 8)
+                     'yes'
+                   else
+                     'no'
+                   end`;
 
-    let script4 = "if not (global.a like 10) or not (global.b like 8)\n" +
-                  "  'yes'\n" +
-                  "else\n" +
-                  "  'no'\n" +
-                  "end";
+    let script4 = `if not (global.a like 10) or not (global.b like 8)
+                     'yes'
+                   else
+                     'no'
+                   end`;
 
     test.equal(evaluate(script1), "hellogoodbye");
     test.equal(evaluate(script2), "hello!");

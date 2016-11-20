@@ -4,7 +4,10 @@ import * as Syntax from '../syntax';
 import { Visitor, annotate, getAnnotation, hasAnnotation } from '../syntax';
 
 const isArray = Array.isArray;
-const scopeContainers = ['function', 'lambda', 'reduce', 'for', 'do'];
+
+const scopeContainers = [
+  'function', 'lambda', 'reduce', 'for', 'do', 'generate'
+];
 
 export default function createTreeProcessors(visit: Visitor) {
   let processNode = visit.breadthByTag({
@@ -84,13 +87,13 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function visitAssignment(node: Syntax.Assignment) {
-    visit.recurseInto(node, processNode); // Children first
+    visit.recurseInto(node, processNode);
     node.getIdentifiers().forEach(declareId);
     return node;
   }
 
   function visitExportableStatement(node: Syntax.ExportableStatement) {
-    visit.recurseInto(node, processNode); // Children first
+    visit.recurseInto(node, processNode);
     node.getModuleItems().forEach(moduleItem => {
       declareId(moduleItem.id);
     });
