@@ -5,7 +5,7 @@ from test import wrap
 def imports_explicit(test)
   let { equalTo } = wrap(test)
 
-  import './exports/export_explicit.fate' as source
+  import '../exports/export_explicit.fate' as source
 
   source.val_a       | equalTo(1)
   source.val_b       | equalTo(2)
@@ -26,7 +26,7 @@ end
 def imports_all(test)
   let { equalTo } = wrap(test)
 
-  import './exports/export_all.fate' as source
+  import '../exports/export_all.fate' as source
 
   source.val_a       | equalTo(1)
   source.val_b       | equalTo(2)
