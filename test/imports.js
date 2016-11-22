@@ -68,7 +68,7 @@ exports.imports = nodeunit.testCase({
 
   "file system importer": nodeunit.testCase({
     setUp: function (callback) {
-      runtime.resolvers().push(createFileResolver({ path: "./test" }));
+      runtime.resolvers().push(createFileResolver({ path: "./test/assets" }));
       callback();
     },
 

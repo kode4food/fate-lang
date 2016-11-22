@@ -24,7 +24,7 @@ end
 def parent(test)
   let { equalTo } = wrap(test)
 
-  import '../module1' as module1
+  import '../assets/module1' as module1
 
   module1.test_value | equalTo('right!')
   test.done()
@@ -33,7 +33,7 @@ end
 def parentFrom(test)
   let { equalTo } = wrap(test)
 
-  from '../module1' import test_value as testv
+  from '../assets/module1' import test_value as testv
 
   testv | equalTo('right!')
   test.done()
