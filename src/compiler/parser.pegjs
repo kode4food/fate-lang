@@ -81,6 +81,7 @@ trailableStatement
   = importStatement
   / letStatement
   / returnStatement
+  / emitStatement
   / exprStatement
 
 exprStatement
@@ -395,6 +396,11 @@ idList
 
 returnStatement
   = op:Return _ expr:expr {
+      return node(op, expr);
+    }
+
+emitStatement
+  = op:Emit _ expr:expr {
       return node(op, expr);
     }
 
@@ -790,14 +796,20 @@ lambdaStatements
     }
 
 doExpression
-  = Do stmts:statementsTail {
-      return node('do', stmts);
+  = op:Do stmts:statementsTail {
+      return node(op, stmts);
     }
   / Do __ When __ when:whenTail {
       return when;
     }
   / Do __ cases:caseClauses End {
       return node('case', cases);
+    }
+  / generateExpression
+
+generateExpression
+  = op:Generate stmts:statementsTail {
+      return node(op, stmts);
     }
   / forExpression
 
@@ -906,40 +918,42 @@ wildcard = Wildcard
 
 /* Lexer *********************************************************************/
 
-Await   = "await"    !NameContinue { return 'await'; }
-Reduce  = "reduce"   !NameContinue { return 'reduce'; }
-Do      = "do"       !NameContinue { return 'do'; }
-Case    = "case"     !NameContinue { return 'case'; }
-Match   = "match"    !NameContinue { return 'match'; }
-For     = "for"      !NameContinue { return 'for'; }
-Def     = "def"      !NameContinue { return 'function'; }
-From    = "from"     !NameContinue { return 'from'; }
-Import  = "import"   !NameContinue { return 'import'; }
-Export  = "export"   !NameContinue { return 'export'; }
-Let     = "let"      !NameContinue { return 'let'; }
-And     = "and"      !NameContinue { return 'and'; }
-Or      = "or"       !NameContinue { return 'or'; }
-Like    = "like"     !NameContinue { return 'like'; }
-Mod     = "mod"      !NameContinue { return 'mod'; }
-Not     = "not"      !NameContinue { return 'not'; }
-In      = "in"       !NameContinue { return 'in'; }
-Return  = "return"   !NameContinue { return 'return'; }
-Context = "it"       !NameContinue { return node('context'); }
-Self    = "self"     !NameContinue { return node('self'); }
-Global  = "global"   !NameContinue { return node('global'); }
-True    = "true"     !NameContinue { return node('literal', true); }
-False   = "false"    !NameContinue { return node('literal', false); }
-If      = "if"       !NameContinue { return true; }
-Unless  = "unless"   !NameContinue { return false; }
-Any     = "any"      !NameContinue { return 'any'; }
-All     = "all"      !NameContinue { return 'all'; }
-As      = "as"       !NameContinue
-By      = "by"       !NameContinue
-Else    = "else"     !NameContinue
-End     = "end"      !NameContinue
-Where   = "where"    !NameContinue
-Select  = "select"   !NameContinue
-When    = "when"     !NameContinue
+Await    = "await"    !NameContinue { return 'await'; }
+Reduce   = "reduce"   !NameContinue { return 'reduce'; }
+Do       = "do"       !NameContinue { return 'do'; }
+Case     = "case"     !NameContinue { return 'case'; }
+Match    = "match"    !NameContinue { return 'match'; }
+For      = "for"      !NameContinue { return 'for'; }
+Def      = "def"      !NameContinue { return 'function'; }
+From     = "from"     !NameContinue { return 'from'; }
+Import   = "import"   !NameContinue { return 'import'; }
+Export   = "export"   !NameContinue { return 'export'; }
+Let      = "let"      !NameContinue { return 'let'; }
+And      = "and"      !NameContinue { return 'and'; }
+Or       = "or"       !NameContinue { return 'or'; }
+Like     = "like"     !NameContinue { return 'like'; }
+Mod      = "mod"      !NameContinue { return 'mod'; }
+Not      = "not"      !NameContinue { return 'not'; }
+In       = "in"       !NameContinue { return 'in'; }
+Return   = "return"   !NameContinue { return 'return'; }
+Emit     = "emit"     !NameContinue { return 'emit'; }
+Generate = "generate" !NameContinue { return 'generate'; }
+Context  = "it"       !NameContinue { return node('context'); }
+Self     = "self"     !NameContinue { return node('self'); }
+Global   = "global"   !NameContinue { return node('global'); }
+True     = "true"     !NameContinue { return node('literal', true); }
+False    = "false"    !NameContinue { return node('literal', false); }
+If       = "if"       !NameContinue { return true; }
+Unless   = "unless"   !NameContinue { return false; }
+Any      = "any"      !NameContinue { return 'any'; }
+All      = "all"      !NameContinue { return 'all'; }
+As       = "as"       !NameContinue
+By       = "by"       !NameContinue
+Else     = "else"     !NameContinue
+End      = "end"      !NameContinue
+Where    = "where"    !NameContinue
+Select   = "select"   !NameContinue
+When     = "when"     !NameContinue
 
 Arrow      = "->" / "→"
 
@@ -959,7 +973,7 @@ ReservedWord "reserved word"
   = ( For / Def / Do / From / Import / Export / Let / And / Or / Like / Mod /
       Not / If / Unless / True / False / As / In / Return / Else / End /
       Where / Select / Reduce / Await / Any / All / When / Case / Match /
-      Context / Self / Global / Wildcard / Compose )
+      Context / Self / Global / Wildcard / Compose / Emit / Generate )
 
 Identifier "identifier"
   = !ReservedWord name:Name {

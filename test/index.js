@@ -3,6 +3,6 @@
 const mixin = require('../dist/runtime').mixin;
 
 mixin(exports,
-  require('./slow'),
-  require('./fast')
+  require('./evaluated'),
+  require('./pure')
 );

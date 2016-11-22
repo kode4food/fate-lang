@@ -191,6 +191,10 @@ export class MatchClause extends Node {
               public statements: Statements) { super(); }
 }
 
+export class GenerateExpression extends Expression {
+  constructor(public statements: Statements) { super(); }
+}
+
 // Array/Object Construction and Comprehension ******************************
 
 export class ElementsConstructor extends Operator {
@@ -246,6 +250,10 @@ export class IfLetStatement extends Statement {
 
 export class ReturnStatement extends Statement {
   constructor(public result: Expression) { super(); }
+}
+
+export class EmitStatement extends Statement {
+  constructor(public value: Expression) { super(); }
 }
 
 export abstract class ExportableStatement extends Statement {

@@ -4,7 +4,7 @@ from pattern import Nothing, Something
 from test import wrap
 from value import null, undefined
 
-import '../dist/runtime' as runtime
+import '../../dist/runtime' as runtime
 
 def trueFalse(test)
   let { isFalse, isTrue } = wrap(test)

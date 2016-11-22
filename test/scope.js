@@ -14,23 +14,23 @@ exports.scope = nodeunit.testCase({
   },
 
   "Shadow Local Scope": function (test) {
-    let script1 = "let greeting = 'Not Hello'\n" +
-                  "def localGreeting()\n" +
-                  "  let greeting = 'Local Hello'\n" +
-                  "  return greeting\n" +
-                  "end\n" +
-                  "localGreeting() + ' ' + greeting";
+    let script1 = `let greeting = 'Not Hello'
+                   def localGreeting()
+                     let greeting = 'Local Hello'
+                     return greeting
+                   end
+                   localGreeting() + ' ' + greeting`;
 
-    let script2 = "let greeting = 'Not Hello'\n" +
-                  "def localGreeting()\n" +
-                  "  let greeting = 'Local Hello'\n" +
-                  "  def evenMoreLocalGreeting()\n" +
-                  "    let greeting = 'More Local Hello'\n" +
-                  "    return greeting\n" +
-                  "  end\n" +
-                  "  return evenMoreLocalGreeting() + ' ' + greeting\n" +
-                  "end\n" +
-                  "localGreeting() + ' ' + greeting";
+    let script2 = `let greeting = 'Not Hello'
+                   def localGreeting()
+                     let greeting = 'Local Hello'
+                     def evenMoreLocalGreeting()
+                       let greeting = 'More Local Hello'
+                       return greeting
+                     end
+                     return evenMoreLocalGreeting() + ' ' + greeting
+                   end
+                   localGreeting() + ' ' + greeting`;
 
     test.equal(evaluate(script1, this.globals), "Local Hello Not Hello");
     test.equal(evaluate(script2, this.globals),
@@ -45,36 +45,36 @@ exports.scope = nodeunit.testCase({
   },
 
   "Inherit Local Scope": function (test) {
-    let script1 = "let greeting = 'Outer Hello'\n" +
-                  "def localGreeting()\n" +
-                  "  global.emit(greeting)\n" +
-                  "  let greeting = 'Inner Hello'\n" +
-                  "  global.emit(greeting)\n" +
-                  "end\n" +
-                  "localGreeting()\n" +
-                  "global.emit(greeting)";
+    let script1 = `let greeting = 'Outer Hello'
+                   def localGreeting()
+                     global.emit(greeting)
+                     let greeting = 'Inner Hello'
+                     global.emit(greeting)
+                   end
+                   localGreeting()
+                   global.emit(greeting)`;
 
     test.deepEqual(evaluateEmit(script1), ["Outer Hello", "Inner Hello", "Outer Hello"]);
     test.done();
   },
 
   "Scope Override": function (test) {
-    let script = "let b = global.a\n" +
-                 "let a = 'child'\n" +
-                 "b + ' ' + a";
+    let script = `let b = global.a
+                  let a = 'child'
+                  b + ' ' + a`;
 
     test.equal(evaluate(script, { a: 'parent' }), "parent child");
     test.done();
   },
 
   "Conditional Scope": function (test) {
-    let script = "let a=global.a, b=global.b\n" +
-                 "let c = a\n" +
-                 "if b\n" +
-                 "  let a = 'child'\n" +
-                 "  let d = a\n" +
-                 "end\n" +
-                 "c + ' ' + d + ' ' + b + ' ' + a";
+    let script = `let a=global.a, b=global.b
+                  let c = a
+                  if b
+                    let a = 'child'
+                    let d = a
+                  end
+                  c + ' ' + d + ' ' + b + ' ' + a`;
 
     test.equal(evaluate(script, { a: 'parent', b: true }),
                "parent child true child");

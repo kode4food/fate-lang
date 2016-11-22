@@ -7,7 +7,8 @@ type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
 type AssignmentMap = { [index: string]: Syntax.Assignment };
 type NameSet = { [index: string]: boolean };
 
-const awaitBarriers = ['function', 'lambda', 'pattern'];
+const awaitBarriers = ['function', 'lambda', 'pattern', 'forExpr'];
+const emitBarriers = awaitBarriers;
 const whenAssigns = ['assignment', 'arrayDestructure', 'objectDestructure'];
 
 export default function createTreeProcessors(visit: Visitor) {
@@ -17,7 +18,8 @@ export default function createTreeProcessors(visit: Visitor) {
   return [
     visit.byTag({
       'parens': rollUpParens,
-      'await': validateAwaits,
+      'await': createBarrierValidator('do', awaitBarriers),
+      'emit': createBarrierValidator('generate', emitBarriers),
       'self': validateSelfReferences,
       'function': validateFunctionArgs,
       'lambda': validateFunctionArgs
@@ -34,29 +36,31 @@ export default function createTreeProcessors(visit: Visitor) {
     return node.left;
   }
 
-  // an 'await' can only exist inside of a 'do' expression
-  function validateAwaits(node: Syntax.AwaitOperator) {
-    let doAncestors = visit.hasAncestorTags('do');
-    let fnAncestors = visit.hasAncestorTags(awaitBarriers);
+  function createBarrierValidator(container: Syntax.Tag,
+                                  barriers: Syntax.Tags) {
+    return (node: Syntax.Node) => {
+      let containerAncestors = visit.hasAncestorTags(container);
+      let barrierAncestors = visit.hasAncestorTags(barriers);
 
-    if ( !doAncestors ) {
-      visit.issueError(node,
-        "awaited expression must appear in a 'do' block"
-      );
-    }
+      if ( !containerAncestors ) {
+        visit.issueError(node,
+          `${node.tag} must appear in a '${container}' block`
+        );
+      }
 
-    if ( !fnAncestors ) {
+      if ( !barrierAncestors ) {
+        return node;
+      }
+
+      let doIndex = visit.nodeStack.indexOf(containerAncestors[0]);
+      let fnIndex = visit.nodeStack.indexOf(barrierAncestors[0]);
+      if ( fnIndex > doIndex ) {
+        visit.issueError(node,
+          `${node.tag} must not appear in a nested block`
+        );
+      }
       return node;
-    }
-
-    let doIndex = visit.nodeStack.indexOf(doAncestors[0]);
-    let fnIndex = visit.nodeStack.indexOf(fnAncestors[0]);
-    if ( fnIndex > doIndex ) {
-      visit.issueError(node,
-        "awaited expression must not appear in a nested function"
-      );
-    }
-    return node;
+    };
   }
 
   function validateSelfReferences(node: Syntax.Self) {

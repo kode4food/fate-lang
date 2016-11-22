@@ -6,31 +6,31 @@ const evaluate = fate.evaluate;
 
 exports.like = nodeunit.testCase({
   "Guard Patterns": function (test) {
-    let script1 = "let p = ~{ name: it != 'Thom', age: it != 43 }\n" +
-                  "def func(person)\n" +
-                  "  'normal person: ' + person.name\n" +
-                  "end\n" +
-                  "def func(p as person)\n" +
-                  "  'non-Thom person: ' + person.name\n" +
-                  "end\n" +
-                  "func({ name: 'Bill', age: 42 })";
+    let script1 = `let p = ~{ name: it != 'Thom', age: it != 43 }
+                   def func(person)
+                     'normal person: ' + person.name
+                   end
+                   def func(p as person)
+                     'non-Thom person: ' + person.name
+                   end
+                   func({ name: 'Bill', age: 42 })`;
 
     test.equal(evaluate(script1), "non-Thom person: Bill");
     test.done();
   },
 
   "Object Patterns": function (test) {
-    let script1 = "let p = ~{ name: it != 'Thom', age: it != 43 }\n" +
-                  "{ name: 'Bill', age: 27 } like p";
+    let script1 = `let p = ~{ name: it != 'Thom', age: it != 43 }
+                   { name: 'Bill', age: 27 } like p`;
 
-    let script2 = "let p = ~[_, { name: 'Thom', age: it > 20 }, 99]\n" +
-                  "['crap', { name: 'Thom', age: 30 }, 99] like p";
+    let script2 = `let p = ~[_, { name: 'Thom', age: it > 20 }, 99]
+                   ['crap', { name: 'Thom', age: 30 }, 99] like p`;
 
-    let script3 = "let p = ~{ name: it != 'Thom', age: it != 43 }\n" +
-                  "{ name: 'Thom', age: 27 } like p";
+    let script3 = `let p = ~{ name: it != 'Thom', age: it != 43 }
+                   { name: 'Thom', age: 27 } like p`;
 
-    let script4 = "let p = ~{name: 'Thom', address: ~{ city: 'Boston' }}\n" +
-                  "{name: 'Thom', address: { street: '123 Main', city: 'Boston' }} like p";
+    let script4 = `let p = ~{name: 'Thom', address: ~{ city: 'Boston' }}
+                   {name: 'Thom', address: { street: '123 Main', city: 'Boston' }} like p`;
 
     test.equal(evaluate(script1), true);
     test.equal(evaluate(script2), true);
@@ -40,20 +40,20 @@ exports.like = nodeunit.testCase({
   },
 
   "Array Patterns": function (test) {
-    let script1 = "let p = ~(it > 50 and it < 100)\n" +
-                  "p(75)";
+    let script1 = `let p = ~(it > 50 and it < 100)
+                   p(75)`;
 
-    let script2 = "let p = ~(it > 50 and it < 100)\n" +
-                  "75 like p";
+    let script2 = `let p = ~(it > 50 and it < 100)
+                   75 like p`;
 
-    let script3 = "let p = ~[12, _, 99]\n" +
-                  "[12, 88, 99] like p";
+    let script3 = `let p = ~[12, _, 99]
+                   [12, 88, 99] like p`;
 
-    let script4 = "let p = ~(it like ~[12, _, 99] and it[1]=88)\n" +
-                  "[12, 88, 99] like p";
+    let script4 = `let p = ~(it like ~[12, _, 99] and it[1]=88)
+                   [12, 88, 99] like p`;
 
-    let script5 = "let p = ~[12, [1, _, 3]]\n" +
-                  "[12, [1, 5, 3], 24] like p";
+    let script5 = `let p = ~[12, [1, _, 3]]
+                   [12, [1, 5, 3], 24] like p`;
 
     let script6 = "'hello' like ~(it)";
 
@@ -102,33 +102,33 @@ exports.like = nodeunit.testCase({
       null_value: null
     };
 
-    let script1 = 'if global.person1 like global.person2\n' +
-                  '  "They match!"\n' +
-                  'end';
+    let script1 = `if global.person1 like global.person2
+                     "They match!"
+                   end`;
 
-    let script2 = 'unless global.person1 like global.person3\n' +
-                  '  "They don\'t match!"\n' +
-                  'end';
+    let script2 = `unless global.person1 like global.person3
+                     "They don\'t match!"
+                   end`;
 
-    let script3 = 'unless global.person1 like global.person4\n' +
-                  '  "They don\'t match!"\n' +
-                  'end';
+    let script3 = `unless global.person1 like global.person4
+                     "They don\'t match!"
+                   end`;
 
-    let script4 = 'if global.array like ["red", "green", "blue"]\n' +
-                  '  "They match!"\n' +
-                  'else\n' +
-                  '  "They don\'t match!"\n' +
-                  'end';
+    let script4 = `if global.array like ["red", "green", "blue"]
+                     "They match!"
+                   else
+                     "They don\'t match!"
+                   end`;
 
-    let script5 = 'unless global.person1 like {name: "Thom", age: 56}\n' +
-                  '  "They don\'t match!"\n' +
-                  'end';
+    let script5 = `unless global.person1 like {name: "Thom", age: 56}
+                     "They don\'t match!"
+                   end`;
 
-    let script6 = "import pattern\n" +
-                  "pattern.Nothing like global.null_value";
+    let script6 = `import pattern
+                   pattern.Nothing like global.null_value`;
 
-    let script7 = "import pattern\n" +
-                  "global.null_value like pattern.Nothing";
+    let script7 = `import pattern
+                   global.null_value like pattern.Nothing`;
 
     test.equal(evaluate(script1, data), "They match!");
     test.equal(evaluate(script1, { person1: null }), "They match!");

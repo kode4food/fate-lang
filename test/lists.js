@@ -49,12 +49,23 @@ exports.lists = nodeunit.testCase({
 
   "Arrays": function (test) {
     test.equal(evaluate("[9,8,'Hello',7,3][2]"), "Hello");
-    test.equal(evaluate("import array\narray.length([9,8,'Hello',7,3])"), 5);
     test.equal(evaluate("[3 * 3, 2 * 4, 'Hel'+'lo', 14 / 2, 9 / 3][2]"), "Hello");
-    test.equal(evaluate("import array\narray.length([1000])"), 1);
+
+    test.equal(evaluate(`
+      import array
+      array.length([9,8,'Hello',7,3])
+    `), 5);
+
+    test.equal(evaluate(`
+      import array
+      array.length([1000])
+    `), 1);
 
     test.throws(function () {
-      evaluate("import array\narray.length(1000)");
+      evaluate(`
+        import array
+        array.length(1000)
+      `);
     });
 
     test.done();
@@ -71,77 +82,156 @@ exports.lists = nodeunit.testCase({
     test.equal(evaluate("{age:21*2}.age"), 42);
     test.equal(evaluate("{global.name + '1': global.value + 1}['hello1']", data), 10);
     test.equal(evaluate("{global.name + '2': global.value + 1}['hello2']", data), 10);
-    test.equal(evaluate('let a = "hello"\n{ "test": a }')['test'], 'hello');
-    test.equal(evaluate('let a = "hello"\n{ a }["a"]'), 'hello');
     test.equal(evaluate('{ "hello" }["hello"]'), 'hello');
+
+    test.equal(evaluate(`
+      let a = "hello"
+      { "test": a }
+    `)['test'], 'hello');
+
+    test.equal(evaluate(`
+      let a = "hello"
+      { a }["a"]
+    `), 'hello');
 
     test.done();
   },
 
   "Nested lists": function (test) {
-    let base = "{" +
-               "  name   : 'World'," +
-               "  title  : 'Famous People', " +
-               "  people : [" +
-               "    { name : 'Larry', age : 50 }," +
-               "    { name : 'Curly', age : 45 }," +
-               "    { name : 'Moe', age : 58 }" +
-               "  ]" +
-               "}";
+    let base = `{
+                  name   : 'World',
+                  title  : 'Famous People',
+                  people : [
+                    { name : 'Larry', age : 50 },
+                    { name : 'Curly', age : 45 },
+                    { name : 'Moe', age : 58 }
+                  ]
+                }`;
 
-    test.equal(evaluate("" + base + ".title"), "Famous People");
-    test.equal(evaluate("" + base + ".people[1].name"), "Curly");
-    test.equal(evaluate("import array\narray.length(" + base + ".people)"), 3);
+    test.equal(evaluate(`${base}.title`), "Famous People");
+    test.equal(evaluate(`${base}.people[1].name`), "Curly");
+
+    test.equal(evaluate(`
+      import array
+      array.length(${base}.people)
+    `), 3);
+
     test.done();
   },
 
   "Functions": function (test) {
-    test.equal(evaluate("import array\narray.join(['this','is','fate'])"), "this is fate");
-    test.equal(evaluate("import array\narray.join(['this','is','fate'], '-=-')"), "this-=-is-=-fate");
+    test.equal(evaluate(`
+      import array
+      array.join(['this','is','fate'], '-=-')
+    `), "this-=-is-=-fate");
+
+    test.equal(evaluate(`
+      import array
+      array.join(['this','is','fate'])
+    `), "this is fate");
 
     test.throws(function () {
-      evaluate("import array\narray.join('hello', '-=-')");
+      evaluate(`
+        import array
+        array.join('hello', '-=-')
+      `);
     });
 
-    test.equal(evaluate("import array\narray.first([1,2,3])"), 1);
-    test.equal(evaluate("import array\narray.first([9])"), 9);
+    test.equal(evaluate(`
+      import array
+      array.first([1,2,3])
+    `), 1);
+
+    test.equal(evaluate(`
+      import array
+      array.first([9])
+    `), 9);
 
     test.throws(function () {
-      evaluate("import array\narray.first({name:'Bill',age:42})");
+      evaluate(`
+        import array
+        array.first({name:'Bill',age:42})
+      `);
     });
 
-    test.equal(evaluate("import array\narray.last([1,2,3])"), 3);
-    test.equal(evaluate("import array\narray.last([])"), undefined);
-    test.equal(evaluate("import array\narray.last([9])"), 9);
+    test.equal(evaluate(`
+      import array
+      array.last([1,2,3])
+    `), 3);
+
+    test.equal(evaluate(`
+      import array
+      array.last([])
+    `), undefined);
+
+    test.equal(evaluate(`
+      import array
+      array.last([9])
+    `), 9);
 
     test.throws(function () {
-      evaluate("import array\narray.last({name:'Bill',age:42})");
+      evaluate(`
+        import array
+        array.last({name:'Bill',age:42})
+      `);
     });
 
-    test.equal(evaluate("import array\narray.length([1,2,3])"), 3);
-    test.equal(evaluate("import array\narray.length([9])"), 1);
+    test.equal(evaluate(`
+      import array
+      array.length([1,2,3])
+    `), 3);
 
-    test.equal(evaluate("import array\narray.empty([1,2,3])"), false);
-    test.equal(evaluate("import array\narray.empty([])"), true);
+    test.equal(evaluate(`
+      import array
+      array.length([9])
+    `), 1);
+
+    test.equal(evaluate(`
+      import array
+      array.empty([1,2,3])
+    `), false);
+
+    test.equal(evaluate(`
+      import array
+      array.empty([])
+    `), true);
 
     test.throws(function () {
-      evaluate("import array\narray.empty(9)");
+      evaluate(`
+        import array
+        array.empty(9)
+      `);
     });
 
     test.throws(function () {
-      evaluate("import array\narray.empty({name:'Bill'})");
+      evaluate(`
+        import array
+        array.empty({name:'Bill'})
+      `);
     });
 
-    test.deepEqual(evaluate("import object\nobject.keys({name:'Thom',age:42})"), ['name','age']);
+    test.deepEqual(evaluate(`
+      import object
+      object.keys({name:'Thom',age:42})
+    `), ['name','age']);
 
     test.throws(function () {
-      evaluate("import object\nobject.keys(62)");
+      evaluate(`
+        import object
+        object.keys(62)
+      `);
     });
 
-    test.deepEqual(evaluate("import object\nobject.values({name:'Thom',age:42})"), ['Thom',42]);
+    test.deepEqual(evaluate(`
+      import object
+      object.values({name:'Thom',age:42})
+    `), ['Thom',42]);
 
     test.throws(function () {
-      evaluate("import object\nobject.values(62)");
+      evaluate(`
+        import object
+        object.values(62)
+      `);
     });
 
     test.done();

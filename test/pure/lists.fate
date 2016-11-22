@@ -111,12 +111,26 @@ def objectFunctions(test)
   test.done()
 end
 
+def basicGenerator(test)
+  let { deepEqualTo } = wrap(test)
+
+  let gen = generate
+    emit 1
+    emit 2
+    emit 3
+  end
+
+  [for item in gen] | deepEqualTo([1, 2, 3])
+  test.done()
+end
+
 let tests = nodeunit.testCase({
   "Basic List Comprehensions": listBasics,
   "Chained List Comprehensions": listAdvanced,
   "Basic Array Handling": arrayBasics,
   "Basic Array Functions": arrayFunctions,
-  "Basic Object Functions": objectFunctions
+  "Basic Object Functions": objectFunctions,
+  "Basic Generator": basicGenerator
 })
 
 export tests

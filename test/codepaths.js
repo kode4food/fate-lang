@@ -129,10 +129,25 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "'if' with literals": function (test) {
-    let script1 = "if true\n'was true'\nelse\n'was false'\nend";
-    let script2 = "if false\n'was true'\nelse\n'was false'\nend";
-    let script3 = "if true\n'was true'\nend";
-    let script4 = "if false\n'was true'\nend";
+    let script1 = `if true
+                     'was true'
+                   else
+                     'was false'
+                   end`;
+
+    let script2 = `if false
+                     'was true'
+                   else
+                     'was false'
+                   end`;
+
+    let script3 = `if true
+                     'was true'
+                   end`;
+
+    let script4 = `if false
+                     'was true'
+                   end`;
 
     test.equal(evaluate(script1), 'was true');
     test.equal(evaluate(script2), 'was false');
@@ -150,15 +165,54 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "'await' expressions": function (test) {
-    test.ok(evaluate("let x = 0\ndo\nawait x\nend"));
+    test.ok(evaluate(`
+      let x = 0
+      do
+        await x
+      end
+    `));
 
     test.throws(function () {
-      evaluate("let x = 0\nawait x");
+      evaluate(`
+        let x = 0
+        await x
+      `);
     }, "await called outside of a 'do' block should explode");
 
     test.throws(function () {
-      evaluate("import io\ndo\n-> await io.timeout(100)\nend");
+      evaluate(`
+        import io
+        do
+          -> await io.timeout(100)
+        end
+      `);
     }, "await called nested in func should explode");
+
+    test.done();
+  },
+
+  "'emit' statements": function (test) {
+    test.throws(function () {
+      evaluate("emit 'blah'");
+    }, "emit called outside of 'generate' block should explode");
+
+    test.throws(function () {
+      evaluate(`
+        generate
+          def blah
+            emit 'nah'
+          end
+        end
+      `);
+    }, "emit nested in a function should explode");
+
+    test.throws(function () {
+      evaluate(`
+        generate
+          let l = for x in [1,2] select emit x
+        end
+      `);
+    }, "emit nested in a 'for' loop should explode");
 
     test.done();
   },
@@ -172,11 +226,17 @@ exports.codepaths = nodeunit.testCase({
 
   "Duplicated Arg Names": function (test) {
     test.throws(function () {
-      evaluate("def someFunction(arg1, arg2, arg1, arg3, arg2)\nend");
+      evaluate(`
+        def someFunction(arg1, arg2, arg1, arg3, arg2)
+        end
+      `);
     }, "Duplicated arg names in a Function should explode");
 
     test.throws(function () {
-      evaluate("when a(arg1, arg2) & b(arg3, arg2)\nend");
+      evaluate(`
+        when a(arg1, arg2) & b(arg3, arg2)
+        end
+      `);
     }, "Arg names duplicated across channels should explode");
 
     test.done();
@@ -197,32 +257,41 @@ exports.codepaths = nodeunit.testCase({
   },
 
   "Truthy": function (test) {
-    test.equal(evaluate("if [1,2,3]\ntrue\nend"), true);
-    test.equal(evaluate("if []\ntrue\nend"), true);
+    test.equal(evaluate(`
+      if [1,2,3]
+        true
+      end
+    `), true);
+
+    test.equal(evaluate(`
+      if []
+        true
+      end
+    `), true);
     test.done();
   },
 
   "Rewrite": function (test) {
-    let script1 = "let a = 'hello'\n" +
-                  "let b = 'goodbye'\n" +
-                  "a + b";
+    let script1 = `let a = 'hello'
+                   let b = 'goodbye'
+                   a + b`;
 
-    let script2 = "let a = 5\n" +
-                  "if not (a like 10)\n" +
-                  "  'hello!'\n" +
-                  "end";
+    let script2 = `let a = 5
+                   if not (a like 10)
+                     'hello!'
+                   end`;
 
-    let script3 = "if not (global.a like 10) and not (global.b like 8)\n" +
-                  "  'yes'\n" +
-                  "else\n" +
-                  "  'no'\n" +
-                  "end";
+    let script3 = `if not (global.a like 10) and not (global.b like 8)
+                     'yes'
+                   else
+                     'no'
+                   end`;
 
-    let script4 = "if not (global.a like 10) or not (global.b like 8)\n" +
-                  "  'yes'\n" +
-                  "else\n" +
-                  "  'no'\n" +
-                  "end";
+    let script4 = `if not (global.a like 10) or not (global.b like 8)
+                     'yes'
+                   else
+                     'no'
+                   end`;
 
     test.equal(evaluate(script1), "hellogoodbye");
     test.equal(evaluate(script2), "hello!");
@@ -260,11 +329,19 @@ exports.codepaths = nodeunit.testCase({
 
   "Parameter Ordering": function (test) {
     test.throws(function () {
-      evaluate("def test(a*, b)\nb\nend");
+      evaluate(`
+        def test(a*, b)
+          b
+        end
+      `);
     }, "Parameters are out of order");
 
     test.throws(function () {
-      evaluate("def test(b*, c*, d*)\nb\nend");
+      evaluate(`
+        def test(b*, c*, d*)
+          b
+        end
+      `);
     }, "Parameters are out of order");
 
     test.done();
@@ -272,7 +349,10 @@ exports.codepaths = nodeunit.testCase({
 
   "Missing Identifiers": function (test) {
     test.throws(function () {
-      evaluate("let a = 'hello'\nexport a as b, c, d as yeah");
+      evaluate(`
+        let a = 'hello'
+        export a as b, c, d as yeah
+      `);
     });
 
     test.throws(function () {
@@ -288,7 +368,12 @@ exports.codepaths = nodeunit.testCase({
     });
 
     test.throws(function () {
-      evaluate("def hi(x)\n'hello'\nend\nx");
+      evaluate(`
+        def hi(x)
+          'hello'
+        end
+        x
+      `);
     });
 
     test.done();
@@ -296,7 +381,11 @@ exports.codepaths = nodeunit.testCase({
 
   "For not Exportable": function (test) {
     test.throws(function () {
-      evaluate("export for i in [1,2,3]\ni * 2\nend");
+      evaluate(`
+        export for i in [1,2,3]
+          i * 2
+        end
+      `);
     });
 
     test.done();

@@ -5,7 +5,7 @@ from test import wrap
 def explicit(test)
   let { isOk } = wrap(test)
 
-  import './basics_pure.fate' as basics
+  import './basics.fate' as basics
 
   basics.tests | isOk
   test.done()
@@ -14,8 +14,8 @@ end
 def multiple(test)
   let { equalTo } = wrap(test)
 
-  import './basics_pure' as basics1
-  import './basics_pure' as basics2
+  import './basics' as basics1
+  import './basics' as basics2
 
   basics1 | equalTo(basics2)
   test.done()
@@ -24,7 +24,7 @@ end
 def parent(test)
   let { equalTo } = wrap(test)
 
-  import './module1' as module1
+  import '../assets/module1' as module1
 
   module1.test_value | equalTo('right!')
   test.done()
@@ -33,7 +33,7 @@ end
 def parentFrom(test)
   let { equalTo } = wrap(test)
 
-  from './module1' import test_value as testv
+  from '../assets/module1' import test_value as testv
 
   testv | equalTo('right!')
   test.done()
