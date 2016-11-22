@@ -11,6 +11,8 @@ const createConsole = helpers.createConsole;
 const fate = require('../dist/Fate');
 const runtime = require('../dist/runtime');
 
+const baseDir = './test/assets';
+
 exports.cli = nodeunit.testCase({
   "Command Line Help": function (test) {
     let cons = createConsole();
@@ -30,7 +32,7 @@ exports.cli = nodeunit.testCase({
 
   "Successful Compile": function (test) {
     let cons = createConsole();
-    compiler(["./test/assets/cli_success/*.fate"], cons, function () {
+    compiler([`${baseDir}/cli_success/*.fate`], cons, function () {
       test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
@@ -44,8 +46,8 @@ exports.cli = nodeunit.testCase({
       test.ok(runtime.isObject(compiled));
 
       // cleanup
-      fs.unlinkSync("./test/assets/cli_success/test1.js");
-      fs.unlinkSync("./test/assets/cli_success/test2.js");
+      fs.unlinkSync(`${baseDir}/cli_success/test1.js`);
+      fs.unlinkSync(`${baseDir}/cli_success/test2.js`);
 
       test.done();
     });
@@ -53,7 +55,7 @@ exports.cli = nodeunit.testCase({
 
   "Warning Compile": function (test) {
     let cons = createConsole();
-    compiler(["./test/assets/cli_warning/*.fate"], cons, function () {
+    compiler([`${baseDir}/cli_warning/*.fate`], cons, function () {
       test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(cons.contains("Warnings"));
@@ -62,14 +64,14 @@ exports.cli = nodeunit.testCase({
       test.ok(cons.contains("sure you wanted to immediately reassign 'a'?"));
       test.ok(cons.contains("sure you wanted to immediately reassign 'b'?"));
       test.ok(!cons.contains("Failures"));
-      fs.unlinkSync("./test/assets/cli_warning/test1.js"); // cleanup
+      fs.unlinkSync(`${baseDir}/cli_warning/test1.js`); // cleanup
       test.done();
     });
   },
 
   "Failure Compile": function (test) {
     let cons = createConsole();
-    compiler(["--in", "./test/assets/cli_failure/"], cons, function () {
+    compiler(["--in", `${baseDir}/cli_failure/`], cons, function () {
       test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(!cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
@@ -81,7 +83,7 @@ exports.cli = nodeunit.testCase({
 
   "Empty Path": function (test) {
     let cons = createConsole();
-    compiler(["./test/assets/cli_empty/*.fate"], cons, function () {
+    compiler([`${baseDir}/cli_empty/*.fate`], cons, function () {
       test.ok(!cons.contains("Fate Compilation Complete"));
       test.ok(!cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
@@ -93,7 +95,7 @@ exports.cli = nodeunit.testCase({
 
   "Parse Only": function (test) {
     let cons = createConsole();
-    compiler(["--parse", "./test/assets/cli_success/*.fate"], cons, function () {
+    compiler(["--parse", `${baseDir}/cli_success/*.fate`], cons, function () {
       test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
@@ -105,13 +107,13 @@ exports.cli = nodeunit.testCase({
   "Clean Compiled Files": function (test) {
     let cons = createConsole();
 
-    compiler(["./test/assets/cli_success/*.fate"], cons, function () {
+    compiler([`${baseDir}/cli_success/*.fate`], cons, function () {
       test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(!cons.contains("Warnings"));
       test.ok(!cons.contains("Failures"));
 
-      compiler(["--clean", "./test/assets/**/*.fate"], cons, function () {
+      compiler(["--clean", `${baseDir}/**/*.fate`], cons, function () {
         test.ok(cons.contains("Deleted: 2"));
         test.done();
       });
@@ -130,8 +132,8 @@ exports.cli = nodeunit.testCase({
 
   "Multiple Input Paths": function (test) {
     let cons = createConsole();
-    compiler(["--parse", "./test/assets/cli_success/*.fate",
-              "./test/assets/cli_warning/*.fate"], cons, function () {
+    compiler(["--parse", `${baseDir}/cli_success/*.fate`,
+              `${baseDir}/cli_warning/*.fate`], cons, function () {
       test.ok(cons.contains("Fate Compilation Complete"));
       test.ok(cons.contains("Success"));
       test.ok(cons.contains("Warnings"));
@@ -152,7 +154,7 @@ exports.cli = nodeunit.testCase({
     }
 
     function successTest() {
-      interpreter(["./test/assets/hello"], cons, function (exitCode) {
+      interpreter([`${baseDir}/hello`], cons, function (exitCode) {
         test.equal(exitCode, 0);
         test.ok(cons.contains("Hello, World!"));
         noArgsTest();
