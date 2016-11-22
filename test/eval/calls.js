@@ -1,7 +1,7 @@
 "use strict";
 
 const nodeunit = require('nodeunit');
-const fate = require('../dist/Fate');
+const fate = require('../../dist/Fate');
 const evaluate = fate.evaluate;
 
 exports.calls = nodeunit.testCase({

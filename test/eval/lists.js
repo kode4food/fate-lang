@@ -1,7 +1,7 @@
 "use strict";
 
 const nodeunit = require('nodeunit');
-const evaluate = require('../dist/Fate').evaluate;
+const evaluate = require('../../dist/Fate').evaluate;
 
 exports.lists = nodeunit.testCase({
   "List comprehensions": function (test) {

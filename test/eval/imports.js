@@ -3,17 +3,17 @@
 const nodeunit = require('nodeunit');
 const helpers = require('./helpers');
 
-const fate = require('../dist/Fate');
+const fate = require('../../dist/Fate');
 const compile = fate.compile;
 const evaluate = fate.evaluate;
 const globals = fate.globals;
 const createModule = fate.createModule;
 
-const resolvers = require('../dist/resolvers');
+const resolvers = require('../../dist/resolvers');
 const createMemoryResolver = resolvers.createMemoryResolver;
 const createFileResolver = resolvers.createFileResolver;
 
-const runtime = require('../dist/runtime');
+const runtime = require('../../dist/runtime');
 
 exports.imports = nodeunit.testCase({
 
