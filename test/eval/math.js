@@ -45,7 +45,11 @@ exports.math = nodeunit.testCase({
     test.equal(evaluate("global.people[0].age / 2", this.data), 25);
     test.equal(evaluate("100 / global.people[0].age", this.data), 2);
     test.equal(evaluate("3 * global.people[0].age", this.data), 150);
-    test.equal(evaluate("(33 * 6 - (global.people[0].age + 1)) mod 6", this.data), 3);
+
+    test.equal(evaluate(`
+      (33 * 6 - (global.people[0].age + 1)) mod 6
+    `, this.data), 3);
+
     test.done();
   },
 
