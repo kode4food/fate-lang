@@ -3,7 +3,7 @@
 const glob = require('glob').sync;
 const files = glob('*.js', { cwd: __dirname });
 
-const blacklist = ['index', 'helpers'];
+const blacklist = ['index'];
 
 files.forEach(filename => {
   let baseName = filename.replace(/\.js$/, '');

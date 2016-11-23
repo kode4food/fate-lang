@@ -1,7 +1,7 @@
 "use strict";
 
 const nodeunit = require('nodeunit');
-const helpers = require('./helpers');
+const helpers = require('../helpers');
 
 const fate = require('../../dist/Fate');
 const compile = fate.compile;

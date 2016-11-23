@@ -3,13 +3,13 @@
 const fs = require('fs');
 const path = require('path');
 const nodeunit = require('nodeunit');
-const compiler = require('../../dist/cli/Compiler')['commandLine'];
-const interpreter = require('../../dist/cli/Interpreter')['commandLine'];
+const compiler = require('../dist/cli/Compiler')['commandLine'];
+const interpreter = require('../dist/cli/Interpreter')['commandLine'];
 const helpers = require('./helpers');
 const createConsole = helpers.createConsole;
 
-const fate = require('../../dist/Fate');
-const runtime = require('../../dist/runtime');
+const fate = require('../dist/Fate');
+const runtime = require('../dist/runtime');
 
 const baseDir = './test/assets';
 
@@ -42,7 +42,7 @@ exports.cli = nodeunit.testCase({
         'fatejs': '../../../dist/Fate'
       });
 
-      let compiled = require('../assets/cli_success/test1.js');
+      let compiled = require('./assets/cli_success/test1.js');
       test.ok(runtime.isObject(compiled));
 
       // cleanup

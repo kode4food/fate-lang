@@ -2,7 +2,7 @@
 
 const nodeunit = require('nodeunit');
 const fate = require('../../dist/Fate');
-const helpers = require('./helpers');
+const helpers = require('../helpers');
 const evaluate = fate.evaluate;
 const evaluateEmit = helpers.evaluateEmit;
 

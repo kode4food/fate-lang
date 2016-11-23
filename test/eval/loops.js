@@ -3,7 +3,7 @@
 const nodeunit = require('nodeunit');
 const fate = require('../../dist/Fate');
 const evaluate = fate.evaluate;
-const helpers = require('./helpers');
+const helpers = require('../helpers');
 const evaluateEmit = helpers.evaluateEmit;
 
 exports.loops = nodeunit.testCase({
