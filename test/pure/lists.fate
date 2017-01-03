@@ -124,13 +124,28 @@ def basicGenerator(test)
   test.done()
 end
 
+def loopGenerator(test)
+  let { deepEqualTo } = wrap(test)
+
+  let list = [1, 2, 3]
+  let gen = generate
+    for x in [for item in list select item * 2]
+      emit x
+    end
+  end
+
+  [for item in gen] | deepEqualTo([2, 4, 6])
+  test.done()
+end
+
 let tests = nodeunit.testCase({
   "Basic List Comprehensions": listBasics,
   "Chained List Comprehensions": listAdvanced,
   "Basic Array Handling": arrayBasics,
   "Basic Array Functions": arrayFunctions,
   "Basic Object Functions": objectFunctions,
-  "Basic Generator": basicGenerator
+  "Basic Generator": basicGenerator,
+  "Loop Generator": loopGenerator
 })
 
 export tests

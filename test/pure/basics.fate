@@ -322,7 +322,7 @@ end
 def nestedMatchers(test)
   let { isFalse, isTrue } = wrap(test)
 
-  let n = Nothing, p = ~(42)
+  let n = Nothing, p = ~42
 
   39 like ~(p)      | isFalse
   42 like ~(p)      | isTrue
