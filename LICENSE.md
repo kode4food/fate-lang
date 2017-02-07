@@ -1,5 +1,5 @@
 Fate (Patterns & Guards & Joins, Oh My!)
-Copyright (c) 2015, 2106 Thomas S. Bradford
+Copyright (c) 2015, 2016, 2017 Thomas S. Bradford
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
