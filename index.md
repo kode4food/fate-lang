@@ -201,7 +201,7 @@ let numbers = [100, 150, 400]
 do
   # will eventually print '[ 200, 300, 800 ]'
   numbers | (arr -> [for x in arr select x | timeout])
-         :| (x -> x * 2)
+         :| (arr -> [for x in arr select x * 2])
           | print
 end
 ```
