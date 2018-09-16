@@ -1,7 +1,7 @@
-"use strict";
+/** @flow */
 
 const nodeunit = require('nodeunit');
-const fate = require('../../dist/Fate');
+const fate = require('../../dist/fate');
 const evaluate = fate.evaluate;
 
 exports.basics = nodeunit.testCase({

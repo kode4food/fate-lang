@@ -1,4 +1,4 @@
-"use strict";
+/** @flow */
 
 const mixin = require('../dist/runtime').mixin;
 

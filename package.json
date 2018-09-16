@@ -2,10 +2,9 @@
   "name": "fatejs",
   "description": "Patterns & Guards & Joins, Oh My!",
   "author": "Thomas S. Bradford",
-  "version": "0.7.6",
+  "version": "0.9.0",
   "license": "MIT",
   "homepage": "http://www.fate-lang.org/",
-  "main": "dist/Fate.js",
   "keywords": [],
   "contributors": [
     {
@@ -14,37 +13,34 @@
     }
   ],
   "repository": "git@github.com/kode4food/fate-lang.git",
+  "main": "dist/fate.cjs.js",
+  "module": "dist/fate.esm.js",
+  "browser": "dist/fate.umd.js",
   "bin": {
     "fate": "bin/fate.js",
     "fatec": "bin/fatec.js"
   },
   "scripts": {
-    "build": "gulp",
-    "test": "gulp test"
+    "prepare": "mkdir -p dist/compiler && mkdir -p dist/modules && cp src/modules/*.fate dist/modules",
+    "pegjs": "npm run prepare && pegjs -o dist/compiler/parser.js src/compiler/parser.pegjs",
+    "build": "npm run pegjs && babel src -d dist",
+    "test": "npm run build && nodeunit test/index.js"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=10.0.0"
   },
   "dependencies": {
-    "glob": "^7.1.1",
+    "glob": "^7.1.3",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "node-uuid": "^1.4.7"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "del": "^2.2.2",
-    "gulp": "^3.9.1",
-    "gulp-copy": "0.0.2",
-    "gulp-istanbul": "^1.1.1",
-    "gulp-istanbul-enforcer": "^1.0.3",
-    "gulp-nodeunit": "0.0.5",
-    "gulp-peg": "^0.2.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-replace": "^0.5.4",
-    "gulp-tslint": "^6.1.3",
-    "gulp-typescript": "^3.1.2",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-flow": "^6.23.0",
+    "flow-bin": "^0.80.0",
     "nodeunit": "^0.10.2",
-    "tslint": "^3.15.1",
-    "typescript": "^2.0.7"
+    "pegjs": "^0.10.0"
   }
 }

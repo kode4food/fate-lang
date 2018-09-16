@@ -1,4 +1,4 @@
-"use strict";
+/** @flow */
 
 const nodeunit = require('nodeunit');
 const runtime = require('../dist/runtime');
@@ -31,7 +31,7 @@ exports.api = nodeunit.testCase({
   },
 
   "Support Library Calls": function (test) {
-    let p = support.make(Continuation, function (resolve) {
+    let p = new Continuation(function (resolve) {
       resolve('hello');
     });
 

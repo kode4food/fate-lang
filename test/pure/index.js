@@ -1,7 +1,7 @@
-"use strict";
+/** @flow */
 
 // Needed to enable Fate script require()
-require('../../dist/Fate');
+require('../../dist/fate');
 
 const glob = require('glob').sync;
 const files = glob('*.fate', { cwd: __dirname });

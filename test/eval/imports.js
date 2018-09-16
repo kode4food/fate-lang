@@ -1,9 +1,9 @@
-"use strict";
+/** @flow */
 
 const nodeunit = require('nodeunit');
 const helpers = require('../helpers');
 
-const fate = require('../../dist/Fate');
+const fate = require('../../dist/fate');
 const compile = fate.compile;
 const evaluate = fate.evaluate;
 const globals = fate.globals;

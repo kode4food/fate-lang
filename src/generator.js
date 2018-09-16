@@ -1,12 +1,4 @@
-"use strict";
-
-/*
- * This module exists only because TypeScript doesn't support generators
- * unless targeting ES6 or higher, but doing so will result in generated
- * code that node 4.x won't understand.  It would have been nice if the
- * TypeScript compiler passed the code through, but it strips the '*'
- * and breaks the world.
- */
+/** @flow */
 
 // Checking for an already instantiated generator
 function isGenerator(value) {
@@ -37,7 +29,6 @@ function* generateArray(array) {
 
 function* generateObject(object) {
   for ( let key in object ) {
-    /* istanbul ignore if: don't know where this object's been */
     if ( !object.hasOwnProperty(key) ) {
       continue;
     }

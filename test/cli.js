@@ -1,14 +1,14 @@
-"use strict";
+/** @flow */
 
 const fs = require('fs');
 const path = require('path');
 const nodeunit = require('nodeunit');
-const compiler = require('../dist/cli/Compiler')['commandLine'];
-const interpreter = require('../dist/cli/Interpreter')['commandLine'];
+const compiler = require('../dist/cli/compiler')['commandLine'];
+const interpreter = require('../dist/cli/interpreter')['commandLine'];
 const helpers = require('./helpers');
 const createConsole = helpers.createConsole;
 
-const fate = require('../dist/Fate');
+const fate = require('../dist/fate');
 const runtime = require('../dist/runtime');
 
 const baseDir = './test/assets';
@@ -39,7 +39,7 @@ exports.cli = nodeunit.testCase({
       test.ok(!cons.contains("Failures"));
 
       helpers.monkeyPatchRequires('./test', {
-        'fatejs': '../../../dist/Fate'
+        'fatejs': '../../../dist/fate'
       });
 
       let compiled = require('./assets/cli_success/test1.js');

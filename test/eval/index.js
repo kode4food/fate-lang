@@ -1,4 +1,4 @@
-"use strict";
+/** @flow */
 
 const glob = require('glob').sync;
 const files = glob('*.js', { cwd: __dirname });

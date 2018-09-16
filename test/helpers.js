@@ -1,10 +1,10 @@
-"use strict";
+/** @flow */
 
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 
-const evaluate = require('../dist/Fate').evaluate;
+const evaluate = require('../dist/fate').evaluate;
 const mixin = require('../dist/runtime').mixin;
 
 const usesFate = /(['"])fate\-compiler:[0-9.]+\1;/g;
