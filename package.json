@@ -13,9 +13,6 @@
     }
   ],
   "repository": "git@github.com/kode4food/fate-lang.git",
-  "main": "dist/fate.cjs.js",
-  "module": "dist/fate.esm.js",
-  "browser": "dist/fate.umd.js",
   "bin": {
     "fate": "bin/fate.js",
     "fatec": "bin/fatec.js"
