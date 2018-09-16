@@ -56,7 +56,7 @@ console.log(resultingLambda(4));
 There's quite a bit left to do in the areas of optimization and runtime library support.  See the project's [GitHub Issues](https://github.com/kode4food/fate-lang/issues) page to get an idea.
 
 ## License (MIT License)
-Copyright (c) 2015, 2016, 2017 Thomas S. Bradford
+Copyright (c) 2015-2018 Thomas S. Bradford
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
