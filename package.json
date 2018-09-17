@@ -22,9 +22,9 @@
     "pegjs": "npm run prepare && pegjs -o dist/compiler/parser.js src/compiler/parser.pegjs",
     "lint": "eslint src",
     "babel": "babel src -d dist",
-    "test": "nodeunit test/index.js",
+    "nodeunit": "nodeunit test/index.js",
     "build": "npm run pegjs && npm run babel",
-    "validate": "npm run lint && npm run build && npm run test"
+    "test": "npm run build && npm run nodeunit"
   },
   "engines": {
     "node": ">=10.0.0"
