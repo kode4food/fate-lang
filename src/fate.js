@@ -1,16 +1,18 @@
 /** @flow */
 
+import type { ScriptContent } from './compiler';
+
 import { readFileSync } from 'fs';
 import { dirname } from 'path';
 
-import { compileModule, generateFunction, ScriptContent } from './compiler';
+import { compileModule, generateFunction } from './compiler';
 import { isObject, mixin } from './runtime';
+import * as RuntimeExports from './runtime';
 
 const pkg = require('../package.json');
-export const VERSION = pkg.version;
 
-import * as RuntimeExports from './runtime';
-export let Runtime = RuntimeExports;
+export const VERSION = pkg.version;
+export const Runtime = RuntimeExports;
 
 export type DirPath = string;
 export type ModuleName = string;
@@ -27,13 +29,13 @@ export interface ModuleExports {
 
 type Globals = {
   [index: string]: any;
-  __filename: string;
-  __dirname: string;
+  __filename: ?string;
+  __dirname: ?string;
 };
 
 const DefaultGlobals: Globals = {
   __filename: undefined,
-  __dirname: undefined
+  __dirname: undefined,
 };
 
 /*
@@ -41,11 +43,11 @@ const DefaultGlobals: Globals = {
  * for invoking it.  The script must be a String.
  */
 export function compile(script: ScriptContent) {
-  if ( typeof script !== 'string' ) {
-    throw new Error("script must be a string");
+  if (typeof script !== 'string') {
+    throw new Error('script must be a string');
   }
 
-  let compiledOutput = compileModule(script).scriptBody;
+  const compiledOutput = compileModule(script).scriptBody;
   return generateFunction(compiledOutput);
 }
 
@@ -54,8 +56,8 @@ export function compile(script: ScriptContent) {
  * Object.  Not generally recommended.
  */
 export function evaluate(script: ScriptContent, context?: Object) {
-  let compiled = compile(script);
-  let module = { exports: {} };
+  const compiled = compile(script);
+  const module = { exports: {} };
   return compiled(globals(context), module);
 }
 
@@ -64,17 +66,17 @@ export function evaluate(script: ScriptContent, context?: Object) {
  * be placed in the exports Object.
  */
 export function runScript(filename: string, exports: Object) {
-  let content = readFileSync(filename, 'utf8');
-  let compiledOutput = compileModule(content).scriptBody;
-  let generatedModule = generateFunction(compiledOutput);
+  const content = readFileSync(filename, 'utf8');
+  const compiledOutput = compileModule(content).scriptBody;
+  const generatedModule = generateFunction(compiledOutput);
   generatedModule(globals({ __filename: filename }), exports);
 }
 
 export function globals(extensions?: Object) {
-  if ( isObject(extensions) ) {
-    let result = Object.create(DefaultGlobals);
+  if (isObject(extensions)) {
+    const result = Object.create(DefaultGlobals);
     mixin(result, extensions);
-    if ( !result.__dirname && result.__filename ) {
+    if (!result.__dirname && result.__filename) {
       result.__dirname = dirname(result.__filename);
     }
     return result;
@@ -85,13 +87,13 @@ export function globals(extensions?: Object) {
 export function createModule(moduleExports?: ModuleExports) {
   return {
     __fateModule: true,
-    exports: moduleExports || {}
+    exports: moduleExports || {},
   };
 }
 
 export function isFateModule(module: any) {
-  return ( typeof module === 'function' || isObject(module) ) &&
-    module.__fateModule;
+  return (typeof module === 'function' || isObject(module))
+    && module.__fateModule;
 }
 
 /*

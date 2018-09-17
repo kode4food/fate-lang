@@ -5,11 +5,15 @@ import { Coder } from '../target';
 
 export interface Evaluator {
   coder: Coder;
+  evaluate(...args: any[]): void;
   getDispatchEvaluator(): Evaluator;
 }
 
 export class NodeEvaluator implements Evaluator {
   static tags: string[];
+  coder: Coder;
+  parent: Evaluator;
+  node: Syntax.Node;
 
   constructor(parent: Evaluator, node: Syntax.Node) {
     this.coder = parent.coder;
@@ -17,13 +21,17 @@ export class NodeEvaluator implements Evaluator {
     this.node = node;
   }
 
+  evaluate(...args: any[]) {
+    throw new Error("Stupid Coder: NodeEvaluator is abstract");
+  }
+
   getDispatchEvaluator(): Evaluator {
     return this.parent.getDispatchEvaluator();
   }
 
   dispatch(node: Syntax.Node, ...args: any[]) {
-    let dispatcher = this.getDispatchEvaluator();
-    dispatcher.evaluate.apply(dispatcher, arguments);
+    const dispatcher = this.getDispatchEvaluator();
+    dispatcher.evaluate(...arguments);
   }
 
   defer(...args: any[]) {

@@ -7,21 +7,20 @@ import { createModule, Module, ModuleName } from '../fate';
 const basePath = resolvePath(__dirname, '../modules');
 
 export function createSystemResolver() {
-  let cache: { [index: string]: Module } = {};
+  const cache: { [index: string]: Module } = {};
   return { resolve };
 
   function resolve(name: ModuleName): Module {
-    if ( name in cache ) {
+    if (name in cache) {
       return cache[name];
     }
-    return cache[name] = tryRequire(name + '.fate');
+    return cache[name] = tryRequire(`${name}.fate`);
   }
 
   function tryRequire(filename: string) {
     try {
       return createModule(require(resolvePath(basePath, filename)));
-    }
-    catch ( err ) {
+    } catch (err) {
       return undefined;
     }
   }

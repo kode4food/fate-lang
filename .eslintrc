@@ -1,0 +1,28 @@
+{
+  "extends": [
+    "airbnb",
+    "plugin:flowtype/recommended"
+  ],
+  "parser": "babel-eslint",
+  "plugins": [
+    "flowtype"
+  ],
+  "rules": {
+    "default-case": "warn",
+    "global-require": "warn",
+    "import/no-dynamic-require": "warn",
+    "import/prefer-default-export": "warn",
+    "no-continue": "warn",
+    "no-multi-assign": "warn",
+    "no-param-reassign": "warn",
+    "no-plusplus": "warn",
+    "no-prototype-builtins": "warn",
+    "no-restricted-syntax": "warn",
+    "no-return-assign": "warn",
+    "no-underscore-dangle": "warn",
+    "no-unused-vars": "warn",
+    "no-use-before-define": "warn",
+    "prefer-destructuring": "warn",
+    "prefer-rest-params": "warn"
+  }
+}

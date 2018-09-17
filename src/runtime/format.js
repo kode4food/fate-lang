@@ -1,23 +1,23 @@
 /** @flow */
 
-type Component = [number, string|number];
+type Component = [number, string | number];
 
 interface FormatFunction {
-  (data: any|any[]): string;
+  (data: any | any[]): string;
   __fate: string;
-  __fateIndexes: (string|number)[];
+  __fateIndexes: (string | number)[];
 }
 
-const Digits = "0|[1-9][0-9]*";
-const Ident = "[$_a-zA-Z][$_a-zA-Z0-9]*";
-const Term = ";?";
+const Digits = '0|[1-9][0-9]*';
+const Ident = '[$_a-zA-Z][$_a-zA-Z0-9]*';
+const Term = ';?';
 const Params = `%((%)|(${Digits})|(${Ident}))?${Term}`;
-               /* "%" ( "%" | digits | identifier )? ";"? */
+/* "%" ( "%" | digits | identifier )? ";"? */
 
-const ParamRegex = new RegExp(Params, "m");
+const ParamRegex = new RegExp(Params, 'm');
 
 export function isFormatter(value: string) {
-  if ( !ParamRegex.test(value) ) {
+  if (!ParamRegex.test(value)) {
     return false;
   }
   return buildFormatter(value).__fateIndexes.length > 0;
@@ -30,38 +30,37 @@ export function isFormatter(value: string) {
  * to fulfill its formatting.
  */
 export function buildFormatter(formatStr: string): FormatFunction {
-  let components: Component[] = [];
-  let requiredIndexes: (number|string)[] = [];
+  const components: Component[] = [];
+  const requiredIndexes: (number | string)[] = [];
   let clen = 0;
   let autoIdx = 0;
 
-  let workStr = '' + formatStr;
-  while ( workStr && workStr.length ) {
-    let paramMatch = ParamRegex.exec(workStr);
-    if ( !paramMatch ) {
+  let workStr = `${formatStr}`;
+  while (workStr && workStr.length) {
+    const paramMatch = ParamRegex.exec(workStr);
+    if (!paramMatch) {
       components.push(createLiteralComponent(workStr));
       break;
     }
 
-    let match = paramMatch[0];
-    let matchIdx = paramMatch.index;
-    let matchLen = match.length;
+    const match = paramMatch[0];
+    const matchIdx = paramMatch.index;
+    const matchLen = match.length;
 
-    if ( matchIdx ) {
+    if (matchIdx) {
       components.push(createLiteralComponent(workStr.substring(0, matchIdx)));
     }
 
-    if ( paramMatch[2] === '%' ) {
+    if (paramMatch[2] === '%') {
       components.push(createLiteralComponent('%'));
       workStr = workStr.substring(matchIdx + matchLen);
       continue;
     }
 
-    let idx: (string|number) = autoIdx++;
-    if ( paramMatch[4] ) {
+    let idx: (string | number) = autoIdx++;
+    if (paramMatch[4]) {
       idx = paramMatch[4];
-    }
-    else if ( paramMatch[3] ) {
+    } else if (paramMatch[3]) {
       idx = parseInt(paramMatch[3], 10);
     }
     requiredIndexes.push(idx);
@@ -80,15 +79,15 @@ export function buildFormatter(formatStr: string): FormatFunction {
     return formatStr;
   }
 
-  function formatFunction(data: any|any[]) {
-    if ( typeof data !== 'object' || data === null ) {
+  function formatFunction(data: any | any[]) {
+    if (typeof data !== 'object' || data === null) {
       data = [data];
     }
 
     let result = '';
-    for ( let i = 0; i < clen; i++ ) {
-      let component = components[i];
-      switch ( component[0] ) {
+    for (let i = 0; i < clen; i++) {
+      const component = components[i];
+      switch (component[0]) {
         case 0:
           result += component[1];
           break;
@@ -104,7 +103,7 @@ export function buildFormatter(formatStr: string): FormatFunction {
     return [0, literal];
   }
 
-  function createIndexedComponent(idx: number|string): Component {
+  function createIndexedComponent(idx: number | string): Component {
     return [1, idx];
   }
 }

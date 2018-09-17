@@ -1,7 +1,7 @@
 /** @flow */
 
-import { definePattern } from "../runtime";
-import { Readable, Writable } from "stream";
+import { Readable, Writable } from 'stream';
+import { definePattern } from '../runtime';
 
 const math = Math;
 const object = Object;
@@ -13,8 +13,8 @@ const json = JSON;
 const Undefined: any = undefined;
 const Null: any = null;
 
-function make(ctor: Function, ...args: any[]) {
-  return new ctor(...args);
+function make(Ctor: Function, ...args: any[]) {
+  return new Ctor(...args);
 }
 
 function isA(type: string): Function {
@@ -28,7 +28,7 @@ function setProperty(target: Target, key: string, value: any) {
 }
 
 function print() {
-  console.log.apply(console, arguments);
+  console.log(...arguments);
 }
 
 export {
@@ -45,5 +45,5 @@ export {
   Undefined as undefined,
   Null as null,
   Readable,
-  Writable
+  Writable,
 };

@@ -5,149 +5,149 @@ import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
 
 export class BinaryEvaluator extends NodeEvaluator {
+  static tags = [
+    'eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'add', 'sub', 'mul', 'div', 'mod',
+  ];
   node: Syntax.BinaryOperator;
 
-  evaluate() {
+  evaluate(...args: any[]) {
     this.coder.binaryOperator(
       this.node.tag,
       this.defer(this.node.left),
-      this.defer(this.node.right)
+      this.defer(this.node.right),
     );
   }
 }
-BinaryEvaluator.tags = [
-  'eq', 'neq', 'gt', 'lt', 'gte', 'lte', 'add', 'sub', 'mul', 'div', 'mod'
-];
 
 export class StatementsEvaluator extends NodeEvaluator {
+  static tags = ['statements'];
   node: Syntax.Statements;
 
-  evaluate() {
-    this.node.statements.forEach(statement => {
+  evaluate(...args: any[]) {
+    this.node.statements.forEach((statement) => {
       this.dispatch(statement);
     });
   }
 }
-StatementsEvaluator.tags = ['statements'];
 
 // generate an evaluator that assigns the result of an expression
 // to the last result scratch variable
 export class ExpressionEvaluator extends NodeEvaluator {
+  static tags = ['expression'];
   node: Syntax.ExpressionStatement;
 
-  evaluate() {
+  evaluate(...args: any[]) {
     this.coder.statement(() => {
       this.coder.assignResult(this.defer(this.node.expression));
     });
   }
 }
-ExpressionEvaluator.tags = ['expression'];
 
 export class OrEvaluator extends NodeEvaluator {
+  static tags = ['or'];
   node: Syntax.OrOperator;
 
-  evaluate() {
+  evaluate(...args: any[]) {
     this.coder.or(this.defer(this.node.left), this.defer(this.node.right));
   }
 }
-OrEvaluator.tags = ['or'];
 
 export class AndEvaluator extends NodeEvaluator {
+  static tags = ['and'];
   node: Syntax.AndOperator;
 
-  evaluate() {
+  evaluate(...args: any[]) {
     this.coder.and(this.defer(this.node.left), this.defer(this.node.right));
   }
 }
-AndEvaluator.tags = ['and'];
 
 export class InEvaluator extends NodeEvaluator {
+  static tags = ['in'];
   node: Syntax.InOperator;
 
-  evaluate() {
-    let isIn = this.coder.runtimeImport('isIn');
+  evaluate(...args: any[]) {
+    const isIn = this.coder.runtimeImport('isIn');
     this.coder.call(isIn, [
       this.defer(this.node.left),
-      this.defer(this.node.right)
+      this.defer(this.node.right),
     ]);
   }
 }
-InEvaluator.tags = ['in'];
 
 export class NotInEvaluator extends NodeEvaluator {
+  static tags = ['notIn'];
   node: Syntax.NotInOperator;
 
-  evaluate() {
+  evaluate(...args: any[]) {
     this.coder.unaryOperator('not', () => {
-      let isIn = this.coder.runtimeImport('isIn');
+      const isIn = this.coder.runtimeImport('isIn');
       this.coder.call(isIn, [
         this.defer(this.node.left),
-        this.defer(this.node.right)
+        this.defer(this.node.right),
       ]);
     });
   }
 }
-NotInEvaluator.tags = ['notIn'];
 
 export class NotEvaluator extends NodeEvaluator {
+  static tags = ['not'];
   node: Syntax.NotOperator;
 
-  evaluate() {
+  evaluate(...args: any[]) {
     this.coder.not(this.defer(this.node.left));
   }
 }
-NotEvaluator.tags = ['not'];
 
 export class UnaryEvaluator extends NodeEvaluator {
+  static tags = ['neg', 'pos'];
   node: Syntax.NegativeOperator;
 
-  evaluate() {
+  evaluate(...args: any[]) {
     this.coder.unaryOperator(this.node.tag, this.defer(this.node.left));
   }
 }
-UnaryEvaluator.tags = ['neg', 'pos'];
 
 export class FormatEvaluator extends NodeEvaluator {
+  static tags = ['format'];
   node: Syntax.FormatOperator;
 
-  evaluate() {
-    let formatStr = this.coder.literal(this.node.left.value);
-    let formatter = this.coder.builder('buildFormatter', formatStr);
+  evaluate(...args: any[]) {
+    const formatStr = this.coder.literal(this.node.left.value);
+    const formatter = this.coder.builder('buildFormatter', formatStr);
     this.coder.write(formatter);
   }
 }
-FormatEvaluator.tags = ['format'];
 
 export class MemberEvaluator extends NodeEvaluator {
+  static tags = ['member'];
   node: Syntax.MemberOperator;
 
-  evaluate() {
+  evaluate(...args: any[]) {
     this.coder.member(this.defer(this.node.left), this.defer(this.node.right));
   }
 }
-MemberEvaluator.tags = ['member'];
 
 export class ArrayEvaluator extends NodeEvaluator {
+  static tags = ['array'];
   node: Syntax.ArrayConstructor;
 
-  evaluate() {
+  evaluate(...args: any[]) {
     this.coder.array(
-      this.node.elements.map(element => this.defer(element))
+      this.node.elements.map(element => this.defer(element)),
     );
   }
 }
-ArrayEvaluator.tags = ['array'];
 
 export class ObjectEvaluator extends NodeEvaluator {
+  static tags = ['object'];
   node: Syntax.ObjectConstructor;
 
-  evaluate() {
-    let elems = this.node.elements.map(elem => {
+  evaluate(...args: any[]) {
+    const elems = this.node.elements.map((elem) => {
       let name: Target.BodyEntry;
-      if ( elem.id instanceof Syntax.Literal ) {
+      if (elem.id instanceof Syntax.Literal) {
         name = elem.id.value;
-      }
-      else {
+      } else {
         name = this.defer(elem.id);
       }
       return [name, this.defer(elem.value), false];
@@ -155,49 +155,51 @@ export class ObjectEvaluator extends NodeEvaluator {
     this.coder.object(elems);
   }
 }
-ObjectEvaluator.tags = ['object'];
 
 export class IdEvaluator extends NodeEvaluator {
+  static tags = ['id'];
   node: Syntax.Identifier;
 
-  evaluate() {
+  evaluate(...args: any[]) {
     this.coder.getter(this.node.value);
   }
 }
-IdEvaluator.tags = ['id'];
 
 export class LiteralEvaluator extends NodeEvaluator {
+  static tags = ['literal'];
   node: Syntax.Literal;
 
-  evaluate() {
-    let literal = this.coder.literal(this.node.value);
+  evaluate(...args: any[]) {
+    const literal = this.coder.literal(this.node.value);
     this.coder.write(literal);
   }
 }
-LiteralEvaluator.tags = ['literal'];
 
 export class ContextEvaluator extends NodeEvaluator {
-  evaluate() {
+  static tags = ['context'];
+
+  evaluate(...args: any[]) {
     let contextName = Syntax.getAnnotation(this.node, 'pattern/local');
-    if ( !contextName ) {
+    if (!contextName) {
       throw new Error("Stupid Coder: Where's the context pattern name?");
     }
     contextName = this.coder.registerAnonymous(contextName);
     this.coder.retrieveAnonymous(contextName);
   }
 }
-ContextEvaluator.tags = ['context'];
 
 export class SelfEvaluator extends NodeEvaluator {
-  evaluate() {
+  static tags = ['self'];
+
+  evaluate(...args: any[]) {
     this.coder.self();
   }
 }
-SelfEvaluator.tags = ['self'];
 
 export class GlobalEvaluator extends NodeEvaluator {
-  evaluate() {
+  static tags = ['global'];
+
+  evaluate(...args: any[]) {
     this.coder.globalObject();
   }
 }
-GlobalEvaluator.tags = ['global'];

@@ -3,59 +3,60 @@
 import * as Target from '../target';
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
-import {RegexEvaluator} from "./pattern";
+import { RegexEvaluator } from './pattern';
 
 class ImportExportEvaluator extends NodeEvaluator {
   createImporterArguments() {
     this.coder.member(
       () => { this.coder.globalObject(); },
-      this.coder.currentDirectory()
+      this.coder.currentDirectory(),
     );
   }
 }
 
 export class ImportEvaluator extends ImportExportEvaluator {
+  static tags = ['import'];
   node: Syntax.ImportStatement;
 
-  evaluate() {
-    let assigns: Target.AssignmentItems = [];
-    this.node.modules.forEach(module => {
-      let moduleName = module.path.value;
-      let moduleAlias = module.alias.value;
+  evaluate(...args: any[]) {
+    const assigns: Target.AssignmentItems = [];
+    this.node.modules.forEach((module) => {
+      const moduleName = module.path.value;
+      const moduleAlias = module.alias.value;
 
-      let moduleNameId = this.coder.literal(moduleName);
-      let importer = this.coder.builder('importer', moduleNameId);
+      const moduleNameId = this.coder.literal(moduleName);
+      const importer = this.coder.builder('importer', moduleNameId);
 
       assigns.push([
         moduleAlias,
         () => {
           this.coder.call(importer, [this.createImporterArguments.bind(this)]);
-        }
+        },
       ]);
     });
     this.coder.assignments(assigns);
   }
 }
-ImportEvaluator.tags = ['import'];
 
 export class FromEvaluator extends ImportExportEvaluator {
+  static tags = ['from'];
   node: Syntax.FromStatement;
 
-  evaluate() {
-    let assigns: any[] = [];
-    let modulePath = this.node.path.value;
-    let modulePathId = this.coder.literal(modulePath);
-    let importer = this.coder.builder('importer', modulePathId);
+  evaluate(...args: any[]) {
+    const assigns: any[] = [];
+    const modulePath = this.node.path.value;
+    const modulePathId = this.coder.literal(modulePath);
+    const importer = this.coder.builder('importer', modulePathId);
 
-    let anon = this.coder.createAnonymous();
+    const anon = this.coder.createAnonymous();
     assigns.push([
       anon,
       () => {
         this.coder.call(importer, [this.createImporterArguments.bind(this)]);
-      }
+      },
     ]);
 
-    this.node.importList.forEach(item => {
+    this.node.importList.forEach((item) => {
       assigns.push([
         item.id.value,
         () => {
@@ -63,32 +64,31 @@ export class FromEvaluator extends ImportExportEvaluator {
             () => {
               this.coder.retrieveAnonymous(anon);
             },
-            this.coder.literal(item.moduleKey.value)
+            this.coder.literal(item.moduleKey.value),
           );
-        }
+        },
       ]);
     });
 
     this.coder.assignments(assigns);
   }
 }
-FromEvaluator.tags = ['from'];
 
 export class ExportEvaluator extends ImportExportEvaluator {
+  static tags = ['export'];
   node: Syntax.ExportStatement;
 
-  evaluate() {
-    let exportItems = this.node.exportItems;
-    if ( !exportItems.length ) {
+  evaluate(...args: any[]) {
+    const exportItems = this.node.exportItems;
+    if (!exportItems.length) {
       this.coder.exportAll();
       return;
     }
 
-    this.coder.exports(exportItems.map(item => {
-      let name = item.id.value;
-      let alias = item.moduleKey.value;
+    this.coder.exports(exportItems.map((item) => {
+      const name = item.id.value;
+      const alias = item.moduleKey.value;
       return [name, alias];
     }));
   }
 }
-ExportEvaluator.tags = ['export'];

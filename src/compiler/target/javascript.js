@@ -1,8 +1,10 @@
 /** @flow */
 
+import type { ResolverValue } from '../syntax';
+
 import * as Target from './index';
 import { mixin } from '../../runtime';
-import { Resolver, ResolverValue } from '../syntax';
+import { Resolver } from '../syntax';
 
 const isArray = Array.isArray;
 const jsonStringify = JSON.stringify;
@@ -15,12 +17,11 @@ type GlobalId = Target.Id;
 type NameIdsMap = { [index: string]: Target.Ids };
 type Modifications = Modification[];
 type NameModificationsMap = { [index: string]: Modifications };
-type FunctionNameMap = { [index: string]: string };
 
 const FirstAccess = {
   Unknown: 0,
   Read: 1,
-  Write: 2
+  Write: 2,
 };
 
 type FirstAccessValue = $Values<typeof FirstAccess>;
@@ -43,30 +44,30 @@ interface Modification {
 
 // presented operators are symbolic
 const operatorMap: StringMap = {
-  'eq': '===',
-  'neq': '!==',
-  'gt': '>',
-  'lt': '<',
-  'gte': '>=',
-  'lte': '<=',
-  'add': '+',
-  'sub': '-',
-  'mul': '*',
-  'div': '/',
-  'mod': '%',
-  'not': '!',
-  'neg': '-',
-  'pos': '+'
+  eq: '===',
+  neq: '!==',
+  gt: '>',
+  lt: '<',
+  gte: '>=',
+  lte: '<=',
+  add: '+',
+  sub: '-',
+  mul: '*',
+  div: '/',
+  mod: '%',
+  not: '!',
+  neg: '-',
+  pos: '+',
 };
 
-const waiterMap: FunctionNameMap = {};
+const waiterMap: string[] = [];
 waiterMap[Resolver.Value] = 'awaitValue';
 waiterMap[Resolver.Any] = 'awaitAny';
 waiterMap[Resolver.All] = 'awaitAll';
 
 // various names
 const selfName = 's';
-const thisOrSelf = 'this||' + selfName;
+const thisOrSelf = `this||${selfName}`;
 const globalObjectName = 'c';
 const exportsName = 'x';
 const valueName = 'v';
@@ -79,63 +80,103 @@ function lastItem(arr: any[]) {
 }
 
 export function createCoder(): Target.Coder {
-  let idCounters: { [index: string]: number } = {}; // prefix -> nextId
+  const idCounters: { [index: string]: number } = {}; // prefix -> nextId
 
-  let generatedLiterals: { [index: string]: GlobalId } = {};
-  let generatedImports: { [index: string]: GlobalId } = {};
-  let generatedBuilders: { [index: string]: GlobalId } = {};
-  let globalVars: string[] = [];
+  const generatedLiterals: { [index: string]: GlobalId } = {};
+  const generatedImports: { [index: string]: GlobalId } = {};
+  const generatedBuilders: { [index: string]: GlobalId } = {};
+  const globalVars: string[] = [];
 
   // keeps track of name -> local mappings throughout the nesting
-  let names: NameIdsMap = {};  // name -> localId[]
+  let names: NameIdsMap = {}; // name -> localId[]
   let scopeInfo = createScopeInfo();
-  let nameStack: NameInfo[] = [];
+  const nameStack: NameInfo[] = [];
   let usesScratch = false;
 
-  let writerStack: Target.BodyEntries[] = [];
+  const writerStack: Target.BodyEntries[] = [];
   let body: Target.BodyEntries = [];
 
   return {
-    selfName, globalObjectName, exportsName, valueName,
-    literal, runtimeImport, builder, registerAnonymous,
-    createAnonymous, assignAnonymous, retrieveAnonymous,
-    createCounter, incrementCounter, assignResult, self,
-    currentDirectory, args, globalObject, member, write,
-    writeAndGroup, getter, assignment, assignments,
-    exportAll, exports, unaryOperator, binaryOperator,
-    isTrue, isFalse, and, or, not, conditional,
-    statement, ifStatement, loopExpression, loopContinue,
-    funcDeclaration, iife, generator, scope, func, waitFor,
-    compoundExpression, returnStatement, emitStatement,
-    call, array, object, parens, code, toString
+    selfName,
+    globalObjectName,
+    exportsName,
+    valueName,
+    literal,
+    runtimeImport,
+    builder,
+    registerAnonymous,
+    createAnonymous,
+    assignAnonymous,
+    retrieveAnonymous,
+    createCounter,
+    incrementCounter,
+    assignResult,
+    self,
+    currentDirectory,
+    args,
+    globalObject,
+    member,
+    write,
+    writeAndGroup,
+    getter,
+    assignment,
+    assignments,
+    exportAll,
+    exports,
+    unaryOperator,
+    binaryOperator,
+    isTrue,
+    isFalse,
+    and,
+    or,
+    not,
+    conditional,
+    statement,
+    ifStatement,
+    loopExpression,
+    loopContinue,
+    funcDeclaration,
+    iife,
+    generator,
+    scope,
+    func,
+    waitFor,
+    compoundExpression,
+    returnStatement,
+    emitStatement,
+    call,
+    array,
+    object,
+    parens,
+    code,
+    toString,
   };
 
   function nextId(prefix: string) {
     let next = idCounters[prefix];
-    if ( typeof next !== 'number' ) {
-      next = 0;  // seed it
+    if (typeof next !== 'number') {
+      next = 0; // seed it
     }
-    let id = prefix + next.toString(36);
+    const id = prefix + next.toString(36);
     idCounters[prefix] = next + 1;
     return id;
   }
 
   function literal(literalValue: any) {
     let canonical: string;
-    if ( literalValue instanceof RegExp ) {
+    if (literalValue instanceof RegExp) {
       canonical = literalValue.toString();
-    }
-    else {
+    } else {
       canonical = jsonStringify(literalValue);
     }
 
-    if ( inlineLiteralTypes.indexOf(typeof literalValue) !== -1 &&
-         canonical.length <= inlineLiteralMaxLength ) {
+    if (inlineLiteralTypes.indexOf(typeof literalValue) !== -1
+         && canonical.length <= inlineLiteralMaxLength) {
       return canonical;
     }
 
     let id = generatedLiterals[canonical];
-    if ( id ) {
+    if (id) {
       return id;
     }
     id = generatedLiterals[canonical] = nextId('lit_');
@@ -146,26 +187,26 @@ export function createCoder(): Target.Coder {
 
   function runtimeImport(funcName: string) {
     let id = generatedImports[funcName];
-    if ( id ) {
+    if (id) {
       return id;
     }
-    id = generatedImports[funcName] = nextId(funcName + '_');
+    id = generatedImports[funcName] = nextId(`${funcName}_`);
     globalVars.push(
-      [id, "=r.", funcName].join('')
+      [id, '=r.', funcName].join(''),
     );
     return id;
   }
 
   function builder(funcName: string, ...literalIds: Target.Ids) {
-    let funcId = runtimeImport(funcName);
-    let key = `${funcId}/${literalIds.join('/')}`;
+    const funcId = runtimeImport(funcName);
+    const key = `${funcId}/${literalIds.join('/')}`;
     let id = generatedBuilders[key];
-    if ( id ) {
+    if (id) {
       return id;
     }
-    id = generatedBuilders[key] = nextId(funcName + '_');
+    id = generatedBuilders[key] = nextId(`${funcName}_`);
     globalVars.push(
-      `${ id }=${ funcId }(${ literalIds.join(',') })`
+      `${id}=${funcId}(${literalIds.join(',')})`,
     );
     return id;
   }
@@ -175,15 +216,15 @@ export function createCoder(): Target.Coder {
       firstAccess: {},
       snapshot() {
         return mixin({}, this);
-      }
+      },
     };
   }
 
   function pushLocalScope() {
     nameStack.push({
-      names: names,
-      scopeInfo: scopeInfo,
-      usesScratch: usesScratch
+      names,
+      scopeInfo,
+      usesScratch,
     });
 
     names = extendNames(names);
@@ -192,15 +233,15 @@ export function createCoder(): Target.Coder {
   }
 
   function extendNames(namesMap: NameIdsMap) {
-    let result: NameIdsMap = {};
-    Object.keys(namesMap).forEach(name => {
+    const result: NameIdsMap = {};
+    Object.keys(namesMap).forEach((name) => {
       result[name] = [lastItem(namesMap[name])];
     });
     return result;
   }
 
   function popLocalScope() {
-    let info = nameStack.pop();
+    const info = nameStack.pop();
     names = info.names;
     scopeInfo = info.scopeInfo;
     usesScratch = info.usesScratch;
@@ -208,35 +249,35 @@ export function createCoder(): Target.Coder {
 
   function popLocalScopeWithScratch() {
     // pass scratch up and through
-    let tmpScratch = usesScratch;
+    const tmpScratch = usesScratch;
     popLocalScope();
     usesScratch = tmpScratch;
   }
 
   function nextIdForName(name: Target.Name) {
-    if ( typeof name !== 'string' ) {
-      return nextId('_' + name + '$');
+    if (typeof name !== 'string') {
+      return nextId(`_${name}$`);
     }
-    return nextId(name + '$');
+    return nextId(`${name}$`);
   }
 
   function localForWrite(name: Target.Name) {
-    if ( isAnonymous(name) ) {
+    if (isAnonymous(name)) {
       return names[name][0];
     }
-    if ( !scopeInfo.firstAccess[name] ) {
+    if (!scopeInfo.firstAccess[name]) {
       scopeInfo.firstAccess[name] = FirstAccess.Write;
     }
-    let ids = names[name] || (names[name] = []);
+    const ids = names[name] || (names[name] = []);
     ids.push(nextIdForName(name));
     return lastItem(ids);
   }
 
   function localForRead(name: Target.Name) {
-    if ( !scopeInfo.firstAccess[name] ) {
+    if (!scopeInfo.firstAccess[name]) {
       scopeInfo.firstAccess[name] = FirstAccess.Read;
     }
-    let ids = names[name] || (names[name] = [nextIdForName(name)]);
+    const ids = names[name] || (names[name] = [nextIdForName(name)]);
     return lastItem(ids);
   }
 
@@ -249,8 +290,8 @@ export function createCoder(): Target.Coder {
   }
 
   function args(startAt: number) {
-    let slice = runtimeImport('sliceArray');
-    write(slice, '(arguments,', '' + startAt, ')');
+    const slice = runtimeImport('sliceArray');
+    write(slice, '(arguments,', `${startAt}`, ')');
   }
 
   function globalObject() {
@@ -259,12 +300,11 @@ export function createCoder(): Target.Coder {
 
   function member(object: Target.BodyEntry, property: Target.BodyEntry) {
     write(object, () => {
-      let propertyCode = code(property);
-      let idMatch = jsStringIdRegex.exec(propertyCode);
-      if ( idMatch ) {
+      const propertyCode = code(property);
+      const idMatch = jsStringIdRegex.exec(propertyCode);
+      if (idMatch) {
         write('.', idMatch[2]);
-      }
-      else {
+      } else {
         write('[', propertyCode, ']');
       }
     });
@@ -282,15 +322,15 @@ export function createCoder(): Target.Coder {
     write(getAnonymousId(name), '=', value);
   }
 
-  function registerAnonymous(id: Target.Id) {
-    let name = ' ' + id;
+  function registerAnonymous(id: Target.Id): string {
+    const name = ` ${id}`;
     names[name] = [id];
     return name;
   }
 
   function createAnonymous() {
-    let id = nextId('anon_');
-    let name = ' ' + id;
+    const id = nextId('anon_');
+    const name = ` ${id}`;
     names[name] = [id];
     return name;
   }
@@ -318,14 +358,14 @@ export function createCoder(): Target.Coder {
   }
 
   function popWriter(): Target.GeneratedCode {
-    let result = body;
+    const result = body;
     body = writerStack.pop();
     return code(result);
   }
 
   function captureState(capturedBody: Function) {
-    let myScopeInfo = scopeInfo.snapshot();
-    let myNames = names;
+    const myScopeInfo = scopeInfo.snapshot();
+    const myNames = names;
 
     return () => {
       pushLocalScope();
@@ -337,14 +377,13 @@ export function createCoder(): Target.Coder {
   }
 
   function write(...content: any[]) {
-    let args = content.filter(
-      arg => arg !== undefined && arg !== null
+    const args = content.filter(
+      arg => arg !== undefined && arg !== null,
     );
-    args.forEach(arg => {
-      if ( typeof arg === 'function' ) {
+    args.forEach((arg) => {
+      if (typeof arg === 'function') {
         body.push(captureState(arg));
-      }
-      else {
+      } else {
         body.push(arg);
       }
     });
@@ -357,11 +396,11 @@ export function createCoder(): Target.Coder {
   }
 
   function writeDelimited(items: Target.BodyEntries, delimiter?: string) {
-    if ( delimiter === undefined ) {
+    if (delimiter === undefined) {
       delimiter = ',';
     }
     items.forEach((item, i) => {
-      if ( i > 0 ) {
+      if (i > 0) {
         write(delimiter);
       }
       write(item);
@@ -369,7 +408,7 @@ export function createCoder(): Target.Coder {
   }
 
   function generate(value: Target.BodyEntry) {
-    if ( typeof value !== 'function' ) {
+    if (typeof value !== 'function') {
       write(value);
       return;
     }
@@ -385,29 +424,29 @@ export function createCoder(): Target.Coder {
   }
 
   function assignments(items: Target.AssignmentItems) {
-    items.forEach(item => {
-      let name = item[0];
-      let value = code(item[1]);
+    items.forEach((item) => {
+      const name = item[0];
+      const value = code(item[1]);
 
-      let localName = localForWrite(name);
-      write(localName, '=', value, ";");
+      const localName = localForWrite(name);
+      write(localName, '=', value, ';');
     });
   }
 
   function exportAll() {
-    Object.keys(names).filter(name => !isAnonymous(name)).forEach(name => {
-      let localName = localForRead(name);
+    Object.keys(names).filter(name => !isAnonymous(name)).forEach((name) => {
+      const localName = localForRead(name);
       member(exportsName, literal(name));
       write('=', localName, ';');
     });
   }
 
   function exports(items: Target.ModuleItems) {
-    items.forEach(item => {
-      let name = item[0];
-      let alias = item[1];
+    items.forEach((item) => {
+      const name = item[0];
+      const alias = item[1];
 
-      let localName = localForRead(name);
+      const localName = localForRead(name);
       member(exportsName, literal(alias));
       write('=', localName, ';');
     });
@@ -418,31 +457,31 @@ export function createCoder(): Target.Coder {
   }
 
   function binaryOperator(operator: string, left: Target.BodyEntry,
-                          right: Target.BodyEntry) {
+    right: Target.BodyEntry) {
     write('(', code(left), operatorMap[operator], code(right), ')');
   }
 
   function isTrue(expr: Target.BodyEntry) {
-    let anon = getAnonymousId(createAnonymous());
+    const anon = getAnonymousId(createAnonymous());
     write('(', anon, '=', expr, ',');
     write(anon, '!==false&&', anon, '!=null)');
   }
 
   function isFalse(expr: Target.BodyEntry) {
-    let anon = getAnonymousId(createAnonymous());
+    const anon = getAnonymousId(createAnonymous());
     write('(', anon, '=', expr, ',');
     write(anon, '===false||', anon, '==null)');
   }
 
   function and(left: Target.BodyEntry, right: Target.BodyEntry) {
-    let anon = getAnonymousId(createAnonymous());
+    const anon = getAnonymousId(createAnonymous());
     write('(', anon, '=', left, ',');
     write(anon, '!==false&&', anon, '!=null?');
     write(right, ':', anon, ')');
   }
 
   function or(left: Target.BodyEntry, right: Target.BodyEntry) {
-    let anon = getAnonymousId(createAnonymous());
+    const anon = getAnonymousId(createAnonymous());
     write('(', anon, '=', left, ',');
     write(anon, '===false||', anon, '==null?');
     write(right, ':', anon, ')');
@@ -455,12 +494,12 @@ export function createCoder(): Target.Coder {
   }
 
   function conditional(condition: Target.BodyEntry, trueVal: Target.BodyEntry,
-                       falseVal: Target.BodyEntry) {
-    let condCode = code(condition);
-    let trueCode = code(trueVal);
-    let falseCode = code(falseVal);
+    falseVal: Target.BodyEntry) {
+    const condCode = code(condition);
+    const trueCode = code(trueVal);
+    const falseCode = code(falseVal);
 
-    let anon = getAnonymousId(createAnonymous());
+    const anon = getAnonymousId(createAnonymous());
     write('(', anon, '=', condCode, ',');
     write(anon, '!==false&&', anon, '!=null?');
     write(trueCode, ':', falseCode, ')');
@@ -474,45 +513,45 @@ export function createCoder(): Target.Coder {
                        thenBranch: Target.BodyEntry,
                        elseBranch: Target.BodyEntry) {
     let condWrapper = isTrue;
-    if ( !thenBranch ) {
+    if (!thenBranch) {
       condWrapper = isFalse;
       thenBranch = elseBranch;
       elseBranch = undefined;
     }
 
-    let condCode = code(condition);
-    let [thenCode, elseCode] = codeBranches(thenBranch, elseBranch);
+    const condCode = code(condition);
+    const [thenCode, elseCode] = codeBranches(thenBranch, elseBranch);
 
     write('if');
     condWrapper(condCode);
     write('{', thenCode, '}');
 
-    if ( elseCode.length ) {
+    if (elseCode.length) {
       write('else{', elseCode, '}');
     }
   }
 
   // code branches using static single assignment
   function codeBranches(...branches: Target.BodyEntry[]) {
-    let branchContent: string[] = [];
+    const branchContent: string[] = [];
 
     // step 1: Code the branches, gathering the assignments
-    let originalNames = names;
-    let modificationSets: NameModificationsMap = {};
+    const originalNames = names;
+    const modificationSets: NameModificationsMap = {};
     branches.forEach((branch, index) => {
       names = extendNames(originalNames);
-      branchContent[index] = branch ? code(branch) : "";
-       Object.keys(names).forEach(key => {
-        let created = !originalNames[key];
-        if ( created || names[key].length > 1 ) {
+      branchContent[index] = branch ? code(branch) : '';
+      Object.keys(names).forEach((key) => {
+        const created = !originalNames[key];
+        if (created || names[key].length > 1) {
           let modificationSet = modificationSets[key];
-          if ( !modificationSet ) {
+          if (!modificationSet) {
             modificationSet = modificationSets[key] = [];
           }
 
           modificationSet[index] = {
             ids: names[key],
-            created: created
+            created,
           };
         }
       });
@@ -520,31 +559,31 @@ export function createCoder(): Target.Coder {
     names = originalNames;
 
     // step 2: Create Phi functions for each name
-    Object.keys(modificationSets).forEach(key => {
+    Object.keys(modificationSets).forEach((key) => {
       let parentIds = names[key] || [];
-      let passthruId = parentIds.length ? lastItem(parentIds) : null;
-      let sourceIds: Target.Ids = [];
-      let modificationSet = modificationSets[key];
+      const passthruId = parentIds.length ? lastItem(parentIds) : null;
+      const sourceIds: Target.Ids = [];
+      const modificationSet = modificationSets[key];
 
-      for ( let i = 0; i < branches.length; i++ ) {
-        let modifications = modificationSet[i];
-        if ( !modifications ) {
+      for (let i = 0; i < branches.length; i++) {
+        const modifications = modificationSet[i];
+        if (!modifications) {
           sourceIds[i] = passthruId;
           continue;
         }
 
-        let ids = modifications.ids.slice(modifications.created ? 0 : 1);
+        const ids = modifications.ids.slice(modifications.created ? 0 : 1);
         parentIds = parentIds.concat(ids);
         sourceIds[i] = lastItem(ids);
       }
       names[key] = parentIds;
 
-      let targetId = localForWrite(key);
+      const targetId = localForWrite(key);
       sourceIds.forEach((sourceId, index) => {
-        if ( !sourceId || sourceId === targetId ) {
+        if (!sourceId || sourceId === targetId) {
           return;
         }
-        let content = [targetId, '=', sourceId, ';'].join('');
+        const content = [targetId, '=', sourceId, ';'].join('');
         branchContent[index] += content;
       });
     });
@@ -553,38 +592,38 @@ export function createCoder(): Target.Coder {
   }
 
   function loopExpression(options: Target.LoopOptions) {
-    let itemValue = options.value;
-    let itemName = options.name;
-    let collection = options.collection;
-    let loopGuard = options.guard;
-    let loopBody = options.body;
+    const itemValue = options.value;
+    const itemName = options.name;
+    const collection = options.collection;
+    const loopGuard = options.guard;
+    const loopBody = options.body;
 
-    let iterator = runtimeImport('createIterator');
-    let iteratorContent = code(() => {
+    const iterator = runtimeImport('createIterator');
+    const iteratorContent = code(() => {
       write(iterator, '(', collection, ')');
     });
 
-    let parentNames = names;
+    const parentNames = names;
     pushLocalScope();
 
-    let contextArgs = [itemValue];
-    if ( itemName ) {
+    const contextArgs = [itemValue];
+    if (itemName) {
       contextArgs.push(itemName);
     }
-    let argNames = contextArgs.map(localForWrite);
+    const argNames = contextArgs.map(localForWrite);
 
-    let bodyContent = code(() => {
+    const bodyContent = code(() => {
       generate(loopBody);
     });
 
-    let guardContent = code(() => {
+    const guardContent = code(() => {
       generate(loopGuard);
     });
 
-    let wrapper = nextId('iter_');
+    const wrapper = nextId('iter_');
     write('for(let ', wrapper, ' of ', iteratorContent, '){');
     write('let ', argNames[0], '=', wrapper, '[0];');
-    if ( itemName ) {
+    if (itemName) {
       write('let ', argNames[1], '=', wrapper, '[1];');
     }
 
@@ -601,10 +640,10 @@ export function createCoder(): Target.Coder {
   }
 
   function funcDeclaration(name: Target.Name,
-                           options: Target.FunctionOptions) {
+    options: Target.FunctionOptions) {
     statement(() => {
       assignResult(() => {
-        let functionId = localForWrite(name);
+        const functionId = localForWrite(name);
         write(functionId, '=');
         func(options);
       });
@@ -624,10 +663,10 @@ export function createCoder(): Target.Coder {
   }
 
   function scope(scopeBody: Target.BodyEntry) {
-    let parentNames = names;
+    const parentNames = names;
     pushLocalScope();
 
-    let bodyContent = code(() => {
+    const bodyContent = code(() => {
       generate(scopeBody);
     });
 
@@ -637,38 +676,38 @@ export function createCoder(): Target.Coder {
   }
 
   function func(options: Target.FunctionOptions) {
-    let internalId = options.internalId;
-    let internalArgs = options.internalArgs || [];
-    let contextArgs = options.contextArgs || [];
-    let isGenerator = options.generator;
-    let funcBody = options.body;
+    const internalId = options.internalId;
+    const internalArgs = options.internalArgs || [];
+    const contextArgs = options.contextArgs || [];
+    const isGenerator = options.generator;
+    const funcBody = options.body;
 
-    let parentNames = names;
+    const parentNames = names;
     pushLocalScope();
 
-    let localNames = contextArgs.map(localForRead);
+    const localNames = contextArgs.map(localForRead);
 
-    let bodyContent = code(() => {
+    const bodyContent = code(() => {
       generate(funcBody);
     });
 
-    let argNames = internalArgs.concat(localNames);
+    const argNames = internalArgs.concat(localNames);
     write('function');
-    if ( isGenerator ) {
+    if (isGenerator) {
       write('*');
     }
-    if ( internalId ) {
-      write(' ' + internalId);
+    if (internalId) {
+      write(` ${internalId}`);
     }
     write('(', argNames.join(','), '){');
-    if ( usesScratch ) {
+    if (usesScratch) {
       write('let _;');
     }
 
     writeLocalVariables(parentNames, argNames);
     write(bodyContent);
 
-    if ( usesScratch ) {
+    if (usesScratch) {
       write('return _;');
     }
     write('}');
@@ -676,23 +715,23 @@ export function createCoder(): Target.Coder {
   }
 
   function writeLocalVariables(parentNames: NameIdsMap,
-                               argNames: Target.Names) {
-    let undefinedVars: Target.Names = [];
-    Object.keys(names).forEach(name => {
-      let localNameIds = names[name];
-      let localNameId = localNameIds[0];
+    argNames: Target.Names) {
+    const undefinedVars: Target.Names = [];
+    Object.keys(names).forEach((name) => {
+      const localNameIds = names[name];
+      const localNameId = localNameIds[0];
 
       // all secondary locals are treated as undefined
-      undefinedVars.push.apply(undefinedVars, localNameIds.slice(1));
+      undefinedVars.push(...localNameIds.slice(1));
 
-      if ( isArgument(localNameId) || parentNames[name] ) {
+      if (isArgument(localNameId) || parentNames[name]) {
         return;
       }
 
       undefinedVars.push(localNameId);
     });
 
-    if ( undefinedVars.length ) {
+    if (undefinedVars.length) {
       write('let ', undefinedVars.sort(compareVarNames).join(','), ';');
     }
 
@@ -702,13 +741,14 @@ export function createCoder(): Target.Coder {
   }
 
   function compareVarNames(left: string, right: string) {
-    let leftU = left.toUpperCase(), rightU = right.toUpperCase();
+    const leftU = left.toUpperCase(); const
+      rightU = right.toUpperCase();
     return leftU < rightU ? -1 : leftU > rightU ? 1 : 0;
   }
 
   function waitFor(resolver: ResolverValue, expression: Target.BodyEntry) {
-    let resolverFuncName = waiterMap[resolver || Resolver.Value];
-    let resolverFunc = runtimeImport(resolverFuncName);
+    const resolverFuncName = waiterMap[resolver || Resolver.Value];
+    const resolverFunc = runtimeImport(resolverFuncName);
     write('(yield [', resolverFunc, ',', expression, '])');
   }
 
@@ -719,7 +759,7 @@ export function createCoder(): Target.Coder {
   }
 
   function returnStatement(bodyCallback?: Target.BodyEntry) {
-    if ( bodyCallback ) {
+    if (bodyCallback) {
       write('return ', bodyCallback, ';');
       return;
     }
@@ -730,9 +770,9 @@ export function createCoder(): Target.Coder {
     write('yield ', bodyCallback, ';');
   }
 
-  function call(funcId: Target.Id|Target.BodyEntry,
-                args?: Target.BodyEntries) {
-    if ( !args ) {
+  function call(funcId: Target.Id | Target.BodyEntry,
+    args?: Target.BodyEntries) {
+    if (!args) {
       // pass through local arguments (for function chaining)
       write(funcId, '.apply(', thisOrSelf, ',arguments)');
       return;
@@ -749,23 +789,23 @@ export function createCoder(): Target.Coder {
   }
 
   function object(items: Target.ObjectAssignmentItems) {
-    let literals: Target.ObjectAssignmentItems = [];
-    let expressions: Target.ObjectAssignmentItems = [];
+    const literals: Target.ObjectAssignmentItems = [];
+    const expressions: Target.ObjectAssignmentItems = [];
 
-    items.forEach(item => {
-      let target = typeof item[0] === 'function' ? expressions : literals;
+    items.forEach((item) => {
+      const target = typeof item[0] === 'function' ? expressions : literals;
       target.push(item);
     });
 
-    if ( expressions.length ) {
-      let dictVar = createAnonymous();
-      let components: Target.BodyEntries = [];
+    if (expressions.length) {
+      const dictVar = createAnonymous();
+      const components: Target.BodyEntries = [];
 
       components.push(() => {
         assignAnonymous(dictVar, writeLiterals);
       });
 
-      expressions.forEach(item => {
+      expressions.forEach((item) => {
         components.push(() => {
           member(dictVar, item[0]);
           write('=', item[1]);
@@ -777,15 +817,14 @@ export function createCoder(): Target.Coder {
       });
 
       compoundExpression(components);
-    }
-    else {
+    } else {
       writeLiterals();
     }
 
     function writeLiterals() {
       write('{');
       literals.forEach((item, i) => {
-        if ( i > 0 ) {
+        if (i > 0) {
           write(',');
         }
         write(jsonStringify(item[0]), ':', item[1]);
@@ -798,28 +837,28 @@ export function createCoder(): Target.Coder {
     write('(', expr, ')');
   }
 
-  function code(value?: Target.BodyEntry|Target.BodyEntries): string {
-    if ( typeof value === 'function' ) {
+  function code(value?: Target.BodyEntry | Target.BodyEntries): string {
+    if (typeof value === 'function') {
       pushWriter();
       value();
       return popWriter();
     }
 
-    if ( isArray(value) ) {
+    if (isArray(value)) {
       return value.map(code).join('');
     }
 
-    return '' + value;
+    return `${value}`;
   }
 
   function toString() {
-    let buffer: string[] = [];
+    const buffer: string[] = [];
 
     // can't know all globals until body content is generated
-    let bodyContent = code(body);
+    const bodyContent = code(body);
 
-    if ( globalVars.length ) {
-      buffer.push(`const ${ globalVars.join(',') };`);
+    if (globalVars.length) {
+      buffer.push(`const ${globalVars.join(',')};`);
     }
 
     buffer.push(bodyContent);

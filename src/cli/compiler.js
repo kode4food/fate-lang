@@ -1,26 +1,28 @@
 /** @flow */
 
-const minimist = require('minimist');
-
 import { join, dirname } from 'path';
 import { sync as glob } from 'glob';
 import { sync as mkdirp } from 'mkdirp';
 
-import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs';
+import {
+  readFileSync, writeFileSync, unlinkSync, existsSync,
+} from 'fs';
 
-import { compileModule, wrapCompileError } from "../compiler";
+import { compileModule, wrapCompileError } from '../compiler';
 import { GeneratedCode } from '../compiler/target';
 import { VERSION } from '../fate';
+
+const minimist = require('minimist');
 
 const defaultPattern = '*.fate';
 
 export interface CompilerArguments {
-  'help'?: boolean;
-  'parse'?: boolean;
-  'clean'?: boolean;
-  'in'?: string;
-  'out'?: string;
-  '_'?: string[];
+  help?: boolean;
+  parse?: boolean;
+  clean?: boolean;
+  in?: string;
+  out?: string;
+  _?: string[];
   console?: Console;
 }
 
@@ -44,40 +46,44 @@ interface CompilerResults {
  *
  *     commandLine("--in", "./scripts", "--out", "./output");
  */
-export function commandLine(inputArgs: string[], console: Console,
-                            completedCallback: Function) {
+export function commandLine(
+  inputArgs: string[],
+  console: Console,
+  completedCallback: Function,
+) {
   let badArg = false;
 
-  let args = minimist(inputArgs, {
+  const args = minimist(inputArgs, {
     boolean: ['parse', 'clean', 'help'],
     string: ['in', 'out'],
-    unknown: value => {
-      let invalidFlag = /^--.+/.test(value);
+    unknown: (value) => {
+      const invalidFlag = /^--.+/.test(value);
       badArg = badArg || invalidFlag;
       return !invalidFlag;
-    }
+    },
   });
 
-  if ( !inputArgs.length || badArg || args.help ) {
+  if (!inputArgs.length || badArg || args.help) {
     displayUsage();
     completedCallback(badArg ? -1 : 0);
     return;
   }
 
-  if ( [args.clean, args.parse].reduce(flagCount, 0) > 1 ) {
-    errorOut("Only one action can be performed at a time");
+  if ([args.clean, args.parse].reduce(flagCount, 0) > 1) {
+    errorOut('Only one action can be performed at a time');
     return;
   }
 
   try {
     compile(args, processResults);
-  }
-  catch ( err ) {
+  } catch (err) {
     errorOut(err);
   }
 
   function processResults(err: any, results: CompilerResults) {
-    let { errors, warnings, success, deleted } = results;
+    const {
+      errors, warnings, success, deleted,
+    } = results;
 
     displayResults();
     displayWarnings();
@@ -85,46 +91,46 @@ export function commandLine(inputArgs: string[], console: Console,
     completedCallback(err ? -2 : 0);
 
     function displayResults() {
-      console.info("Fate Compilation Complete");
-      console.info("");
+      console.info('Fate Compilation Complete');
+      console.info('');
 
-      if ( success > 0 ) {
-        console.info("   Success: " + success);
+      if (success > 0) {
+        console.info(`   Success: ${success}`);
       }
-      if ( args.clean ) {
-        console.info("   Deleted: " + deleted);
+      if (args.clean) {
+        console.info(`   Deleted: ${deleted}`);
       }
-      if ( warnings.length ) {
-        console.info("  Warnings: " + warnings.length);
+      if (warnings.length) {
+        console.info(`  Warnings: ${warnings.length}`);
       }
-      if ( errors.length ) {
-        console.info("  Failures: " + errors.length);
+      if (errors.length) {
+        console.info(`  Failures: ${errors.length}`);
       }
-      console.info("");
+      console.info('');
     }
 
     function displayWarnings() {
-      if ( warnings.length ) {
+      if (warnings.length) {
         // If there are any warnings, display them
-        console.warn("Compiler Warnings");
-        console.warn("=================");
+        console.warn('Compiler Warnings');
+        console.warn('=================');
         warnings.forEach(displayCompilationError);
       }
     }
 
     function displayErrors() {
-      if ( errors.length ) {
+      if (errors.length) {
         // If there are any errors, display them
-        console.warn("Compiler Errors");
-        console.warn("===============");
+        console.warn('Compiler Errors');
+        console.warn('===============');
         errors.forEach(displayCompilationError);
       }
     }
 
     function displayCompilationError(error: CompilerOutput) {
-      let wrapped = wrapCompileError(error.err, error.filePath);
+      const wrapped = wrapCompileError(error.err, error.filePath);
       console.warn(wrapped.toString());
-      console.warn("");
+      console.warn('');
     }
   }
 
@@ -136,22 +142,22 @@ export function commandLine(inputArgs: string[], console: Console,
 
   function errorOut(message: string) {
     displayUsage();
-    console.error("Error!");
-    console.error("");
-    console.error("  " + message);
-    console.error("");
+    console.error('Error!');
+    console.error('');
+    console.error(`  ${message}`);
+    console.error('');
 
     completedCallback(1);
   }
 
   function displayVersion() {
-    console.info("Fate v" + VERSION);
+    console.info(`Fate v${VERSION}`);
   }
 
   function displayUsage() {
     displayVersion();
     console.info(
-`
+      `
   Usage:
 
     fatec (options) <patterns>
@@ -167,15 +173,15 @@ export function commandLine(inputArgs: string[], console: Console,
     --clean        - Delete any compiled output
 
     <patterns>     - Filename patterns to parse (*.fate)
-`
+`,
     );
   }
 }
 
 export function compile(args: CompilerArguments, callback: Function) {
-  let patterns = args._.length ? args._ : [defaultPattern];
-  let errors: CompilerOutput[] = [];
-  let warnings: CompilerOutput[] = [];
+  const patterns = args._.length ? args._ : [defaultPattern];
+  const errors: CompilerOutput[] = [];
+  const warnings: CompilerOutput[] = [];
   let success = 0;
   let deleted = 0;
 
@@ -183,43 +189,46 @@ export function compile(args: CompilerArguments, callback: Function) {
   patterns.forEach(processPattern);
 
   // Done!
-  callback(
-    errors.length ? "Errors Encountered" : null,
-    { errors, warnings, success, deleted }
-  );
+  callback(errors.length ? 'Errors Encountered' : null, {
+    errors,
+    warnings,
+    success,
+    deleted,
+  });
 
   function processPattern(pattern: string) {
-    let inDir = args.in || process.cwd();
-    let outDir = args.out || inDir;
-    let files = glob(pattern, { cwd: inDir });
+    const inDir = args.in || process.cwd();
+    const outDir = args.out || inDir;
+    const files = glob(pattern, { cwd: inDir });
 
-    if ( !files.length ) {
+    if (!files.length) {
       throw `No files found matching '${pattern}'`;
     }
 
     // Bleh, make this pretty
-    let processor = args.parse ? performParse :
-                    args.clean ? performClean :
-                                 performCompile;
+    const processor = args.parse
+      ? performParse
+      : args.clean
+        ? performClean
+        : performCompile;
 
-    files.forEach(file => {
-      let inputPath = join(inDir, file);
-      let outputPath = join(outDir, file.replace(/\.fate$/, '.js'));
+    files.forEach((file) => {
+      const inputPath = join(inDir, file);
+      const outputPath = join(outDir, file.replace(/\.fate$/, '.js'));
 
       try {
         processor(inputPath, outputPath);
-      }
-      catch ( err ) {
-        errors.push({ filePath: inputPath, err: err });
+      } catch (err) {
+        errors.push({ filePath: inputPath, err });
       }
     });
   }
 
   function parseSource(inputPath: string) {
-    let compileResult = compileInputScript(inputPath);
-    let compileWarnings = compileResult.err;
+    const compileResult = compileInputScript(inputPath);
+    const compileWarnings = compileResult.err;
 
-    compileWarnings.forEach(compileWarning => {
+    compileWarnings.forEach((compileWarning) => {
       warnings.push({ filePath: inputPath, err: compileWarning });
     });
 
@@ -237,7 +246,7 @@ export function compile(args: CompilerArguments, callback: Function) {
   }
 
   function performClean(inputPath: string, outputPath: string) {
-    if ( !existsSync(outputPath) ) {
+    if (!existsSync(outputPath)) {
       return;
     }
     unlinkSync(outputPath);
@@ -245,7 +254,7 @@ export function compile(args: CompilerArguments, callback: Function) {
   }
 
   function compileInputScript(inputPath: string) {
-    let intContent = readFileSync(inputPath).toString();
+    const intContent = readFileSync(inputPath).toString();
     return compileModule(intContent);
   }
 
@@ -256,15 +265,15 @@ export function compile(args: CompilerArguments, callback: Function) {
 }
 
 export function generateNodeModule(generatedCode: GeneratedCode) {
-  let buffer: string[] = [];
+  const buffer: string[] = [];
   buffer.push('/** @flow */');
   buffer.push(`"fate-compiler:${VERSION}";`);
   buffer.push("const fate=require('fatejs');");
-  buffer.push("const r=fate.Runtime;");
+  buffer.push('const r=fate.Runtime;');
   buffer.push(generatedCode);
-  buffer.push("module.__fateModule=true;");
-  buffer.push("module.result=s(");
-  buffer.push("fate.globals({__filename}),");
-  buffer.push("module.exports);");
+  buffer.push('module.__fateModule=true;');
+  buffer.push('module.result=s(');
+  buffer.push('fate.globals({__filename}),');
+  buffer.push('module.exports);');
   return buffer.join('');
 }

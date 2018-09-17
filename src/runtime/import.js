@@ -11,16 +11,16 @@ const systemResolver = Resolvers.createSystemResolver();
 const memoryResolver = Resolvers.createMemoryResolver();
 
 const _resolvers: Resolvers.Resolver[] = [
-  fileResolver, nodeResolver, systemResolver, memoryResolver
+  fileResolver, nodeResolver, systemResolver, memoryResolver,
 ];
 
 export const registerModule = memoryResolver.register;
 export const unregisterModule = memoryResolver.unregister;
 
 export function resolve(moduleName: ModuleName, basePath?: DirPath) {
-  for ( let i = _resolvers.length - 1; i >= 0; i-- ) {
-    let module = _resolvers[i].resolve(moduleName, basePath);
-    if ( module ) {
+  for (let i = _resolvers.length - 1; i >= 0; i--) {
+    const module = _resolvers[i].resolve(moduleName, basePath);
+    if (module) {
       return module.exports;
     }
   }
@@ -32,17 +32,17 @@ export function resolvers(): Resolvers.Resolver[] {
 }
 
 export function importer(moduleName: ModuleName) {
-  let cache: { [index: string]: ModuleExports } = {};
+  const cache: { [index: string]: ModuleExports } = {};
   return performImport;
 
   function performImport(basePath?: DirPath) {
     let moduleExports = cache[basePath];
-    if ( moduleExports ) {
+    if (moduleExports) {
       return moduleExports;
     }
 
     moduleExports = resolve(moduleName, basePath);
-    if ( !moduleExports ) {
+    if (!moduleExports) {
       throw new Error(`Module '${moduleName}' not resolved`);
     }
     cache[basePath] = moduleExports;

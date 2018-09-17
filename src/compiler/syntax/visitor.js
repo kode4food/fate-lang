@@ -1,7 +1,9 @@
 /** @flow */
 
+import type { CompileErrors } from '../index';
+
 import * as Syntax from './index';
-import { CompileError, CompileErrors } from '../index';
+import { CompileError } from '../index';
 
 const isArray = Array.isArray;
 const slice = Array.prototype.slice;
@@ -16,6 +18,7 @@ interface VisitorMap {
 }
 
 export class Visitor {
+  warnings: CompileErrors;
   nodeStack: NodeStackElement[];
 
   constructor(warnings: CompileErrors) {
@@ -29,7 +32,7 @@ export class Visitor {
 
   ancestry(matcher: NodeMatcher, ...matchers: NodeMatcher[]) {
     return (node: Syntax.Node) => {
-      if ( !matcher(node) ) {
+      if (!matcher(node)) {
         return false;
       }
       return this.hasAncestry.apply(this, matchers) !== undefined;
@@ -37,20 +40,20 @@ export class Visitor {
   }
 
   hasAncestorTags(...tags: Syntax.TagOrTags[]) {
-    let args = tags.map(this.tags);
+    const args = tags.map(this.tags);
     return this.hasAncestry.apply(this, args);
   }
 
   hasAncestry(...matchers: NodeMatcher[]) {
     let matcher = matchers.shift();
-    let stack = this.nodeStack.slice().reverse();
-    let result: NodeStackElement[] = [];
-    while ( stack.length ) {
-      let node = stack.shift();
-      if ( matcher(node) ) {
+    const stack = this.nodeStack.slice().reverse();
+    const result: NodeStackElement[] = [];
+    while (stack.length) {
+      const node = stack.shift();
+      if (matcher(node)) {
         result.push(node);
         matcher = matchers.shift();
-        if ( !matcher ) {
+        if (!matcher) {
           return result;
         }
       }
@@ -58,11 +61,11 @@ export class Visitor {
     return undefined;
   }
 
-  findAncestor(tag: Syntax.TagOrTags): Syntax.Node {
-    let nodeStack = this.nodeStack;
-    for ( let i = nodeStack.length - 1; i >= 0; i-- ) {
-      let node: NodeStackElement = nodeStack[i];
-      if ( node instanceof Syntax.Node && Syntax.hasTag(node, tag) ) {
+  findAncestor(tag: Syntax.TagOrTags): ?Syntax.Node {
+    const nodeStack = this.nodeStack;
+    for (let i = nodeStack.length - 1; i >= 0; i--) {
+      const node: NodeStackElement = nodeStack[i];
+      if (node instanceof Syntax.Node && Syntax.hasTag(node, tag)) {
         return node;
       }
     }
@@ -70,20 +73,20 @@ export class Visitor {
   }
 
   nodes(startNode: NodeStackElement, matcher: NodeMatcher,
-               visitor: NodeVisitor, breadthFirst = false) {
-    let self = this;
+        visitor: NodeVisitor, breadthFirst: boolean = false) {
+    const self = this;
     return visitNode(startNode);
 
     function visitNode(node: NodeStackElement): NodeStackElement {
-      if ( !(node instanceof Syntax.Node) && !isArray(node) ) {
+      if (!(node instanceof Syntax.Node) && !isArray(node)) {
         return node;
       }
 
-      if ( !matcher(node) ) {
+      if (!matcher(node)) {
         return self.recurseInto(node, visitNode);
       }
 
-      if ( breadthFirst ) {
+      if (breadthFirst) {
         return self.recurseInto(visitor(node), visitNode);
       }
       return visitor(self.recurseInto(node, visitNode));
@@ -91,18 +94,17 @@ export class Visitor {
   }
 
   recurseInto(node: NodeStackElement, visitor: NodeVisitor) {
-    let nodeStack = this.nodeStack;
+    const nodeStack = this.nodeStack;
     nodeStack.push(node);
-    if ( isArray(node) ) {
-      let arrNode = node;
-      for ( let i = 0, len = arrNode.length; i < len; i++ ) {
+    if (isArray(node)) {
+      const arrNode = node;
+      for (let i = 0, len = arrNode.length; i < len; i++) {
         arrNode[i] = visitor(arrNode[i]);
       }
-    }
-    else {
-      let currentNode = node;
-      let keys = currentNode.visitorKeys || Object.keys(currentNode);
-      keys.forEach(key => {
+    } else {
+      const currentNode = node;
+      const keys = currentNode.visitorKeys || Object.keys(currentNode);
+      keys.forEach((key) => {
         currentNode[key] = visitor(currentNode[key]);
       });
     }
@@ -111,15 +113,11 @@ export class Visitor {
   }
 
   matching(visitor: NodeVisitor, matcher: NodeMatcher) {
-    return (node: Syntax.Node) => {
-      return this.nodes(node, matcher, visitor);
-    };
+    return (node: Syntax.Node) => this.nodes(node, matcher, visitor);
   }
 
   breadthMatching(visitor: NodeVisitor, matcher: NodeMatcher) {
-    return (node: Syntax.Node) => {
-      return this.nodes(node, matcher, visitor, true);
-    };
+    return (node: Syntax.Node) => this.nodes(node, matcher, visitor, true);
   }
 
   byTag(visitorMap: VisitorMap) {
@@ -131,9 +129,7 @@ export class Visitor {
   }
 
   statements(visitor: StatementsVisitor) {
-    return (node: Syntax.Node) => {
-      return this.nodes(node, Syntax.isStatements, statementsProcessor);
-    };
+    return (node: Syntax.Node) => this.nodes(node, Syntax.isStatements, statementsProcessor);
 
     function statementsProcessor(node: Syntax.Statements) {
       node.statements = visitor(node.statements);
@@ -144,18 +140,17 @@ export class Visitor {
   // Iterates over a set of statements and presents adjacent groups
   // to the callback function for replacement
   statementGroups(visitor: StatementsVisitor, matcher: NodeMatcher,
-                  minGroupSize: number) {
+    minGroupSize: number) {
     return this.statements(groupProcessor);
 
     function groupProcessor(statements: Syntax.Statement[]) {
       let group: Syntax.Statement[] = [];
       let output: Syntax.Statement[] = [];
 
-      statements.forEach(statement => {
-        if ( matcher(statement) ) {
+      statements.forEach((statement) => {
+        if (matcher(statement)) {
           group.push(statement);
-        }
-        else {
+        } else {
           processMatches();
           output.push(statement);
         }
@@ -165,7 +160,7 @@ export class Visitor {
       return output;
 
       function processMatches() {
-        let result = group.length < minGroupSize ? group : visitor(group);
+        const result = group.length < minGroupSize ? group : visitor(group);
         output = output.concat(result);
         group = [];
       }
@@ -177,7 +172,7 @@ export class Visitor {
   }
 
   tags(tags: Syntax.TagOrTags) {
-    if ( !isArray(tags) ) {
+    if (!isArray(tags)) {
       tags = slice.call(arguments, 0);
     }
     return matcher;
@@ -188,12 +183,12 @@ export class Visitor {
   }
 
   upTreeUntilMatch(matcher: NodeMatcher,
-                          visitor: NodeVisitor): NodeStackElement {
-    let nodeStack = this.nodeStack;
-    for ( let i = nodeStack.length - 1; i >= 0; i-- ) {
-      let node: NodeStackElement = nodeStack[i];
+    visitor: NodeVisitor): NodeStackElement {
+    const nodeStack = this.nodeStack;
+    for (let i = nodeStack.length - 1; i >= 0; i--) {
+      const node: NodeStackElement = nodeStack[i];
       visitor(node);
-      if ( matcher(node) ) {
+      if (matcher(node)) {
         return node;
       }
     }
@@ -206,13 +201,13 @@ export class Visitor {
 
   issueWarning(source: Syntax.Node, message: string) {
     this.warnings.push(
-      new CompileError(message, source.line, source.column)
+      new CompileError(message, source.line, source.column),
     );
   }
 
   createByTagMatcher(visitorMap: VisitorMap, method: Function) {
-    let nodesToVisit = this.tags(Object.keys(visitorMap));
-    let visitNode = (node: Syntax.Node) => visitorMap[node.tag](node);
+    const nodesToVisit = this.tags(Object.keys(visitorMap));
+    const visitNode = (node: Syntax.Node) => visitorMap[node.tag](node);
     return method.call(this, visitNode, nodesToVisit);
   }
 }

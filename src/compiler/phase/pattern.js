@@ -1,7 +1,9 @@
 /** @flow */
 
 import * as Syntax from '../syntax';
-import { Visitor, annotate, getAnnotation, hasAnnotation } from '../syntax';
+import {
+  Visitor, annotate, getAnnotation, hasAnnotation,
+} from '../syntax';
 
 interface NumberMap {
   [index: string]: number;
@@ -13,21 +15,21 @@ const patternParentTags = ['pattern', 'patternElement'];
 const contextPatternLocal = 'p';
 
 const patternNodeComplexity: NumberMap = {
-  'match': 5,
-  'objectPattern': 4,
-  'arrayPattern': 4,
-  'patternElement': 2,
-  'call': 3,
-  'regex': 2,
-  'like': 2
+  match: 5,
+  objectPattern: 4,
+  arrayPattern: 4,
+  patternElement: 2,
+  call: 3,
+  regex: 2,
+  like: 2,
 };
 
 export default function createTreeProcessors(visit: Visitor) {
   let contextPatternNumbering = 0;
 
-  let nestedPattern = visit.ancestorTags('pattern', 'pattern');
-  let nestedContext = visit.ancestorTags('context', 'pattern');
-  let collections = visit.ancestorTags(collectionTags, 'pattern');
+  const nestedPattern = visit.ancestorTags('pattern', 'pattern');
+  const nestedContext = visit.ancestorTags('context', 'pattern');
+  const collections = visit.ancestorTags(collectionTags, 'pattern');
 
   return [
     visit.matching(rollUpPatterns, nestedPattern),
@@ -38,21 +40,21 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(annotateComplexity, visit.isNode),
 
     visit.byTag({
-      'signature': buildPatternGuards,
-      'pattern': annotatePatternEquality,
-      'patternElement': annotateElementEquality
-    })
+      signature: buildPatternGuards,
+      pattern: annotatePatternEquality,
+      patternElement: annotateElementEquality,
+    }),
   ];
 
   function getParent() {
-    let nodeStack = visit.nodeStack;
+    const nodeStack = visit.nodeStack;
     return nodeStack[nodeStack.length - 1];
   }
 
   // patterns don't always have to exist within Patterns
   function rollUpPatterns(node: Syntax.Pattern) {
-    let parent = getParent();
-    if ( !Syntax.hasTag(parent, patternParentTags) ) {
+    const parent = getParent();
+    if (!Syntax.hasTag(parent, patternParentTags)) {
       return node;
     }
     return node.left;
@@ -65,19 +67,19 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function getPatternParent() {
-    let matches = visit.hasAncestorTags(patternParentTags);
+    const matches = visit.hasAncestorTags(patternParentTags);
     return matches && matches[0];
   }
 
   function annotateCollection(node: Syntax.CollectionPattern) {
-    let parent = getPatternParent();
-    let parentLocal = getAnnotation(parent, 'pattern/local');
+    const parent = getPatternParent();
+    const parentLocal = getAnnotation(parent, 'pattern/local');
     annotate(node, 'pattern/parent', parentLocal);
     annotate(node, 'pattern/local', parentLocal);
 
-    node.elements.forEach(element => {
-      if ( element instanceof Syntax.PatternElement ) {
-        let localId = contextPatternLocal + (contextPatternNumbering++);
+    node.elements.forEach((element) => {
+      if (element instanceof Syntax.PatternElement) {
+        const localId = contextPatternLocal + (contextPatternNumbering++);
         annotate(element, 'pattern/parent', parentLocal);
         annotate(element, 'pattern/local', localId);
       }
@@ -86,17 +88,16 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function validateContext(node: Syntax.Context) {
-    if ( !getPatternParent() ) {
+    if (!getPatternParent()) {
       visit.issueError(node,
-        "Relative references must appear within a Pattern"
-      );
+        'Relative references must appear within a Pattern');
     }
     return node;
   }
 
   function annotateContext(node: Syntax.Context) {
-    let parent = getPatternParent();
-    let parentLocal = getAnnotation(parent, 'pattern/local');
+    const parent = getPatternParent();
+    const parentLocal = getAnnotation(parent, 'pattern/local');
     annotate(node, 'pattern/context', parentLocal);
     annotate(node, 'pattern/local', parentLocal);
     visit.upTreeUntilMatch(visit.tags(patternParentTags), annotateNode);
@@ -109,31 +110,31 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function annotateComplexity(node: Syntax.Node) {
-    let anchor = visit.findAncestor('pattern');
-    if ( anchor ) {
-      let complexity = getAnnotation(anchor, 'pattern/complexity') || 0;
-      let delta = patternNodeComplexity[node.tag] || 1;
+    const anchor = visit.findAncestor('pattern');
+    if (anchor) {
+      const complexity = getAnnotation(anchor, 'pattern/complexity') || 0;
+      const delta = patternNodeComplexity[node.tag] || 1;
       annotate(anchor, 'pattern/complexity', complexity + delta);
     }
     return node;
   }
 
   function buildPatternGuards(node: Syntax.Signature) {
-    let newGuards: Syntax.Expressions = [];
+    const newGuards: Syntax.Expressions = [];
 
     // Generate Guards from the Parameters
-    let params = node.params;
+    const params = node.params;
     params.forEach((param, idx) => {
-      if ( param instanceof Syntax.PatternParameter ) {
-        let ident = param.id || param.template('id', idx);
+      if (param instanceof Syntax.PatternParameter) {
+        const ident = param.id || param.template('id', idx);
         params[idx] = ident.template('idParam', ident, param.cardinality);
         newGuards.push(ident.template('call', param.pattern, [ident]));
       }
     });
 
     // Combine the Guards
-    if ( newGuards.length ) {
-      if ( node.guard ) {
+    if (newGuards.length) {
+      if (node.guard) {
         // Push it to the end of the list
         newGuards.push(node.guard);
       }
@@ -147,8 +148,8 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function canGenerateEquality(elementValue: Syntax.Node) {
-    return !hasAnnotation(elementValue, 'pattern/parent') &&
-           !(elementValue instanceof Syntax.RelationalOperator);
+    return !hasAnnotation(elementValue, 'pattern/parent')
+           && !(elementValue instanceof Syntax.RelationalOperator);
   }
 
   function annotatePatternEquality(node: Syntax.Pattern) {

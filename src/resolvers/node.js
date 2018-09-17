@@ -11,16 +11,14 @@ export function createNodeResolver() {
 
   function resolve(name: ModuleName, basePath?: DirPath) {
     try {
-      let explicit = nodeModuleRegex.exec(name);
-      if ( explicit ) {
+      const explicit = nodeModuleRegex.exec(name);
+      if (explicit) {
         name = explicit[1];
-      }
-      else if ( basePath && relativePathRegex.test(name) ) {
+      } else if (basePath && relativePathRegex.test(name)) {
         name = resolvePath(basePath, name);
       }
       return createModule(require(name));
-    }
-    catch ( err ) {
+    } catch (err) {
       return undefined;
     }
   }

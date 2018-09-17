@@ -3,7 +3,7 @@
 import { isObject } from '../runtime';
 
 import {
-  compile, globals, Module, isFateModule, createModule, ModuleName, ModuleExports
+  compile, globals, Module, isFateModule, createModule, ModuleName, ModuleExports,
 } from '../fate';
 
 type AnyMap = { [index: string]: any };
@@ -16,12 +16,12 @@ type AnyMap = { [index: string]: any };
  * modules and native JavaScript helpers.
  */
 export function createMemoryResolver() {
-  let cache: { [index: string]: Module } = {};
+  const cache: { [index: string]: Module } = {};
   return { resolve, unregister, register };
 
   function resolve(name: ModuleName) {
-    let result = cache[name];
-    if ( !result ) {
+    const result = cache[name];
+    if (!result) {
       return undefined;
     }
     return result;
@@ -37,28 +37,28 @@ export function createMemoryResolver() {
   /*
    * Registers a module in the module cache.
    */
-  function register(name: ModuleName, module: string|AnyMap) {
+  function register(name: ModuleName, module: string | AnyMap) {
     // A compiled Fate Module function
-    if ( isFateModule(module) ) {
+    if (isFateModule(module)) {
       cache[name] = module;
       return;
     }
 
     // *String* - An unparsed Fate script
-    if ( typeof module === 'string' ) {
-      let compiled = compile(module);
-      let generatedModule = createModule();
+    if (typeof module === 'string') {
+      const compiled = compile(module);
+      const generatedModule = createModule();
       compiled(globals(), generatedModule.exports);
       cache[name] = generatedModule;
       return;
     }
 
     // *Object* - A hash of Helpers (name->Function)
-    if ( isObject(module) ) {
+    if (isObject(module)) {
       cache[name] = createModule(module);
       return;
     }
 
-    throw new Error("Module not provided");
+    throw new Error('Module not provided');
   }
 }

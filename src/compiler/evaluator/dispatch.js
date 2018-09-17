@@ -1,17 +1,17 @@
 /** @flow */
 
-import * as Syntax from "../syntax";
-import { Evaluator, NodeEvaluator } from "./evaluator";
-import { Coder } from "../target";
+import * as Syntax from '../syntax';
+import { Evaluator, NodeEvaluator } from './evaluator';
+import { Coder } from '../target';
 
-import * as AssignmentEvaluators from "./assignment";
-import * as BasicEvaluators from "./basic";
-import * as ConcurrencyEvaluators from "./concurrency";
-import * as ConditionalEvaluators from "./conditional";
-import * as FunctionEvaluators from "./function";
-import * as LoopEvaluators from "./looping";
-import * as ModuleEvaluators from "./module";
-import * as PatternEvaluators from "./pattern";
+import * as AssignmentEvaluators from './assignment';
+import * as BasicEvaluators from './basic';
+import * as ConcurrencyEvaluators from './concurrency';
+import * as ConditionalEvaluators from './conditional';
+import * as FunctionEvaluators from './function';
+import * as LoopEvaluators from './looping';
+import * as ModuleEvaluators from './module';
+import * as PatternEvaluators from './pattern';
 
 interface AnyMap {
   [index: string]: any;
@@ -29,7 +29,7 @@ const evaluatorModules = [
   FunctionEvaluators,
   LoopEvaluators,
   ModuleEvaluators,
-  PatternEvaluators
+  PatternEvaluators,
 ];
 
 export class DispatchEvaluator implements Evaluator {
@@ -41,8 +41,8 @@ export class DispatchEvaluator implements Evaluator {
       Object.keys(module)
         .map(key => module[key])
         .filter(isNodeEvaluator)
-        .forEach(constructorFunction => {
-          let tags = constructorFunction.tags;
+        .forEach((constructorFunction) => {
+          const tags = constructorFunction.tags;
           tags.forEach((tag: string) => {
             this.ctors[tag] = constructorFunction;
           });
@@ -50,23 +50,23 @@ export class DispatchEvaluator implements Evaluator {
     });
 
     function isNodeEvaluator(module: any) {
-      return typeof module === "function" && module.hasOwnProperty("tags");
+      return typeof module === 'function' && module.hasOwnProperty('tags');
     }
   }
 
   evaluate(node: Syntax.Node, ...args: any[]): void {
     if (!(node instanceof Syntax.Node)) {
-      throw new Error("Stupid Coder: createEvaluator called without a Node");
+      throw new Error('Stupid Coder: createEvaluator called without a Node');
     }
 
-    let nodeType = node.tag;
-    let EvaluatorConstructor = this.ctors[nodeType];
+    const nodeType = node.tag;
+    const EvaluatorConstructor = this.ctors[nodeType];
 
     if (!EvaluatorConstructor) {
       throw new Error(`Stupid Coder: Invalid tag in Node: ${nodeType}`);
     }
 
-    let instance = new EvaluatorConstructor(this, node);
+    const instance = new EvaluatorConstructor(this, node);
     instance.evaluate(...args);
   }
 

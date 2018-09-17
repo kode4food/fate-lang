@@ -15,12 +15,12 @@ export type AssignmentItem = [Name, BodyEntry];
 export type AssignmentItems = AssignmentItem[];
 export type ModuleItem = [Name, Alias];
 export type ModuleItems = ModuleItem[];
-export type ObjectAssignmentItem = [Name|BodyEntry, BodyEntry, boolean];
+export type ObjectAssignmentItem = [Name | BodyEntry, BodyEntry, boolean];
 export type ObjectAssignmentItems = ObjectAssignmentItem[];
 
-export type BodyEntry = string|Function;
+export type BodyEntry = string | Function;
 export type BodyEntries = BodyEntry[];
-export type Literal = string|Id;
+export type Literal = string | Id;
 
 export type GeneratedCode = string;
 
@@ -90,11 +90,11 @@ export interface Coder {
   compoundExpression(expressions: BodyEntries): void;
   returnStatement(bodyCallback?: BodyEntry): void;
   emitStatement(bodyCallback: BodyEntry): void;
-  call(funcId: Id|BodyEntry, args?: BodyEntries): void;
+  call(funcId: Id | BodyEntry, args?: BodyEntries): void;
   array(items: BodyEntries): void;
   object(items: ObjectAssignmentItems): void;
   parens(expr: BodyEntry): void;
-  code(value?: BodyEntry|BodyEntries): string;
+  code(value?: BodyEntry | BodyEntries): string;
   toString(): string;
 }
 
@@ -109,14 +109,14 @@ export function generateScriptBody(parseTree: Syntax.Statements) {
 }
 
 function createScriptFunction(statements: Syntax.Statements) {
-  let coder = JavaScript.createCoder();
+  const coder = JavaScript.createCoder();
 
   coder.func({
     internalId: coder.selfName,
     internalArgs: [coder.globalObjectName, coder.exportsName],
     body: () => {
       new Evaluator.DispatchEvaluator(coder).evaluate(statements);
-    }
+    },
   });
   return coder.toString();
 }

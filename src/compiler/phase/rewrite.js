@@ -13,67 +13,70 @@ type LiteralObject = { [index: string]: any };
 type FunctionMap = { [index: string]: Function };
 
 const inverseOperators: StringMap = {
-  'eq': 'neq', 'neq': 'eq',
-  'lt': 'gte', 'gte': 'lt',
-  'gt': 'lte', 'lte': 'gt'
+  eq: 'neq',
+  neq: 'eq',
+  lt: 'gte',
+  gte: 'lt',
+  gt: 'lte',
+  lte: 'gt',
 };
 
 const unaryConstantFolders: FunctionMap = {
-  'not':   (v: any) => isFalse(v),
-  'neg':   (v: any) => -v
+  not: (v: any) => isFalse(v),
+  neg: (v: any) => -v,
 };
 
 const unaryConstantFolderKeys = Object.keys(unaryConstantFolders);
 
 const binaryConstantFolders: FunctionMap = {
-  'add':   (l: any, r: any) => l + r,
-  'sub':   (l: any, r: any) => l - r,
-  'mul':   (l: any, r: any) => l * r,
-  'div':   (l: any, r: any) => l / r,
-  'eq':    (l: any, r: any) => l === r,
-  'neq':   (l: any, r: any) => l !== r,
-  'in':    (l: any, r: any) => isIn(l, r),
-  'notIn': (l: any, r: any) => !isIn(l, r),
-  'gt':    (l: any, r: any) => l > r,
-  'lt':    (l: any, r: any) => l < r,
-  'gte':   (l: any, r: any) => l >= r,
-  'lte':   (l: any, r: any) => l <= r,
-  'mod':   (l: any, r: any) => l % r
+  add: (l: any, r: any) => l + r,
+  sub: (l: any, r: any) => l - r,
+  mul: (l: any, r: any) => l * r,
+  div: (l: any, r: any) => l / r,
+  eq: (l: any, r: any) => l === r,
+  neq: (l: any, r: any) => l !== r,
+  in: (l: any, r: any) => isIn(l, r),
+  notIn: (l: any, r: any) => !isIn(l, r),
+  gt: (l: any, r: any) => l > r,
+  lt: (l: any, r: any) => l < r,
+  gte: (l: any, r: any) => l >= r,
+  lte: (l: any, r: any) => l <= r,
+  mod: (l: any, r: any) => l % r,
 };
 
 const binaryConstantFolderKeys = Object.keys(binaryConstantFolders);
 
 const shortCircuitFolders: FunctionMap = {
-  'or': (node: Syntax.OrOperator) => {
-    if ( !isLiteral(node.left) ) {
+  or: (node: Syntax.OrOperator) => {
+    if (!isLiteral(node.left)) {
       return node;
     }
-    let value = node.left.value;
+    const value = node.left.value;
     return isTrue(value) ? node.left : node.right;
   },
-  'and': (node: Syntax.AndOperator) => {
-    if ( !isLiteral(node.left) ) {
+  and: (node: Syntax.AndOperator) => {
+    if (!isLiteral(node.left)) {
       return node;
     }
-    let value = node.left.value;
+    const value = node.left.value;
     return isFalse(value) ? node.left : node.right;
   },
-  'conditional': (node: Syntax.ConditionalOperator) => {
-    if ( !isLiteral(node.condition) ) {
+  conditional: (node: Syntax.ConditionalOperator) => {
+    if (!isLiteral(node.condition)) {
       return node;
     }
-    let value = node.condition.value;
+    const value = node.condition.value;
     return isTrue(value) ? node.trueResult : node.falseResult;
-  }
+  },
 };
 
 const shortCircuitFolderKeys = Object.keys(shortCircuitFolders);
 
 export default function createTreeProcessors(visit: Visitor) {
-  let foldableShortCircuit = visit.tags(shortCircuitFolderKeys);
-  let foldableUnaryConstant = visit.tags(unaryConstantFolderKeys);
-  let foldableBinaryConstant = visit.tags(binaryConstantFolderKeys);
-  let collection = visit.tags(['object', 'array']);
+  const foldableShortCircuit = visit.tags(shortCircuitFolderKeys);
+  const foldableUnaryConstant = visit.tags(unaryConstantFolderKeys);
+  const foldableBinaryConstant = visit.tags(binaryConstantFolderKeys);
+  const collection = visit.tags(['object', 'array']);
 
   return [
     visit.matching(foldShortCircuits, foldableShortCircuit),
@@ -84,63 +87,63 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.statements(foldIfStatements),
 
     visit.byTag({
-      'conditional': flipConditionals,
-      'not': flipEquality,
-      'and': promoteNot,
-      'or': promoteNot,
-      'for': rollUpForLoops,
-      'expression': rollUpStandaloneLoops
+      conditional: flipConditionals,
+      not: flipEquality,
+      and: promoteNot,
+      or: promoteNot,
+      for: rollUpForLoops,
+      expression: rollUpStandaloneLoops,
     }),
 
-    visit.statementGroups(splitExportStatements, visit.tags('export'), 1)
+    visit.statementGroups(splitExportStatements, visit.tags('export'), 1),
   ];
 
   // or, and, conditional Folding
   function foldShortCircuits(node: Syntax.Node) {
-    let tag = hasTag(node);
+    const tag = hasTag(node);
     return shortCircuitFolders[tag](node);
   }
 
   function foldUnaryConstants(node: Syntax.UnaryOperator) {
-    if ( !isLiteral(node.left) ) {
+    if (!isLiteral(node.left)) {
       return node;
     }
 
-    let tag = hasTag(node);
-    let leftValue = node.left.value;
-    let output = unaryConstantFolders[tag](leftValue);
+    const tag = hasTag(node);
+    const leftValue = node.left.value;
+    const output = unaryConstantFolders[tag](leftValue);
     return node.template('literal', output);
   }
 
   function foldBinaryConstants(node: Syntax.BinaryOperator) {
-    if ( !isLiteral(node.left) || !isLiteral(node.right) ) {
+    if (!isLiteral(node.left) || !isLiteral(node.right)) {
       return node;
     }
 
-    let tag = hasTag(node);
-    let leftValue = node.left.value;
-    let rightValue = node.right.value;
-    let output = binaryConstantFolders[tag](leftValue, rightValue);
+    const tag = hasTag(node);
+    const leftValue = node.left.value;
+    const rightValue = node.right.value;
+    const output = binaryConstantFolders[tag](leftValue, rightValue);
     return node.template('literal', output);
   }
 
   // if all the elements of an Array or Array are literals, then we can
   // convert it to a literal
   function rollUpObjectsAndArrays(node: Syntax.ElementsConstructor) {
-    if ( node.tag === 'array' ) {
+    if (node.tag === 'array') {
       return rollUpArray(node);
     }
     return rollUpObject(node);
   }
 
   function rollUpArray(node: Syntax.ArrayConstructor) {
-    let elements = node.elements;
-    let output: LiteralArray = [];
-    let type = 'literal';
+    const elements = node.elements;
+    const output: LiteralArray = [];
+    const type = 'literal';
 
-    for ( let i = 0, len = elements.length; i < len; i++ ) {
-      let element = elements[i];
-      if ( !isLiteral(element) ) {
+    for (let i = 0, len = elements.length; i < len; i++) {
+      const element = elements[i];
+      if (!isLiteral(element)) {
         return node;
       }
       output.push(element.value);
@@ -150,15 +153,15 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function rollUpObject(node: Syntax.ObjectConstructor) {
-    let elements = node.elements;
-    let output: LiteralObject = {};
-    let type = 'literal';
+    const elements = node.elements;
+    const output: LiteralObject = {};
+    const type = 'literal';
 
-    for ( let i = 0, len = elements.length; i < len; i++ ) {
-      let element = elements[i];
-      let name = element.id;
-      let value = element.value;
-      if ( !isLiteral(name) || !isLiteral(value) ) {
+    for (let i = 0, len = elements.length; i < len; i++) {
+      const element = elements[i];
+      const name = element.id;
+      const value = element.value;
+      if (!isLiteral(name) || !isLiteral(value)) {
         return node;
       }
       output[name.value] = value.value;
@@ -171,17 +174,16 @@ export default function createTreeProcessors(visit: Visitor) {
   // the inapplicable branch and just inline the matching statements
   function foldIfStatements(statements: Syntax.IfStatement[]) {
     let output: Syntax.Statement[] = [];
-    statements.forEach(statement => {
-      if ( !hasTag(statement, 'if') || !isLiteral(statement.condition) ) {
+    statements.forEach((statement) => {
+      if (!hasTag(statement, 'if') || !isLiteral(statement.condition)) {
         output.push(statement);
         return;
       }
 
       let foldedStatements: Syntax.Statement[];
-      if ( isTrue(statement.condition.value) ) {
+      if (isTrue(statement.condition.value)) {
         foldedStatements = statement.thenStatements.statements;
-      }
-      else {
+      } else {
         foldedStatements = statement.elseStatements.statements;
       }
       output = output.concat(foldedStatements);
@@ -192,75 +194,74 @@ export default function createTreeProcessors(visit: Visitor) {
   // if the condition is 'not' we can roll up its argument
   // and flip the branches.
   function flipConditionals(node: Syntax.ConditionalOperator) {
-    if ( !hasTag(node.condition, 'not') ) {
+    if (!hasTag(node.condition, 'not')) {
       return node;
     }
 
-    let cond = node.condition.left;
+    const cond = node.condition.left;
     return node.template(node.tag, cond, node.falseResult, node.trueResult);
   }
 
   // if the operator is 'not' and it contains an equality,
   // then we can flip the equality operator and roll it up
   function flipEquality(node: Syntax.NotOperator) {
-    let tag = hasTag(node.left);
-    let newTag = inverseOperators[tag];
+    const tag = hasTag(node.left);
+    const newTag = inverseOperators[tag];
 
-    if ( !tag || !newTag ) {
+    if (!tag || !newTag) {
       return node;
     }
 
-    let child = node.left;
+    const child = node.left;
     return node.template(newTag, child.left, child.right);
   }
 
   // if left and right operands of an 'and' or 'or' are using the 'not'
   // unary, then promote it to the top and flip the and/or
   function promoteNot(node: Syntax.BinaryOperator) {
-    let leftTag = hasTag(node.left, 'not');
-    let rightTag = hasTag(node.right, 'not');
+    const leftTag = hasTag(node.left, 'not');
+    const rightTag = hasTag(node.right, 'not');
 
-    if ( !leftTag || !rightTag ) {
+    if (!leftTag || !rightTag) {
       return node;
     }
 
-    let left = node.left;
-    let right = node.right;
+    const left = node.left;
+    const right = node.right;
 
-    let tag = hasTag(node);
-    let newTag = tag === 'and' ? 'or' : 'and';
+    const tag = hasTag(node);
+    const newTag = tag === 'and' ? 'or' : 'and';
 
-    let newNode = node.template(newTag, left.left, right.left);
+    const newNode = node.template(newTag, left.left, right.left);
     return left.template('not', newNode);
   }
 
   // we can roll up a single nested for loop into a containing for
   // loop so that they share the same context
   function rollUpForLoops(node: Syntax.ForStatement) {
-    let forStatements = node.loopStatements.statements;
+    const forStatements = node.loopStatements.statements;
 
-    if ( forStatements.length !== 1 ) {
-      return node;  // should only be one child
+    if (forStatements.length !== 1) {
+      return node; // should only be one child
     }
-    if ( !hasTag(forStatements[0], 'for') ) {
-      return node;  // should have a nested for loop
+    if (!hasTag(forStatements[0], 'for')) {
+      return node; // should have a nested for loop
     }
 
-    let nested = forStatements[0];
-    if ( !node.elseStatements.isEmpty() ||
-         !nested.elseStatements.isEmpty() ) {
-      return node;  // no else clauses
+    const nested = forStatements[0];
+    if (!node.elseStatements.isEmpty()
+         || !nested.elseStatements.isEmpty()) {
+      return node; // no else clauses
     }
 
     return node.template('for',
       node.ranges.concat(nested.ranges),
       nested.loopStatements,
-      node.elseStatements
-    );
+      node.elseStatements);
   }
 
   function rollUpStandaloneLoops(statement: Syntax.ExpressionStatement) {
-    if ( Syntax.hasTag(statement.expression, 'reduce') ) {
+    if (Syntax.hasTag(statement.expression, 'reduce')) {
       annotate(statement.expression, 'function/single_expression');
       return statement.expression;
     }
@@ -268,10 +269,10 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function splitExportStatements(statements: Syntax.ExportStatement[]) {
-    let result: Syntax.Statement[] = [];
-    statements.forEach(statement => {
-      let exportedStatement = statement.statement;
-      if ( exportedStatement ) {
+    const result: Syntax.Statement[] = [];
+    statements.forEach((statement) => {
+      const exportedStatement = statement.statement;
+      if (exportedStatement) {
         result.push(exportedStatement);
         statement.statement = null;
       }

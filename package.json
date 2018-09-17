@@ -20,8 +20,11 @@
   "scripts": {
     "prepare": "mkdir -p dist/compiler && mkdir -p dist/modules && cp src/modules/*.fate dist/modules",
     "pegjs": "npm run prepare && pegjs -o dist/compiler/parser.js src/compiler/parser.pegjs",
-    "build": "npm run pegjs && babel src -d dist",
-    "test": "npm run build && nodeunit test/index.js"
+    "lint": "eslint src",
+    "babel": "babel src -d dist",
+    "test": "nodeunit test/index.js",
+    "build": "npm run pegjs && npm run babel",
+    "validate": "npm run lint && npm run build && npm run test"
   },
   "engines": {
     "node": ">=10.0.0"
@@ -34,8 +37,16 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-eslint": "^9.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
+    "eslint": "^5.6.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-flowtype": "^2.50.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.1",
     "flow-bin": "^0.80.0",
     "nodeunit": "^0.10.2",
     "pegjs": "^0.10.0"

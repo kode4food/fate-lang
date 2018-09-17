@@ -1,22 +1,30 @@
 /** @flow */
 
+import type {Evaluator} from "./evaluator";
+
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
 
 type FunctionMap = { [index: string]: Function };
 
 export class LetEvaluator extends NodeEvaluator {
+  static tags = ['let'];
   node: Syntax.LetStatement;
 
-  evaluate() {
-    this.node.assignments.forEach(assignment => {
+  constructor(parent: Evaluator, node: Syntax.LetStatement) {
+    super(parent, node);
+    this.node = node;
+  }
+
+  evaluate(...args: any[]) {
+    this.node.assignments.forEach((assignment) => {
       this.dispatch(assignment);
     });
   }
 }
-LetEvaluator.tags = ['let'];
 
 export class AssignmentEvaluator extends NodeEvaluator {
+  static tags = ['assignment', 'arrayDestructure', 'objectDestructure'];
   node: Syntax.Assignment;
 
   evaluate(getValue?: Function) {
@@ -24,13 +32,13 @@ export class AssignmentEvaluator extends NodeEvaluator {
       getValue = this.getAssignmentValue.bind(this);
     }
 
-    let AssignmentEvaluators: FunctionMap = {
-      'assignment': this.createDirectAssignmentEvaluator,
-      'arrayDestructure': this.createArrayDestructureEvaluator,
-      'objectDestructure': this.createObjectDestructureEvaluator
+    const AssignmentEvaluators: FunctionMap = {
+      assignment: this.createDirectAssignmentEvaluator,
+      arrayDestructure: this.createArrayDestructureEvaluator,
+      objectDestructure: this.createObjectDestructureEvaluator,
     };
 
-    let assignmentEvaluator = AssignmentEvaluators[this.node.tag];
+    const assignmentEvaluator = AssignmentEvaluators[this.node.tag];
     return assignmentEvaluator.call(this, getValue);
   }
 
@@ -39,48 +47,46 @@ export class AssignmentEvaluator extends NodeEvaluator {
   }
 
   createDirectAssignmentEvaluator(getValue: Function) {
-    let thisNode = this.node;
+    const thisNode = this.node;
     this.coder.assignment(thisNode.id.value, getValue());
   }
 
   createArrayDestructureEvaluator(getValue: Function) {
-    let thisNode = this.node;
-    let result = this.coder.createAnonymous();
+    const thisNode = this.node;
+    const result = this.coder.createAnonymous();
 
     this.coder.statement(() => {
       this.coder.assignAnonymous(result, getValue(thisNode));
     });
 
     thisNode.getIdentifiers().forEach((id, index) => {
-      if ( id instanceof Syntax.Wildcard ) {
+      if (id instanceof Syntax.Wildcard) {
         return;
       }
       this.coder.assignment(id.value, () => {
         this.coder.member(
           () => { this.coder.retrieveAnonymous(result); },
-          this.coder.literal(index)
+          this.coder.literal(index),
         );
       });
     });
   }
 
   createObjectDestructureEvaluator(getValue: Function) {
-    let thisNode = this.node;
-    let result = this.coder.createAnonymous();
+    const thisNode = this.node;
+    const result = this.coder.createAnonymous();
 
     this.coder.statement(() => {
       this.coder.assignAnonymous(result, getValue(thisNode));
     });
 
-    thisNode.items.forEach(item => {
+    thisNode.items.forEach((item) => {
       this.coder.assignment(item.id.value, () => {
         this.coder.member(
           () => { this.coder.retrieveAnonymous(result); },
-          this.defer(item.value)
+          this.defer(item.value),
         );
       });
     });
   }
 }
-AssignmentEvaluator.tags = ['assignment', 'arrayDestructure',
-                            'objectDestructure'];

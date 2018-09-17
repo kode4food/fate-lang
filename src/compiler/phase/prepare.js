@@ -1,10 +1,12 @@
 /** @flow */
 
 import * as Syntax from '../syntax';
-import { Visitor, annotate, hasAnnotation, getAnnotation } from '../syntax';
-import {Cardinality} from "../syntax";
+import {
+  Visitor, annotate, hasAnnotation, getAnnotation,
+} from '../syntax';
+import { Cardinality } from '../syntax';
 
-type FunctionOrLambda = Syntax.FunctionDeclaration|Syntax.LambdaExpression;
+type FunctionOrLambda = Syntax.FunctionDeclaration | Syntax.LambdaExpression;
 type AssignmentMap = { [index: string]: Syntax.Assignment };
 type NameSet = { [index: string]: boolean };
 
@@ -13,24 +15,24 @@ const emitBarriers = awaitBarriers;
 const whenAssigns = ['assignment', 'arrayDestructure', 'objectDestructure'];
 
 export default function createTreeProcessors(visit: Visitor) {
-  let selfFunction = visit.ancestorTags('self', ['function', 'lambda']);
-  let whenReference = visit.ancestorTags('id', whenAssigns, 'let', 'do');
+  const selfFunction = visit.ancestorTags('self', ['function', 'lambda']);
+  const whenReference = visit.ancestorTags('id', whenAssigns, 'let', 'do');
 
   return [
     visit.byTag({
-      'parens': rollUpParens,
-      'await': createBarrierValidator('do', awaitBarriers),
-      'emit': createBarrierValidator('generate', emitBarriers),
-      'self': validateSelfReferences,
-      'function': validateFunctionArgs,
-      'lambda': validateFunctionArgs
+      parens: rollUpParens,
+      await: createBarrierValidator('do', awaitBarriers),
+      emit: createBarrierValidator('generate', emitBarriers),
+      self: validateSelfReferences,
+      function: validateFunctionArgs,
+      lambda: validateFunctionArgs,
     }),
 
     visit.matching(annotateSelfFunctions, selfFunction),
     visit.matching(annotateWhenReferences, whenReference),
     visit.matching(groupWhenAssignments, visit.tags('do')),
     visit.statementGroups(validateAssignments, visit.tags('let'), 1),
-    visit.statements(warnFunctionShadowing)
+    visit.statements(warnFunctionShadowing),
   ];
 
   function rollUpParens(node: Syntax.Parens) {
@@ -38,37 +40,34 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function createBarrierValidator(container: Syntax.Tag,
-                                  barriers: Syntax.Tags) {
+    barriers: Syntax.Tags) {
     return (node: Syntax.Node) => {
-      let containerAncestors = visit.hasAncestorTags(container);
-      let barrierAncestors = visit.hasAncestorTags(barriers);
+      const containerAncestors = visit.hasAncestorTags(container);
+      const barrierAncestors = visit.hasAncestorTags(barriers);
 
-      if ( !containerAncestors ) {
+      if (!containerAncestors) {
         visit.issueError(node,
-          `${node.tag} must appear in a '${container}' block`
-        );
+          `${node.tag} must appear in a '${container}' block`);
       }
 
-      if ( !barrierAncestors ) {
+      if (!barrierAncestors) {
         return node;
       }
 
-      let doIndex = visit.nodeStack.indexOf(containerAncestors[0]);
-      let fnIndex = visit.nodeStack.indexOf(barrierAncestors[0]);
-      if ( fnIndex > doIndex ) {
+      const doIndex = visit.nodeStack.indexOf(containerAncestors[0]);
+      const fnIndex = visit.nodeStack.indexOf(barrierAncestors[0]);
+      if (fnIndex > doIndex) {
         visit.issueError(node,
-          `${node.tag} must not appear in a nested block`
-        );
+          `${node.tag} must not appear in a nested block`);
       }
       return node;
     };
   }
 
   function validateSelfReferences(node: Syntax.Self) {
-    if ( !visit.hasAncestorTags(['function', 'lambda']) ) {
+    if (!visit.hasAncestorTags(['function', 'lambda'])) {
       visit.issueError(node,
-        "'self' keyword must appear within a Function"
-      );
+        "'self' keyword must appear within a Function");
     }
     return node;
   }
@@ -80,14 +79,14 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function checkParamsForDuplication(node: Syntax.Node,
-                                     signatures: Syntax.Signatures) {
-    let encounteredNames: NameSet = {};
-    let duplicatedNames: NameSet = {};
-    signatures.forEach(signature => {
-      let namedParams = signature.params.filter(param => !!param.id);
-      namedParams.forEach(param => {
-        let name = param.id.value;
-        if ( encounteredNames[name] ) {
+    signatures: Syntax.Signatures) {
+    const encounteredNames: NameSet = {};
+    const duplicatedNames: NameSet = {};
+    signatures.forEach((signature) => {
+      const namedParams = signature.params.filter(param => !!param.id);
+      namedParams.forEach((param) => {
+        const name = param.id.value;
+        if (encounteredNames[name]) {
           duplicatedNames[name] = true;
           return;
         }
@@ -95,57 +94,54 @@ export default function createTreeProcessors(visit: Visitor) {
       });
     });
 
-    let duplicatedItems = Object.keys(duplicatedNames);
-    if ( duplicatedItems.length ) {
+    const duplicatedItems = Object.keys(duplicatedNames);
+    if (duplicatedItems.length) {
       visit.issueError(node,
-        "Argument names are repeated in declaration: " +
-        duplicatedItems.join(', ')
-      );
+        `Argument names are repeated in declaration: ${
+        duplicatedItems.join(', ')}`);
     }
   }
 
   function checkParamCardinality(node: Syntax.Signature) {
     // the rules, for now: required* -> zeroToMany?
     let state = 0;
-    node.params.forEach(parameter => {
-      switch ( parameter.cardinality ) {
+    node.params.forEach((parameter) => {
+      switch (parameter.cardinality) {
         case Cardinality.Required:
-          if ( state !== 0 ) {
+          if (state !== 0) {
             visit.issueError(parameter,
-              "A required argument can't follow a wildcard argument"
-            );
+              "A required argument can't follow a wildcard argument");
           }
           break;
 
         case Cardinality.ZeroToMany:
-          if ( state !== 0 ) {
+          if (state !== 0) {
             visit.issueError(parameter,
-              "A wildcard argument can't follow a wildcard argument"
-            );
+              "A wildcard argument can't follow a wildcard argument");
           }
           state = 1;
           break;
 
         default:
-          throw new Error("Stupid Coder: Bad Cardinality Value");
+          throw new Error('Stupid Coder: Bad Cardinality Value');
       }
     });
   }
 
   function annotateSelfFunctions(node: Syntax.Self) {
-    let func = visit.hasAncestorTags(['function', 'lambda'])[0];
+    const func = visit.hasAncestorTags(['function', 'lambda'])[0];
     annotate(func, 'function/self');
     return node;
   }
 
   function annotateWhenReferences(node: Syntax.Identifier) {
-    if ( !hasAnnotation(node, 'id/reference') ) {
+    if (!hasAnnotation(node, 'id/reference')) {
       return node;
     }
 
-    visit.nodeStack.forEach(parent => {
-      if ( parent instanceof Syntax.Node &&
-           Syntax.hasTag(parent, whenAssigns) ) {
+    visit.nodeStack.forEach((parent) => {
+      if (parent instanceof Syntax.Node
+        && Syntax.hasTag(parent, whenAssigns)) {
         addDoReference(parent, node);
       }
     });
@@ -154,36 +150,36 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function addDoReference(node: Syntax.Assignment, id: Syntax.Identifier) {
-    let ids: NameSet = getAnnotation(node, 'do/references') || {};
+    const ids: NameSet = getAnnotation(node, 'do/references') || {};
     ids[id.value] = true;
     annotate(node, 'do/references', ids);
   }
 
   function groupWhenAssignments(node: Syntax.DoExpression) {
-    if ( !(node.whenClause instanceof Syntax.LetStatement) ) {
+    if (!(node.whenClause instanceof Syntax.LetStatement)) {
       return node;
     }
 
-    let whenClause = node.whenClause;
-    let encountered: AssignmentMap = {};
-    whenClause.assignments.forEach(assignment => {
-      let getters: NameSet = getAnnotation(assignment, 'do/references') || {};
+    const whenClause = node.whenClause;
+    const encountered: AssignmentMap = {};
+    whenClause.assignments.forEach((assignment) => {
+      const getters: NameSet = getAnnotation(assignment, 'do/references') || {};
 
-      Object.keys(getters).forEach(getter => {
-        let prevAssignment = encountered[getter];
-        if ( !prevAssignment ) {
+      Object.keys(getters).forEach((getter) => {
+        const prevAssignment = encountered[getter];
+        if (!prevAssignment) {
           return;
         }
 
         let thisGroup = getAnnotation(assignment, 'when/group') || 0;
-        let prevGroup = getAnnotation(prevAssignment, 'when/group') || 0;
+        const prevGroup = getAnnotation(prevAssignment, 'when/group') || 0;
 
-        if ( thisGroup <= prevGroup ) {
+        if (thisGroup <= prevGroup) {
           annotate(assignment, 'when/group', thisGroup = prevGroup + 1);
         }
       });
 
-      assignment.getIdentifiers().forEach(id => {
+      assignment.getIdentifiers().forEach((id) => {
         encountered[id.value] = assignment;
       });
     });
@@ -191,15 +187,14 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function validateAssignments(statements: Syntax.LetStatement[]) {
-    let namesSeen: NameSet = {};
-    statements.forEach(statement => {
-      statement.assignments.forEach(assignment => {
-        assignment.getIdentifiers().forEach(id => {
-          let name = id.value;
-          if ( namesSeen[name] ) {
+    const namesSeen: NameSet = {};
+    statements.forEach((statement) => {
+      statement.assignments.forEach((assignment) => {
+        assignment.getIdentifiers().forEach((id) => {
+          const name = id.value;
+          if (namesSeen[name]) {
             visit.issueWarning(id,
-              `Are you sure you wanted to immediately reassign '${name}'?`
-            );
+              `Are you sure you wanted to immediately reassign '${name}'?`);
           }
           namesSeen[name] = true;
         });
@@ -209,29 +204,28 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function isGuarded(signature: Syntax.Signature) {
-    if ( signature.guard ) {
+    if (signature.guard) {
       return true;
     }
 
     return signature.params.filter(
-      param => param instanceof Syntax.PatternParameter
+      param => param instanceof Syntax.PatternParameter,
     ).length !== 0;
   }
 
   function warnFunctionShadowing(statements: Syntax.Statement[]) {
-    let namesSeen: NameSet = {};
+    const namesSeen: NameSet = {};
     let lastName: string;
 
-    statements.forEach(statement => {
-      if ( statement instanceof Syntax.FunctionDeclaration ) {
-        let signature = statement.signature;
-        let name = signature.id.value;
+    statements.forEach((statement) => {
+      if (statement instanceof Syntax.FunctionDeclaration) {
+        const signature = statement.signature;
+        const name = signature.id.value;
 
-        if ( !isGuarded(signature) && namesSeen[name] ) {
+        if (!isGuarded(signature) && namesSeen[name]) {
           visit.issueWarning(statement,
-            `The unguarded Function '${name}' will replace ` +
-            `the previous definition(s)`
-          );
+            `The unguarded Function '${name}' will replace `
+            + 'the previous definition(s)');
         }
 
         namesSeen[name] = true;

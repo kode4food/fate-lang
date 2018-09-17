@@ -1,46 +1,41 @@
 /** @flow */
 
-const minimist = require('minimist');
-
 import { VERSION, runScript, createModule } from '../fate';
 
-interface ParsedArguments {
-  'help'?: boolean;
-  '_'?: string[];
-}
+const minimist = require('minimist');
 
 export function commandLine(inputArgs: string[], console: Console,
-                            completedCallback: Function) {
+  completedCallback: Function) {
   let badArg = false;
 
-  let args = minimist(inputArgs, {
+  const args = minimist(inputArgs, {
     boolean: ['help'],
-    unknown: value => {
-      let invalidFlag = /^--.+/.test(value);
+    unknown: (value) => {
+      const invalidFlag = /^--.+/.test(value);
       badArg = badArg || invalidFlag;
       return !invalidFlag;
-    }
+    },
   });
 
-  if ( !inputArgs.length || badArg || args.help ) {
+  if (!inputArgs.length || badArg || args.help) {
     displayUsage();
     completedCallback(badArg ? -1 : 0);
     return;
   }
 
-  let match = /^(.+?)?(\.fate)?$/.exec(args._[0]);
-  let filename = match[1] + '.fate';
+  const match = /^(.+?)?(\.fate)?$/.exec(args._[0]);
+  const filename = `${match[1]}.fate`;
   runScript(filename, createModule());
   completedCallback(0);
 
   function displayVersion() {
-    console.info("Fate v" + VERSION);
+    console.info(`Fate v${VERSION}`);
   }
 
   function displayUsage() {
     displayVersion();
     console.info(
-`
+      `
   Usage:
 
     fate (options) <script name>
@@ -50,7 +45,7 @@ export function commandLine(inputArgs: string[], console: Console,
     Options:
 
     --help         - You're looking at me right now
-`
+`,
     );
   }
 }

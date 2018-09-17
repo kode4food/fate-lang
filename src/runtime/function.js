@@ -12,7 +12,7 @@ export interface FateFunction {
 const slice = Array.prototype.slice;
 
 export function functionNotExhaustive() {
-  throw new Error("Function invocation not exhaustive");
+  throw new Error('Function invocation not exhaustive');
 }
 
 export function ensureFunction(func: Function): Function {
@@ -20,26 +20,25 @@ export function ensureFunction(func: Function): Function {
 }
 
 export function bindFunction(func: Function, args: ArgTemplate) {
-  let indexes = Object.keys(args).map(Number);
-  let templateSize = Math.max.apply(null, indexes);
-  let template: any[] = [];
-  let argMap: number[] = [];
+  const indexes = Object.keys(args).map(Number);
+  const templateSize = Math.max.apply(null, indexes);
+  const template: any[] = [];
+  const argMap: number[] = [];
 
-  for ( let i = 0; i <= templateSize; i++ ) {
-    if ( indexes.indexOf(i) !== -1 ) {
+  for (let i = 0; i <= templateSize; i++) {
+    if (indexes.indexOf(i) !== -1) {
       template[i] = args[i];
-    }
-    else {
+    } else {
       argMap.push(i);
     }
   }
 
-  let sliceIndex = argMap.length;
+  const sliceIndex = argMap.length;
   return boundFunction;
 
   function boundFunction(thisValue: any) {
-    let funcArgs = template.slice().concat(slice.call(arguments, sliceIndex));
-    for ( let i = 0; i < argMap.length; i++ ) {
+    const funcArgs = template.slice().concat(slice.call(arguments, sliceIndex));
+    for (let i = 0; i < argMap.length; i++) {
       funcArgs[argMap[i]] = arguments[i];
     }
     return func.apply(thisValue, funcArgs);
@@ -52,7 +51,7 @@ export function compose(funcs: FateFunction[]) {
 
   function wrapper() {
     let result = funcs[0].apply(null, arguments);
-    for ( let i = 1; i < funcs.length; i++ ) {
+    for (let i = 1; i < funcs.length; i++) {
       result = funcs[i](result);
     }
     return result;
@@ -72,9 +71,9 @@ function createWrapper(funcs: FateFunction[], check: Function) {
   return wrapper;
 
   function wrapper() {
-    for ( let i = 0; i < funcs.length - 1; i++ ) {
-      let result = funcs[i].apply(null, arguments);
-      if ( check(result) ) {
+    for (let i = 0; i < funcs.length - 1; i++) {
+      const result = funcs[i].apply(null, arguments);
+      if (check(result)) {
         return result;
       }
     }
@@ -85,10 +84,10 @@ function createWrapper(funcs: FateFunction[], check: Function) {
 function checkComposition(funcs: FateFunction[]) {
   let fateType: string;
 
-  for ( let i = 0; i < funcs.length; i++ ) {
-    let func = funcs[i];
-    if ( typeof func !== 'function' ) {
-      throw new Error("Cannot compose values that are not functions");
+  for (let i = 0; i < funcs.length; i++) {
+    const func = funcs[i];
+    if (typeof func !== 'function') {
+      throw new Error('Cannot compose values that are not functions');
     }
     fateType = fateType || func.__fate;
   }
