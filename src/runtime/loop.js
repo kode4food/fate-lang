@@ -1,15 +1,7 @@
 /** @flow */
 
 import { isArray, isObject } from './index';
-
-const generator = require('../generator');
-
-const isGenerator = generator.isGenerator;
-const generateArray = generator.generateArray;
-const generateObject = generator.generateObject;
-
-export const materializeArray = generator.materializeArray;
-export const materializeObject = generator.materializeObject;
+import { isGenerator, generateArray, generateObject } from './generator';
 
 export type Collection = any[] | any | Function;
 

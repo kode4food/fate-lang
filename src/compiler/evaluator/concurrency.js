@@ -2,10 +2,16 @@
 
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
+import type { Evaluator } from './evaluator';
 
 export class AwaitEvaluator extends NodeEvaluator {
   static tags = ['await'];
   node: Syntax.AwaitOperator;
+
+  constructor(parent: Evaluator, node: Syntax.AwaitOperator) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     this.coder.waitFor(this.node.resolver, this.defer(this.node.left));
@@ -16,6 +22,11 @@ export class DoEvaluator extends NodeEvaluator {
   static tags = ['do'];
   node: Syntax.DoExpression;
 
+  constructor(parent: Evaluator, node: Syntax.DoExpression) {
+    super(parent);
+    this.node = node;
+  }
+
   evaluate(caseGuard?: Function) {
     this.coder.call(this.coder.runtimeImport('createDoBlock'), [
       () => {
@@ -23,7 +34,7 @@ export class DoEvaluator extends NodeEvaluator {
           generator: true,
           body: () => {
             if (this.node.whenClause instanceof Syntax.LetStatement) {
-              const whenClause = this.node.whenClause;
+              const { whenClause } = this.node;
               const groups = this.getAssignmentGroups(whenClause.assignments);
               groups.forEach(group => this.generateAssignment(group));
             } else if (this.node.whenClause) {
@@ -51,6 +62,7 @@ export class DoEvaluator extends NodeEvaluator {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getAssignmentGroups(assignments: Syntax.Assignments) {
     const groups: Syntax.Assignments[] = [];
 
@@ -89,6 +101,11 @@ export class DoEvaluator extends NodeEvaluator {
 export class CaseEvaluator extends NodeEvaluator {
   static tags = ['case'];
   node: Syntax.CaseExpression;
+
+  constructor(parent: Evaluator, node: Syntax.CaseExpression) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     this.coder.call(this.coder.runtimeImport('createDoBlock'), [

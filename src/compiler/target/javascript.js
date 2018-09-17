@@ -6,7 +6,7 @@ import * as Target from './index';
 import { mixin } from '../../runtime';
 import { Resolver } from '../syntax';
 
-const isArray = Array.isArray;
+const { isArray } = Array;
 const jsonStringify = JSON.stringify;
 const jsStringIdRegex = /^(["'])([$_a-zA-Z][$_a-zA-Z0-9]*)\1$/;
 const anonIdRegex = /^ anon_[a-zA-Z0-9]+$/;
@@ -88,10 +88,10 @@ export function createCoder(): Target.Coder {
   const globalVars: string[] = [];
 
   // keeps track of name -> local mappings throughout the nesting
-  let names: NameIdsMap = {}; // name -> localId[]
-  let scopeInfo = createScopeInfo();
   const nameStack: NameInfo[] = [];
+  let names: NameIdsMap = {};
   let usesScratch = false;
+  let scopeInfo = createScopeInfo();
 
   const writerStack: Target.BodyEntries[] = [];
   let body: Target.BodyEntries = [];
@@ -179,8 +179,8 @@ export function createCoder(): Target.Coder {
     if (id) {
       return id;
     }
-    id = generatedLiterals[canonical] = nextId('lit_');
-
+    id = nextId('lit_');
+    generatedLiterals[canonical] = id;
     globalVars.push(`${id}=${canonical}`);
     return id;
   }
@@ -190,7 +190,8 @@ export function createCoder(): Target.Coder {
     if (id) {
       return id;
     }
-    id = generatedImports[funcName] = nextId(`${funcName}_`);
+    id = nextId(`${funcName}_`);
+    generatedImports[funcName] = id;
     globalVars.push(
       [id, '=r.', funcName].join(''),
     );
@@ -204,7 +205,8 @@ export function createCoder(): Target.Coder {
     if (id) {
       return id;
     }
-    id = generatedBuilders[key] = nextId(`${funcName}_`);
+    id = nextId(`${funcName}_`);
+    generatedBuilders[key] = id;
     globalVars.push(
       `${id}=${funcId}(${literalIds.join(',')})`,
     );
@@ -240,7 +242,9 @@ export function createCoder(): Target.Coder {
     return result;
   }
 
+
   function popLocalScope() {
+    /* eslint-disable */
     const info = nameStack.pop();
     names = info.names;
     scopeInfo = info.scopeInfo;
@@ -592,11 +596,10 @@ export function createCoder(): Target.Coder {
   }
 
   function loopExpression(options: Target.LoopOptions) {
-    const itemValue = options.value;
-    const itemName = options.name;
-    const collection = options.collection;
+    const {
+      name, value, collection, body,
+    } = options;
     const loopGuard = options.guard;
-    const loopBody = options.body;
 
     const iterator = runtimeImport('createIterator');
     const iteratorContent = code(() => {
@@ -606,14 +609,14 @@ export function createCoder(): Target.Coder {
     const parentNames = names;
     pushLocalScope();
 
-    const contextArgs = [itemValue];
-    if (itemName) {
-      contextArgs.push(itemName);
+    const contextArgs = [value];
+    if (name) {
+      contextArgs.push(name);
     }
     const argNames = contextArgs.map(localForWrite);
 
     const bodyContent = code(() => {
-      generate(loopBody);
+      generate(body);
     });
 
     const guardContent = code(() => {
@@ -623,7 +626,7 @@ export function createCoder(): Target.Coder {
     const wrapper = nextId('iter_');
     write('for(let ', wrapper, ' of ', iteratorContent, '){');
     write('let ', argNames[0], '=', wrapper, '[0];');
-    if (itemName) {
+    if (name) {
       write('let ', argNames[1], '=', wrapper, '[1];');
     }
 
@@ -676,7 +679,7 @@ export function createCoder(): Target.Coder {
   }
 
   function func(options: Target.FunctionOptions) {
-    const internalId = options.internalId;
+    const { internalId } = options;
     const internalArgs = options.internalArgs || [];
     const contextArgs = options.contextArgs || [];
     const isGenerator = options.generator;

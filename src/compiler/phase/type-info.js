@@ -3,8 +3,9 @@
 import { v4 as uuid } from 'uuid';
 
 import * as Syntax from '../syntax';
-import { Visitor, getAnnotation, annotate } from '../syntax';
 import { isArray } from '../../runtime';
+
+const { Visitor, getAnnotation, annotate } = Syntax;
 
 type Type = string;
 
@@ -39,7 +40,7 @@ export default function createTreeProcessors(visit: Visitor) {
   ];
 
   function visitLiteral(node: Syntax.Literal) {
-    const value = node.value;
+    const { value } = node;
     let type = typeof value;
     if (type === 'object' && isArray(value)) {
       type = 'array';

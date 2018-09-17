@@ -1,7 +1,7 @@
 /** @flow */
 
 import * as Syntax from '../syntax';
-import { Evaluator, NodeEvaluator } from './evaluator';
+import { Evaluator } from './evaluator';
 import { Coder } from '../target';
 
 import * as AssignmentEvaluators from './assignment';
@@ -15,10 +15,6 @@ import * as PatternEvaluators from './pattern';
 
 interface AnyMap {
   [index: string]: any;
-}
-
-interface NodeEvaluatorConstructorMap {
-  [index: string]: (parent: Evaluator, node: Syntax.Node) => NodeEvaluator;
 }
 
 const evaluatorModules = [
@@ -42,7 +38,7 @@ export class DispatchEvaluator implements Evaluator {
         .map(key => module[key])
         .filter(isNodeEvaluator)
         .forEach((constructorFunction) => {
-          const tags = constructorFunction.tags;
+          const { tags } = constructorFunction;
           tags.forEach((tag: string) => {
             this.ctors[tag] = constructorFunction;
           });
@@ -50,7 +46,8 @@ export class DispatchEvaluator implements Evaluator {
     });
 
     function isNodeEvaluator(module: any) {
-      return typeof module === 'function' && module.hasOwnProperty('tags');
+      return typeof module === 'function'
+          && Object.prototype.hasOwnProperty.call(module, 'tags');
     }
   }
 

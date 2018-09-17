@@ -13,6 +13,7 @@ export function createNodeResolver() {
     try {
       const explicit = nodeModuleRegex.exec(name);
       if (explicit) {
+        // eslint-disable-next-line prefer-destructuring
         name = explicit[1];
       } else if (basePath && relativePathRegex.test(name)) {
         name = resolvePath(basePath, name);

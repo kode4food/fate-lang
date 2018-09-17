@@ -7,15 +7,16 @@ export interface Annotated {
 export class Annotations {}
 
 export function annotate(node: Annotated, name: string, value?: any) {
-  let annotations = node.annotations;
+  let { annotations } = node;
   if (!annotations) {
-    node.annotations = annotations = new Annotations();
+    annotations = new Annotations();
+    node.annotations = annotations;
   }
   annotations[name] = value === undefined ? true : value;
 }
 
 export function getAnnotation(node: Annotated, name: string) {
-  const annotations = node.annotations;
+  const { annotations } = node;
   if (!annotations) {
     return false;
   }

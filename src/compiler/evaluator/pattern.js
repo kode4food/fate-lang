@@ -3,6 +3,7 @@
 import * as Target from '../target';
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
+import type { Evaluator } from './evaluator';
 
 const likeLiteralTypes = ['string', 'number', 'boolean', 'symbol'];
 const cachedPatternThreshold = 8;
@@ -10,6 +11,11 @@ const cachedPatternThreshold = 8;
 export class RegexEvaluator extends NodeEvaluator {
   static tags = ['regex'];
   node: Syntax.Regex;
+
+  constructor(parent: Evaluator, node: Syntax.Regex) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     const regex = this.coder.builder(
@@ -44,6 +50,7 @@ class LikeComparisonEvaluator extends NodeEvaluator {
     return typeof node === 'function' ? node : this.defer(node);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   isLikeLiteral(node: Syntax.Node | Function) {
     const valueType = typeof node.value;
     return likeLiteralTypes.indexOf(valueType) !== -1;
@@ -54,6 +61,11 @@ export class LikeEvaluator extends LikeComparisonEvaluator {
   static tags = ['like'];
   node: Syntax.LikeOperator;
 
+  constructor(parent: Evaluator, node: Syntax.LikeOperator) {
+    super(parent);
+    this.node = node;
+  }
+
   evaluate(...args: any[]) {
     this.createLikeComparison(this.node.left, this.node.right);
   }
@@ -62,6 +74,11 @@ export class LikeEvaluator extends LikeComparisonEvaluator {
 export class NotLikeEvaluator extends LikeComparisonEvaluator {
   static tags = ['notLike'];
   node: Syntax.NotLikeOperator;
+
+  constructor(parent: Evaluator, node: Syntax.NotLikeOperator) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     this.coder.unaryOperator('not', () => {
@@ -73,6 +90,11 @@ export class NotLikeEvaluator extends LikeComparisonEvaluator {
 export class MatchEvaluator extends LikeComparisonEvaluator {
   static tags = ['match'];
   node: Syntax.MatchExpression;
+
+  constructor(parent: Evaluator, node: Syntax.MatchExpression) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     const self = this;
@@ -162,6 +184,11 @@ export class PatternEvaluator extends BasePatternEvaluator {
   static tags = ['pattern'];
   node: Syntax.Pattern;
 
+  constructor(parent: Evaluator, node: Syntax.Pattern) {
+    super(parent);
+    this.node = node;
+  }
+
   evaluate(...args: any[]) {
     const defineName = this.getPatternDefineMethodName(this.node);
     const definePattern = this.coder.runtimeImport(defineName);
@@ -179,16 +206,22 @@ export class PatternEvaluator extends BasePatternEvaluator {
     ]);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getPatternDefineMethodName(node: Syntax.Pattern) {
     const complexity = Syntax.getAnnotation(node, 'pattern/complexity');
     return complexity > cachedPatternThreshold ? 'defineCachedPattern'
-      : 'definePattern';
+                                               : 'definePattern';
   }
 }
 
 export class NestedPatternEvaluator extends BasePatternEvaluator {
   static tags = ['objectPattern', 'arrayPattern'];
   node: Syntax.CollectionPattern;
+
+  constructor(parent: Evaluator, node: Syntax.CollectionPattern) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     const self = this;

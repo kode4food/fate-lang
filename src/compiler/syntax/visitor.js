@@ -5,8 +5,7 @@ import type { CompileErrors } from '../index';
 import * as Syntax from './index';
 import { CompileError } from '../index';
 
-const isArray = Array.isArray;
-const slice = Array.prototype.slice;
+const { isArray } = Array;
 
 type NodeStackElement = Syntax.NodeOrNodes;
 type NodeVisitor = (node: NodeStackElement) => any;
@@ -27,7 +26,7 @@ export class Visitor {
   }
 
   ancestorTags(...tags: Syntax.TagOrTags[]) {
-    return this.ancestry.apply(this, tags.map(this.tags));
+    return this.ancestry(...tags.map(this.tags));
   }
 
   ancestry(matcher: NodeMatcher, ...matchers: NodeMatcher[]) {
@@ -35,13 +34,13 @@ export class Visitor {
       if (!matcher(node)) {
         return false;
       }
-      return this.hasAncestry.apply(this, matchers) !== undefined;
+      return this.hasAncestry(...matchers) !== undefined;
     };
   }
 
   hasAncestorTags(...tags: Syntax.TagOrTags[]) {
     const args = tags.map(this.tags);
-    return this.hasAncestry.apply(this, args);
+    return this.hasAncestry(...args);
   }
 
   hasAncestry(...matchers: NodeMatcher[]) {
@@ -62,7 +61,7 @@ export class Visitor {
   }
 
   findAncestor(tag: Syntax.TagOrTags): ?Syntax.Node {
-    const nodeStack = this.nodeStack;
+    const { nodeStack } = this;
     for (let i = nodeStack.length - 1; i >= 0; i--) {
       const node: NodeStackElement = nodeStack[i];
       if (node instanceof Syntax.Node && Syntax.hasTag(node, tag)) {
@@ -94,7 +93,7 @@ export class Visitor {
   }
 
   recurseInto(node: NodeStackElement, visitor: NodeVisitor) {
-    const nodeStack = this.nodeStack;
+    const { nodeStack } = this;
     nodeStack.push(node);
     if (isArray(node)) {
       const arrNode = node;
@@ -129,7 +128,10 @@ export class Visitor {
   }
 
   statements(visitor: StatementsVisitor) {
-    return (node: Syntax.Node) => this.nodes(node, Syntax.isStatements, statementsProcessor);
+    return (node: Syntax.Node) => this.nodes(
+      node, Syntax.isStatements,
+      statementsProcessor,
+    );
 
     function statementsProcessor(node: Syntax.Statements) {
       node.statements = visitor(node.statements);
@@ -140,7 +142,7 @@ export class Visitor {
   // Iterates over a set of statements and presents adjacent groups
   // to the callback function for replacement
   statementGroups(visitor: StatementsVisitor, matcher: NodeMatcher,
-    minGroupSize: number) {
+                  minGroupSize: number) {
     return this.statements(groupProcessor);
 
     function groupProcessor(statements: Syntax.Statement[]) {
@@ -167,13 +169,16 @@ export class Visitor {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   isNode(node: Syntax.Node) {
     return node instanceof Syntax.Node;
   }
 
-  tags(tags: Syntax.TagOrTags) {
+  // eslint-disable-next-line class-methods-use-this
+  tags(...args: any[]) {
+    let tags: Syntax.TagOrTags = args[0];
     if (!isArray(tags)) {
-      tags = slice.call(arguments, 0);
+      tags = args;
     }
     return matcher;
 
@@ -183,8 +188,8 @@ export class Visitor {
   }
 
   upTreeUntilMatch(matcher: NodeMatcher,
-    visitor: NodeVisitor): NodeStackElement {
-    const nodeStack = this.nodeStack;
+                   visitor: NodeVisitor): NodeStackElement {
+    const { nodeStack } = this;
     for (let i = nodeStack.length - 1; i >= 0; i--) {
       const node: NodeStackElement = nodeStack[i];
       visitor(node);
@@ -195,6 +200,7 @@ export class Visitor {
     throw new Error("Stupid Coder: upTreeUntilMatch didn't match");
   }
 
+  // eslint-disable-next-line class-methods-use-this
   issueError(source: Syntax.Node, message: string) {
     throw new CompileError(message, source.line, source.column);
   }

@@ -2,9 +2,10 @@
 
 const mixin = require('../dist/runtime').mixin;
 
-mixin(exports,
+mixin(
+  exports,
   require('./api'),
   require('./cli'),
   require('./eval'),
-  require('./pure')
+  require('./pure'),
 );

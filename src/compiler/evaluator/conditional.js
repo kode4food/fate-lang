@@ -2,10 +2,16 @@
 
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
+import type { Evaluator } from './evaluator';
 
 export class ConditionalEvaluator extends NodeEvaluator {
   static tags = ['conditional'];
   node: Syntax.ConditionalOperator;
+
+  constructor(parent: Evaluator, node: Syntax.ConditionalOperator) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     this.coder.conditional(
@@ -27,16 +33,8 @@ class IfGeneratingEvaluator extends NodeEvaluator {
 
     this.coder.ifStatement(
       condition,
-      thens
-        ? () => {
-          this.dispatch(thens);
-        }
-        : null,
-      elses
-        ? () => {
-          this.dispatch(elses);
-        }
-        : null,
+      thens ? () => { this.dispatch(thens); } : null,
+      elses ? () => { this.dispatch(elses); } : null,
     );
   }
 }
@@ -44,6 +42,11 @@ class IfGeneratingEvaluator extends NodeEvaluator {
 export class IfEvaluator extends IfGeneratingEvaluator {
   static tags = ['if'];
   node: Syntax.IfStatement;
+
+  constructor(parent: Evaluator, node: Syntax.IfStatement) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     this.generateIf(
@@ -58,12 +61,17 @@ export class IfLetEvaluator extends IfGeneratingEvaluator {
   static tags = ['ifLet'];
   node: Syntax.IfLetStatement;
 
+  constructor(parent: Evaluator, node: Syntax.IfLetStatement) {
+    super(parent);
+    this.node = node;
+  }
+
   evaluate(...args: any[]) {
     const some = this.coder.runtimeImport('isSomething');
     const letStatement = this.node.condition;
     this.dispatch(letStatement);
 
-    const assignments = letStatement.assignments;
+    const { assignments } = letStatement;
     const conditions: string[] = [];
     assignments.forEach((assignment) => {
       assignment.getIdentifiers().forEach((id) => {

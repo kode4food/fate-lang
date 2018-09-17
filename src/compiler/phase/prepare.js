@@ -1,10 +1,10 @@
 /** @flow */
 
 import * as Syntax from '../syntax';
-import {
-  Visitor, annotate, hasAnnotation, getAnnotation,
-} from '../syntax';
-import { Cardinality } from '../syntax';
+
+const {
+  Visitor, annotate, hasAnnotation, getAnnotation, Cardinality,
+} = Syntax;
 
 type FunctionOrLambda = Syntax.FunctionDeclaration | Syntax.LambdaExpression;
 type AssignmentMap = { [index: string]: Syntax.Assignment };
@@ -160,7 +160,7 @@ export default function createTreeProcessors(visit: Visitor) {
       return node;
     }
 
-    const whenClause = node.whenClause;
+    const { whenClause } = node;
     const encountered: AssignmentMap = {};
     whenClause.assignments.forEach((assignment) => {
       const getters: NameSet = getAnnotation(assignment, 'do/references') || {};
@@ -215,11 +215,10 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function warnFunctionShadowing(statements: Syntax.Statement[]) {
     const namesSeen: NameSet = {};
-    let lastName: string;
 
     statements.forEach((statement) => {
       if (statement instanceof Syntax.FunctionDeclaration) {
-        const signature = statement.signature;
+        const { signature } = statement;
         const name = signature.id.value;
 
         if (!isGuarded(signature) && namesSeen[name]) {
@@ -229,7 +228,6 @@ export default function createTreeProcessors(visit: Visitor) {
         }
 
         namesSeen[name] = true;
-        lastName = name;
       }
     });
     return statements;

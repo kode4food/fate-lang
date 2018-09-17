@@ -18,6 +18,7 @@ function make(Ctor: Function, ...args: any[]) {
 }
 
 function isA(type: string): Function {
+  // eslint-disable-next-line valid-typeof
   return definePattern((value: any) => typeof value === type);
 }
 
@@ -27,8 +28,9 @@ function setProperty(target: Target, key: string, value: any) {
   return (target[key] = value);
 }
 
-function print() {
-  console.log(...arguments);
+function print(...args: any[]) {
+  // eslint-disable-next-line no-console
+  console.log(...args);
 }
 
 export {

@@ -1,16 +1,17 @@
 /** @flow */
 
 const glob = require('glob').sync;
+
 const files = glob('*.js', { cwd: __dirname });
 
 const blacklist = ['index'];
 
-files.forEach(filename => {
-  let baseName = filename.replace(/\.js$/, '');
-  if ( blacklist.indexOf(baseName) !== -1 ) {
+files.forEach((filename) => {
+  const baseName = filename.replace(/\.js$/, '');
+  if (blacklist.indexOf(baseName) !== -1) {
     return;
   }
-  let key = baseName + " (eval)";
-  let requireName = './' + baseName;
+  const key = `${baseName} (eval)`;
+  const requireName = `./${baseName}`;
   exports[key] = require(requireName)[baseName];
 });

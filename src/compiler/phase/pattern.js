@@ -1,9 +1,10 @@
 /** @flow */
 
 import * as Syntax from '../syntax';
-import {
+
+const {
   Visitor, annotate, getAnnotation, hasAnnotation,
-} from '../syntax';
+} = Syntax;
 
 interface NumberMap {
   [index: string]: number;
@@ -47,7 +48,7 @@ export default function createTreeProcessors(visit: Visitor) {
   ];
 
   function getParent() {
-    const nodeStack = visit.nodeStack;
+    const { nodeStack } = visit;
     return nodeStack[nodeStack.length - 1];
   }
 
@@ -123,7 +124,7 @@ export default function createTreeProcessors(visit: Visitor) {
     const newGuards: Syntax.Expressions = [];
 
     // Generate Guards from the Parameters
-    const params = node.params;
+    const { params } = node;
     params.forEach((param, idx) => {
       if (param instanceof Syntax.PatternParameter) {
         const ident = param.id || param.template('id', idx);

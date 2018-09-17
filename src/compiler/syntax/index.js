@@ -95,8 +95,8 @@ const tagToConstructor: FunctionMap = {
 };
 
 export function node(tag: Tag, ...args: any[]) {
-  const ctor = tagToConstructor[tag];
-  const instance = new ctor(...args);
+  const Ctor = tagToConstructor[tag];
+  const instance = new Ctor(...args);
   instance.tag = tag;
   return instance;
 }

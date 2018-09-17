@@ -9,7 +9,7 @@ export interface FateFunction {
   __fate?: string;
 }
 
-const slice = Array.prototype.slice;
+const { slice } = Array.prototype;
 
 export function functionNotExhaustive() {
   throw new Error('Function invocation not exhaustive');
@@ -36,10 +36,11 @@ export function bindFunction(func: Function, args: ArgTemplate) {
   const sliceIndex = argMap.length;
   return boundFunction;
 
-  function boundFunction(thisValue: any) {
-    const funcArgs = template.slice().concat(slice.call(arguments, sliceIndex));
+  function boundFunction(...a: any[]) {
+    const thisValue = a[0];
+    const funcArgs = template.slice().concat(slice.call(a, sliceIndex));
     for (let i = 0; i < argMap.length; i++) {
-      funcArgs[argMap[i]] = arguments[i];
+      funcArgs[argMap[i]] = a[i];
     }
     return func.apply(thisValue, funcArgs);
   }
@@ -49,8 +50,8 @@ export function compose(funcs: FateFunction[]) {
   wrapper.__fate = checkComposition(funcs);
   return wrapper;
 
-  function wrapper() {
-    let result = funcs[0].apply(null, arguments);
+  function wrapper(...args: any[]) {
+    let result = funcs[0](...args);
     for (let i = 1; i < funcs.length; i++) {
       result = funcs[i](result);
     }
@@ -70,14 +71,14 @@ function createWrapper(funcs: FateFunction[], check: Function) {
   wrapper.__fate = checkComposition(funcs);
   return wrapper;
 
-  function wrapper() {
+  function wrapper(...args: any[]) {
     for (let i = 0; i < funcs.length - 1; i++) {
-      const result = funcs[i].apply(null, arguments);
+      const result = funcs[i](...args);
       if (check(result)) {
         return result;
       }
     }
-    return funcs[funcs.length - 1].apply(null, arguments);
+    return funcs[funcs.length - 1](...args);
   }
 }
 

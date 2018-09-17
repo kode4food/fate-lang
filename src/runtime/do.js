@@ -2,7 +2,7 @@
 
 import { Continuation, Result, ResultOrArray } from './continuation';
 
-const isArray = Array.isArray;
+const { isArray } = Array;
 
 interface GeneratorResult {
   done: boolean;
@@ -68,9 +68,9 @@ export function awaitAll(resultOrArray: ResultOrArray): Continuation {
     for (let i = 0, len = waitingFor; i < len; i++) {
       if (array[i] instanceof Continuation) {
         array[i].then(resolveArrayAtIndex(i));
-        continue;
+      } else {
+        waitingFor--;
       }
-      waitingFor--;
     }
 
     if (waitingFor === 0) {

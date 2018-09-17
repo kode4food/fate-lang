@@ -1,18 +1,16 @@
 /** @flow */
 
-import type { ScriptContent } from './compiler';
-
 import { readFileSync } from 'fs';
 import { dirname } from 'path';
 
+import type { ScriptContent } from './compiler';
+
 import { compileModule, generateFunction } from './compiler';
 import { isObject, mixin } from './runtime';
-import * as RuntimeExports from './runtime';
 
 const pkg = require('../package.json');
 
 export const VERSION = pkg.version;
-export const Runtime = RuntimeExports;
 
 export type DirPath = string;
 export type ModuleName = string;

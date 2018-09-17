@@ -1,6 +1,6 @@
 /** @flow */
 
-import type {Evaluator} from "./evaluator";
+import type { Evaluator } from './evaluator';
 
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
@@ -12,7 +12,7 @@ export class LetEvaluator extends NodeEvaluator {
   node: Syntax.LetStatement;
 
   constructor(parent: Evaluator, node: Syntax.LetStatement) {
-    super(parent, node);
+    super(parent);
     this.node = node;
   }
 
@@ -26,6 +26,11 @@ export class LetEvaluator extends NodeEvaluator {
 export class AssignmentEvaluator extends NodeEvaluator {
   static tags = ['assignment', 'arrayDestructure', 'objectDestructure'];
   node: Syntax.Assignment;
+
+  constructor(parent: Evaluator, node: Syntax.Assignment) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(getValue?: Function) {
     if (!getValue) {

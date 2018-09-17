@@ -3,7 +3,6 @@
 import * as Target from '../target';
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
-import { RegexEvaluator } from './pattern';
 
 class ImportExportEvaluator extends NodeEvaluator {
   createImporterArguments() {
@@ -17,6 +16,11 @@ class ImportExportEvaluator extends NodeEvaluator {
 export class ImportEvaluator extends ImportExportEvaluator {
   static tags = ['import'];
   node: Syntax.ImportStatement;
+
+  constructor(parent: Evaluator, node: Syntax.ImportStatement) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     const assigns: Target.AssignmentItems = [];
@@ -41,6 +45,11 @@ export class ImportEvaluator extends ImportExportEvaluator {
 export class FromEvaluator extends ImportExportEvaluator {
   static tags = ['from'];
   node: Syntax.FromStatement;
+
+  constructor(parent: Evaluator, node: Syntax.FromStatement) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     const assigns: any[] = [];
@@ -78,8 +87,13 @@ export class ExportEvaluator extends ImportExportEvaluator {
   static tags = ['export'];
   node: Syntax.ExportStatement;
 
+  constructor(parent: Evaluator, node: Syntax.ExportStatement) {
+    super(parent);
+    this.node = node;
+  }
+
   evaluate(...args: any[]) {
-    const exportItems = this.node.exportItems;
+    const { exportItems } = this.node;
     if (!exportItems.length) {
       this.coder.exportAll();
       return;

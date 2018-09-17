@@ -3,7 +3,7 @@
 import { isObject } from '../runtime';
 
 import {
-  compile, globals, Module, isFateModule, createModule, ModuleName, ModuleExports,
+  compile, globals, Module, isFateModule, createModule, ModuleName,
 } from '../fate';
 
 type AnyMap = { [index: string]: any };

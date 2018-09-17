@@ -5,7 +5,7 @@ import type { Tag, TagOrTags } from './index';
 import { Annotated, Annotations } from './annotation';
 import { node } from './index';
 
-const isArray = Array.isArray;
+const { isArray } = Array;
 
 export type Nodes = Node[];
 export type NodeOrNodes = Node | Nodes;
@@ -33,8 +33,6 @@ export class Node implements Annotated {
   column: number;
   length: number;
 
-  constructor() {}
-
   template(...args: any[]) {
     const result = node(...args);
     result.line = this.line;
@@ -44,24 +42,24 @@ export class Node implements Annotated {
   }
 }
 
-export function hasTag(node: Node, tags?: TagOrTags): any {
-  if (!(node instanceof Node)) {
+export function hasTag(n: Node, tags?: TagOrTags): any {
+  if (!(n instanceof Node)) {
     return false;
   }
 
   if (tags === undefined) {
-    return node.tag;
+    return n.tag;
   }
 
   if (isArray(tags)) {
-    const idx = tags.indexOf(node.tag);
+    const idx = tags.indexOf(n.tag);
     if (idx === -1) {
       return false;
     }
     return tags[idx];
   }
 
-  return tags === node.tag;
+  return tags === n.tag;
 }
 
 // Expression Nodes *********************************************************
@@ -334,8 +332,8 @@ export class Statements extends Node {
   }
 }
 
-export function isStatements(node: Node) {
-  return node instanceof Statements;
+export function isStatements(n: Node) {
+  return n instanceof Statements;
 }
 
 export class ExpressionStatement extends Statement {
@@ -394,8 +392,9 @@ export class EmitStatement extends Statement {
 }
 
 export class ExportableStatement extends Statement {
+  // eslint-disable-next-line class-methods-use-this
   getModuleItems(): ExportModuleItems {
-    throw new Error("Stupid Coder: ExportableStatement is abstract");
+    throw new Error('Stupid Coder: ExportableStatement is abstract');
   }
 }
 
@@ -552,8 +551,8 @@ export class Literal extends Symbol {
   }
 }
 
-export function isLiteral(node: Node) {
-  return node instanceof Literal;
+export function isLiteral(n: Node) {
+  return n instanceof Literal;
 }
 
 export class PatternSymbol extends Symbol {}
@@ -692,8 +691,9 @@ export class Assignment extends Node {
     this.value = value;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getIdentifiers(): Identifiers {
-    throw new Error("Stupid Coder: Assignment is abstract");
+    throw new Error('Stupid Coder: Assignment is abstract');
   }
 }
 

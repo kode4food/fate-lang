@@ -10,6 +10,11 @@ export class ReduceEvaluator extends NodeEvaluator {
   static tags = ['reduce'];
   node: Syntax.ReduceExpression;
 
+  constructor(parent: Evaluator, node: Syntax.ReduceExpression) {
+    super(parent);
+    this.node = node;
+  }
+
   evaluate(...args: any[]) {
     const statements = this.node.template('statements', [
       this.node.template(
@@ -89,13 +94,18 @@ export class ForEvaluator extends LoopEvaluator {
   static tags = ['for'];
   node: Syntax.ForStatement;
 
+  constructor(parent: Evaluator, node: Syntax.ForStatement) {
+    super(parent);
+    this.node = node;
+  }
+
   evaluate(...args: any[]) {
     const self = this;
 
     let generateLoop: Function; let
       generateBody: Function;
     let idMappings: IdMapping[];
-    const reduceAssignments = self.node.reduceAssignments;
+    const { reduceAssignments } = self.node;
 
     if (reduceAssignments) {
       generateLoop = generateReduceLoop;
@@ -111,22 +121,19 @@ export class ForEvaluator extends LoopEvaluator {
     }
 
     function generateStatements() {
-      const elseStatements = self.node.elseStatements;
+      const { elseStatements } = self.node;
       if (elseStatements.isEmpty()) {
-        return generateLoop();
+        generateLoop();
+        return;
       }
 
       const successVar = self.coder.createAnonymous();
       self.coder.assignment(successVar, self.coder.literal(false));
       generateLoop(successVar);
       self.coder.ifStatement(
-        () => {
-          self.coder.retrieveAnonymous(successVar);
-        },
+        () => { self.coder.retrieveAnonymous(successVar); },
         null,
-        () => {
-          self.dispatch(elseStatements);
-        },
+        () => { self.dispatch(elseStatements); },
       );
     }
 
@@ -208,6 +215,11 @@ export class ForExpressionEvaluator extends LoopEvaluator {
   static tags = ['forExpr'];
   node: Syntax.ForExpression;
 
+  constructor(parent: Evaluator, node: Syntax.ForExpression) {
+    super(parent);
+    this.node = node;
+  }
+
   evaluate(...args: any[]) {
     const self = this;
     const hasName = this.node.select.name;
@@ -245,6 +257,11 @@ class ListComprehensionEvaluator extends NodeEvaluator {
   node: Syntax.ListComprehension;
   materializer: string;
 
+  constructor(parent: Evaluator, node: Syntax.ListComprehension) {
+    super(parent);
+    this.node = node;
+  }
+
   evaluate(...args: any[]) {
     const materialize = this.coder.runtimeImport(this.materializer);
     this.coder.call(materialize, [this.defer(this.node.forExpression)]);
@@ -265,6 +282,11 @@ export class GenerateEvaluator extends NodeEvaluator {
   static tags = ['generate'];
   node: Syntax.GenerateExpression;
 
+  constructor(parent: Evaluator, node: Syntax.GenerateExpression) {
+    super(parent);
+    this.node = node;
+  }
+
   evaluate(...args: any[]) {
     this.coder.generator(() => {
       this.coder.createCounter('idx');
@@ -276,6 +298,11 @@ export class GenerateEvaluator extends NodeEvaluator {
 export class EmitEvaluator extends NodeEvaluator {
   static tags = ['emit'];
   node: Syntax.EmitStatement;
+
+  constructor(parent: Evaluator, node: Syntax.EmitStatement) {
+    super(parent);
+    this.node = node;
+  }
 
   evaluate(...args: any[]) {
     this.coder.emitStatement(() => {

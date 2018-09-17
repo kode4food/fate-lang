@@ -1,7 +1,7 @@
 /** @flow */
 
 import { createContext, runInContext } from 'vm';
-import * as PEG from "pegjs";
+import * as PEG from 'pegjs';
 
 import * as Runtime from '../runtime';
 import * as Target from './target';
@@ -11,9 +11,10 @@ import { Visitor } from './syntax';
 
 import { globals } from '../fate';
 
+// eslint-disable-next-line import/no-unresolved
 import generatedParser from './parser';
 
-const SyntaxError = generatedParser.SyntaxError;
+const { SyntaxError } = generatedParser;
 
 export type ScriptContent = string;
 export type FilePath = string;
@@ -98,14 +99,12 @@ export function wrapCompileError(err: Error, filePath?: FilePath): Error {
   if (err instanceof SyntaxError) {
     return formatSyntaxError(err, filePath);
   }
-
-  console.log(err);
   return err;
 }
 
 function formatCompileError(err: CompileError, filePath?: FilePath) {
   const lineInfo = `:${err.line}:${err.column}`;
-  const message = err.message;
+  const { message } = err;
 
   filePath = filePath || err.filePath || 'string';
   return `${filePath}${lineInfo}: ${message}`;
@@ -114,9 +113,8 @@ function formatCompileError(err: CompileError, filePath?: FilePath) {
 // intercepts a PEG.js Exception and generate a human-readable error message
 function formatSyntaxError(err: PEG.SyntaxError,
                            filePath?: FilePath): CompileError {
-  const found = err.found;
-  const line = err.location.start.line;
-  const column = err.location.start.column;
+  const { found } = err;
+  const { line, column } = err.location.start;
 
   const unexpected = found ? `'${found}'` : 'end of file';
   const errString = `Unexpected ${unexpected}`;

@@ -1,11 +1,11 @@
 /** @flow */
 
 import * as Syntax from '../syntax';
-import { Visitor, annotate } from '../syntax';
 import { isTrue, isFalse, isIn } from '../../runtime';
 
-const hasTag = Syntax.hasTag;
-const isLiteral = Syntax.isLiteral;
+const {
+  Visitor, annotate, hasTag, isLiteral,
+} = Syntax;
 
 type LiteralArray = any[];
 type StringMap = { [index: string]: string };
@@ -51,21 +51,21 @@ const shortCircuitFolders: FunctionMap = {
     if (!isLiteral(node.left)) {
       return node;
     }
-    const value = node.left.value;
+    const { value } = node.left;
     return isTrue(value) ? node.left : node.right;
   },
   and: (node: Syntax.AndOperator) => {
     if (!isLiteral(node.left)) {
       return node;
     }
-    const value = node.left.value;
+    const { value } = node.left;
     return isFalse(value) ? node.left : node.right;
   },
   conditional: (node: Syntax.ConditionalOperator) => {
     if (!isLiteral(node.condition)) {
       return node;
     }
-    const value = node.condition.value;
+    const { value } = node.condition;
     return isTrue(value) ? node.trueResult : node.falseResult;
   },
 };
@@ -137,7 +137,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function rollUpArray(node: Syntax.ArrayConstructor) {
-    const elements = node.elements;
+    const { elements } = node;
     const output: LiteralArray = [];
     const type = 'literal';
 
@@ -153,14 +153,14 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function rollUpObject(node: Syntax.ObjectConstructor) {
-    const elements = node.elements;
+    const { elements } = node;
     const output: LiteralObject = {};
     const type = 'literal';
 
     for (let i = 0, len = elements.length; i < len; i++) {
       const element = elements[i];
       const name = element.id;
-      const value = element.value;
+      const { value } = element;
       if (!isLiteral(name) || !isLiteral(value)) {
         return node;
       }
@@ -226,9 +226,7 @@ export default function createTreeProcessors(visit: Visitor) {
       return node;
     }
 
-    const left = node.left;
-    const right = node.right;
-
+    const { left, right } = node;
     const tag = hasTag(node);
     const newTag = tag === 'and' ? 'or' : 'and';
 

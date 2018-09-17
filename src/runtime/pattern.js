@@ -125,11 +125,10 @@ export function isMatch(template: any, obj: any) {
   }
 
   for (const key in template) {
-    if (!template.hasOwnProperty(key)) {
-      continue;
-    }
-    if (!isMatch(template[key], obj[key])) {
-      return false;
+    if (Object.prototype.hasOwnProperty.call(template, key)) {
+      if (!isMatch(template[key], obj[key])) {
+        return false;
+      }
     }
   }
   return true;

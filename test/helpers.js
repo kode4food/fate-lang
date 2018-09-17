@@ -14,7 +14,7 @@ const usesFate = /(['"])fate\-compiler:[0-9.]+\1;/g;
  * Fate command-line tool
  */
 function createConsole() {
-  let buffer = [];
+  const buffer = [];
   let str;
 
   return {
@@ -22,8 +22,8 @@ function createConsole() {
     info: append,
     warn: append,
     error: append,
-    result: result,
-    contains: contains
+    result,
+    contains,
   };
 
   function append(value) {
@@ -32,7 +32,7 @@ function createConsole() {
   }
 
   function result() {
-    if ( !str ) {
+    if (!str) {
       str = buffer.join('\n');
     }
     return str;
@@ -44,8 +44,8 @@ function createConsole() {
 }
 
 function evaluateEmit(script, data) {
-  let result = [];
-  evaluate(script, mixin({ emit: emit }, data));
+  const result = [];
+  evaluate(script, mixin({ emit }, data));
   return result;
 
   function emit(value) {
@@ -54,22 +54,22 @@ function evaluateEmit(script, data) {
 }
 
 function monkeyPatchRequires(root, remappedPaths) {
-  let files = glob.sync('**/*.js', { cwd: root });
-  files.filter(isFateCompilation).forEach(function (file) {
+  const files = glob.sync('**/*.js', { cwd: root });
+  files.filter(isFateCompilation).forEach((file) => {
     // Rewrite the file to point to the local Fate instance
-    let filePath = path.join(root, file);
+    const filePath = path.join(root, file);
     let content = fs.readFileSync(filePath).toString();
-    Object.keys(remappedPaths).forEach(function (originalPackage) {
+    Object.keys(remappedPaths).forEach((originalPackage) => {
       content = content.replace(
-        "require('" + originalPackage + "')",
-        "require('" + remappedPaths[originalPackage] + "')"
+        `require('${originalPackage}')`,
+        `require('${remappedPaths[originalPackage]}')`,
       );
     });
     fs.writeFileSync(filePath, content);
   });
 
   function isFateCompilation(file) {
-    let filePath = path.join(root, file);
+    const filePath = path.join(root, file);
     return usesFate.test(fs.readFileSync(filePath).toString());
   }
 }

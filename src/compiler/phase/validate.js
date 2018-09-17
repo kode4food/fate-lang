@@ -1,11 +1,12 @@
 /** @flow */
 
 import * as Syntax from '../syntax';
-import {
-  Visitor, annotate, getAnnotation, hasAnnotation,
-} from '../syntax';
 
-const isArray = Array.isArray;
+const {
+  Visitor, annotate, getAnnotation, hasAnnotation,
+} = Syntax;
+
+const { isArray } = Array;
 
 const scopeContainers = [
   'function', 'lambda', 'reduce', 'for', 'do', 'generate',
@@ -34,7 +35,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function isIdDeclared(id: Syntax.Identifier) {
-    const nodeStack = visit.nodeStack;
+    const { nodeStack } = visit;
     for (let i = nodeStack.length - 1; i >= 0; i--) {
       const node = nodeStack[i];
       if (node instanceof Syntax.Node && isScopeContainer(node)) {
@@ -48,7 +49,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function declareId(id: Syntax.Identifier) {
-    const nodeStack = visit.nodeStack;
+    const { nodeStack } = visit;
     for (let i = nodeStack.length - 1; i >= 0; i--) {
       const node = nodeStack[i];
       if (node instanceof Syntax.Node && isScopeContainer(node)) {

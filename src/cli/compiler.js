@@ -202,6 +202,7 @@ export function compile(args: CompilerArguments, callback: Function) {
     const files = glob(pattern, { cwd: inDir });
 
     if (!files.length) {
+      // eslint-disable-next-line no-throw-literal
       throw `No files found matching '${pattern}'`;
     }
 
@@ -268,8 +269,8 @@ export function generateNodeModule(generatedCode: GeneratedCode) {
   const buffer: string[] = [];
   buffer.push('/** @flow */');
   buffer.push(`"fate-compiler:${VERSION}";`);
-  buffer.push("const fate=require('fatejs');");
-  buffer.push('const r=fate.Runtime;');
+  buffer.push("const fate=require('fatejs/dist/fate');");
+  buffer.push("const r=require('fatejs/dist/runtime');");
   buffer.push(generatedCode);
   buffer.push('module.__fateModule=true;');
   buffer.push('module.result=s(');

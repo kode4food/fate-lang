@@ -13,16 +13,15 @@ export class NodeEvaluator implements Evaluator {
   static tags: string[];
   coder: Coder;
   parent: Evaluator;
-  node: Syntax.Node;
 
-  constructor(parent: Evaluator, node: Syntax.Node) {
+  constructor(parent: Evaluator) {
     this.coder = parent.coder;
     this.parent = parent;
-    this.node = node;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   evaluate(...args: any[]) {
-    throw new Error("Stupid Coder: NodeEvaluator is abstract");
+    throw new Error('Stupid Coder: NodeEvaluator is abstract');
   }
 
   getDispatchEvaluator(): Evaluator {
@@ -31,10 +30,10 @@ export class NodeEvaluator implements Evaluator {
 
   dispatch(node: Syntax.Node, ...args: any[]) {
     const dispatcher = this.getDispatchEvaluator();
-    dispatcher.evaluate(...arguments);
+    dispatcher.evaluate(node, ...args);
   }
 
   defer(...args: any[]) {
-    return () => this.dispatch.apply(this, args);
+    return () => this.dispatch(...args);
   }
 }

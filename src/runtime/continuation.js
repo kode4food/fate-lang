@@ -22,7 +22,7 @@ class Scheduler {
   }
 
   queue(callback: Function, target?: Object): void {
-    const queueLength = this.queueLength;
+    const { queueLength } = this;
     this[queueLength] = callback;
     this[queueLength + 1] = target;
     this.queueLength = queueLength + 2;
@@ -33,8 +33,7 @@ class Scheduler {
   }
 
   collapseQueue(): void {
-    const queueIndex = this.queueIndex;
-    const queueLength = this.queueLength;
+    const { queueIndex, queueLength } = this;
     let i = 0;
     const remainingLength = queueLength - queueIndex;
     for (; i < remainingLength; i++) {
@@ -49,7 +48,7 @@ class Scheduler {
 
   flushQueue(): void {
     while (this.queueIndex < this.queueLength) {
-      const queueIndex = this.queueIndex;
+      const { queueIndex } = this;
       const callback = this[queueIndex];
       const target = this[queueIndex + 1];
       this.queueIndex = queueIndex + 2;
@@ -112,7 +111,7 @@ export class Continuation {
       return;
     }
 
-    const pendingLength = this.pendingLength;
+    const { pendingLength } = this;
     if (pendingLength === 0) {
       this.pendingHandler = pending;
       this.pendingLength = 1;
@@ -155,7 +154,7 @@ export class Continuation {
   }
 
   notifyPending(): void {
-    const pendingLength = this.pendingLength;
+    const { pendingLength } = this;
     if (pendingLength === 0) {
       return;
     }
@@ -167,7 +166,7 @@ export class Continuation {
       return;
     }
 
-    const pendingHandlers = this.pendingHandlers;
+    const { pendingHandlers } = this;
     for (let i = 0, len = this.pendingLength; i < len; i++) {
       this.settlePending(pendingHandlers[i]);
       pendingHandlers[i] = undefined;

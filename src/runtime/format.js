@@ -54,19 +54,18 @@ export function buildFormatter(formatStr: string): FormatFunction {
     if (paramMatch[2] === '%') {
       components.push(createLiteralComponent('%'));
       workStr = workStr.substring(matchIdx + matchLen);
-      continue;
+    } else {
+      let idx: (string | number) = autoIdx++;
+      if (paramMatch[4]) {
+        // eslint-disable-next-line prefer-destructuring
+        idx = paramMatch[4];
+      } else if (paramMatch[3]) {
+        idx = parseInt(paramMatch[3], 10);
+      }
+      requiredIndexes.push(idx);
+      components.push(createIndexedComponent(idx));
+      workStr = workStr.substring(matchIdx + matchLen);
     }
-
-    let idx: (string | number) = autoIdx++;
-    if (paramMatch[4]) {
-      idx = paramMatch[4];
-    } else if (paramMatch[3]) {
-      idx = parseInt(paramMatch[3], 10);
-    }
-    requiredIndexes.push(idx);
-    components.push(createIndexedComponent(idx));
-
-    workStr = workStr.substring(matchIdx + matchLen);
   }
   clen = components.length;
 
@@ -94,6 +93,8 @@ export function buildFormatter(formatStr: string): FormatFunction {
         case 1:
           result += data[component[1]];
           break;
+        default:
+          throw new Error('Stupid Coder: Default switch case');
       }
     }
     return result;
