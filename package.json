@@ -49,6 +49,6 @@
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.11.1",
     "flow-bin": "^0.80.0",
-    "nodeunit": "^0.10.2"
+    "nodeunit": "^0.11.3"
   }
 }
