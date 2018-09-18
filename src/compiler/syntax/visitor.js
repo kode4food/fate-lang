@@ -1,7 +1,6 @@
 /** @flow */
 
 import type { CompileErrors } from '../index';
-
 import * as Syntax from './index';
 import { CompileError } from '../index';
 
@@ -12,7 +11,7 @@ type NodeVisitor = (node: NodeStackElement) => any;
 type StatementsVisitor = (node: Syntax.Statement[]) => any;
 type NodeMatcher = (node: NodeStackElement) => boolean;
 
-interface VisitorMap {
+type VisitorMap = {
   [index: string]: Function;
 }
 
@@ -129,7 +128,8 @@ export class Visitor {
 
   statements(visitor: StatementsVisitor) {
     return (node: Syntax.Node) => this.nodes(
-      node, Syntax.isStatements,
+      node,
+      Syntax.isStatements,
       statementsProcessor,
     );
 

@@ -1,10 +1,9 @@
 /** @flow */
 
+import type { Evaluator } from './evaluator';
 import * as Target from '../target';
 import * as Syntax from '../syntax';
-
 import { NodeEvaluator } from './evaluator';
-import type { Evaluator } from './evaluator';
 
 export class CallEvaluator extends NodeEvaluator {
   static tags = ['call'];
@@ -110,12 +109,6 @@ class FuncOrLambdaEvaluator extends NodeEvaluator {
 
 export class FunctionEvaluator extends FuncOrLambdaEvaluator {
   static tags = ['function'];
-  node: Syntax.FunctionDeclaration;
-
-  constructor(parent: Evaluator, node: Syntax.FunctionDeclaration) {
-    super(parent);
-    this.node = node;
-  }
 
   evaluate(...args: any[]) {
     const { signature } = this.node;
@@ -189,12 +182,6 @@ export class FunctionEvaluator extends FuncOrLambdaEvaluator {
 
 export class LambdaEvaluator extends FuncOrLambdaEvaluator {
   static tags = ['lambda'];
-  node: Syntax.LambdaExpression;
-
-  constructor(parent: Evaluator, node: Syntax.LambdaExpression) {
-    super(parent);
-    this.node = node;
-  }
 
   evaluate(...args: any[]) {
     const { params } = this.node.signature;

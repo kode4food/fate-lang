@@ -1,5 +1,3 @@
-/** @flow */
-
 const nodeunit = require('nodeunit');
 
 const fate = require('../../dist/fate');

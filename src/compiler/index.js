@@ -42,7 +42,7 @@ export function compileModule(script: ScriptContent) {
 }
 
 export function generateFunction(generatedCode: Target.GeneratedCode) {
-  interface FateContext {
+  type FateContext = {
     g: any;
     r: any;
     module: any;

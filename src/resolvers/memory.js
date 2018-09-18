@@ -1,10 +1,11 @@
 /** @flow */
 
+import type { Module, ModuleName } from '../fate';
 import { isObject } from '../runtime';
 
 import {
-  compile, globals, Module, isFateModule, createModule, ModuleName,
-} from '../fate';
+  compile, globals, isFateModule, createModule,
+ } from '../fate';
 
 type AnyMap = { [index: string]: any };
 

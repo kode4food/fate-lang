@@ -1,11 +1,8 @@
 /** @flow */
 
 import type { Evaluator } from './evaluator';
-
-import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
-
-type FunctionMap = { [index: string]: Function };
+import * as Syntax from '../syntax';
 
 export class LetEvaluator extends NodeEvaluator {
   static tags = ['let'];
@@ -24,42 +21,42 @@ export class LetEvaluator extends NodeEvaluator {
 }
 
 export class AssignmentEvaluator extends NodeEvaluator {
-  static tags = ['assignment', 'arrayDestructure', 'objectDestructure'];
-  node: Syntax.Assignment;
+  static tags = ['assignment'];
+  node: Syntax.DirectAssignment;
 
-  constructor(parent: Evaluator, node: Syntax.Assignment) {
+  constructor(parent: Evaluator, node: Syntax.DirectAssignment) {
     super(parent);
     this.node = node;
   }
 
-  evaluate(getValue?: Function) {
+  evaluate(getValue: Function) {
     if (!getValue) {
       getValue = this.getAssignmentValue.bind(this);
     }
-
-    const AssignmentEvaluators: FunctionMap = {
-      assignment: this.createDirectAssignmentEvaluator,
-      arrayDestructure: this.createArrayDestructureEvaluator,
-      objectDestructure: this.createObjectDestructureEvaluator,
-    };
-
-    const assignmentEvaluator = AssignmentEvaluators[this.node.tag];
-    return assignmentEvaluator.call(this, getValue);
+    this.coder.assignment(this.node.id.value, getValue());
   }
 
   getAssignmentValue() {
     return this.defer(this.node.value);
   }
+}
 
-  createDirectAssignmentEvaluator(getValue: Function) {
-    const thisNode = this.node;
-    this.coder.assignment(thisNode.id.value, getValue());
+export class ArrayDestructureEvaluator extends NodeEvaluator {
+  static tags = ['arrayDestructure'];
+  node: Syntax.ArrayDestructure;
+
+  constructor(parent: Evaluator, node: Syntax.ArrayDestructure) {
+    super(parent);
+    this.node = node;
   }
 
-  createArrayDestructureEvaluator(getValue: Function) {
-    const thisNode = this.node;
-    const result = this.coder.createAnonymous();
+  evaluate(getValue: Function) {
+    if (!getValue) {
+      getValue = this.getAssignmentValue.bind(this);
+    }
 
+    const result = this.coder.createAnonymous();
+    const thisNode = this.node;
     this.coder.statement(() => {
       this.coder.assignAnonymous(result, getValue(thisNode));
     });
@@ -77,10 +74,26 @@ export class AssignmentEvaluator extends NodeEvaluator {
     });
   }
 
-  createObjectDestructureEvaluator(getValue: Function) {
-    const thisNode = this.node;
-    const result = this.coder.createAnonymous();
+  getAssignmentValue() {
+    return this.defer(this.node.value);
+  }
+}
 
+export class ObjectDestructureEvaluator extends NodeEvaluator {
+  static tags = ['objectDestructure'];
+  node: Syntax.ObjectDestructure;
+
+  constructor(parent: Evaluator, node: Syntax.ObjectDestructure) {
+    super(parent);
+    this.node = node;
+  }
+
+  evaluate(getValue: Function) {
+    if (!getValue) {
+      getValue = this.getAssignmentValue.bind(this);
+    }
+    const result = this.coder.createAnonymous();
+    const thisNode = this.node;
     this.coder.statement(() => {
       this.coder.assignAnonymous(result, getValue(thisNode));
     });
@@ -93,5 +106,9 @@ export class AssignmentEvaluator extends NodeEvaluator {
         );
       });
     });
+  }
+
+  getAssignmentValue() {
+    return this.defer(this.node.value);
   }
 }

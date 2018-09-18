@@ -1,14 +1,14 @@
 /** @flow */
 
 // Checking for an already instantiated generator
-export function isGenerator(value) {
+export function isGenerator(value: any) {
   if (value === null || typeof value !== 'object') {
     return false;
   }
   return typeof value.next === 'function' && value.next.length === 1;
 }
 
-export function* createRangeGenerator(start, end) {
+export function* createRangeGenerator(start: number, end: number) {
   let current = Math.floor(start);
   start = current;
   end = Math.floor(end);

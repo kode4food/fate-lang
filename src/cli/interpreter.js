@@ -5,7 +5,7 @@ import { VERSION, runScript, createModule } from '../fate';
 const minimist = require('minimist');
 
 export function commandLine(inputArgs: string[], console: Console,
-  completedCallback: Function) {
+                            completedCallback: Function) {
   let badArg = false;
 
   const args = minimist(inputArgs, {

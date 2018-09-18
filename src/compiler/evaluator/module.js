@@ -1,5 +1,6 @@
 /** @flow */
 
+import type { Evaluator } from './evaluator';
 import * as Target from '../target';
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';

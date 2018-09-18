@@ -1,8 +1,7 @@
 /** @flow */
 
+import type { DirPath, ModuleName, ModuleExports } from '../fate';
 import * as Resolvers from '../resolvers';
-
-import { DirPath, ModuleName, ModuleExports } from '../fate';
 
 // Register the default resolvers
 const nodeResolver = Resolvers.createNodeResolver();
@@ -35,7 +34,7 @@ export function importer(moduleName: ModuleName) {
   const cache: { [index: string]: ModuleExports } = {};
   return performImport;
 
-  function performImport(basePath?: DirPath) {
+  function performImport(basePath: DirPath) {
     let moduleExports = cache[basePath];
     if (moduleExports) {
       return moduleExports;

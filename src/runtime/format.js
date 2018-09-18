@@ -2,7 +2,7 @@
 
 type Component = [number, string | number];
 
-interface FormatFunction {
+type FormatFunction = {
   (data: any | any[]): string;
   __fate: string;
   __fateIndexes: (string | number)[];

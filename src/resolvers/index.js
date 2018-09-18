@@ -1,8 +1,8 @@
 /** @flow */
 
-import { ModuleName, DirPath, Module } from '../fate';
+import type { ModuleName, DirPath, Module } from '../fate';
 
-export interface Resolver {
+export type Resolver = {
   resolve(name: ModuleName, basePath?: DirPath): Module;
 }
 

@@ -1,7 +1,6 @@
 /** @flow */
 
 import type { Tag, TagOrTags } from './index';
-
 import { Annotated, Annotations } from './annotation';
 import { node } from './index';
 

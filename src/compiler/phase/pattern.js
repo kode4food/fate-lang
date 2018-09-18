@@ -6,7 +6,7 @@ const {
   Visitor, annotate, getAnnotation, hasAnnotation,
 } = Syntax;
 
-interface NumberMap {
+type NumberMap = {
   [index: string]: number;
 }
 

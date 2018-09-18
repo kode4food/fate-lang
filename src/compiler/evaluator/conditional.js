@@ -1,8 +1,8 @@
 /** @flow */
 
+import type { Evaluator } from './evaluator';
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
-import type { Evaluator } from './evaluator';
 
 export class ConditionalEvaluator extends NodeEvaluator {
   static tags = ['conditional'];

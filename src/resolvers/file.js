@@ -2,11 +2,10 @@
 
 import { resolve as resolvePath } from 'path';
 
-import {
-  DirPath, createModule, Module, ModuleName,
-} from '../fate';
+import type { DirPath, Module, ModuleName } from '../fate';
+import { createModule } from '../fate';
 
-interface Options {
+type Options = {
   path: string;
 }
 

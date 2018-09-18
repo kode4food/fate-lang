@@ -4,7 +4,6 @@ import { readFileSync } from 'fs';
 import { dirname } from 'path';
 
 import type { ScriptContent } from './compiler';
-
 import { compileModule, generateFunction } from './compiler';
 import { isObject, mixin } from './runtime';
 
@@ -15,13 +14,13 @@ export const VERSION = pkg.version;
 export type DirPath = string;
 export type ModuleName = string;
 
-export interface Module {
+export type Module = {
   __fateModule?: boolean;
   result?: any;
   exports: ModuleExports;
 }
 
-export interface ModuleExports {
+export type ModuleExports = {
   [index: string]: any;
 }
 

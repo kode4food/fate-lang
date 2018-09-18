@@ -5,7 +5,7 @@ type Matchers = Matcher[];
 
 type AnyMap = { [index: string]: any };
 
-export interface Pattern {
+export type Pattern = {
   (obj: any): boolean;
   __fate?: string;
   native?: RegExp;

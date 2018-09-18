@@ -1,10 +1,11 @@
 /** @flow */
 
-import { Continuation, Result, ResultOrArray } from './continuation';
+import type { Result, ResultOrArray } from './continuation';
+import { Continuation } from './continuation';
 
 const { isArray } = Array;
 
-interface GeneratorResult {
+type GeneratorResult = {
   done: boolean;
   value: any;
 }

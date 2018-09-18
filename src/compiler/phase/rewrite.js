@@ -248,14 +248,16 @@ export default function createTreeProcessors(visit: Visitor) {
 
     const nested = forStatements[0];
     if (!node.elseStatements.isEmpty()
-         || !nested.elseStatements.isEmpty()) {
+      || !nested.elseStatements.isEmpty()) {
       return node; // no else clauses
     }
 
-    return node.template('for',
+    return node.template(
+      'for',
       node.ranges.concat(nested.ranges),
       nested.loopStatements,
-      node.elseStatements);
+      node.elseStatements,
+    );
   }
 
   function rollUpStandaloneLoops(statement: Syntax.ExpressionStatement) {

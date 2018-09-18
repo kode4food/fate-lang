@@ -1,5 +1,3 @@
-/** @flow */
-
 const fs = require('fs');
 const nodeunit = require('nodeunit');
 const compiler = require('../dist/cli/compiler').commandLine;

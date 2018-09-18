@@ -18,13 +18,13 @@ export type ModuleItems = ModuleItem[];
 export type ObjectAssignmentItem = [Name | BodyEntry, BodyEntry, boolean];
 export type ObjectAssignmentItems = ObjectAssignmentItem[];
 
-export type BodyEntry = string | Function;
+export type BodyEntry = string | Function | null;
 export type BodyEntries = BodyEntry[];
 export type Literal = string | Id;
 
 export type GeneratedCode = string;
 
-export interface LoopOptions {
+export type LoopOptions = {
   name?: Name;
   value: Name;
   collection: BodyEntry;
@@ -32,7 +32,7 @@ export interface LoopOptions {
   body: BodyEntry;
 }
 
-export interface FunctionOptions {
+export type FunctionOptions = {
   internalId?: string;
   internalArgs?: Name[];
   contextArgs?: Name[];
@@ -40,7 +40,7 @@ export interface FunctionOptions {
   body: BodyEntry;
 }
 
-export interface Coder {
+export type Coder = {
   selfName: string;
   globalObjectName: string;
   exportsName: string;

@@ -1,15 +1,15 @@
 /** @flow */
 
+import type { Coder } from '../target';
 import * as Syntax from '../syntax';
-import { Coder } from '../target';
 
-export interface Evaluator {
+export type Evaluator = {
   coder: Coder;
   evaluate(...args: any[]): void;
   getDispatchEvaluator(): Evaluator;
 }
 
-export class NodeEvaluator implements Evaluator {
+export class NodeEvaluator {
   static tags: string[];
   coder: Coder;
   parent: Evaluator;

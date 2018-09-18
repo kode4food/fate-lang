@@ -4,7 +4,7 @@ import { isTrue, isFalse } from './pattern';
 
 type ArgTemplate = { [index: number]: any };
 
-export interface FateFunction {
+export type FateFunction = {
   (...args: any[]): any;
   __fate?: string;
 }
@@ -83,7 +83,7 @@ function createWrapper(funcs: FateFunction[], check: Function) {
 }
 
 function checkComposition(funcs: FateFunction[]) {
-  let fateType: string;
+  let fateType = '';
 
   for (let i = 0; i < funcs.length; i++) {
     const func = funcs[i];

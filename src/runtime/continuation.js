@@ -14,6 +14,11 @@ function noOp() {
 }
 
 class Scheduler {
+  capacity: number;
+  isFlushing: boolean;
+  queueIndex: number;
+  queueLength: number;
+
   constructor() {
     this.capacity = 16 * 2;
     this.isFlushing = false;
@@ -67,13 +72,9 @@ const GlobalScheduler = new Scheduler();
 
 export class Continuation {
   isResolved: boolean;
-
   result: Result;
-
-  pendingHandler: PendingHandler;
-
-  pendingHandlers: PendingHandlers;
-
+  pendingHandler: ?PendingHandler;
+  pendingHandlers: ?PendingHandlers;
   pendingLength: number;
 
   constructor(executor: Executor) {

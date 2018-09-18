@@ -1,7 +1,6 @@
 /** @flow */
 
 import type { ResolverValue } from '../syntax';
-
 import * as Target from './index';
 import { mixin } from '../../runtime';
 import { Resolver } from '../syntax';
@@ -26,18 +25,18 @@ const FirstAccess = {
 
 type FirstAccessValue = $Values<typeof FirstAccess>;
 
-interface NameInfo {
+type NameInfo = {
   names: NameIdsMap;
   scopeInfo: ScopeInfo;
   usesScratch: boolean;
 }
 
-interface ScopeInfo {
+type ScopeInfo = {
   firstAccess: { [index: string]: FirstAccessValue };
   snapshot(): ScopeInfo;
 }
 
-interface Modification {
+type Modification = {
   ids: Target.Ids;
   created: boolean;
 }

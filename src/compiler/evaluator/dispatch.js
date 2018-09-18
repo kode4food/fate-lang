@@ -1,9 +1,7 @@
 /** @flow */
 
+import type { Coder } from '../target';
 import * as Syntax from '../syntax';
-import { Evaluator } from './evaluator';
-import { Coder } from '../target';
-
 import * as AssignmentEvaluators from './assignment';
 import * as BasicEvaluators from './basic';
 import * as ConcurrencyEvaluators from './concurrency';
@@ -13,7 +11,7 @@ import * as LoopEvaluators from './looping';
 import * as ModuleEvaluators from './module';
 import * as PatternEvaluators from './pattern';
 
-interface AnyMap {
+type AnyMap = {
   [index: string]: any;
 }
 
@@ -28,7 +26,10 @@ const evaluatorModules = [
   PatternEvaluators,
 ];
 
-export class DispatchEvaluator implements Evaluator {
+export class DispatchEvaluator {
+  coder: Coder;
+  ctors: { [string]: Function };
+
   constructor(coder: Coder) {
     this.coder = coder;
     this.ctors = {};

@@ -2,7 +2,8 @@
 
 import { resolve as resolvePath } from 'path';
 
-import { createModule, Module, ModuleName } from '../fate';
+import type { Module, ModuleName } from '../fate';
+import { createModule } from '../fate';
 
 const basePath = resolvePath(__dirname, '../modules');
 

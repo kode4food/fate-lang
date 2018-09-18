@@ -1,7 +1,9 @@
 /** @flow */
 
 import { resolve as resolvePath } from 'path';
-import { createModule, ModuleName, DirPath } from '../fate';
+
+import type { ModuleName, DirPath } from '../fate';
+import { createModule } from '../fate';
 
 const nodeModuleRegex = /^node:(.*)$/;
 const relativePathRegex = /^\.|\../;

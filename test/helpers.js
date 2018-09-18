@@ -1,5 +1,3 @@
-/** @flow */
-
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
@@ -38,8 +36,8 @@ function createConsole() {
     return str;
   }
 
-  function contains(str) {
-    return result().indexOf(str) !== -1;
+  function contains(s) {
+    return result().indexOf(s) !== -1;
   }
 }
 

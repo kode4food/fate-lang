@@ -8,30 +8,30 @@ import {
   readFileSync, writeFileSync, unlinkSync, existsSync,
 } from 'fs';
 
+import type { GeneratedCode } from '../compiler/target';
 import { compileModule, wrapCompileError } from '../compiler';
-import { GeneratedCode } from '../compiler/target';
 import { VERSION } from '../fate';
 
 const minimist = require('minimist');
 
 const defaultPattern = '*.fate';
 
-export interface CompilerArguments {
-  help?: boolean;
-  parse?: boolean;
-  clean?: boolean;
-  in?: string;
-  out?: string;
-  _?: string[];
-  console?: Console;
+export type CompilerArguments = {
+  help: boolean;
+  parse: boolean;
+  clean: boolean;
+  in: string;
+  out: string;
+  _: string[];
+  console: Console;
 }
 
-interface CompilerOutput {
+type CompilerOutput = {
   filePath: string;
-  err?: Error;
+  err: Error;
 }
 
-interface CompilerResults {
+type CompilerResults = {
   errors: CompilerOutput[];
   warnings: CompilerOutput[];
   success: number;
@@ -207,11 +207,9 @@ export function compile(args: CompilerArguments, callback: Function) {
     }
 
     // Bleh, make this pretty
-    const processor = args.parse
-      ? performParse
-      : args.clean
-        ? performClean
-        : performCompile;
+    const processor = args.parse ? performParse
+                                 : args.clean ? performClean
+                                              : performCompile;
 
     files.forEach((file) => {
       const inputPath = join(inDir, file);

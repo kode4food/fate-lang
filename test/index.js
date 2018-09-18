@@ -1,5 +1,3 @@
-/** @flow */
-
 const mixin = require('../dist/runtime').mixin;
 
 mixin(
