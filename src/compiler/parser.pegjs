@@ -1,5 +1,5 @@
 {
-  const isFormatter = require('../runtime/Format').isFormatter;
+  const isFormatter = require('../runtime/format').isFormatter;
   const Syntax = require('./syntax');
   const annotate = Syntax.annotate;
 

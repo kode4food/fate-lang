@@ -1,27 +1,28 @@
-"use strict";
+/** @flow */
 
 const nodeunit = require('nodeunit');
-const fate = require('../../dist/Fate');
+const fate = require('../../dist/fate');
 const helpers = require('../helpers');
+
 const evaluate = fate.evaluate;
 const evaluateEmit = helpers.evaluateEmit;
 
 exports.scope = nodeunit.testCase({
-  setUp: function (callback) {
-    this.globals = { greeting: "Hello, World!" };
+  setUp(callback) {
+    this.globals = { greeting: 'Hello, World!' };
 
     callback();
   },
 
-  "Shadow Local Scope": function (test) {
-    let script1 = `let greeting = 'Not Hello'
+  'Shadow Local Scope': function (test) {
+    const script1 = `let greeting = 'Not Hello'
                    def localGreeting()
                      let greeting = 'Local Hello'
                      return greeting
                    end
                    localGreeting() + ' ' + greeting`;
 
-    let script2 = `let greeting = 'Not Hello'
+    const script2 = `let greeting = 'Not Hello'
                    def localGreeting()
                      let greeting = 'Local Hello'
                      def evenMoreLocalGreeting()
@@ -32,20 +33,20 @@ exports.scope = nodeunit.testCase({
                    end
                    localGreeting() + ' ' + greeting`;
 
-    test.equal(evaluate(script1, this.globals), "Local Hello Not Hello");
+    test.equal(evaluate(script1, this.globals), 'Local Hello Not Hello');
     test.equal(evaluate(script2, this.globals),
-               "More Local Hello Local Hello Not Hello");
-    test.equal(evaluate("global.greeting", this.globals), "Hello, World!");
+               'More Local Hello Local Hello Not Hello');
+    test.equal(evaluate('global.greeting', this.globals), 'Hello, World!');
 
     test.throws(function () {
-      evaluate("greeting", this.globals);
+      evaluate('greeting', this.globals);
     });
 
     test.done();
   },
 
-  "Inherit Local Scope": function (test) {
-    let script1 = `let greeting = 'Outer Hello'
+  'Inherit Local Scope': function (test) {
+    const script1 = `let greeting = 'Outer Hello'
                    def localGreeting()
                      global.emit(greeting)
                      let greeting = 'Inner Hello'
@@ -54,21 +55,21 @@ exports.scope = nodeunit.testCase({
                    localGreeting()
                    global.emit(greeting)`;
 
-    test.deepEqual(evaluateEmit(script1), ["Outer Hello", "Inner Hello", "Outer Hello"]);
+    test.deepEqual(evaluateEmit(script1), ['Outer Hello', 'Inner Hello', 'Outer Hello']);
     test.done();
   },
 
-  "Scope Override": function (test) {
-    let script = `let b = global.a
+  'Scope Override': function (test) {
+    const script = `let b = global.a
                   let a = 'child'
                   b + ' ' + a`;
 
-    test.equal(evaluate(script, { a: 'parent' }), "parent child");
+    test.equal(evaluate(script, { a: 'parent' }), 'parent child');
     test.done();
   },
 
-  "Conditional Scope": function (test) {
-    let script = `let a=global.a, b=global.b
+  'Conditional Scope': function (test) {
+    const script = `let a=global.a, b=global.b
                   let c = a
                   if b
                     let a = 'child'
@@ -77,7 +78,7 @@ exports.scope = nodeunit.testCase({
                   c + ' ' + d + ' ' + b + ' ' + a`;
 
     test.equal(evaluate(script, { a: 'parent', b: true }),
-               "parent child true child");
+               'parent child true child');
     test.done();
-  }
+  },
 });

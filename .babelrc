@@ -1,0 +1,7 @@
+{
+  "presets": [
+    ["env", {"targets": { "node": "10" }}],
+    "flow"
+  ],
+  "plugins": ["transform-class-properties"]
+}

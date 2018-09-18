@@ -2,13 +2,7 @@ language: node_js
 
 os:
   - linux
-  - osx
 
 node_js:
-  - "4.6"
-  - "6.9"
-  - "7.1"
+  - "10.8.0"
   - "stable"
-
-notifications:
-  slack: 49er:CXuKchwgiZUCoBfykSaYMlgr
