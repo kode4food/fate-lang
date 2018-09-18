@@ -51,7 +51,7 @@ class LikeComparisonEvaluator extends NodeEvaluator {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  isLikeLiteral(node: Syntax.Node | Function) {
+  isLikeLiteral(node: Syntax.Literal) {
     const valueType = typeof node.value;
     return likeLiteralTypes.indexOf(valueType) !== -1;
   }
