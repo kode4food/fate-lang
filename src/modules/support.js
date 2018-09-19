@@ -25,7 +25,9 @@ function isA(type: string): Function {
 type Target = { [index: string]: any };
 
 function setProperty(target: Target, key: string, value: any) {
-  return (target[key] = value);
+  // eslint-disable-next-line no-param-reassign
+  target[key] = value;
+  return value;
 }
 
 function print(...args: any[]) {

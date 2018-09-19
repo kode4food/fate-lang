@@ -2,10 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 
-const evaluate = require('../dist/fate').evaluate;
-const mixin = require('../dist/runtime').mixin;
+const { evaluate } = require('../dist/fate');
+const { mixin } = require('../dist/runtime');
 
-const usesFate = /(['"])fate\-compiler:[0-9.]+\1;/g;
+const usesFate = /(['"])fate-compiler:[0-9.]+\1;/g;
 
 /*
  * Creates a mock console, primarily for intercepting the results of the

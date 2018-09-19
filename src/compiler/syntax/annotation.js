@@ -1,16 +1,17 @@
 /** @flow */
 
-export interface Annotated {
+export type Annotated = {
   annotations: Annotations;
 }
 
-export class Annotations {}
+export type Annotations = { [string]: any };
 
 export function annotate(node: Annotated, name: string, value?: any) {
-  let { annotations } = node;
+  const n = node;
+  let { annotations } = n;
   if (!annotations) {
-    annotations = new Annotations();
-    node.annotations = annotations;
+    annotations = {};
+    n.annotations = annotations;
   }
   annotations[name] = value === undefined ? true : value;
 }

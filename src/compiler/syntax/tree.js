@@ -1,7 +1,7 @@
 /** @flow */
 
 import type { Tag, TagOrTags } from './index';
-import { Annotated, Annotations } from './annotation';
+import type { Annotated, Annotations } from './annotation';
 import { node } from './index';
 
 const { isArray } = Array;
@@ -24,7 +24,7 @@ export type ObjectElements = ObjectAssignment[];
 export type CollectionPatternElement = Expression | PatternElement;
 export type CollectionPatternElements = CollectionPatternElement[];
 
-export class Node implements Annotated {
+export class Node {
   tag: Tag;
   visitorKeys: string[];
   annotations: Annotations;
@@ -175,12 +175,12 @@ export class BindOperator extends Operator {
   }
 }
 
-export interface FunctionOrLambda extends Annotated {
+export type FunctionOrLambda = Annotated & {
   signature: Signature;
   statements: Statements;
 }
 
-export class LambdaExpression extends Expression implements FunctionOrLambda {
+export class LambdaExpression extends Expression {
   signature: Signature;
   statements: Statements;
 
@@ -491,8 +491,7 @@ export class ImportStatement extends ExportableStatement {
   }
 }
 
-export class FunctionDeclaration extends ExportableStatement
-                                 implements FunctionOrLambda {
+export class FunctionDeclaration extends ExportableStatement {
   signature: Signature;
   statements: Statements;
 

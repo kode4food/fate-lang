@@ -1,8 +1,8 @@
 const nodeunit = require('nodeunit');
-const evaluate = require('../../dist/fate').evaluate;
+const { evaluate } = require('../../dist/fate');
 
 exports.lists = nodeunit.testCase({
-  'List comprehensions': function (test) {
+  'List comprehensions': (test) => {
     const data = {
       yl: [10, 20, 30, 50, 51, 75, 90, 100],
       xl: [
@@ -76,7 +76,7 @@ exports.lists = nodeunit.testCase({
     test.done();
   },
 
-  'Object Construction': function (test) {
+  'Object Construction': (test) => {
     const data = {
       name: 'hello',
       value: 9,
@@ -108,7 +108,7 @@ exports.lists = nodeunit.testCase({
     test.done();
   },
 
-  'Nested lists': function (test) {
+  'Nested lists': (test) => {
     const base = `{
                   name   : 'World',
                   title  : 'Famous People',

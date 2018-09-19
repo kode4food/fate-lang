@@ -7,12 +7,7 @@ const {
   Visitor, annotate, hasTag, isLiteral,
 } = Syntax;
 
-type LiteralArray = any[];
-type StringMap = { [index: string]: string };
-type LiteralObject = { [index: string]: any };
-type FunctionMap = { [index: string]: Function };
-
-const inverseOperators: StringMap = {
+const inverseOperators = {
   eq: 'neq',
   neq: 'eq',
   lt: 'gte',
@@ -21,14 +16,14 @@ const inverseOperators: StringMap = {
   lte: 'gt',
 };
 
-const unaryConstantFolders: FunctionMap = {
+const unaryConstantFolders = {
   not: (v: any) => isFalse(v),
   neg: (v: any) => -v,
 };
 
 const unaryConstantFolderKeys = Object.keys(unaryConstantFolders);
 
-const binaryConstantFolders: FunctionMap = {
+const binaryConstantFolders = {
   add: (l: any, r: any) => l + r,
   sub: (l: any, r: any) => l - r,
   mul: (l: any, r: any) => l * r,
@@ -46,7 +41,7 @@ const binaryConstantFolders: FunctionMap = {
 
 const binaryConstantFolderKeys = Object.keys(binaryConstantFolders);
 
-const shortCircuitFolders: FunctionMap = {
+const shortCircuitFolders = {
   or: (node: Syntax.OrOperator) => {
     if (!isLiteral(node.left)) {
       return node;
@@ -138,10 +133,10 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function rollUpArray(node: Syntax.ArrayConstructor) {
     const { elements } = node;
-    const output: LiteralArray = [];
+    const output = [];
     const type = 'literal';
 
-    for (let i = 0, len = elements.length; i < len; i++) {
+    for (let i = 0, len = elements.length; i < len; i += 1) {
       const element = elements[i];
       if (!isLiteral(element)) {
         return node;
@@ -154,10 +149,10 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function rollUpObject(node: Syntax.ObjectConstructor) {
     const { elements } = node;
-    const output: LiteralObject = {};
+    const output = {};
     const type = 'literal';
 
-    for (let i = 0, len = elements.length; i < len; i++) {
+    for (let i = 0, len = elements.length; i < len; i += 1) {
       const element = elements[i];
       const name = element.id;
       const { value } = element;
@@ -274,6 +269,7 @@ export default function createTreeProcessors(visit: Visitor) {
       const exportedStatement = statement.statement;
       if (exportedStatement) {
         result.push(exportedStatement);
+        // eslint-disable-next-line no-param-reassign
         statement.statement = null;
       }
       result.push(statement);

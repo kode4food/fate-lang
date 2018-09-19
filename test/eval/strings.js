@@ -1,20 +1,18 @@
 const nodeunit = require('nodeunit');
-const fate = require('../../dist/fate');
-
-const evaluate = fate.evaluate;
+const { evaluate } = require('../../dist/fate');
 
 exports.strings = nodeunit.testCase({
-  'Escape Sequences': function (test) {
+  'Escape Sequences': (test) => {
     const script1 = '"\\\\ \\" \\\' \\b \\f \\n \\r \\t"';
     const script2 = "'\\\\ \\\" \\' \\b \\f \\n \\r \\t'";
     const script3 = "{name:'hello', age:9} | '%% %name %% %%%% %age'";
-    test.equal(evaluate(script1), "\\ \" \' \b \f \n \r \t");
-    test.equal(evaluate(script2), "\\ \" \' \b \f \n \r \t");
+    test.equal(evaluate(script1), "\\ \" ' \b \f \n \r \t");
+    test.equal(evaluate(script2), "\\ \" ' \b \f \n \r \t");
     test.equal(evaluate(script3), '% hello % %% 9');
     test.done();
   },
 
-  'Multi-Line, Single Quote': function (test) {
+  'Multi-Line, Single Quote': (test) => {
     const script1 = "'''hello\nthere'''";
     test.equal(evaluate(script1), 'hello\nthere');
     test.done();

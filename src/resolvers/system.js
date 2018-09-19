@@ -2,25 +2,28 @@
 
 import { resolve as resolvePath } from 'path';
 
+import type { Resolver } from './index';
 import type { Module, ModuleName } from '../fate';
 import { createModule } from '../fate';
 
-const basePath = resolvePath(__dirname, '../modules');
+const moduleBasePath = resolvePath(__dirname, '../modules');
 
-export function createSystemResolver() {
-  const cache: { [index: string]: Module } = {};
+export function createSystemResolver(): Resolver {
+  const cache: { [index: string]: ?Module } = {};
   return { resolve };
 
-  function resolve(name: ModuleName): Module {
+  function resolve(name: ModuleName, basePath?: string): ?Module {
     if (name in cache) {
       return cache[name];
     }
-    return cache[name] = tryRequire(`${name}.fate`);
+    const module = tryRequire(`${name}.fate`);
+    cache[name] = module;
+    return module;
   }
 
-  function tryRequire(filename: string) {
+  function tryRequire(filename: string): ?Module {
     try {
-      return createModule(require(resolvePath(basePath, filename)));
+      return createModule(require(resolvePath(moduleBasePath, filename)));
     } catch (err) {
       return undefined;
     }

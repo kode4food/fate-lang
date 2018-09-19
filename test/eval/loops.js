@@ -1,27 +1,19 @@
 const nodeunit = require('nodeunit');
-const fate = require('../../dist/fate');
+const { evaluate } = require('../../dist/fate');
+const { evaluateEmit } = require('../helpers');
 
-const evaluate = fate.evaluate;
-const helpers = require('../helpers');
-
-const evaluateEmit = helpers.evaluateEmit;
+const testData = {
+  name: 'World',
+  title: 'Famous People',
+  people: [
+    { name: 'Larry', age: 50, brothers: [] },
+    { name: 'Curly', age: 45, brothers: ['Moe', 'Shemp'] },
+    { name: 'Moe', age: 58, brothers: ['Curly', 'Shemp'] },
+  ],
+};
 
 exports.loops = nodeunit.testCase({
-  setUp(callback) {
-    this.data = {
-      name: 'World',
-      title: 'Famous People',
-      people: [
-        { name: 'Larry', age: 50, brothers: [] },
-        { name: 'Curly', age: 45, brothers: ['Moe', 'Shemp'] },
-        { name: 'Moe', age: 58, brothers: ['Curly', 'Shemp'] },
-      ],
-    };
-
-    callback();
-  },
-
-  'Basic Loops': function (test) {
+  'Basic Loops': (test) => {
     const script1 = `for color in ["red", "green", "blue"]
                    where color != "red": global.emit(color + " is a color")`;
 
@@ -61,16 +53,16 @@ exports.loops = nodeunit.testCase({
     test.deepEqual(evaluateEmit(script2), ['No Colors']);
     test.deepEqual(evaluateEmit(script3), []);
     test.deepEqual(evaluateEmit(script4), ['name=Thom', 'age=42']);
-    test.deepEqual(evaluateEmit(script5, this.data),
+    test.deepEqual(evaluateEmit(script5, testData),
                    ['Curly-Moe', 'Curly-Shemp', 'Moe-Curly', 'Moe-Shemp']);
-    test.deepEqual(evaluateEmit(script6, this.data),
+    test.deepEqual(evaluateEmit(script6, testData),
                    ['-', 'Curly-Moe', 'Curly-Shemp', 'Moe-Curly', 'Moe-Shemp']);
-    test.deepEqual(evaluateEmit(script7, this.data),
+    test.deepEqual(evaluateEmit(script7, testData),
                    ['Curly-Moe', 'Curly-Shemp', 'Moe-Curly', 'Moe-Shemp']);
     test.done();
   },
 
-  'Shadowing Loops': function (test) {
+  'Shadowing Loops': (test) => {
     const script5 = `let name = "Bobby"
                    for person in global.people, brother in person.brothers
                      let name = person.name
@@ -78,13 +70,13 @@ exports.loops = nodeunit.testCase({
                    end
                    global.emit(name)`;
 
-    test.deepEqual(evaluateEmit(script5, this.data),
+    test.deepEqual(evaluateEmit(script5, testData),
                    ['Curly-Moe', 'Curly-Shemp', 'Moe-Curly', 'Moe-Shemp', 'Bobby']);
 
     test.done();
   },
 
-  'Generator Loops': function (test) {
+  'Generator Loops': (test) => {
     const script1 = `from math import range
                    for i in range(1, 10)
                      global.emit(i)
@@ -120,7 +112,7 @@ exports.loops = nodeunit.testCase({
     test.done();
   },
 
-  'Indexed Loops': function (test) {
+  'Indexed Loops': (test) => {
     function* colors() {
       yield ['red', 0];
       yield ['green', 1];
@@ -135,7 +127,7 @@ exports.loops = nodeunit.testCase({
     const script3 = '[for color in 97]';
     const script4 = '{for x:y in 100}';
 
-    test.deepEqual(evaluate(script1, this.data), ['Curly:0', 'Shemp:1']);
+    test.deepEqual(evaluate(script1, testData), ['Curly:0', 'Shemp:1']);
     test.deepEqual(evaluate(script2, { colors }), ['red:0', 'green:1', 'blue:2']);
     test.deepEqual(evaluate(script3), []);
     test.deepEqual(evaluate(script4), {});

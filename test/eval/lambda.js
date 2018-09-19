@@ -1,7 +1,5 @@
 const nodeunit = require('nodeunit');
-const fate = require('../../dist/fate');
-
-const evaluate = fate.evaluate;
+const { evaluate } = require('../../dist/fate');
 
 exports.lambda = nodeunit.testCase({
   Lambdas(test) {

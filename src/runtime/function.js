@@ -25,7 +25,7 @@ export function bindFunction(func: Function, args: ArgTemplate) {
   const template: any[] = [];
   const argMap: number[] = [];
 
-  for (let i = 0; i <= templateSize; i++) {
+  for (let i = 0; i <= templateSize; i += 1) {
     if (indexes.indexOf(i) !== -1) {
       template[i] = args[i];
     } else {
@@ -39,7 +39,7 @@ export function bindFunction(func: Function, args: ArgTemplate) {
   function boundFunction(...a: any[]) {
     const thisValue = a[0];
     const funcArgs = template.slice().concat(slice.call(a, sliceIndex));
-    for (let i = 0; i < argMap.length; i++) {
+    for (let i = 0; i < argMap.length; i += 1) {
       funcArgs[argMap[i]] = a[i];
     }
     return func.apply(thisValue, funcArgs);
@@ -52,7 +52,7 @@ export function compose(funcs: FateFunction[]) {
 
   function wrapper(...args: any[]) {
     let result = funcs[0](...args);
-    for (let i = 1; i < funcs.length; i++) {
+    for (let i = 1; i < funcs.length; i += 1) {
       result = funcs[i](result);
     }
     return result;
@@ -72,7 +72,7 @@ function createWrapper(funcs: FateFunction[], check: Function) {
   return wrapper;
 
   function wrapper(...args: any[]) {
-    for (let i = 0; i < funcs.length - 1; i++) {
+    for (let i = 0; i < funcs.length - 1; i += 1) {
       const result = funcs[i](...args);
       if (check(result)) {
         return result;
@@ -85,7 +85,7 @@ function createWrapper(funcs: FateFunction[], check: Function) {
 function checkComposition(funcs: FateFunction[]) {
   let fateType = '';
 
-  for (let i = 0; i < funcs.length; i++) {
+  for (let i = 0; i < funcs.length; i += 1) {
     const func = funcs[i];
     if (typeof func !== 'function') {
       throw new Error('Cannot compose values that are not functions');

@@ -1,10 +1,8 @@
 const nodeunit = require('nodeunit');
-const fate = require('../../dist/fate');
-
-const evaluate = fate.evaluate;
+const { evaluate } = require('../../dist/fate');
 
 exports.like = nodeunit.testCase({
-  'Guard Patterns': function (test) {
+  'Guard Patterns': (test) => {
     const script1 = `let p = ~{ name: it != 'Thom', age: it != 43 }
                    def func(person)
                      'normal person: ' + person.name
@@ -18,7 +16,7 @@ exports.like = nodeunit.testCase({
     test.done();
   },
 
-  'Object Patterns': function (test) {
+  'Object Patterns': (test) => {
     const script1 = `let p = ~{ name: it != 'Thom', age: it != 43 }
                    { name: 'Bill', age: 27 } like p`;
 
@@ -38,7 +36,7 @@ exports.like = nodeunit.testCase({
     test.done();
   },
 
-  'Array Patterns': function (test) {
+  'Array Patterns': (test) => {
     const script1 = `let p = ~(it > 50 and it < 100)
                    p(75)`;
 
@@ -65,7 +63,7 @@ exports.like = nodeunit.testCase({
     test.done();
   },
 
-  'Like Matching': function (test) {
+  'Like Matching': (test) => {
     const person1 = {
       name: 'Thom',
       age: 42,
@@ -106,21 +104,21 @@ exports.like = nodeunit.testCase({
                    end`;
 
     const script2 = `unless global.person1 like global.person3
-                     "They don\'t match!"
+                     "They don't match!"
                    end`;
 
     const script3 = `unless global.person1 like global.person4
-                     "They don\'t match!"
+                     "They don't match!"
                    end`;
 
     const script4 = `if global.array like ["red", "green", "blue"]
                      "They match!"
                    else
-                     "They don\'t match!"
+                     "They don't match!"
                    end`;
 
     const script5 = `unless global.person1 like {name: "Thom", age: 56}
-                     "They don\'t match!"
+                     "They don't match!"
                    end`;
 
     const script6 = `import pattern

@@ -2,7 +2,7 @@
 
 type Component = [number, string | number];
 
-type FormatFunction = {
+export type FormatFunction = {
   (data: any | any[]): string;
   __fate: string;
   __fateIndexes: (string | number)[];
@@ -55,7 +55,8 @@ export function buildFormatter(formatStr: string): FormatFunction {
       components.push(createLiteralComponent('%'));
       workStr = workStr.substring(matchIdx + matchLen);
     } else {
-      let idx: (string | number) = autoIdx++;
+      let idx: (string | number) = autoIdx;
+      autoIdx += 1;
       if (paramMatch[4]) {
         // eslint-disable-next-line prefer-destructuring
         idx = paramMatch[4];
@@ -79,19 +80,20 @@ export function buildFormatter(formatStr: string): FormatFunction {
   }
 
   function formatFunction(data: any | any[]) {
-    if (typeof data !== 'object' || data === null) {
-      data = [data];
+    let d = data;
+    if (typeof d !== 'object' || d === null) {
+      d = [d];
     }
 
     let result = '';
-    for (let i = 0; i < clen; i++) {
+    for (let i = 0; i < clen; i += 1) {
       const component = components[i];
       switch (component[0]) {
         case 0:
           result += component[1];
           break;
         case 1:
-          result += data[component[1]];
+          result += d[component[1]];
           break;
         default:
           throw new Error('Stupid Coder: Default switch case');

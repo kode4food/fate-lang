@@ -30,10 +30,8 @@ export class AssignmentEvaluator extends NodeEvaluator {
   }
 
   evaluate(getValue: Function) {
-    if (!getValue) {
-      getValue = this.getAssignmentValue.bind(this);
-    }
-    this.coder.assignment(this.node.id.value, getValue());
+    const gv = getValue || this.getAssignmentValue.bind(this);
+    this.coder.assignment(this.node.id.value, gv());
   }
 
   getAssignmentValue() {
@@ -51,14 +49,11 @@ export class ArrayDestructureEvaluator extends NodeEvaluator {
   }
 
   evaluate(getValue: Function) {
-    if (!getValue) {
-      getValue = this.getAssignmentValue.bind(this);
-    }
-
+    const gv = getValue || this.getAssignmentValue.bind(this);
     const result = this.coder.createAnonymous();
     const thisNode = this.node;
     this.coder.statement(() => {
-      this.coder.assignAnonymous(result, getValue(thisNode));
+      this.coder.assignAnonymous(result, gv(thisNode));
     });
 
     thisNode.getIdentifiers().forEach((id, index) => {
@@ -89,13 +84,11 @@ export class ObjectDestructureEvaluator extends NodeEvaluator {
   }
 
   evaluate(getValue: Function) {
-    if (!getValue) {
-      getValue = this.getAssignmentValue.bind(this);
-    }
+    const gv = getValue || this.getAssignmentValue.bind(this);
     const result = this.coder.createAnonymous();
     const thisNode = this.node;
     this.coder.statement(() => {
-      this.coder.assignAnonymous(result, getValue(thisNode));
+      this.coder.assignAnonymous(result, gv(thisNode));
     });
 
     thisNode.items.forEach((item) => {

@@ -3,6 +3,7 @@
 import { join, dirname } from 'path';
 import { sync as glob } from 'glob';
 import { sync as mkdirp } from 'mkdirp';
+import minimist from 'minimist';
 
 import {
   readFileSync, writeFileSync, unlinkSync, existsSync,
@@ -11,8 +12,6 @@ import {
 import type { GeneratedCode } from '../compiler/target';
 import { compileModule, wrapCompileError } from '../compiler';
 import { VERSION } from '../fate';
-
-const minimist = require('minimist');
 
 const defaultPattern = '*.fate';
 
@@ -236,12 +235,12 @@ export function compile(args: CompilerArguments, callback: Function) {
 
   function performParse(inputPath: string) {
     parseSource(inputPath);
-    success++;
+    success += 1;
   }
 
   function performCompile(inputPath: string, outputPath: string) {
     writeNodeModule(parseSource(inputPath), outputPath);
-    success++;
+    success += 1;
   }
 
   function performClean(inputPath: string, outputPath: string) {
@@ -249,7 +248,7 @@ export function compile(args: CompilerArguments, callback: Function) {
       return;
     }
     unlinkSync(outputPath);
-    deleted++;
+    deleted += 1;
   }
 
   function compileInputScript(inputPath: string) {

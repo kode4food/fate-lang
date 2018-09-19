@@ -3,7 +3,7 @@
 import type { ModuleName, DirPath, Module } from '../fate';
 
 export type Resolver = {
-  resolve(name: ModuleName, basePath?: DirPath): Module;
+  resolve(name: ModuleName, basePath?: DirPath): ?Module;
 }
 
 export * from './node';

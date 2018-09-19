@@ -1,6 +1,7 @@
 /** @flow */
 
 import type { DirPath, ModuleName, ModuleExports } from '../fate';
+import type { Resolver } from '../resolvers';
 import * as Resolvers from '../resolvers';
 
 // Register the default resolvers
@@ -9,7 +10,7 @@ const fileResolver = Resolvers.createFileResolver({ path: process.cwd() });
 const systemResolver = Resolvers.createSystemResolver();
 const memoryResolver = Resolvers.createMemoryResolver();
 
-const _resolvers: Resolvers.Resolver[] = [
+const _resolvers: Resolver[] = [
   fileResolver, nodeResolver, systemResolver, memoryResolver,
 ];
 
@@ -17,7 +18,7 @@ export const registerModule = memoryResolver.register;
 export const unregisterModule = memoryResolver.unregister;
 
 export function resolve(moduleName: ModuleName, basePath?: DirPath) {
-  for (let i = _resolvers.length - 1; i >= 0; i--) {
+  for (let i = _resolvers.length - 1; i >= 0; i -= 1) {
     const module = _resolvers[i].resolve(moduleName, basePath);
     if (module) {
       return module.exports;

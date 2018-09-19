@@ -61,7 +61,7 @@ export class Visitor {
 
   findAncestor(tag: Syntax.TagOrTags): ?Syntax.Node {
     const { nodeStack } = this;
-    for (let i = nodeStack.length - 1; i >= 0; i--) {
+    for (let i = nodeStack.length - 1; i >= 0; i -= 1) {
       const node: NodeStackElement = nodeStack[i];
       if (node instanceof Syntax.Node && Syntax.hasTag(node, tag)) {
         return node;
@@ -96,7 +96,7 @@ export class Visitor {
     nodeStack.push(node);
     if (isArray(node)) {
       const arrNode = node;
-      for (let i = 0, len = arrNode.length; i < len; i++) {
+      for (let i = 0, len = arrNode.length; i < len; i += 1) {
         arrNode[i] = visitor(arrNode[i]);
       }
     } else {
@@ -134,6 +134,7 @@ export class Visitor {
     );
 
     function statementsProcessor(node: Syntax.Statements) {
+      // eslint-disable-next-line no-param-reassign
       node.statements = visitor(node.statements);
       return node;
     }
@@ -190,7 +191,7 @@ export class Visitor {
   upTreeUntilMatch(matcher: NodeMatcher,
                    visitor: NodeVisitor): NodeStackElement {
     const { nodeStack } = this;
-    for (let i = nodeStack.length - 1; i >= 0; i--) {
+    for (let i = nodeStack.length - 1; i >= 0; i -= 1) {
       const node: NodeStackElement = nodeStack[i];
       visitor(node);
       if (matcher(node)) {

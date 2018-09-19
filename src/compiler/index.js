@@ -89,11 +89,12 @@ export class CompileError extends Error {
 
 export function wrapCompileError(err: Error, filePath?: FilePath): Error {
   if (err instanceof CompileError) {
+    const e = Object.create(err);
     if (filePath) {
-      err.filePath = filePath;
+      e.filePath = filePath;
     }
-    err.message = formatCompileError(err, filePath);
-    return err;
+    e.message = formatCompileError(e, filePath);
+    return e;
   }
 
   if (err instanceof SyntaxError) {
@@ -106,8 +107,8 @@ function formatCompileError(err: CompileError, filePath?: FilePath) {
   const lineInfo = `:${err.line}:${err.column}`;
   const { message } = err;
 
-  filePath = filePath || err.filePath || 'string';
-  return `${filePath}${lineInfo}: ${message}`;
+  const fp = filePath || err.filePath || 'string';
+  return `${fp}${lineInfo}: ${message}`;
 }
 
 // intercepts a PEG.js Exception and generate a human-readable error message

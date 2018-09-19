@@ -11,10 +11,6 @@ import * as LoopEvaluators from './looping';
 import * as ModuleEvaluators from './module';
 import * as PatternEvaluators from './pattern';
 
-type AnyMap = {
-  [index: string]: any;
-}
-
 const evaluatorModules = [
   AssignmentEvaluators,
   BasicEvaluators,
@@ -34,7 +30,7 @@ export class DispatchEvaluator {
     this.coder = coder;
     this.ctors = {};
 
-    evaluatorModules.forEach((module: AnyMap) => {
+    evaluatorModules.forEach((module: {}) => {
       Object.keys(module)
         .map(key => module[key])
         .filter(isNodeEvaluator)

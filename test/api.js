@@ -1,11 +1,8 @@
 const nodeunit = require('nodeunit');
 const runtime = require('../dist/runtime');
 
-const Continuation = runtime.Continuation;
-
 exports.api = nodeunit.testCase({
-
-  'True / False': function (test) {
+  'True / False': (test) => {
     test.equal(runtime.isTrue(runtime.isNothing), true);
     test.equal(runtime.isTrue(runtime.isSomething), true);
     test.equal(runtime.isTrue(null), false);
@@ -28,12 +25,12 @@ exports.api = nodeunit.testCase({
     test.done();
   },
 
-  'Support Library Calls': function (test) {
-    const p = new Continuation(((resolve) => {
+  'Support Library Calls': (test) => {
+    const p = new runtime.Continuation(((resolve) => {
       resolve('hello');
     }));
 
-    test.ok(p instanceof Continuation);
+    test.ok(p instanceof runtime.Continuation);
     p.then((value) => {
       test.equal(value, 'hello');
       test.done();

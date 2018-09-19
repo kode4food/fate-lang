@@ -1,2 +1,5 @@
 [include]
 ./src/**/*.js
+
+[options]
+include_warnings=true

@@ -36,7 +36,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function isIdDeclared(id: Syntax.Identifier) {
     const { nodeStack } = visit;
-    for (let i = nodeStack.length - 1; i >= 0; i--) {
+    for (let i = nodeStack.length - 1; i >= 0; i -= 1) {
       const node = nodeStack[i];
       if (node instanceof Syntax.Node && isScopeContainer(node)) {
         const ids = getAnnotation(node, 'scope/declarations');
@@ -50,7 +50,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
   function declareId(id: Syntax.Identifier) {
     const { nodeStack } = visit;
-    for (let i = nodeStack.length - 1; i >= 0; i--) {
+    for (let i = nodeStack.length - 1; i >= 0; i -= 1) {
       const node = nodeStack[i];
       if (node instanceof Syntax.Node && isScopeContainer(node)) {
         const ids = getAnnotation(node, 'scope/declarations') || [];

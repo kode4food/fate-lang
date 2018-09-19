@@ -51,7 +51,7 @@ function awaitArray(resultOrArray: ResultOrArray) {
 
 export function awaitAny(resultOrArray: ResultOrArray): Continuation {
   return awaitArray(resultOrArray).then((array: Result[]) => new Continuation((resolve) => {
-    for (let i = 0, len = array.length; i < len; i++) {
+    for (let i = 0, len = array.length; i < len; i += 1) {
       const value = array[i];
       if (value instanceof Continuation) {
         value.then(resolve);
@@ -64,25 +64,27 @@ export function awaitAny(resultOrArray: ResultOrArray): Continuation {
 
 export function awaitAll(resultOrArray: ResultOrArray): Continuation {
   return awaitArray(resultOrArray).then((array: Result[]) => new Continuation((resolve) => {
-    let waitingFor = array.length;
+    const a = array;
+    let waitingFor = a.length;
 
-    for (let i = 0, len = waitingFor; i < len; i++) {
-      if (array[i] instanceof Continuation) {
-        array[i].then(resolveArrayAtIndex(i));
+    for (let i = 0, len = waitingFor; i < len; i += 1) {
+      if (a[i] instanceof Continuation) {
+        a[i].then(resolveArrayAtIndex(i));
       } else {
-        waitingFor--;
+        waitingFor -= 1;
       }
     }
 
     if (waitingFor === 0) {
-      resolve(array);
+      resolve(a);
     }
 
     function resolveArrayAtIndex(index: number) {
       return (result: Result) => {
-        array[index] = result;
-        if (--waitingFor === 0) {
-          resolve(array);
+        a[index] = result;
+        waitingFor -= 1;
+        if (waitingFor === 0) {
+          resolve(a);
         }
         return result;
       };

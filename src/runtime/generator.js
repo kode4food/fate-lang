@@ -1,5 +1,8 @@
 /** @flow */
 
+type Indexed = Generator<[any, number], void, void>;
+type Keyed = Generator<[any, string], void, void>;
+
 // Checking for an already instantiated generator
 export function isGenerator(value: any) {
   if (value === null || typeof value !== 'object') {
@@ -8,27 +11,28 @@ export function isGenerator(value: any) {
   return typeof value.next === 'function' && value.next.length === 1;
 }
 
-export function* createRangeGenerator(start: number, end: number) {
+export function* createRangeGenerator(start: number, end: number): Indexed {
   let current = Math.floor(start);
-  start = current;
-  end = Math.floor(end);
-  const increment = end > start ? 1 : -1;
+  const e = Math.floor(end);
+  const increment = e > current ? 1 : -1;
   let idx = 0;
 
-  yield [current, idx++];
-  while (current !== end) {
+  yield [current, idx];
+  idx += 1;
+  while (current !== e) {
     current += increment;
-    yield [current, idx++];
+    yield [current, idx];
+    idx += 1;
   }
 }
 
-export function* generateArray(array) {
-  for (let i = 0; i < array.length; i++) {
+export function* generateArray(array: any[]): Indexed {
+  for (let i = 0; i < array.length; i += 1) {
     yield [array[i], i];
   }
 }
 
-export function* generateObject(object) {
+export function* generateObject(object: {}): Keyed {
   for (const key in object) {
     if (Object.prototype.hasOwnProperty.call(object, key)) {
       yield [object[key], key];
@@ -36,17 +40,18 @@ export function* generateObject(object) {
   }
 }
 
-export function materializeArray(collection) {
+export function materializeArray(collection: any[]) {
   const result = [];
   let idx = 0;
   for (const item of collection) {
     // eslint-disable-next-line prefer-destructuring
-    result[idx++] = item[0];
+    result[idx] = item[0];
+    idx += 1;
   }
   return result;
 }
 
-export function materializeObject(collection) {
+export function materializeObject(collection: any[]) {
   const result = {};
   for (const item of collection) {
     // eslint-disable-next-line prefer-destructuring

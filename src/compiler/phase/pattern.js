@@ -6,16 +6,12 @@ const {
   Visitor, annotate, getAnnotation, hasAnnotation,
 } = Syntax;
 
-type NumberMap = {
-  [index: string]: number;
-}
-
 const collectionTags = ['objectPattern', 'arrayPattern'];
 const patternParentTags = ['pattern', 'patternElement'];
 
 const contextPatternLocal = 'p';
 
-const patternNodeComplexity: NumberMap = {
+const patternNodeComplexity = {
   match: 5,
   objectPattern: 4,
   arrayPattern: 4,
@@ -80,7 +76,8 @@ export default function createTreeProcessors(visit: Visitor) {
 
     node.elements.forEach((element) => {
       if (element instanceof Syntax.PatternElement) {
-        const localId = contextPatternLocal + (contextPatternNumbering++);
+        const localId = contextPatternLocal + contextPatternNumbering;
+        contextPatternNumbering += 1;
         annotate(element, 'pattern/parent', parentLocal);
         annotate(element, 'pattern/local', localId);
       }
@@ -121,10 +118,11 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function buildPatternGuards(node: Syntax.Signature) {
+    const n = node;
     const newGuards: Syntax.Expressions = [];
 
     // Generate Guards from the Parameters
-    const { params } = node;
+    const { params } = n;
     params.forEach((param, idx) => {
       if (param instanceof Syntax.PatternParameter) {
         const ident = param.id || param.template('id', idx);
@@ -135,17 +133,17 @@ export default function createTreeProcessors(visit: Visitor) {
 
     // Combine the Guards
     if (newGuards.length) {
-      if (node.guard) {
+      if (n.guard) {
         // Push it to the end of the list
-        newGuards.push(node.guard);
+        newGuards.push(n.guard);
       }
-      node.guard = newGuards.shift();
+      n.guard = newGuards.shift();
       newGuards.forEach((newGuard) => {
-        node.guard = node.guard.template('and', node.guard, newGuard);
+        n.guard = n.guard.template('and', n.guard, newGuard);
       });
     }
 
-    return node;
+    return n;
   }
 
   function canGenerateEquality(elementValue: Syntax.Node) {

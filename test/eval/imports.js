@@ -1,21 +1,16 @@
 const nodeunit = require('nodeunit');
 
-const fate = require('../../dist/fate');
+const {
+  evaluate, compile, globals, createModule,
+} = require('../../dist/fate');
 
-const compile = fate.compile;
-const evaluate = fate.evaluate;
-const globals = fate.globals;
-const createModule = fate.createModule;
-
-const resolvers = require('../../dist/resolvers');
-
-const createMemoryResolver = resolvers.createMemoryResolver;
-const createFileResolver = resolvers.createFileResolver;
+const {
+  createMemoryResolver, createFileResolver,
+} = require('../../dist/resolvers');
 
 const runtime = require('../../dist/runtime');
 
 exports.imports = nodeunit.testCase({
-
   'helper imports': nodeunit.testCase({
     setUp(callback) {
       const resolver = createMemoryResolver();
@@ -44,7 +39,7 @@ exports.imports = nodeunit.testCase({
       callback();
     },
 
-    'Helper Import': function (test) {
+    'Helper Import': (test) => {
       const script1 = `import helpers
                      helpers.testHelper(1,2)`;
 
@@ -76,7 +71,7 @@ exports.imports = nodeunit.testCase({
       callback();
     },
 
-    'Module Retrieval': function (test) {
+    'Module Retrieval': (test) => {
       const found = runtime.resolve('test');
       const notFound = runtime.resolve('unknown');
       test.ok(runtime.isObject(found));
@@ -84,7 +79,7 @@ exports.imports = nodeunit.testCase({
       test.done();
     },
 
-    'File Import': function (test) {
+    'File Import': (test) => {
       const script = `import test as t
                     t.renderTest('Curly')`;
 
@@ -92,7 +87,7 @@ exports.imports = nodeunit.testCase({
       test.done();
     },
 
-    'File Submodule Import': function (test) {
+    'File Submodule Import': (test) => {
       const script1 = `import module1
                      module1.test_value`;
       const script2 = `import module2
@@ -118,7 +113,7 @@ exports.imports = nodeunit.testCase({
       callback();
     },
 
-    'System Import': function (test) {
+    'System Import': (test) => {
       test.equal(evaluate(`
         import math
         math.round(9.5)
@@ -148,7 +143,7 @@ exports.imports = nodeunit.testCase({
       test.done();
     },
 
-    'Bound System Import': function (test) {
+    'Bound System Import': (test) => {
       const script = `from array import join
                     let a = ['this', 'is', 'an', 'array']
                     let j = join(_, '///')
@@ -158,7 +153,7 @@ exports.imports = nodeunit.testCase({
       test.done();
     },
 
-    'Math Constant Import': function (test) {
+    'Math Constant Import': (test) => {
       test.equal(evaluate(`
         import math
         math.E
@@ -172,7 +167,7 @@ exports.imports = nodeunit.testCase({
       test.done();
     },
 
-    'Missing Module Import': function (test) {
+    'Missing Module Import': (test) => {
       test.throws(() => {
         evaluate('import bogus1');
       }, 'should throw module not resolved');

@@ -1,13 +1,18 @@
 /** @flow */
 
+import type { Resolver } from './index';
 import type { Module, ModuleName } from '../fate';
 import { isObject } from '../runtime';
 
 import {
   compile, globals, isFateModule, createModule,
- } from '../fate';
+} from '../fate';
 
-type AnyMap = { [index: string]: any };
+
+export type MemoryResolver = Resolver & {
+  register(name: ModuleName, module: string | {}): void;
+  unregister(name: ModuleName): void;
+}
 
 /*
  * Creates a new MemoryResolver.  As its name implies, this resolver
@@ -16,11 +21,11 @@ type AnyMap = { [index: string]: any };
  * Because of its flexibility, it can also be used to store custom
  * modules and native JavaScript helpers.
  */
-export function createMemoryResolver() {
+export function createMemoryResolver(): MemoryResolver {
   const cache: { [index: string]: Module } = {};
   return { resolve, unregister, register };
 
-  function resolve(name: ModuleName) {
+  function resolve(name: ModuleName, basePath?: string): ?Module {
     const result = cache[name];
     if (!result) {
       return undefined;
@@ -38,10 +43,10 @@ export function createMemoryResolver() {
   /*
    * Registers a module in the module cache.
    */
-  function register(name: ModuleName, module: string | AnyMap) {
+  function register(name: ModuleName, module: string | {}) {
     // A compiled Fate Module function
     if (isFateModule(module)) {
-      cache[name] = module;
+      cache[name] = (module: any);
       return;
     }
 

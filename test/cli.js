@@ -2,16 +2,13 @@ const fs = require('fs');
 const nodeunit = require('nodeunit');
 const compiler = require('../dist/cli/compiler').commandLine;
 const interpreter = require('../dist/cli/interpreter').commandLine;
-const helpers = require('./helpers');
-
-const createConsole = helpers.createConsole;
-
+const { createConsole, monkeyPatchRequires } = require('./helpers');
 const runtime = require('../dist/runtime');
 
 const baseDir = './test/assets';
 
 exports.cli = nodeunit.testCase({
-  'Command Line Help': function (test) {
+  'Command Line Help': (test) => {
     const cons = createConsole();
     compiler([], cons, () => {
       test.ok(cons.contains('Usage'));
@@ -19,7 +16,7 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  'Bad Arguments': function (test) {
+  'Bad Arguments': (test) => {
     const cons = createConsole();
     compiler(['--poo'], cons, () => {
       test.ok(cons.contains('Usage'));
@@ -27,7 +24,7 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  'Successful Compile': function (test) {
+  'Successful Compile': (test) => {
     const cons = createConsole();
     compiler([`${baseDir}/cli_success/*.fate`], cons, () => {
       test.ok(cons.contains('Fate Compilation Complete'));
@@ -35,7 +32,7 @@ exports.cli = nodeunit.testCase({
       test.ok(!cons.contains('Warnings'));
       test.ok(!cons.contains('Failures'));
 
-      helpers.monkeyPatchRequires('./test', {
+      monkeyPatchRequires('./test', {
         'fatejs/dist/runtime': '../../../dist/runtime',
         'fatejs/dist/fate': '../../../dist/fate',
       });
@@ -51,7 +48,7 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  'Warning Compile': function (test) {
+  'Warning Compile': (test) => {
     const cons = createConsole();
     compiler([`${baseDir}/cli_warning/*.fate`], cons, () => {
       test.ok(cons.contains('Fate Compilation Complete'));
@@ -67,7 +64,7 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  'Failure Compile': function (test) {
+  'Failure Compile': (test) => {
     const cons = createConsole();
     compiler(['--in', `${baseDir}/cli_failure/`], cons, () => {
       test.ok(cons.contains('Fate Compilation Complete'));
@@ -79,7 +76,7 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  'Empty Path': function (test) {
+  'Empty Path': (test) => {
     const cons = createConsole();
     compiler([`${baseDir}/cli_empty/*.fate`], cons, () => {
       test.ok(!cons.contains('Fate Compilation Complete'));
@@ -91,7 +88,7 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  'Parse Only': function (test) {
+  'Parse Only': (test) => {
     const cons = createConsole();
     compiler(['--parse', `${baseDir}/cli_success/*.fate`], cons, () => {
       test.ok(cons.contains('Fate Compilation Complete'));
@@ -102,7 +99,7 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  'Clean Compiled Files': function (test) {
+  'Clean Compiled Files': (test) => {
     const cons = createConsole();
 
     compiler([`${baseDir}/cli_success/*.fate`], cons, () => {
@@ -118,7 +115,7 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  'Mutually Exclusive Actions': function (test) {
+  'Mutually Exclusive Actions': (test) => {
     const cons = createConsole();
 
     compiler(['--clean', '--parse'], cons, () => {
@@ -128,7 +125,7 @@ exports.cli = nodeunit.testCase({
     });
   },
 
-  'Multiple Input Paths': function (test) {
+  'Multiple Input Paths': (test) => {
     const cons = createConsole();
     compiler(['--parse', `${baseDir}/cli_success/*.fate`,
               `${baseDir}/cli_warning/*.fate`], cons, () => {

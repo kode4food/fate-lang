@@ -24,13 +24,7 @@ export type ModuleExports = {
   [index: string]: any;
 }
 
-type Globals = {
-  [index: string]: any;
-  __filename: ?string;
-  __dirname: ?string;
-};
-
-const DefaultGlobals: Globals = {
+const DefaultGlobals = {
   __filename: undefined,
   __dirname: undefined,
 };
@@ -52,7 +46,7 @@ export function compile(script: ScriptContent) {
  * Convenience function to compile and execute a script against a context
  * Object.  Not generally recommended.
  */
-export function evaluate(script: ScriptContent, context?: Object) {
+export function evaluate(script: ScriptContent, context?: {}) {
   const compiled = compile(script);
   const module = { exports: {} };
   return compiled(globals(context), module);
@@ -62,14 +56,14 @@ export function evaluate(script: ScriptContent, context?: Object) {
  * Loads and immediately invokes the named script.  Any exported symbols will
  * be placed in the exports Object.
  */
-export function runScript(filename: string, exports: Object) {
+export function runScript(filename: string, exports: {}) {
   const content = readFileSync(filename, 'utf8');
   const compiledOutput = compileModule(content).scriptBody;
   const generatedModule = generateFunction(compiledOutput);
   generatedModule(globals({ __filename: filename }), exports);
 }
 
-export function globals(extensions?: Object) {
+export function globals(extensions?: {}) {
   if (isObject(extensions)) {
     const result = Object.create(DefaultGlobals);
     mixin(result, extensions);

@@ -1,4 +1,4 @@
-const mixin = require('../dist/runtime').mixin;
+const { mixin } = require('../dist/runtime');
 
 mixin(
   exports,

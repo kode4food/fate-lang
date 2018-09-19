@@ -1,18 +1,11 @@
 const nodeunit = require('nodeunit');
-const fate = require('../../dist/fate');
-const helpers = require('../helpers');
+const { evaluate } = require('../../dist/fate');
+const { evaluateEmit } = require('../helpers');
 
-const evaluate = fate.evaluate;
-const evaluateEmit = helpers.evaluateEmit;
+const testData = { greeting: 'Hello, World!' };
 
 exports.scope = nodeunit.testCase({
-  setUp(callback) {
-    this.globals = { greeting: 'Hello, World!' };
-
-    callback();
-  },
-
-  'Shadow Local Scope': function (test) {
+  'Shadow Local Scope': (test) => {
     const script1 = `let greeting = 'Not Hello'
                    def localGreeting()
                      let greeting = 'Local Hello'
@@ -31,19 +24,19 @@ exports.scope = nodeunit.testCase({
                    end
                    localGreeting() + ' ' + greeting`;
 
-    test.equal(evaluate(script1, this.globals), 'Local Hello Not Hello');
-    test.equal(evaluate(script2, this.globals),
+    test.equal(evaluate(script1, testData), 'Local Hello Not Hello');
+    test.equal(evaluate(script2, testData),
                'More Local Hello Local Hello Not Hello');
-    test.equal(evaluate('global.greeting', this.globals), 'Hello, World!');
+    test.equal(evaluate('global.greeting', testData), 'Hello, World!');
 
-    test.throws(function () {
-      evaluate('greeting', this.globals);
+    test.throws(() => {
+      evaluate('greeting', testData);
     });
 
     test.done();
   },
 
-  'Inherit Local Scope': function (test) {
+  'Inherit Local Scope': (test) => {
     const script1 = `let greeting = 'Outer Hello'
                    def localGreeting()
                      global.emit(greeting)
@@ -57,7 +50,7 @@ exports.scope = nodeunit.testCase({
     test.done();
   },
 
-  'Scope Override': function (test) {
+  'Scope Override': (test) => {
     const script = `let b = global.a
                   let a = 'child'
                   b + ' ' + a`;
@@ -66,7 +59,7 @@ exports.scope = nodeunit.testCase({
     test.done();
   },
 
-  'Conditional Scope': function (test) {
+  'Conditional Scope': (test) => {
     const script = `let a=global.a, b=global.b
                   let c = a
                   if b

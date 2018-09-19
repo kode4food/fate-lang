@@ -40,7 +40,7 @@ export class ReduceEvaluator extends NodeEvaluator {
 }
 
 class LoopEvaluator extends NodeEvaluator {
-  createLoop(ranges: Syntax.Ranges, createBody: Function, successVar?: string) {
+  createLoop(ranges: Syntax.Ranges, createBody: Function, successVar: string) {
     const self = this;
     processRange(0);
 
@@ -185,7 +185,7 @@ export class ForEvaluator extends LoopEvaluator {
       });
     }
 
-    function generateReduceLoop(successVar?: string) {
+    function generateReduceLoop(successVar: string) {
       generateReduceInitializers();
       createAnonymousCounters();
       generateAnonymousAssignments();
@@ -193,7 +193,7 @@ export class ForEvaluator extends LoopEvaluator {
       generateResultAssignments();
     }
 
-    function generateForLoop(successVar?: string) {
+    function generateForLoop(successVar: string) {
       self.coder.statement(() => {
         self.createLoop(self.node.ranges, generateBody, successVar);
       });

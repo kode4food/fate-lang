@@ -2,25 +2,27 @@
 
 import { resolve as resolvePath } from 'path';
 
-import type { ModuleName, DirPath } from '../fate';
+import type { Resolver } from './index';
+import type { Module, ModuleName, DirPath } from '../fate';
 import { createModule } from '../fate';
 
 const nodeModuleRegex = /^node:(.*)$/;
 const relativePathRegex = /^\.|\../;
 
-export function createNodeResolver() {
+export function createNodeResolver(): Resolver {
   return { resolve };
 
-  function resolve(name: ModuleName, basePath?: DirPath) {
+  function resolve(name: ModuleName, basePath?: DirPath): ?Module {
+    let n = name;
+    const explicit = nodeModuleRegex.exec(n);
+    if (explicit) {
+      // eslint-disable-next-line prefer-destructuring
+      n = explicit[1];
+    } else if (basePath && relativePathRegex.test(n)) {
+      n = resolvePath(basePath, n);
+    }
     try {
-      const explicit = nodeModuleRegex.exec(name);
-      if (explicit) {
-        // eslint-disable-next-line prefer-destructuring
-        name = explicit[1];
-      } else if (basePath && relativePathRegex.test(name)) {
-        name = resolvePath(basePath, name);
-      }
-      return createModule(require(name));
+      return createModule(require(n));
     } catch (err) {
       return undefined;
     }

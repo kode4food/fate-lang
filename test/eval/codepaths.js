@@ -1,133 +1,127 @@
 const nodeunit = require('nodeunit');
-const fate = require('../../dist/fate');
+const { evaluate } = require('../../dist/fate');
 
-const evaluate = fate.evaluate;
+const testData = {
+  low_number: 12,
+  high_number: 20,
+  true_val: true,
+  false_val: false,
+  null_value: null,
+  undefined_value: undefined,
+  obj_value: {
+    name: 'Thom',
+    age: 42,
+  },
+  name_key: 'name',
+  missing_key: 'missing',
+};
 
 exports.codepaths = nodeunit.testCase({
-  setUp(callback) {
-    this.data = {
-      low_number: 12,
-      high_number: 20,
-      true_val: true,
-      false_val: false,
-      null_value: null,
-      undefined_value: undefined,
-      obj_value: {
-        name: 'Thom',
-        age: 42,
-      },
-      name_key: 'name',
-      missing_key: 'missing',
-    };
-
-    callback();
-  },
-
-  'No Literals': function (test) {
-    test.equal(evaluate('global.low_number < global.high_number', this.data), true);
-    test.equal(evaluate('global.low_number <= global.high_number', this.data), true);
-    test.equal(evaluate('global.high_number > global.low_number', this.data), true);
-    test.equal(evaluate('global.high_number >= global.low_number', this.data), true);
-    test.equal(evaluate('global.low_number = global.low_number', this.data), true);
-    test.equal(evaluate('global.high_number != global.low_number', this.data), true);
-    test.equal(evaluate('global.low_number + global.high_number', this.data), 32);
-    test.equal(evaluate('global.high_number - global.low_number', this.data), 8);
-    test.equal(evaluate('global.high_number * global.low_number', this.data), 240);
-    test.equal(evaluate('global.high_number / global.low_number', this.data), 1.6666666666666667);
-    test.equal(evaluate('global.high_number like global.high_number', this.data), true);
-    test.equal(evaluate('global.high_number mod global.low_number', this.data), 8);
-    test.equal(evaluate('global.true_val and global.true_val', this.data), true);
-    test.equal(evaluate('global.false_val and global.true_val', this.data), false);
-    test.equal(evaluate('global.false_val or global.true_val', this.data), true);
-    test.equal(evaluate('global.true_val or global.false_val', this.data), true);
+  'No Literals': (test) => {
+    test.equal(evaluate('global.low_number < global.high_number', testData), true);
+    test.equal(evaluate('global.low_number <= global.high_number', testData), true);
+    test.equal(evaluate('global.high_number > global.low_number', testData), true);
+    test.equal(evaluate('global.high_number >= global.low_number', testData), true);
+    test.equal(evaluate('global.low_number = global.low_number', testData), true);
+    test.equal(evaluate('global.high_number != global.low_number', testData), true);
+    test.equal(evaluate('global.low_number + global.high_number', testData), 32);
+    test.equal(evaluate('global.high_number - global.low_number', testData), 8);
+    test.equal(evaluate('global.high_number * global.low_number', testData), 240);
+    test.equal(evaluate('global.high_number / global.low_number', testData), 1.6666666666666667);
+    test.equal(evaluate('global.high_number like global.high_number', testData), true);
+    test.equal(evaluate('global.high_number mod global.low_number', testData), 8);
+    test.equal(evaluate('global.true_val and global.true_val', testData), true);
+    test.equal(evaluate('global.false_val and global.true_val', testData), false);
+    test.equal(evaluate('global.false_val or global.true_val', testData), true);
+    test.equal(evaluate('global.true_val or global.false_val', testData), true);
     test.done();
   },
 
-  'Left Literal': function (test) {
-    test.equal(evaluate('12 < global.high_number', this.data), true);
-    test.equal(evaluate('12 <= global.high_number', this.data), true);
-    test.equal(evaluate('20 > global.low_number', this.data), true);
-    test.equal(evaluate('20 >= global.low_number', this.data), true);
-    test.equal(evaluate('12 = global.low_number', this.data), true);
-    test.equal(evaluate('20 != global.low_number', this.data), true);
-    test.equal(evaluate('12 + global.high_number', this.data), 32);
-    test.equal(evaluate('20 - global.low_number', this.data), 8);
-    test.equal(evaluate('20 * global.low_number', this.data), 240);
-    test.equal(evaluate('20 / global.low_number', this.data), 1.6666666666666667);
-    test.equal(evaluate('20 like global.high_number', this.data), true);
-    test.equal(evaluate('20 mod global.low_number', this.data), 8);
-    test.equal(evaluate('true and global.true_val', this.data), true);
-    test.equal(evaluate('false and global.true_val', this.data), false);
-    test.equal(evaluate('false or global.true_val', this.data), true);
-    test.equal(evaluate('true or global.false_val', this.data), true);
+  'Left Literal': (test) => {
+    test.equal(evaluate('12 < global.high_number', testData), true);
+    test.equal(evaluate('12 <= global.high_number', testData), true);
+    test.equal(evaluate('20 > global.low_number', testData), true);
+    test.equal(evaluate('20 >= global.low_number', testData), true);
+    test.equal(evaluate('12 = global.low_number', testData), true);
+    test.equal(evaluate('20 != global.low_number', testData), true);
+    test.equal(evaluate('12 + global.high_number', testData), 32);
+    test.equal(evaluate('20 - global.low_number', testData), 8);
+    test.equal(evaluate('20 * global.low_number', testData), 240);
+    test.equal(evaluate('20 / global.low_number', testData), 1.6666666666666667);
+    test.equal(evaluate('20 like global.high_number', testData), true);
+    test.equal(evaluate('20 mod global.low_number', testData), 8);
+    test.equal(evaluate('true and global.true_val', testData), true);
+    test.equal(evaluate('false and global.true_val', testData), false);
+    test.equal(evaluate('false or global.true_val', testData), true);
+    test.equal(evaluate('true or global.false_val', testData), true);
     test.done();
   },
 
-  'Right Literal': function (test) {
-    test.equal(evaluate('global.low_number < 20', this.data), true);
-    test.equal(evaluate('global.low_number <= 20', this.data), true);
-    test.equal(evaluate('global.high_number > 12', this.data), true);
-    test.equal(evaluate('global.high_number >= 12', this.data), true);
-    test.equal(evaluate('global.low_number = 12', this.data), true);
-    test.equal(evaluate('global.high_number != 12', this.data), true);
-    test.equal(evaluate('global.low_number + 20', this.data), 32);
-    test.equal(evaluate('global.high_number - 12', this.data), 8);
-    test.equal(evaluate('global.high_number * 12', this.data), 240);
-    test.equal(evaluate('global.high_number / 12', this.data), 1.6666666666666667);
-    test.equal(evaluate('global.high_number like 20', this.data), true);
-    test.equal(evaluate('global.high_number mod 12', this.data), 8);
-    test.equal(evaluate('global.true_val and true', this.data), true);
-    test.equal(evaluate('global.false_val and true', this.data), false);
-    test.equal(evaluate('global.false_val or true', this.data), true);
-    test.equal(evaluate('global.true_val or false', this.data), true);
+  'Right Literal': (test) => {
+    test.equal(evaluate('global.low_number < 20', testData), true);
+    test.equal(evaluate('global.low_number <= 20', testData), true);
+    test.equal(evaluate('global.high_number > 12', testData), true);
+    test.equal(evaluate('global.high_number >= 12', testData), true);
+    test.equal(evaluate('global.low_number = 12', testData), true);
+    test.equal(evaluate('global.high_number != 12', testData), true);
+    test.equal(evaluate('global.low_number + 20', testData), 32);
+    test.equal(evaluate('global.high_number - 12', testData), 8);
+    test.equal(evaluate('global.high_number * 12', testData), 240);
+    test.equal(evaluate('global.high_number / 12', testData), 1.6666666666666667);
+    test.equal(evaluate('global.high_number like 20', testData), true);
+    test.equal(evaluate('global.high_number mod 12', testData), 8);
+    test.equal(evaluate('global.true_val and true', testData), true);
+    test.equal(evaluate('global.false_val and true', testData), false);
+    test.equal(evaluate('global.false_val or true', testData), true);
+    test.equal(evaluate('global.true_val or false', testData), true);
     test.done();
   },
 
-  'Both Literals': function (test) {
-    test.equal(evaluate('12 < 20', this.data), true);
-    test.equal(evaluate('12 <= 20', this.data), true);
-    test.equal(evaluate('20 > 12', this.data), true);
-    test.equal(evaluate('20 >= 20', this.data), true);
-    test.equal(evaluate('12 = 12', this.data), true);
-    test.equal(evaluate('20 != 12', this.data), true);
-    test.equal(evaluate('12 + 20', this.data), 32);
-    test.equal(evaluate('20 - 12', this.data), 8);
-    test.equal(evaluate('20 * 12', this.data), 240);
-    test.equal(evaluate('20 / 12', this.data), 1.6666666666666667);
-    test.equal(evaluate('20 like 20', this.data), true);
-    test.equal(evaluate('20 mod 12', this.data), 8);
-    test.equal(evaluate('true and true', this.data), true);
-    test.equal(evaluate('false and true', this.data), false);
-    test.equal(evaluate('false or true', this.data), true);
-    test.equal(evaluate('true or false', this.data), true);
+  'Both Literals': (test) => {
+    test.equal(evaluate('12 < 20', testData), true);
+    test.equal(evaluate('12 <= 20', testData), true);
+    test.equal(evaluate('20 > 12', testData), true);
+    test.equal(evaluate('20 >= 20', testData), true);
+    test.equal(evaluate('12 = 12', testData), true);
+    test.equal(evaluate('20 != 12', testData), true);
+    test.equal(evaluate('12 + 20', testData), 32);
+    test.equal(evaluate('20 - 12', testData), 8);
+    test.equal(evaluate('20 * 12', testData), 240);
+    test.equal(evaluate('20 / 12', testData), 1.6666666666666667);
+    test.equal(evaluate('20 like 20', testData), true);
+    test.equal(evaluate('20 mod 12', testData), 8);
+    test.equal(evaluate('true and true', testData), true);
+    test.equal(evaluate('false and true', testData), false);
+    test.equal(evaluate('false or true', testData), true);
+    test.equal(evaluate('true or false', testData), true);
     test.done();
   },
 
   Conditional(test) {
-    test.equal(evaluate('true if true else false', this.data), true);
-    test.equal(evaluate('true if global.true_val else false', this.data), true);
-    test.equal(evaluate('true if true else global.false_val', this.data), true);
-    test.equal(evaluate('true if global.true_val else global.false_val', this.data), true);
-    test.equal(evaluate('global.true_val if true else false', this.data), true);
-    test.equal(evaluate('global.true_val if global.true_val else false', this.data), true);
-    test.equal(evaluate('global.true_val if true else global.false_val', this.data), true);
-    test.equal(evaluate('global.true_val if global.true_val else global.false_val', this.data), true);
-    test.equal(evaluate('global.true_val if not global.false_val else global.false_val', this.data), true);
+    test.equal(evaluate('true if true else false', testData), true);
+    test.equal(evaluate('true if global.true_val else false', testData), true);
+    test.equal(evaluate('true if true else global.false_val', testData), true);
+    test.equal(evaluate('true if global.true_val else global.false_val', testData), true);
+    test.equal(evaluate('global.true_val if true else false', testData), true);
+    test.equal(evaluate('global.true_val if global.true_val else false', testData), true);
+    test.equal(evaluate('global.true_val if true else global.false_val', testData), true);
+    test.equal(evaluate('global.true_val if global.true_val else global.false_val', testData), true);
+    test.equal(evaluate('global.true_val if not global.false_val else global.false_val', testData), true);
 
-    test.equal(evaluate('true if false else false', this.data), false);
-    test.equal(evaluate('true if global.false_val else false', this.data), false);
-    test.equal(evaluate('true if false else global.false_val', this.data), false);
-    test.equal(evaluate('true if global.false_val else global.false_val', this.data), false);
-    test.equal(evaluate('global.true_val if false else false', this.data), false);
-    test.equal(evaluate('global.true_val if global.false_val else false', this.data), false);
-    test.equal(evaluate('global.true_val if false else global.false_val', this.data), false);
-    test.equal(evaluate('global.true_val if global.false_val else global.false_val', this.data), false);
-    test.equal(evaluate('global.true_val if not global.true_val else global.false_val', this.data), false);
+    test.equal(evaluate('true if false else false', testData), false);
+    test.equal(evaluate('true if global.false_val else false', testData), false);
+    test.equal(evaluate('true if false else global.false_val', testData), false);
+    test.equal(evaluate('true if global.false_val else global.false_val', testData), false);
+    test.equal(evaluate('global.true_val if false else false', testData), false);
+    test.equal(evaluate('global.true_val if global.false_val else false', testData), false);
+    test.equal(evaluate('global.true_val if false else global.false_val', testData), false);
+    test.equal(evaluate('global.true_val if global.false_val else global.false_val', testData), false);
+    test.equal(evaluate('global.true_val if not global.true_val else global.false_val', testData), false);
 
     test.done();
   },
 
-  "'if' with literals": function (test) {
+  "'if' with literals": (test) => {
     const script1 = `if true
                      'was true'
                    else
@@ -156,14 +150,14 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
-  "'self' outside Function": function (test) {
+  "'self' outside Function": (test) => {
     test.throws(() => {
       evaluate("self('hello')");
     }, 'self called outside of a Function should explode');
     test.done();
   },
 
-  "'await' expressions": function (test) {
+  "'await' expressions": (test) => {
     test.ok(evaluate(`
       let x = 0
       do
@@ -190,7 +184,7 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
-  "'emit' statements": function (test) {
+  "'emit' statements": (test) => {
     test.throws(() => {
       evaluate("emit 'blah'");
     }, "emit called outside of 'generate' block should explode");
@@ -216,14 +210,14 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
-  'Wildcard outside Binding': function (test) {
+  'Wildcard outside Binding': (test) => {
     test.throws(() => {
       evaluate('_ < 99');
     }, 'Wildcard used outside of a binding');
     test.done();
   },
 
-  'Duplicated Arg Names': function (test) {
+  'Duplicated Arg Names': (test) => {
     test.throws(() => {
       evaluate(`
         def someFunction(arg1, arg2, arg1, arg3, arg2)
@@ -243,14 +237,14 @@ exports.codepaths = nodeunit.testCase({
 
   Membership(test) {
     test.throws(() => {
-      evaluate('global.null_value[global.null_value]', this.data);
+      evaluate('global.null_value[global.null_value]', testData);
     });
 
-    test.equal(evaluate('global.obj_value.name', this.data), 'Thom');
-    test.equal(evaluate("global.obj_value['name']", this.data), 'Thom');
-    test.equal(evaluate('global.obj_value[global.name_key]', this.data), 'Thom');
-    test.equal(evaluate('global.obj_value.missing', this.data), undefined);
-    test.equal(evaluate('global.obj_value[global.missing_key]', this.data), undefined);
+    test.equal(evaluate('global.obj_value.name', testData), 'Thom');
+    test.equal(evaluate("global.obj_value['name']", testData), 'Thom');
+    test.equal(evaluate('global.obj_value[global.name_key]', testData), 'Thom');
+    test.equal(evaluate('global.obj_value.missing', testData), undefined);
+    test.equal(evaluate('global.obj_value[global.missing_key]', testData), undefined);
 
     test.done();
   },
@@ -326,7 +320,7 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
-  'Parameter Ordering': function (test) {
+  'Parameter Ordering': (test) => {
     test.throws(() => {
       evaluate(`
         def test(a*, b)
@@ -346,7 +340,7 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
-  'Missing Identifiers': function (test) {
+  'Missing Identifiers': (test) => {
     test.throws(() => {
       evaluate(`
         let a = 'hello'
@@ -378,7 +372,7 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
-  'For not Exportable': function (test) {
+  'For not Exportable': (test) => {
     test.throws(() => {
       evaluate(`
         export for i in [1,2,3]
@@ -390,7 +384,7 @@ exports.codepaths = nodeunit.testCase({
     test.done();
   },
 
-  'Relative References': function (test) {
+  'Relative References': (test) => {
     test.throws(() => {
       evaluate('.someValue');
     });

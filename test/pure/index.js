@@ -1,5 +1,3 @@
-/** @flow */
-
 // Needed to enable Fate script require()
 require('../../dist/fate');
 

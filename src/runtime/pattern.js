@@ -3,8 +3,6 @@
 type Matcher = (value: any) => boolean;
 type Matchers = Matcher[];
 
-type AnyMap = { [index: string]: any };
-
 export type Pattern = {
   (obj: any): boolean;
   __fate?: string;
@@ -111,7 +109,7 @@ export function isMatch(template: any, obj: any) {
       return false;
     }
 
-    for (let i = 0, len = template.length; i < len; i++) {
+    for (let i = 0, len = template.length; i < len; i += 1) {
       if (!isMatch(template[i], obj[i])) {
         return false;
       }
@@ -159,7 +157,7 @@ function buildArrayMatcher(template: any[]) {
   const matchers: Matchers = [];
   const mlen = template.length;
 
-  for (let i = 0; i < mlen; i++) {
+  for (let i = 0; i < mlen; i += 1) {
     matchers.push(nestedMatcher(template[i]));
   }
   return arrayMatcher;
@@ -171,7 +169,7 @@ function buildArrayMatcher(template: any[]) {
     if (!isArray(obj) || obj.length < mlen) {
       return false;
     }
-    for (let i = 0; i < mlen; i++) {
+    for (let i = 0; i < mlen; i += 1) {
       if (!matchers[i](obj[i])) {
         return false;
       }
@@ -180,12 +178,12 @@ function buildArrayMatcher(template: any[]) {
   }
 }
 
-function buildObjectMatcher(template: AnyMap) {
+function buildObjectMatcher(template: {}) {
   const matchers: Matchers = [];
   const keys = Object.keys(template);
   const mlen = keys.length;
 
-  for (let i = 0; i < mlen; i++) {
+  for (let i = 0; i < mlen; i += 1) {
     matchers.push(nestedMatcher(template[keys[i]]));
   }
   return objectMatcher;
@@ -194,7 +192,7 @@ function buildObjectMatcher(template: AnyMap) {
     if (typeof obj !== 'object' || obj === null) {
       return false;
     }
-    for (let i = 0; i < mlen; i++) {
+    for (let i = 0; i < mlen; i += 1) {
       if (!matchers[i](obj[keys[i]])) {
         return false;
       }

@@ -10,8 +10,6 @@ const jsonStringify = JSON.stringify;
 const jsStringIdRegex = /^(["'])([$_a-zA-Z][$_a-zA-Z0-9]*)\1$/;
 const anonIdRegex = /^ anon_[a-zA-Z0-9]+$/;
 
-type StringMap = { [index: string]: string };
-
 type GlobalId = Target.Id;
 type NameIdsMap = { [index: string]: Target.Ids };
 type Modifications = Modification[];
@@ -42,7 +40,7 @@ type Modification = {
 }
 
 // presented operators are symbolic
-const operatorMap: StringMap = {
+const operatorMap = {
   eq: '===',
   neq: '!==',
   gt: '>',
@@ -568,7 +566,7 @@ export function createCoder(): Target.Coder {
       const sourceIds: Target.Ids = [];
       const modificationSet = modificationSets[key];
 
-      for (let i = 0; i < branches.length; i++) {
+      for (let i = 0; i < branches.length; i += 1) {
         const modifications = modificationSet[i];
         if (!modifications) {
           sourceIds[i] = passthruId;

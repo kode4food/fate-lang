@@ -7,9 +7,7 @@ import { isArray } from '../../runtime';
 
 const { Visitor, getAnnotation, annotate } = Syntax;
 
-type Type = string;
-
-function addTypeEntry(typeKey: string, node: Syntax.Node, type: Type) {
+function addTypeEntry(typeKey: string, node: Syntax.Node, type: string) {
   let types = getAnnotation(node, typeKey);
   if (!types) {
     annotate(node, typeKey, types = []);

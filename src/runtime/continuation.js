@@ -26,7 +26,7 @@ class Scheduler {
     this.queueLength = 0;
   }
 
-  queue(callback: Function, target?: Object): void {
+  queue(callback: Function, target?: {}): void {
     const { queueLength } = this;
     this[queueLength] = callback;
     this[queueLength + 1] = target;
@@ -41,11 +41,12 @@ class Scheduler {
     const { queueIndex, queueLength } = this;
     let i = 0;
     const remainingLength = queueLength - queueIndex;
-    for (; i < remainingLength; i++) {
+    for (; i < remainingLength; i += 1) {
       this[i] = this[queueIndex + i];
     }
     while (i < queueLength) {
-      this[i++] = undefined;
+      this[i] = undefined;
+      i += 1;
     }
     this.queueIndex = 0;
     this.queueLength = remainingLength;
@@ -126,7 +127,8 @@ export class Continuation {
       return;
     }
 
-    this.pendingHandlers[this.pendingLength++] = pending;
+    this.pendingHandlers[this.pendingLength] = pending;
+    this.pendingLength += 1;
   }
 
   settlePending(pending: PendingHandler): void {
@@ -168,7 +170,7 @@ export class Continuation {
     }
 
     const { pendingHandlers } = this;
-    for (let i = 0, len = this.pendingLength; i < len; i++) {
+    for (let i = 0, len = this.pendingLength; i < len; i += 1) {
       this.settlePending(pendingHandlers[i]);
       pendingHandlers[i] = undefined;
     }
