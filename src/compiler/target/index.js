@@ -25,7 +25,7 @@ export type Literal = string | Id;
 export type GeneratedCode = string;
 
 export type LoopOptions = {
-  name?: Name;
+  name: ?Name;
   value: Name;
   collection: BodyEntry;
   guard: BodyEntry;
@@ -55,7 +55,7 @@ export type Coder = {
   member(object: BodyEntry, property: BodyEntry): void;
   retrieveAnonymous(name: Name): void;
   assignAnonymous(name: Name, value: BodyEntry): void;
-  registerAnonymous(id: string): void;
+  registerAnonymous(id: string): Name;
   createAnonymous(): Name;
   createCounter(id: Id): void;
   incrementCounter(id: Id): void;

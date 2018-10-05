@@ -24,7 +24,7 @@ export type ModuleExports = {
   [index: string]: any;
 }
 
-const DefaultGlobals = {
+const defaultGlobals = {
   __filename: undefined,
   __dirname: undefined,
 };
@@ -65,14 +65,14 @@ export function runScript(filename: string, exports: {}) {
 
 export function globals(extensions?: {}) {
   if (isObject(extensions)) {
-    const result = Object.create(DefaultGlobals);
+    const result = Object.create(defaultGlobals);
     mixin(result, extensions);
     if (!result.__dirname && result.__filename) {
       result.__dirname = dirname(result.__filename);
     }
     return result;
   }
-  return DefaultGlobals;
+  return defaultGlobals;
 }
 
 export function createModule(moduleExports?: ModuleExports) {

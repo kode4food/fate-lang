@@ -1,6 +1,7 @@
 /** @flow */
 
 import * as Syntax from '../syntax';
+import { isArray } from '../../runtime';
 
 const {
   Visitor, annotate, hasAnnotation, getAnnotation, Cardinality,
@@ -40,7 +41,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function createBarrierValidator(container: Syntax.Tag,
-    barriers: Syntax.Tags) {
+                                  barriers: Syntax.Tags) {
     return (node: Syntax.Node) => {
       const containerAncestors = visit.hasAncestorTags(container);
       const barrierAncestors = visit.hasAncestorTags(barriers);
@@ -79,7 +80,7 @@ export default function createTreeProcessors(visit: Visitor) {
   }
 
   function checkParamsForDuplication(node: Syntax.Node,
-    signatures: Syntax.Signatures) {
+                                     signatures: Syntax.Signatures) {
     const encounteredNames: NameSet = {};
     const duplicatedNames: NameSet = {};
     signatures.forEach((signature) => {
@@ -140,8 +141,7 @@ export default function createTreeProcessors(visit: Visitor) {
     }
 
     visit.nodeStack.forEach((parent) => {
-      if (parent instanceof Syntax.Node
-        && Syntax.hasTag(parent, whenAssigns)) {
+      if (Syntax.isNode(parent) && Syntax.hasTag(parent, whenAssigns)) {
         addDoReference(parent, node);
       }
     });

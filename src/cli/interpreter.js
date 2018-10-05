@@ -22,7 +22,7 @@ export function commandLine(inputArgs: string[], console: Console,
     return;
   }
 
-  const match = /^(.+?)?(\.fate)?$/.exec(args._[0]);
+  const match = (/^(.+?)?(\.fate)?$/.exec(args._[0]): any);
   const filename = `${match[1]}.fate`;
   runScript(filename, createModule());
   completedCallback(0);

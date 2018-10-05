@@ -14,22 +14,16 @@ function noOp() {
 }
 
 class Scheduler {
-  capacity: number;
-  isFlushing: boolean;
-  queueIndex: number;
-  queueLength: number;
-
-  constructor() {
-    this.capacity = 16 * 2;
-    this.isFlushing = false;
-    this.queueIndex = 0;
-    this.queueLength = 0;
-  }
+  entries: any[] = [];
+  capacity = 16 * 2;
+  isFlushing = false;
+  queueIndex = 0;
+  queueLength = 0;
 
   queue(callback: Function, target?: {}): void {
     const { queueLength } = this;
-    this[queueLength] = callback;
-    this[queueLength + 1] = target;
+    this.entries[queueLength] = callback;
+    this.entries[queueLength + 1] = target;
     this.queueLength = queueLength + 2;
     if (!this.isFlushing) {
       this.isFlushing = true;
@@ -42,10 +36,10 @@ class Scheduler {
     let i = 0;
     const remainingLength = queueLength - queueIndex;
     for (; i < remainingLength; i += 1) {
-      this[i] = this[queueIndex + i];
+      this.entries[i] = this.entries[queueIndex + i];
     }
     while (i < queueLength) {
-      this[i] = undefined;
+      this.entries[i] = undefined;
       i += 1;
     }
     this.queueIndex = 0;
@@ -55,8 +49,8 @@ class Scheduler {
   flushQueue(): void {
     while (this.queueIndex < this.queueLength) {
       const { queueIndex } = this;
-      const callback = this[queueIndex];
-      const target = this[queueIndex + 1];
+      const callback = this.entries[queueIndex];
+      const target = this.entries[queueIndex + 1];
       this.queueIndex = queueIndex + 2;
 
       if (this.queueLength > this.capacity) {
@@ -69,19 +63,15 @@ class Scheduler {
   }
 }
 
-const GlobalScheduler = new Scheduler();
+const globalScheduler = new Scheduler();
 
 export class Continuation {
-  isResolved: boolean;
+  isResolved = false;
   result: Result;
-  pendingHandler: ?PendingHandler;
-  pendingHandlers: ?PendingHandlers;
-  pendingLength: number;
+  pendingHandlers: PendingHandlers = [];
+  pendingLength = 0
 
   constructor(executor: Executor) {
-    this.isResolved = false;
-    this.pendingLength = 0;
-
     if (executor !== noOp) {
       this.resolveExecutor(executor);
     }
@@ -100,35 +90,22 @@ export class Continuation {
     }
     this.isResolved = true;
     this.result = result;
-    GlobalScheduler.queue(this.notifyPending, this);
+    globalScheduler.queue(this.notifyPending, this);
   }
 
   addPending(target: Continuation, onFulfilled: Handler): void {
     const pending: PendingHandler = [target, onFulfilled];
 
     if (this.isResolved === true) {
-      GlobalScheduler.queue(() => {
+      globalScheduler.queue(() => {
         this.settlePending(pending);
       });
       return;
     }
 
     const { pendingLength } = this;
-    if (pendingLength === 0) {
-      this.pendingHandler = pending;
-      this.pendingLength = 1;
-      return;
-    }
-
-    if (pendingLength === 1) {
-      this.pendingHandlers = [this.pendingHandler, pending];
-      this.pendingHandler = undefined;
-      this.pendingLength = 2;
-      return;
-    }
-
-    this.pendingHandlers[this.pendingLength] = pending;
-    this.pendingLength += 1;
+    this.pendingHandlers[pendingLength] = pending;
+    this.pendingLength = pendingLength + 1;
   }
 
   settlePending(pending: PendingHandler): void {
@@ -159,13 +136,6 @@ export class Continuation {
   notifyPending(): void {
     const { pendingLength } = this;
     if (pendingLength === 0) {
-      return;
-    }
-
-    if (pendingLength === 1) {
-      this.settlePending(this.pendingHandler);
-      this.pendingLength = 0;
-      this.pendingHandler = undefined;
       return;
     }
 

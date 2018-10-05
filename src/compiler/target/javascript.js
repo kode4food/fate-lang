@@ -1,11 +1,12 @@
 /** @flow */
 
 import type { ResolverValue } from '../syntax';
+import type { Literal, BodyEntries } from './index';
+
 import * as Target from './index';
-import { mixin } from '../../runtime';
+import { mixin, isArray } from '../../runtime';
 import { Resolver } from '../syntax';
 
-const { isArray } = Array;
 const jsonStringify = JSON.stringify;
 const jsStringIdRegex = /^(["'])([$_a-zA-Z][$_a-zA-Z0-9]*)\1$/;
 const anonIdRegex = /^ anon_[a-zA-Z0-9]+$/;
@@ -15,13 +16,13 @@ type NameIdsMap = { [index: string]: Target.Ids };
 type Modifications = Modification[];
 type NameModificationsMap = { [index: string]: Modifications };
 
-const FirstAccess = {
+const firstAccess = {
   Unknown: 0,
   Read: 1,
   Write: 2,
 };
 
-type FirstAccessValue = $Values<typeof FirstAccess>;
+type FirstAccessValue = $Values<typeof firstAccess>;
 
 type NameInfo = {
   names: NameIdsMap;
@@ -159,7 +160,7 @@ export function createCoder(): Target.Coder {
     return id;
   }
 
-  function literal(literalValue: any) {
+  function literal(literalValue: any): Literal {
     let canonical: string;
     if (literalValue instanceof RegExp) {
       canonical = literalValue.toString();
@@ -168,7 +169,7 @@ export function createCoder(): Target.Coder {
     }
 
     if (inlineLiteralTypes.indexOf(typeof literalValue) !== -1
-         && canonical.length <= inlineLiteralMaxLength) {
+        && canonical.length <= inlineLiteralMaxLength) {
       return canonical;
     }
 
@@ -267,7 +268,7 @@ export function createCoder(): Target.Coder {
       return names[name][0];
     }
     if (!scopeInfo.firstAccess[name]) {
-      scopeInfo.firstAccess[name] = FirstAccess.Write;
+      scopeInfo.firstAccess[name] = firstAccess.Write;
     }
     const ids = names[name] || (names[name] = []);
     ids.push(nextIdForName(name));
@@ -276,7 +277,7 @@ export function createCoder(): Target.Coder {
 
   function localForRead(name: Target.Name) {
     if (!scopeInfo.firstAccess[name]) {
-      scopeInfo.firstAccess[name] = FirstAccess.Read;
+      scopeInfo.firstAccess[name] = firstAccess.Read;
     }
     const ids = names[name] || (names[name] = [nextIdForName(name)]);
     return lastItem(ids);
@@ -323,7 +324,7 @@ export function createCoder(): Target.Coder {
     write(getAnonymousId(name), '=', value);
   }
 
-  function registerAnonymous(id: Target.Id): string {
+  function registerAnonymous(id: Target.Id): Target.Name {
     const name = ` ${id}`;
     names[name] = [id];
     return name;
@@ -458,7 +459,7 @@ export function createCoder(): Target.Coder {
   }
 
   function binaryOperator(operator: string, left: Target.BodyEntry,
-    right: Target.BodyEntry) {
+                          right: Target.BodyEntry) {
     write('(', code(left), operatorMap[operator], code(right), ')');
   }
 
@@ -495,7 +496,7 @@ export function createCoder(): Target.Coder {
   }
 
   function conditional(condition: Target.BodyEntry, trueVal: Target.BodyEntry,
-    falseVal: Target.BodyEntry) {
+                       falseVal: Target.BodyEntry) {
     const condCode = code(condition);
     const trueCode = code(trueVal);
     const falseCode = code(falseVal);
@@ -533,8 +534,8 @@ export function createCoder(): Target.Coder {
   }
 
   // code branches using static single assignment
-  function codeBranches(...branches: Target.BodyEntry[]) {
-    const branchContent: string[] = [];
+  function codeBranches(...branches: BodyEntries) {
+    const branchContent: BodyEntries = [];
 
     // step 1: Code the branches, gathering the assignments
     const originalNames = names;
@@ -640,7 +641,7 @@ export function createCoder(): Target.Coder {
   }
 
   function funcDeclaration(name: Target.Name,
-    options: Target.FunctionOptions) {
+                           options: Target.FunctionOptions) {
     statement(() => {
       assignResult(() => {
         const functionId = localForWrite(name);
@@ -715,7 +716,7 @@ export function createCoder(): Target.Coder {
   }
 
   function writeLocalVariables(parentNames: NameIdsMap,
-    argNames: Target.Names) {
+                               argNames: Target.Names) {
     const undefinedVars: Target.Names = [];
     Object.keys(names).forEach((name) => {
       const localNameIds = names[name];
@@ -771,7 +772,7 @@ export function createCoder(): Target.Coder {
   }
 
   function call(funcId: Target.Id | Target.BodyEntry,
-    args?: Target.BodyEntries) {
+                args?: Target.BodyEntries) {
     if (!args) {
       // pass through local arguments (for function chaining)
       write(funcId, '.apply(', thisOrSelf, ',arguments)');
@@ -837,7 +838,7 @@ export function createCoder(): Target.Coder {
     write('(', expr, ')');
   }
 
-  function code(value?: Target.BodyEntry | Target.BodyEntries): string {
+  function code(value: Target.BodyEntry | Target.BodyEntries): string {
     if (typeof value === 'function') {
       pushWriter();
       value();
@@ -848,6 +849,9 @@ export function createCoder(): Target.Coder {
       return value.map(code).join('');
     }
 
+    if (value === null) {
+      return '';
+    }
     return `${value}`;
   }
 

@@ -1,12 +1,11 @@
 /** @flow */
 
+import { isArray } from '../../runtime';
 import * as Syntax from '../syntax';
 
 const {
   Visitor, annotate, getAnnotation, hasAnnotation,
 } = Syntax;
-
-const { isArray } = Array;
 
 const scopeContainers = [
   'function', 'lambda', 'reduce', 'for', 'do', 'generate',
@@ -38,7 +37,7 @@ export default function createTreeProcessors(visit: Visitor) {
     const { nodeStack } = visit;
     for (let i = nodeStack.length - 1; i >= 0; i -= 1) {
       const node = nodeStack[i];
-      if (node instanceof Syntax.Node && isScopeContainer(node)) {
+      if (Syntax.isNode(node) && isScopeContainer(node)) {
         const ids = getAnnotation(node, 'scope/declarations');
         if (isArray(ids) && ids.indexOf(id.value) !== -1) {
           return true;
@@ -52,7 +51,7 @@ export default function createTreeProcessors(visit: Visitor) {
     const { nodeStack } = visit;
     for (let i = nodeStack.length - 1; i >= 0; i -= 1) {
       const node = nodeStack[i];
-      if (node instanceof Syntax.Node && isScopeContainer(node)) {
+      if (Syntax.isNode(node) && isScopeContainer(node)) {
         const ids = getAnnotation(node, 'scope/declarations') || [];
         if (ids.indexOf(id.value) === -1) {
           ids.push(id.value);

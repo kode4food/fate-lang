@@ -34,7 +34,7 @@ export default function createTreeProcessors(visit: Visitor) {
     visit.matching(validateContext, visit.tags('context')),
     visit.breadthMatching(annotateCollection, collections),
     visit.breadthMatching(annotateContext, nestedContext),
-    visit.matching(annotateComplexity, visit.isNode),
+    visit.matching(annotateComplexity, Syntax.isNode),
 
     visit.byTag({
       signature: buildPatternGuards,
@@ -50,7 +50,7 @@ export default function createTreeProcessors(visit: Visitor) {
 
   // patterns don't always have to exist within Patterns
   function rollUpPatterns(node: Syntax.Pattern) {
-    const parent = getParent();
+    const parent = ((getParent(): any): Syntax.Node);
     if (!Syntax.hasTag(parent, patternParentTags)) {
       return node;
     }

@@ -45,11 +45,8 @@ type CompilerResults = {
  *
  *     commandLine("--in", "./scripts", "--out", "./output");
  */
-export function commandLine(
-  inputArgs: string[],
-  console: Console,
-  completedCallback: Function,
-) {
+export function commandLine(inputArgs: string[], console: Console,
+                            completedCallback: Function) {
   let badArg = false;
 
   const args = minimist(inputArgs, {
@@ -206,9 +203,8 @@ export function compile(args: CompilerArguments, callback: Function) {
     }
 
     // Bleh, make this pretty
-    const processor = args.parse ? performParse
-                                 : args.clean ? performClean
-                                              : performCompile;
+    const processor = args.parse ? (inputPath, _) => performParse(inputPath)
+                                 : args.clean ? performClean : performCompile;
 
     files.forEach((file) => {
       const inputPath = join(inDir, file);
@@ -264,7 +260,7 @@ export function compile(args: CompilerArguments, callback: Function) {
 
 export function generateNodeModule(generatedCode: GeneratedCode) {
   const buffer: string[] = [];
-  buffer.push('/** @flow */');
+  buffer.push('"use strict";');
   buffer.push(`"fate-compiler:${VERSION}";`);
   buffer.push("const fate=require('fatejs/dist/fate');");
   buffer.push("const r=require('fatejs/dist/runtime');");

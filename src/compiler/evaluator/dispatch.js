@@ -49,10 +49,6 @@ export class DispatchEvaluator {
   }
 
   evaluate(node: Syntax.Node, ...args: any[]): void {
-    if (!(node instanceof Syntax.Node)) {
-      throw new Error('Stupid Coder: createEvaluator called without a Node');
-    }
-
     const nodeType = node.tag;
     const EvaluatorConstructor = this.ctors[nodeType];
 

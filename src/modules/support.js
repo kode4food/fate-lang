@@ -10,8 +10,8 @@ const number = Number;
 const timeout = setTimeout;
 const json = JSON;
 
-const Undefined: any = undefined;
-const Null: any = null;
+const Undefined = undefined;
+const Null = null;
 
 function make(Ctor: Function, ...args: any[]) {
   return new Ctor(...args);

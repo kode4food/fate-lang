@@ -40,7 +40,7 @@ export default function createTreeProcessors(visit: Visitor) {
   function visitLiteral(node: Syntax.Literal) {
     const { value } = node;
     let type = typeof value;
-    if (type === 'object' && isArray(value)) {
+    if (isArray(value)) {
       type = 'array';
     }
     addEvalType(node, type);

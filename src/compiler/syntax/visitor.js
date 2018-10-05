@@ -3,8 +3,7 @@
 import type { CompileErrors } from '../index';
 import * as Syntax from './index';
 import { CompileError } from '../index';
-
-const { isArray } = Array;
+import { isArray } from '../../runtime';
 
 type NodeStackElement = Syntax.NodeOrNodes;
 type NodeVisitor = (node: NodeStackElement) => any;
@@ -63,7 +62,7 @@ export class Visitor {
     const { nodeStack } = this;
     for (let i = nodeStack.length - 1; i >= 0; i -= 1) {
       const node: NodeStackElement = nodeStack[i];
-      if (node instanceof Syntax.Node && Syntax.hasTag(node, tag)) {
+      if (Syntax.isNode(node) && Syntax.hasTag(node, tag)) {
         return node;
       }
     }
@@ -76,7 +75,7 @@ export class Visitor {
     return visitNode(startNode);
 
     function visitNode(node: NodeStackElement): NodeStackElement {
-      if (!(node instanceof Syntax.Node) && !isArray(node)) {
+      if (!Syntax.isNode(node) && !isArray(node)) {
         return node;
       }
 
@@ -168,11 +167,6 @@ export class Visitor {
         group = [];
       }
     }
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  isNode(node: Syntax.Node) {
-    return node instanceof Syntax.Node;
   }
 
   // eslint-disable-next-line class-methods-use-this

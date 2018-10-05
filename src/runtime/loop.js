@@ -3,11 +3,7 @@
 import { isArray, isObject } from './index';
 import { isGenerator, generateArray, generateObject } from './generator';
 
-export type Collection = any[] | any | Function;
-
-const EmptyCollection: Collection = [];
-
-export function createIterator(collection: Collection) {
+export function createIterator(collection: any) {
   if (isArray(collection)) {
     return generateArray(collection);
   }
@@ -17,5 +13,5 @@ export function createIterator(collection: Collection) {
   if (isObject(collection)) {
     return generateObject(collection);
   }
-  return EmptyCollection;
+  return [];
 }

@@ -158,7 +158,7 @@ class BasePatternEvaluator extends LikeComparisonEvaluator {
     switch (node.tag) {
       case 'objectPattern':
       case 'arrayPattern':
-        new NestedPatternEvaluator(this, node).evaluate();
+        new NestedPatternEvaluator(this, (node: any)).evaluate();
         break;
       case 'context':
         this.coder.write(this.coder.literal(true));
@@ -167,8 +167,9 @@ class BasePatternEvaluator extends LikeComparisonEvaluator {
         if (Syntax.hasAnnotation(node, 'pattern/equality')) {
           this.createLikeComparison(
             () => {
-              let localName = Syntax.getAnnotation(node, 'pattern/local');
-              localName = this.coder.registerAnonymous(localName);
+              const localName = this.coder.registerAnonymous(
+                (Syntax.getAnnotation(node, 'pattern/local'): any),
+              );
               this.coder.retrieveAnonymous(localName);
             },
             node,
@@ -225,8 +226,9 @@ export class NestedPatternEvaluator extends BasePatternEvaluator {
 
   evaluate(...args: any[]) {
     const self = this;
-    let parentLocal = Syntax.getAnnotation(this.node, 'pattern/local');
-    parentLocal = self.coder.registerAnonymous(parentLocal);
+    const parentLocal = self.coder.registerAnonymous(
+      (Syntax.getAnnotation(this.node, 'pattern/local'): any),
+    );
 
     const isObject = this.node instanceof Syntax.ObjectPattern;
     const containerCheckName = isObject ? 'isObject' : 'isArray';
@@ -278,7 +280,7 @@ export class NestedPatternEvaluator extends BasePatternEvaluator {
     }
 
     function generateEquality(elementValue: Syntax.Node,
-      elementIndex: Target.BodyEntry) {
+                              elementIndex: Target.BodyEntry) {
       if (elementValue instanceof Syntax.Literal) {
         return () => {
           self.createLikeComparison(value, elementValue);
@@ -297,7 +299,7 @@ export class NestedPatternEvaluator extends BasePatternEvaluator {
     }
 
     function generateNested(element: Syntax.Node, elementValue: Syntax.Node,
-      elementIndex: Target.BodyEntry) {
+                            elementIndex: Target.BodyEntry) {
       let elementLocal = Syntax.getAnnotation(element, 'pattern/local');
       elementLocal = self.coder.registerAnonymous(elementLocal);
 

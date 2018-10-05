@@ -19,6 +19,10 @@ export const isObject: Pattern = definePattern(
   (value: any) => typeof value === 'object' && value !== null && !isArray(value),
 );
 
+export const isObjectOrArray: Pattern = definePattern(
+  (value: any) => typeof value === 'object' && value !== null,
+);
+
 export const isFalse: Pattern = definePattern(
   (value: any) => value === false || value === null || value === undefined,
 );
@@ -54,8 +58,8 @@ export function definePattern(pattern: Pattern) {
   return wrapped;
 }
 
-const CachedTrue = 'true';
-const CachedFalse = 'false';
+const cachedTrue = 'true';
+const cachedFalse = 'false';
 
 export function defineCachedPattern(pattern: Pattern) {
   const wrapped = coerceBooleanResult(pattern);
@@ -70,11 +74,11 @@ export function defineCachedPattern(pattern: Pattern) {
 
     const cached = cache.get(value);
     if (cached) {
-      return cached === CachedTrue;
+      return cached === cachedTrue;
     }
 
     const result = wrapped(value);
-    cache.set(value, result ? CachedTrue : CachedFalse);
+    cache.set(value, result ? cachedTrue : cachedFalse);
     return result;
   }
 }

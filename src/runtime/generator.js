@@ -1,11 +1,13 @@
 /** @flow */
 
+import { isObjectOrArray } from './pattern';
+
 type Indexed = Generator<[any, number], void, void>;
 type Keyed = Generator<[any, string], void, void>;
 
 // Checking for an already instantiated generator
 export function isGenerator(value: any) {
-  if (value === null || typeof value !== 'object') {
+  if (!isObjectOrArray(value)) {
     return false;
   }
   return typeof value.next === 'function' && value.next.length === 1;

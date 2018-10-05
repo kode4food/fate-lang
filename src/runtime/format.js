@@ -1,5 +1,7 @@
 /** @flow */
 
+import { isObject, isArray } from './pattern';
+
 type Component = [number, string | number];
 
 export type FormatFunction = {
@@ -8,16 +10,14 @@ export type FormatFunction = {
   __fateIndexes: (string | number)[];
 }
 
-const Digits = '0|[1-9][0-9]*';
-const Ident = '[$_a-zA-Z][$_a-zA-Z0-9]*';
-const Term = ';?';
-const Params = `%((%)|(${Digits})|(${Ident}))?${Term}`;
-/* "%" ( "%" | digits | identifier )? ";"? */
-
-const ParamRegex = new RegExp(Params, 'm');
+const digits = '0|[1-9][0-9]*';
+const ident = '[$_a-zA-Z][$_a-zA-Z0-9]*';
+const term = ';?';
+const params = `%((%)|(${digits})|(${ident}))?${term}`;
+const paramRegex = new RegExp(params, 'm');
 
 export function isFormatter(value: string) {
-  if (!ParamRegex.test(value)) {
+  if (!paramRegex.test(value)) {
     return false;
   }
   return buildFormatter(value).__fateIndexes.length > 0;
@@ -37,7 +37,7 @@ export function buildFormatter(formatStr: string): FormatFunction {
 
   let workStr = `${formatStr}`;
   while (workStr && workStr.length) {
-    const paramMatch = ParamRegex.exec(workStr);
+    const paramMatch = paramRegex.exec(workStr);
     if (!paramMatch) {
       components.push(createLiteralComponent(workStr));
       break;
@@ -79,9 +79,9 @@ export function buildFormatter(formatStr: string): FormatFunction {
     return formatStr;
   }
 
-  function formatFunction(data: any | any[]) {
+  function formatFunction(data: any) {
     let d = data;
-    if (typeof d !== 'object' || d === null) {
+    if (!isObject(d) && !isArray(d)) {
       d = [d];
     }
 
@@ -93,7 +93,7 @@ export function buildFormatter(formatStr: string): FormatFunction {
           result += component[1];
           break;
         case 1:
-          result += d[component[1]];
+          result += d[(component[1]: any)];
           break;
         default:
           throw new Error('Stupid Coder: Default switch case');

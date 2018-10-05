@@ -3,8 +3,7 @@
 import type { Tag, TagOrTags } from './index';
 import type { Annotated, Annotations } from './annotation';
 import { node } from './index';
-
-const { isArray } = Array;
+import { isObject, isArray } from '../../runtime';
 
 export type Nodes = Node[];
 export type NodeOrNodes = Node | Nodes;
@@ -24,7 +23,15 @@ export type ObjectElements = ObjectAssignment[];
 export type CollectionPatternElement = Expression | PatternElement;
 export type CollectionPatternElements = CollectionPatternElement[];
 
-export class Node {
+export type Node = {
+  tag: Tag;
+  annotations: Annotations;
+  line: number;
+  column: number;
+  length: number;
+}
+
+export class BasicNode {
   tag: Tag;
   visitorKeys: string[];
   annotations: Annotations;
@@ -41,11 +48,11 @@ export class Node {
   }
 }
 
-export function hasTag(n: Node, tags?: TagOrTags): any {
-  if (!(n instanceof Node)) {
-    return false;
-  }
+export function isNode(n: NodeOrNodes): boolean {
+  return isObject(n) && Object.prototype.hasOwnProperty.call(n, 'tag');
+}
 
+export function hasTag(n: Node, tags?: TagOrTags): any {
   if (tags === undefined) {
     return n.tag;
   }
@@ -63,7 +70,7 @@ export function hasTag(n: Node, tags?: TagOrTags): any {
 
 // Expression Nodes *********************************************************
 
-export class Expression extends Node {}
+export class Expression extends BasicNode {}
 export class Operator extends Expression {}
 
 export class Parens extends Expression {
@@ -84,7 +91,15 @@ export class UnaryOperator extends Operator {
   }
 }
 
-export class FormatOperator extends UnaryOperator {}
+export class FormatOperator extends Operator {
+  left: Literal;
+
+  constructor(left: Literal) {
+    super();
+    this.left = left;
+  }
+}
+
 export class PositiveOperator extends UnaryOperator {}
 export class NegativeOperator extends UnaryOperator {}
 export class NotOperator extends UnaryOperator {}
@@ -268,7 +283,7 @@ export class MatchExpression extends Expression {
   }
 }
 
-export class MatchClause extends Node {
+export class MatchClause extends BasicNode {
   pattern: Pattern;
   statements: Statements;
 
@@ -316,9 +331,9 @@ export class ObjectComprehension extends ListComprehension {}
 
 // Statement Nodes **********************************************************
 
-export class Statement extends Node {}
+export class Statement extends BasicNode {}
 
-export class Statements extends Node {
+export class Statements extends BasicNode {
   statements: Statement[];
 
   constructor(statements: Statement[]) {
@@ -524,7 +539,7 @@ export class ExportStatement extends Statement {
 
 // Symbol Nodes *************************************************************
 
-export class Symbol extends Node {}
+export class Symbol extends BasicNode {}
 
 export class Identifier extends Symbol {
   value: string;
@@ -589,7 +604,7 @@ export class PatternElement extends PatternSymbol {
 
 // Supporting Nodes *********************************************************
 
-export class Range extends Node {
+export class Range extends BasicNode {
   valueId: Identifier;
   nameId: Identifier;
   collection: Expression;
@@ -605,7 +620,7 @@ export class Range extends Node {
   }
 }
 
-export class Signature extends Node {
+export class Signature extends BasicNode {
   id: Identifier;
   params: Parameters;
   guard: Expression;
@@ -625,7 +640,7 @@ export const Cardinality = {
 
 export type CardinalityValue = $Values<typeof Cardinality>;
 
-export class Parameter extends Node {
+export class Parameter extends BasicNode {
   id: Identifier;
   cardinality: CardinalityValue;
 
@@ -639,14 +654,13 @@ export class Parameter extends Node {
 export class PatternParameter extends Parameter {
   pattern: Pattern;
 
-  constructor(id: Identifier, pattern: Pattern,
-              cardinality: CardinalityValue) {
+  constructor(id: Identifier, pattern: Pattern, cardinality: CardinalityValue) {
     super(id, cardinality);
     this.pattern = pattern;
   }
 }
 
-export class ImportModuleItem extends Node {
+export class ImportModuleItem extends BasicNode {
   moduleKey: Literal;
   id: Identifier;
 
@@ -657,7 +671,7 @@ export class ImportModuleItem extends Node {
   }
 }
 
-export class ExportModuleItem extends Node {
+export class ExportModuleItem extends BasicNode {
   id: Identifier;
   moduleKey: Literal;
 
@@ -668,7 +682,7 @@ export class ExportModuleItem extends Node {
   }
 }
 
-export class ModuleSpecifier extends Node {
+export class ModuleSpecifier extends BasicNode {
   path: ModulePath;
   alias: Identifier;
 
@@ -681,7 +695,7 @@ export class ModuleSpecifier extends Node {
 
 export class ModulePath extends Identifier {}
 
-export class Assignment extends Node {
+export class Assignment extends BasicNode {
   value: Expression;
 
   constructor(value: Expression) {
@@ -734,7 +748,7 @@ export class ObjectDestructure extends Assignment {
   }
 }
 
-export class ObjectDestructureItem extends Node {
+export class ObjectDestructureItem extends BasicNode {
   id: Identifier;
   value: Expression;
 
@@ -745,7 +759,7 @@ export class ObjectDestructureItem extends Node {
   }
 }
 
-export class ObjectAssignment extends Node {
+export class ObjectAssignment extends BasicNode {
   id: Expression;
   value: Expression;
 
@@ -756,7 +770,7 @@ export class ObjectAssignment extends Node {
   }
 }
 
-export class Select extends Node {
+export class Select extends BasicNode {
   value: Expression;
   name: ?Expression;
 

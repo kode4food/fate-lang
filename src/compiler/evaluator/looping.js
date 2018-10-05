@@ -6,6 +6,8 @@ import { NodeEvaluator } from './evaluator';
 
 type IdMapping = { id: string, anon: string };
 
+const noSuccessVar = '';
+
 export class ReduceEvaluator extends NodeEvaluator {
   static tags = ['reduce'];
   node: Syntax.ReduceExpression;
@@ -40,7 +42,7 @@ export class ReduceEvaluator extends NodeEvaluator {
 }
 
 class LoopEvaluator extends NodeEvaluator {
-  createLoop(ranges: Syntax.Ranges, createBody: Function, successVar: string) {
+  createLoop(ranges: Syntax.Ranges, successVar: string, createBody: Function) {
     const self = this;
     processRange(0);
 
@@ -61,7 +63,6 @@ class LoopEvaluator extends NodeEvaluator {
       let guardFunc: Function;
 
       if (range.guard) {
-        // we have a guard
         guardFunc = () => {
           self.coder.ifStatement(self.defer(range.guard), null, () => {
             self.coder.loopContinue();
@@ -195,7 +196,7 @@ export class ForEvaluator extends LoopEvaluator {
 
     function generateForLoop(successVar: string) {
       self.coder.statement(() => {
-        self.createLoop(self.node.ranges, generateBody, successVar);
+        self.createLoop(self.node.ranges, successVar, generateBody);
       });
     }
 
@@ -228,7 +229,7 @@ export class ForExpressionEvaluator extends LoopEvaluator {
 
     function counterBody() {
       self.coder.createCounter('idx');
-      self.createLoop(self.node.ranges, () => {
+      self.createLoop(self.node.ranges, noSuccessVar, () => {
         self.coder.emitStatement(() => {
           self.coder.array([
             self.defer(self.node.select.value),
@@ -241,7 +242,7 @@ export class ForExpressionEvaluator extends LoopEvaluator {
     }
 
     function namedBody() {
-      self.createLoop(self.node.ranges, () => {
+      self.createLoop(self.node.ranges, noSuccessVar, () => {
         self.coder.emitStatement(() => {
           self.coder.array([
             self.defer(self.node.select.value),

@@ -1,6 +1,8 @@
 /** @flow */
 
 import type { Evaluator } from './evaluator';
+import type { BodyEntries } from '../target';
+
 import * as Syntax from '../syntax';
 import { NodeEvaluator } from './evaluator';
 
@@ -23,11 +25,8 @@ export class ConditionalEvaluator extends NodeEvaluator {
 }
 
 class IfGeneratingEvaluator extends NodeEvaluator {
-  generateIf(
-    condition: Function,
-    thenStatements: Syntax.Statements,
-    elseStatements: Syntax.Statements,
-  ) {
+  generateIf(condition: Function, thenStatements: Syntax.Statements,
+             elseStatements: Syntax.Statements) {
     const thens = thenStatements.isEmpty() ? null : thenStatements;
     const elses = elseStatements.isEmpty() ? null : elseStatements;
 
@@ -72,7 +71,7 @@ export class IfLetEvaluator extends IfGeneratingEvaluator {
     this.dispatch(letStatement);
 
     const { assignments } = letStatement;
-    const conditions: string[] = [];
+    const conditions: BodyEntries = [];
     assignments.forEach((assignment) => {
       assignment.getIdentifiers().forEach((id) => {
         conditions.push(
