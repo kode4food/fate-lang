@@ -28,7 +28,7 @@
   "dependencies": {
     "glob": "^7.1.1",
     "minimist": "^1.2.0",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.4",
     "node-uuid": "^1.4.7"
   },
   "devDependencies": {
