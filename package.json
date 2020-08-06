@@ -40,7 +40,7 @@
     "gulp-nodeunit": "0.0.5",
     "gulp-peg": "^0.2.0",
     "gulp-rename": "^1.2.2",
-    "gulp-replace": "^0.5.4",
+    "gulp-replace": "^1.0.0",
     "gulp-tslint": "^6.1.3",
     "gulp-typescript": "^3.1.2",
     "nodeunit": "^0.10.2",
